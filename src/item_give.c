@@ -1319,6 +1319,8 @@ RECOMP_PATCH s32 Actor_OfferGetItem(Actor* actor, PlayState* play, GetItemId get
     u32 i;
     u8 item;
 
+    return Actor_OfferGetItemHook(actor, play, getItemId, 0, xzRange, yRange, false, false);
+
     if (!(player->stateFlags1 &
           (PLAYER_STATE1_80 | PLAYER_STATE1_1000 | PLAYER_STATE1_2000 | PLAYER_STATE1_4000 | PLAYER_STATE1_40000 |
            PLAYER_STATE1_80000 | PLAYER_STATE1_100000 | PLAYER_STATE1_200000)) &&

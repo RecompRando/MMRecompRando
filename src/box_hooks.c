@@ -182,6 +182,8 @@ RECOMP_PATCH void EnBox_Init(Actor* thisx, PlayState* play) {
         this->getItemId = rando_get_item_id(LOCATION_ENBOX);
     }
 
+    this->getItemId = ENBOX_GET_ITEM(thisx);
+
     if (Flags_GetTreasure(play, ENBOX_GET_CHEST_FLAG(&this->dyna.actor)) || this->getItemId == GI_NONE) {
         switch (vanillaType) {
             case ENBOX_TYPE_BIG_INVISIBLE:

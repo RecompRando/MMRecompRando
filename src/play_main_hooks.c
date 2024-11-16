@@ -20,7 +20,7 @@ PlayState* gPlay;
 RECOMP_CALLBACK("*", recomp_on_init)
 void call_rando_init()
 {
-    rando_init();
+    //~ rando_init();
 
     recomp_set_moon_crash_resets_save(false);
     recomp_set_fd_anywhere(true);
@@ -265,7 +265,7 @@ void update_rando(PlayState* play) {
 
     gPlay = play;
 
-    if (saveOpened) {
+    if (false && saveOpened) {
         new_items_size = rando_get_items_size();
 
         if (!initItems) {

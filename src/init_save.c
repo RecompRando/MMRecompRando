@@ -87,7 +87,7 @@ RECOMP_PATCH void Sram_InitDebugSave(void) {
 
     Lib_MemCpy(&gSaveContext.save.saveInfo.playerData, &sSaveDefaultPlayerData, sizeof(SavePlayerData));
     Lib_MemCpy(&gSaveContext.save.saveInfo.equips, &sSaveDefaultItemEquips, sizeof(ItemEquips));
-    Lib_MemCpy(&gSaveContext.save.saveInfo.inventory, &sSaveDefaultInventory, sizeof(Inventory));
+    Lib_MemCpy(&gSaveContext.save.saveInfo.inventory, &sSaveDebugInventory, sizeof(Inventory));
     gSaveContext.save.saveInfo.checksum = 0;
     
     gSaveContext.save.playerForm = PLAYER_FORM_HUMAN;
