@@ -218,7 +218,8 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
                 if (count_msg == count_done_str) {
                     break;
                 }
-                u8 swamp_token_count = ((rando_skulltulas_enabled()) ? rando_has_item(GI_SKULL_TOKEN) : Inventory_GetSkullTokenCount(0x27));
+                //~ u8 swamp_token_count = ((rando_skulltulas_enabled()) ? rando_has_item(GI_SKULL_TOKEN) : Inventory_GetSkullTokenCount(0x27));
+                u8 swamp_token_count = 69;
                 u8 count_suffix[2] = "th";
                 if ((swamp_token_count % 10) == 1 && swamp_token_count != 11) {
                     count_suffix[0] = 's';
