@@ -4,6 +4,7 @@
 #include "modding.h"
 #include "global.h"
 
+#define GI_BAG_BOMBCHU GI_74
 #define GI_TRUE_SKULL_TOKEN GI_75
 
 #define AP_ITEM_ID_STRAY_FAIRY_WOODFALL 0x010000

@@ -89,7 +89,7 @@ GetItemEntry sGetItemTable_ap[GI_MAX - 1] = {
     GET_ITEM(ITEM_RECOVERY_HEART, OBJECT_GI_HEART, GID_RECOVERY_HEART, 0xB,
              GIFIELD(GIFIELD_20 | GIFIELD_NO_COLLECTIBLE, 0), CHEST_ANIM_LONG),
     // GI_HEART_PIECE
-    GET_ITEM(ITEM_HEART_PIECE_2, OBJECT_UNSET_0, GID_BAG_BOMBCHU, 0xC,
+    GET_ITEM(ITEM_HEART_PIECE_2, OBJECT_GI_HEARTS, GID_HEART_PIECE, 0xC,
              GIFIELD(GIFIELD_20 | GIFIELD_NO_COLLECTIBLE, 0), CHEST_ANIM_LONG),
     // GI_HEART_CONTAINER
     GET_ITEM(ITEM_HEART_CONTAINER, OBJECT_GI_HEARTS, GID_HEART_CONTAINER, 0xD,
@@ -358,7 +358,7 @@ GetItemEntry sGetItemTable_ap[GI_MAX - 1] = {
     // GI_73
     GET_ITEM(ITEM_NONE, OBJECT_UNSET_0, GID_NONE, 0x73, 0, 0),
     // GI_74
-    GET_ITEM(ITEM_NONE, OBJECT_UNSET_0, GID_NONE, 0x74, 0, 0),
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_UNSET_0, GID_BAG_BOMBCHU, 0x74, 0, 0),
     // GI_75
     GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_SUTARU, GID_SKULL_TOKEN, 0x75, GIFIELD(GIFIELD_NO_COLLECTIBLE, 0), CHEST_ANIM_SHORT),
     // GI_ICE_TRAP
@@ -552,7 +552,7 @@ GetItemEntry sGetItemTable_ap[GI_MAX - 1] = {
 };
 
 bool isAP(s16 gi) {
-    return gi == GI_AP_FILLER || gi == GI_AP_PROG || gi == GI_AP_USEFUL || gi == GI_HEART_PIECE;
+    return gi == GI_AP_FILLER || gi == GI_AP_PROG || gi == GI_AP_USEFUL || gi == GI_BAG_BOMBCHU;
 }
 
 u8 getItem(s16 gi) {
@@ -1821,6 +1821,12 @@ u8 randoItemGive(u32 gi) {
         Inventory_IncrementSkullTokenCount(0x27);
         return ITEM_NONE;
 
+    } else if (gi == GI_BAG_BOMBCHU) {
+        if (!INV_HAS(ITEM_BOMBCHU)) {
+            INV_CONTENT(ITEM_BOMBCHU) = ITEM_BOMBCHU;
+        }
+        return ITEM_NONE;
+
     } else if (item == ITEM_DEED_LAND) {
         INV_CONTENT(ITEM_DEED_LAND) = ITEM_DEED_LAND;
         return ITEM_NONE;
@@ -2075,6 +2081,9 @@ u8 randoItemGive(u32 gi) {
         return ITEM_NONE;
 
     } else if (item == ITEM_BOMBCHU) {
+        if (!rando_has_item(GI_BAG_BOMBCHU)) {
+            return item;
+        }
         u8 max_bombchus = MAX(CUR_CAPACITY(UPG_BOMB_BAG), 10);
         if (INV_CONTENT(ITEM_BOMBCHU) != ITEM_BOMBCHU) {
             INV_CONTENT(ITEM_BOMBCHU) = ITEM_BOMBCHU;
@@ -2087,6 +2096,9 @@ u8 randoItemGive(u32 gi) {
         return ITEM_NONE;
 
     } else if ((item >= ITEM_BOMBCHUS_20) && (item <= ITEM_BOMBCHUS_5)) {
+        if (!rando_has_item(GI_BAG_BOMBCHU)) {
+            return item;
+        }
         u8 max_bombchus = MAX(CUR_CAPACITY(UPG_BOMB_BAG), 10);
         if (gSaveContext.save.saveInfo.inventory.items[SLOT_BOMBCHU] != ITEM_BOMBCHU) {
             INV_CONTENT(ITEM_BOMBCHU) = ITEM_BOMBCHU;
