@@ -38,6 +38,11 @@
 #define GID_DEFENSE_DOUBLE (GID_MASK_FIERCE_DEITY + 12)
 #define GID_OCEAN_SKULL_TOKEN (GID_MASK_FIERCE_DEITY + 13)
 
+#define GID_SF_WOODFALL (GID_MASK_FIERCE_DEITY + 14)
+#define GID_SF_SNOWHEAD (GID_MASK_FIERCE_DEITY + 15)
+#define GID_SF_GREATBAY (GID_MASK_FIERCE_DEITY + 16)
+#define GID_SF_STONETOWER (GID_MASK_FIERCE_DEITY + 17)
+
 #define GID_APLOGO_FILLER GID_37
 #define GID_APLOGO_PROG GID_46
 #define GID_APLOGO_USEFUL GID_4C
@@ -71,6 +76,8 @@ RECOMP_IMPORT(".", void rando_complete_goal());
 RECOMP_IMPORT(".", u32 rando_has_item(u32 item_id));
 RECOMP_IMPORT(".", u32 rando_get_items_size());
 RECOMP_IMPORT(".", u32 rando_get_item(u32 items_i));
+RECOMP_IMPORT(".", u32 rando_get_unconverted_item_id(u32 location_id));
+RECOMP_IMPORT(".", u32 rando_get_last_location());
 
 // WEEKEVENTREG_17_80: we have given the Moon's Tear to the scrub
 // WEEKEVENTREG_74_80: the Moon's Tear has fallen

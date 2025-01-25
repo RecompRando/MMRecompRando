@@ -28,7 +28,11 @@ extern s32 sCharTexScale;
 extern s32 D_801F6B08;
 
 static unsigned char ap_msg[128] = "You got an\x01 AP item\x00!\xbf";
-static unsigned char sf_msg[128] = "You got a\x05 Stray Fairy\x00!\xbf";
+static unsigned char ctsf_msg[128] = "You found\x08 Clock Town's\x06 Stray Fairy\x00!\xbf";
+static unsigned char wfsf_msg[128] = "You found a\x02 Woodfall\x06 Stray Fairy\x00!\xbf";
+static unsigned char shsf_msg[128] = "You found a\x05 Snowhead\x06 Stray Fairy\x00!\xbf";
+static unsigned char gbsf_msg[128] = "You found a\x03 Great Bay\x06 Stray Fairy\x00!\xbf";
+static unsigned char stsf_msg[128] = "You found a\x04 Stone Tower\x06 Stray Fairy\x00!\xbf";
 static unsigned char sot_msg[128] = "You got the\x05 Song of Time\x00!\xbf";
 static unsigned char soh_msg[128] = "You got the\x05 Song of Healing\x00!\xbf";
 static unsigned char es_msg[128] = "You got\x05 Epona's Song\x00!\xbf";
@@ -41,10 +45,15 @@ static unsigned char eoe_msg[128] = "You got the\x05 Elegy of Emptiness\x00!\xbf
 static unsigned char oto_msg[128] = "You got the\x05 Oath to Order\x00!\xbf";
 static unsigned char ssht_msg[128] = "You got a\x02 Swamp Token\x00!\xbf";
 static unsigned char osht_msg[128] = "You got an\x03 Ocean Token\x00!\xbf";
-static unsigned char hp_msg[128] = "You got a\x06 Heart Piece\x00!\xbf";
+static unsigned char sword_msg[128] = "You got the\x01 Kokiri Sword\x00!\xbf";
+static unsigned char spin_msg[128] = "You mastered the\x01 Spin Attack\x00!\xbf";
+static unsigned char sk_msg[128] = "You got a\x01 Small Key\x00! \xbf";
+static unsigned char bk_msg[128] = "You got the\x01 Boss Key\x00! \xbf";
+static unsigned char map_msg[128] = "You found a\x01 Map\x00! \xbf";
+static unsigned char compass_msg[128] = "You found a\x01 Compass\x00! \xbf";
 
 static unsigned char p_monkey_msg[128] = "Keep this\x01 picture of a monkey\x00?\x02\x11\x11\xc2Yes\x11No\xbf";
-static unsigned char p_big_octo_msg[128] = "Keep this\x01 picture of a big octo\x00?\x02\x11\x11\xc2Yes\x11No\xbf";
+static unsigned char p_big_octo_msg[128] = "Keep this\x01 picture of an Octorok\x00?\x02\x11\x11\xc2Yes\x11No\xbf";
 static unsigned char p_lulu_good_msg[128] = "Keep this\x01 good picture of Lulu\x00?\x02\x11\x11\xc2Yes\x11No\xbf";
 static unsigned char p_lulu_bad_msg[128] = "Keep this\x01 bad picture of Lulu\x00?\x02\x11\x11\xc2Yes\x11No\xbf";
 static unsigned char p_scarecrow_msg[128] = "Keep this\x01 picture of a scarecrow\x00?\x02\x11\x11\xc2Yes\x11No\xbf";
@@ -94,6 +103,16 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         }
     } else if ((textId == 0x92) && (play->sceneId == SCENE_KOEPONARACE)) {
         textId = 0xCD;
+    } else if ((textId == 0xC) && ((GET_QUEST_HEART_PIECE_COUNT - 1) != 0)) {
+        textId = GET_QUEST_HEART_PIECE_COUNT - 1;
+        textId += 0xC4;
+        if (textId == 0xC3) {
+            textId = 0xC7;
+        }
+    } else if (textId == 0x37) {
+        if (rando_get_unconverted_item_id(rando_get_last_location()) != 0x37) {
+            textId = 0xCA;
+        }
     }
 
     msgCtx->currentTextId = textId;
@@ -165,8 +184,11 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
     msgCtx->decodedTextLen = 0;
 
     switch (textId) {
-        case 0xC:
-            msg = hp_msg;
+        case 0x37:
+            msg = sword_msg;
+            break;
+        case 0xCA:
+            msg = spin_msg;
             break;
         case 0x72:
             msg = osht_msg;
@@ -205,7 +227,19 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
             msg = sot_msg;
             break;
         case 0xB2:
-            msg = sf_msg;
+            msg = ctsf_msg;
+            break;
+        case 0x46:
+            msg = wfsf_msg;
+            break;
+        case 0x47:
+            msg = shsf_msg;
+            break;
+        case 0x48:
+            msg = gbsf_msg;
+            break;
+        case 0x49:
+            msg = stsf_msg;
             break;
         case GI_AP_FILLER:
         case GI_AP_PROG:
@@ -244,6 +278,18 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         case 0x3545:
             msg = slow_dog_msg;
             break;
+        case 0x3C:
+            msg = sk_msg;
+            break;
+        case 0x3D:
+            msg = bk_msg;
+            break;
+        case 0x3E:
+            msg = map_msg;
+            break;
+        case 0x3F:
+            msg = compass_msg;
+            break;
     }
 
     if (msg != NULL) {
@@ -258,11 +304,79 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         }
     }
 
-    if (textId == 0xF8)
-    {
+    if (textId == 0xF8) {
         font->msgBuf.schar[0] = 0x06;
         font->msgBuf.schar[1] = 0x71;
     }
+
+    if (msg == sk_msg || msg == bk_msg || msg == map_msg || msg == compass_msg) {
+        u8* dungeon_msg;
+        u8 wf_str[128] = "\x02(Woodfall)\x00\xbf";
+        u8 sh_str[128] = "\x05(Snowhead)\x00\xbf";
+        u8 gb_str[128] = "\x03(Great Bay)\x00\xbf";
+        u8 st_str[128] = "\x04(Stone Tower)\x00\xbf";
+
+        s16 dungeonId = rando_get_unconverted_item_id(rando_get_last_location()) & 0xF00;
+        switch (dungeonId) {
+            case 0x000:
+                dungeon_msg = wf_str;
+                break;
+            case 0x100:
+                dungeon_msg = sh_str;
+                break;
+            case 0x200:
+                dungeon_msg = gb_str;
+                break;
+            case 0x300:
+                dungeon_msg = st_str;
+                break;
+        }
+        u8 end_i = i + 11;
+        for (i = 0; i < 128; ++i) {
+            font->msgBuf.schar[end_i + i] = dungeon_msg[i];
+            if (dungeon_msg[i] == 0xBF) {
+                break;
+            }
+        }
+
+        // small key count
+        if (msg == sk_msg) {
+            u8 count_str[128] = "\x11This is your \xbf";
+            u8* count_msg = count_str;
+            u8 new_end_i = end_i + i;
+            for (i = 0; i < 128; ++i) {
+                font->msgBuf.schar[new_end_i + i] = count_msg[i];
+                if (count_msg[i] == 0xBF) {
+                    u8 key_count = DUNGEON_KEY_COUNT(dungeonId / 0x100);
+                    u8 count_suffix[2] = "th";
+                    if ((key_count % 10) == 1 && key_count != 11) {
+                        count_suffix[0] = 's';
+                        count_suffix[1] = 't';
+                    } else if ((key_count % 10) == 2 && key_count != 12) {
+                        count_suffix[0] = 'n';
+                        count_suffix[1] = 'd';
+                    } else if ((key_count % 10) == 3 && key_count != 13) {
+                        count_suffix[0] = 'r';
+                        count_suffix[1] = 'd';
+                    }
+                    font->msgBuf.schar[new_end_i + i] = 0x01;
+                    i += 1;
+                    if (key_count >= 10) {
+                        font->msgBuf.schar[new_end_i + i] = (key_count / 10) + 0x30;
+                        i += 1;
+                    }
+                    font->msgBuf.schar[new_end_i + i] = (key_count % 10) + 0x30;
+                    font->msgBuf.schar[new_end_i + i + 1] = count_suffix[0];
+                    font->msgBuf.schar[new_end_i + i + 2] = count_suffix[1];
+                    font->msgBuf.schar[new_end_i + i + 3] = 0x00;
+                    font->msgBuf.schar[new_end_i + i + 4] = '.';
+                    font->msgBuf.schar[new_end_i + i + 5] = 0xBF;
+                    break;
+                }
+            }
+        }
+    }
+    
 
     if (msg == ssht_msg) {
         u8 count_str[128] = "\x11This is your \xbf";
@@ -305,8 +419,7 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
                 break;
             }
         }
-    }
-    else if (msg == osht_msg) {
+    } else if (msg == osht_msg) {
         u8 count_str[128] = "\x11This is your \xbf";
         u8 count_done_str[128] = "\x11You've found all of them!\xbf";
         u8* count_msg = count_str;
@@ -339,6 +452,47 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
                     i += 1;
                 }
                 font->msgBuf.schar[end_i + i] = (ocean_token_count % 10) + 0x30;
+                font->msgBuf.schar[end_i + i + 1] = count_suffix[0];
+                font->msgBuf.schar[end_i + i + 2] = count_suffix[1];
+                font->msgBuf.schar[end_i + i + 3] = 0x00;
+                font->msgBuf.schar[end_i + i + 4] = '.';
+                font->msgBuf.schar[end_i + i + 5] = 0xBF;
+                break;
+            }
+        }
+    } else if (msg == wfsf_msg || msg == shsf_msg || msg == gbsf_msg || msg == stsf_msg) {
+        u8 count_str[128] = "\x11This is your \xbf";
+        u8 count_done_str[128] = "\x11You've found all of them!\xbf";
+        u8* count_msg = count_str;
+        if (gSaveContext.save.saveInfo.inventory.strayFairies[textId - 0x46] >= 0xF) {
+            count_msg = count_done_str;
+        }
+        u8 end_i = i + 11;
+        for (i = 0; i < 128; ++i) {
+            font->msgBuf.schar[end_i + i] = count_msg[i];
+            if (count_msg[i] == 0xBF) {
+                if (count_msg == count_done_str) {
+                    break;
+                }
+                u8 fairy_count = gSaveContext.save.saveInfo.inventory.strayFairies[textId - 0x46];
+                u8 count_suffix[2] = "th";
+                if ((fairy_count % 10) == 1 && fairy_count != 11) {
+                    count_suffix[0] = 's';
+                    count_suffix[1] = 't';
+                } else if ((fairy_count % 10) == 2 && fairy_count != 12) {
+                    count_suffix[0] = 'n';
+                    count_suffix[1] = 'd';
+                } else if ((fairy_count % 10) == 3 && fairy_count != 13) {
+                    count_suffix[0] = 'r';
+                    count_suffix[1] = 'd';
+                }
+                font->msgBuf.schar[end_i + i] = 0x01;
+                i += 1;
+                if (fairy_count >= 10) {
+                    font->msgBuf.schar[end_i + i] = (fairy_count / 10) + 0x30;
+                    i += 1;
+                }
+                font->msgBuf.schar[end_i + i] = (fairy_count % 10) + 0x30;
                 font->msgBuf.schar[end_i + i + 1] = count_suffix[0];
                 font->msgBuf.schar[end_i + i + 2] = count_suffix[1];
                 font->msgBuf.schar[end_i + i + 3] = 0x00;
