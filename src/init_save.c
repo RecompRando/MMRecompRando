@@ -358,7 +358,7 @@ RECOMP_PATCH void Sram_SaveEndOfCycle(PlayState* play) {
     }
 
     sceneId = Play_GetOriginalSceneId(play->sceneId);
-    Play_SaveCycleSceneFlags(&play->state);
+    Play_SaveCycleSceneFlags(play);
 
     // sPersistentCycleSceneFlags override
     sPersistentCycleSceneFlags[SCENE_PIRATE].switch1 |= (1 << 29);
@@ -479,13 +479,13 @@ RECOMP_PATCH void Sram_SaveEndOfCycle(PlayState* play) {
     //gSaveContext.save.saveInfo.skullTokenCount &= ~0x0000FFFF;
     gSaveContext.save.saveInfo.unk_EA0 = 0;
 
-    gSaveContext.save.saveInfo.unk_E64[0] = 0;
-    gSaveContext.save.saveInfo.unk_E64[1] = 0;
-    gSaveContext.save.saveInfo.unk_E64[2] = 0;
-    gSaveContext.save.saveInfo.unk_E64[3] = 0;
-    gSaveContext.save.saveInfo.unk_E64[4] = 0;
-    gSaveContext.save.saveInfo.unk_E64[5] = 0;
-    gSaveContext.save.saveInfo.unk_E64[6] = 0;
+    gSaveContext.save.saveInfo.alienInfo[0] = 0;
+    gSaveContext.save.saveInfo.alienInfo[1] = 0;
+    gSaveContext.save.saveInfo.alienInfo[2] = 0;
+    gSaveContext.save.saveInfo.alienInfo[3] = 0;
+    gSaveContext.save.saveInfo.alienInfo[4] = 0;
+    gSaveContext.save.saveInfo.alienInfo[5] = 0;
+    gSaveContext.save.saveInfo.alienInfo[6] = 0;
 
     Sram_ClearHighscores();
 

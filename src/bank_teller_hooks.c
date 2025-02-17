@@ -84,7 +84,7 @@ RECOMP_PATCH void EnGinkoMan_DepositDialogue(EnGinkoMan* this, PlayState* play) 
     switch (this->curTextId) {
         case 0x44C:
             Actor_ChangeAnimationByInfo(&this->skelAnime, sAnimationInfo, GINKO_ANIM_SITTING);
-            if (CHECK_WEEKEVENTREG(WEEKEVENTREG_10_08)) {
+            if (CHECK_WEEKEVENTREG(WEEKEVENTREG_RECEIVED_BANK_WALLET_UPGRADE)) {
                 Message_StartTextbox(play, 0x44E, &this->actor);
                 this->curTextId = 0x44E;
             } else {
@@ -120,7 +120,7 @@ RECOMP_PATCH void EnGinkoMan_DepositDialogue(EnGinkoMan* this, PlayState* play) 
                     Actor_ChangeAnimationByInfo(&this->skelAnime, sAnimationInfo, GINKO_ANIM_LEGSMACKING);
                 }
 
-                play->msgCtx.bankRupees = HS_GET_BANK_RUPEES();
+                play->msgCtx.rupeesTotal = HS_GET_BANK_RUPEES();
                 Message_StartTextbox(play, 0x45A, &this->actor);
                 this->curTextId = 0x45A;
             }
@@ -195,7 +195,7 @@ RECOMP_PATCH void EnGinkoMan_DepositDialogue(EnGinkoMan* this, PlayState* play) 
 
         case 0x465:
             Actor_ChangeAnimationByInfo(&this->skelAnime, sAnimationInfo, GINKO_ANIM_LEGSMACKING);
-            play->msgCtx.bankRupees = HS_GET_BANK_RUPEES();
+            play->msgCtx.rupeesTotal = HS_GET_BANK_RUPEES();
             Message_StartTextbox(play, 0x45A, &this->actor);
             this->curTextId = 0x45A;
             break;
@@ -271,7 +271,7 @@ RECOMP_PATCH void EnGinkoMan_DepositDialogue(EnGinkoMan* this, PlayState* play) 
                 Message_StartTextbox(play, 0x478, &this->actor);
                 this->curTextId = 0x478;
             } else {
-                play->msgCtx.bankRupees = HS_GET_BANK_RUPEES();
+                play->msgCtx.rupeesTotal = HS_GET_BANK_RUPEES();
                 Message_StartTextbox(play, 0x45A, &this->actor);
                 this->curTextId = 0x45A;
             }

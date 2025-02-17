@@ -29,14 +29,14 @@ typedef struct EnKitan {
     /* 0x2D8 */ EnKitanActionFunc actionFunc;
 } EnKitan; // size = 0x2DC
 
-void func_80C095C8(EnKitan* this, PlayState* play);
+void EnKitan_WaitForPrizeTextboxClosed(EnKitan* this, PlayState* play);
 
-RECOMP_PATCH void func_80C09648(EnKitan* this, PlayState* play) {
+RECOMP_PATCH void EnKitan_OfferPrize(EnKitan* this, PlayState* play) {
     SkelAnime_Update(&this->skelAnime);
 
     if (Actor_HasParent(&this->actor, play)) {
         this->actor.parent = NULL;
-        this->actionFunc = func_80C095C8;
+        this->actionFunc = EnKitan_WaitForPrizeTextboxClosed;
         //SET_WEEKEVENTREG(WEEKEVENTREG_RECEIVED_KEATON_HEART_PIECE);
         return;
     }

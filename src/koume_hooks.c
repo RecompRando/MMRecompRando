@@ -2,6 +2,10 @@
 #include "global.h"
 #include "z64msgevent.h"
 
+// won't build without this?
+#define MSCRIPT_CMD_EVENT_INF(flag) \
+    MSCRIPT_CMD_ID_UNSET_EVENT_INF, SCRIPT_UNPACK_8(((flag) >> 4)), SCRIPT_UNPACK_8((1 << ((flag) & 0xF)))
+
 #include "apcommon.h"
 
 #define LOCATION_KOUME_GIFT 0x000043
@@ -249,13 +253,13 @@ MsgScript D_80A5138C[] = {
     /* 0x007D 0x01 */ MSCRIPT_CMD_DONE(),
 };
 
-s32 Actor_ProcessTalkRequest(Actor* actor, GameState* gameState);
-void* func_80A50DF8(EnDnh* this, PlayState* play);
+s32 Actor_TalkOfferAccepted(Actor* actor, GameState* gameState);
+void* EnDnh_GetMsgScript(EnDnh* this, PlayState* play);
 void func_80A50F38(EnDnh* this, PlayState* play);
 void EnDnh_DoNothing(EnDnh* this, PlayState* play);
 s32 func_80A50D40(Actor* actor, PlayState* play);
 
-RECOMP_PATCH void* func_80A50DF8(EnDnh* this, PlayState* play) {
+RECOMP_PATCH void* EnDnh_GetMsgScript(EnDnh* this, PlayState* play) {
     if (rando_location_is_checked(LOCATION_KOUME_GIFT)) {
         SET_WEEKEVENTREG(WEEKEVENTREG_25_10);
     } else {

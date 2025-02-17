@@ -429,7 +429,7 @@ RECOMP_PATCH void EnTrt_SelectItem(EnTrt* this, PlayState* play) {
 
     if (EnTrt_TakeItemOffShelf(this)) {
         if (talkState == TEXT_STATE_CHOICE) {
-            func_8011552C(play, DO_ACTION_DECIDE);
+            Interface_SetAButtonDoAction(play, DO_ACTION_DECIDE);
             if (!EnTrt_TestCancelOption(this, play, CONTROLLER1(&play->state)) && Message_ShouldAdvance(play)) {
                 switch (play->msgCtx.choiceIndex) {
                     case 0:
@@ -446,7 +446,7 @@ RECOMP_PATCH void EnTrt_SelectItem(EnTrt* this, PlayState* play) {
                         break;
                 }
             }
-        } else if ((talkState == TEXT_STATE_5) && Message_ShouldAdvance(play)) {
+        } else if ((talkState == TEXT_STATE_EVENT) && Message_ShouldAdvance(play)) {
             // if (!Inventory_HasEmptyBottle()) {
             if (!Inventory_HasEmptyBottle() && !rando_shopsanity_enabled()) {
                 Audio_PlaySfx(NA_SE_SY_ERROR);

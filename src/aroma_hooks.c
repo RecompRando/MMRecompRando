@@ -8,7 +8,9 @@
 
 struct EnAl;
 
-#define FLAGS (ACTOR_FLAG_TARGETABLE | ACTOR_FLAG_FRIENDLY | ACTOR_FLAG_10 | ACTOR_FLAG_20)
+#define FLAGS                                                                                  \
+    (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_FRIENDLY | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
+     ACTOR_FLAG_DRAW_CULLING_DISABLED)
 
 #define THIS ((EnAl*)thisx)
 
@@ -424,7 +426,7 @@ MsgScript D_80BDFF24[] = {
 
 static ColliderCylinderInit sCylinderInit = {
     {
-        COLTYPE_HIT1,
+        COL_MATERIAL_HIT1,
         AT_NONE,
         AC_NONE,
         OC1_ON | OC1_TYPE_ALL,
@@ -432,11 +434,11 @@ static ColliderCylinderInit sCylinderInit = {
         COLSHAPE_CYLINDER,
     },
     {
-        ELEMTYPE_UNK1,
+        ELEM_MATERIAL_UNK1,
         { 0x00000000, 0x00, 0x00 },
         { 0x00000000, 0x00, 0x00 },
-        TOUCH_NONE | TOUCH_SFX_NORMAL,
-        BUMP_NONE,
+        ATELEM_NONE | ATELEM_SFX_NORMAL,
+        ACELEM_NONE,
         OCELEM_ON,
     },
     { 14, 62, 0, { 0, 0, 0 } },
@@ -470,7 +472,7 @@ s32 func_80BDE92C(EnAl* this, PlayState* play);
 s32 func_80BDE7FC(Actor* thisx, PlayState* play);
 s32 func_80BDEA14(EnAl* this, PlayState* play);
 
-RECOMP_PATCH u8* func_80BDEABC(EnAl* this, PlayState* play) {
+RECOMP_PATCH u8* EnAl_GetMsgScript(EnAl* this, PlayState* play) {
     Player* player = GET_PLAYER(play);
 
     if (this->scheduleResult == 3) {

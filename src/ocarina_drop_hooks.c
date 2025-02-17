@@ -5,7 +5,7 @@
 
 struct DmChar02;
 
-#define FLAGS (ACTOR_FLAG_10 | ACTOR_FLAG_20)
+#define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_DRAW_CULLING_DISABLED)
 
 #define THIS ((DmChar02*)thisx)
 
@@ -60,7 +60,7 @@ RECOMP_PATCH void DmChar02_Init(Actor* thisx, PlayState* play) {
     //if (gSaveContext.save.saveInfo.inventory.items[SLOT_OCARINA] == ITEM_NONE) {
     if (!rando_location_is_checked(GI_OCARINA_OF_TIME) || !rando_location_is_checked(LOCATION_SOT)) {
         this->animIndex = DMCHAR02_ANIM_HIT_GROUND;
-        this->actor.targetArrowOffset = 3000.0f;
+        this->actor.lockOnArrowOffset = 3000.0f;
         ActorShape_Init(&this->actor.shape, 0.0f, ActorShadow_DrawCircle, 24.0f);
         SkelAnime_InitFlex(play, &this->skelAnime, &gClockTowerOcarinaOfTimeSkel, NULL, NULL, NULL, 0);
         DmChar02_ChangeAnim(&this->skelAnime, &sAnimationInfo[DMCHAR02_ANIM_HIT_GROUND], 0);

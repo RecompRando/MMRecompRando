@@ -65,7 +65,7 @@ void BgDkjailIvy_SetupFadeOut(BgDkjailIvy* this);
 RECOMP_PATCH void BgDkjailIvy_BeginCutscene(BgDkjailIvy* this, PlayState* play) {
     if (CutsceneManager_IsNext(this->dyna.actor.csId)) {
         // CutsceneManager_StartWithPlayerCs(this->dyna.actor.csId, &this->dyna.actor);
-        func_800B7298(play, NULL, PLAYER_CSACTION_END);
+        Player_SetCsActionWithHaltedActors(play, NULL, PLAYER_CSACTION_END);
         this->fadeOutTimer = 50;
         DynaPoly_DisableCollision(play, &play->colCtx.dyna, this->dyna.bgId);
         Flags_SetSwitch(play, BG_DKJAIL_GET_SWITCH_FLAG(&this->dyna.actor));

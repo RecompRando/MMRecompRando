@@ -5,7 +5,7 @@
 
 struct DmChar03;
 
-#define FLAGS (ACTOR_FLAG_10 | ACTOR_FLAG_20)
+#define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_DRAW_CULLING_DISABLED)
 
 #define THIS ((DmChar03*)thisx)
 
@@ -45,7 +45,7 @@ RECOMP_PATCH void DmChar03_Init(Actor* thisx, PlayState* play) {
     //gSaveContext.save.playerForm = PLAYER_FORM_DEKU;
 
     this->animIndex = DMCHAR03_ANIM_FALL_OVER;
-    this->actor.targetArrowOffset = 3000.0f;
+    this->actor.lockOnArrowOffset = 3000.0f;
     this->unk_18E = false;
     ActorShape_Init(&this->actor.shape, 0.0f, ActorShadow_DrawCircle, 24.0f);
     SkelAnime_InitFlex(play, &this->skelAnime, &gDekuMaskSkel, NULL, NULL, NULL, 0);

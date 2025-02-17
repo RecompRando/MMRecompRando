@@ -25,7 +25,7 @@ s32 Player_GrabPlayer(PlayState* play, Player* this);
 s32 Player_TryCsAction(PlayState* play, Player* this, PlayerCsAction csAction);
 void func_8085B384(Player* this, PlayState* play);
 s32 Player_InflictDamage(PlayState* play, s32 damage);
-void Player_TalkWithPlayer(PlayState* play, Actor* actor);
+void Player_StartTalking(PlayState* play, Actor* actor);
 void func_8085B74C(PlayState* play);
 void func_8085B820(PlayState* play, s16 arg1);
 PlayerItemAction func_8085B854(PlayState* play, Player* this, ItemId itemId);
@@ -52,9 +52,10 @@ void Player_Action_80(Player* this, PlayState* play);
 void Player_Action_81(Player* this, PlayState* play);
 void Player_UseItem(PlayState* play, Player* this, ItemId item);
 void Player_StopHorizontalMovement(Player* this);
-void Player_AnimationPlayOnce(PlayState* play, Player* this, PlayerAnimationHeader* anim);
+void Player_Anim_PlayOnce(PlayState* play, Player* this, PlayerAnimationHeader* anim);
+PlayerAnimationHeader* Player_GetIdleAnim(Player* this);
 void func_8082DE50(PlayState* play, Player* this);
-PlayerAnimationHeader* func_8082ED20(Player* this);
+PlayerAnimationHeader* Player_GetIdleAnim(Player* this);
 void func_80836D8C(Player* this);
 
 s32 Player_TryActionChangeList(PlayState* play, Player* this, s8* actionChangeList, s32 updateUpperBody);
@@ -68,14 +69,15 @@ void func_8083CB04(Player* this, f32 arg1, s16 arg2, f32 arg3, f32 arg4, s16 arg
 void func_808309CC(PlayState* play, Player* this);
 
 static InitChainEntry sInitChain[] = {
-    ICHAIN_F32(targetArrowOffset, 500, ICHAIN_STOP),
+    ICHAIN_F32(lockOnArrowOffset, 500, ICHAIN_STOP),
 };
 
 Vec3s sPlayerSkeletonBaseTransl = { -57, 3377, 0 };
 
+// sCylinderInit
 ColliderCylinderInit D_8085C2EC = {
     {
-        COLTYPE_HIT5,
+        COL_MATERIAL_HIT5,
         AT_NONE,
         AC_ON | AC_TYPE_ENEMY,
         OC1_ON | OC1_TYPE_ALL,
@@ -83,19 +85,20 @@ ColliderCylinderInit D_8085C2EC = {
         COLSHAPE_CYLINDER,
     },
     {
-        ELEMTYPE_UNK1,
+        ELEM_MATERIAL_UNK1,
         { 0x00000000, 0x00, 0x00 },
         { 0xF7CFFFFF, 0x00, 0x00 },
-        TOUCH_NONE | TOUCH_SFX_NORMAL,
-        BUMP_ON,
+        ATELEM_NONE | ATELEM_SFX_NORMAL,
+        ACELEM_ON,
         OCELEM_ON,
     },
     { 12, 60, 0, { 0, 0, 0 } },
 };
 
+// sShieldCylinderInit
 ColliderCylinderInit D_8085C318 = {
     {
-        COLTYPE_METAL,
+        COL_MATERIAL_METAL,
         AT_ON | AT_TYPE_PLAYER,
         AC_ON | AC_HARD | AC_TYPE_ENEMY,
         OC1_NONE,
@@ -103,19 +106,20 @@ ColliderCylinderInit D_8085C318 = {
         COLSHAPE_CYLINDER,
     },
     {
-        ELEMTYPE_UNK2,
+        ELEM_MATERIAL_UNK2,
         { 0x00100000, 0x00, 0x02 },
         { 0xD7CFFFFF, 0x00, 0x00 },
-        TOUCH_NONE | TOUCH_SFX_NORMAL,
-        BUMP_ON,
+        ATELEM_NONE | ATELEM_SFX_NORMAL,
+        ACELEM_ON,
         OCELEM_ON,
     },
     { 25, 60, 0, { 0, 0, 0 } },
 };
 
+// sMeleeWeaponQuadInit
 ColliderQuadInit D_8085C344 = {
     {
-        COLTYPE_NONE,
+        COL_MATERIAL_NONE,
         AT_ON | AT_TYPE_PLAYER,
         AC_NONE,
         OC1_NONE,
@@ -123,11 +127,11 @@ ColliderQuadInit D_8085C344 = {
         COLSHAPE_QUAD,
     },
     {
-        ELEMTYPE_UNK2,
+        ELEM_MATERIAL_UNK2,
         { 0x00000000, 0x00, 0x01 },
         { 0xF7CFFFFF, 0x00, 0x00 },
-        TOUCH_ON | TOUCH_SFX_NORMAL,
-        BUMP_NONE,
+        ATELEM_ON | ATELEM_SFX_NORMAL,
+        ACELEM_NONE,
         OCELEM_NONE,
     },
     { { { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } } },
@@ -140,9 +144,10 @@ typedef union {
 
 dirsu dirs;
 
+// sShieldQuadInit
 ColliderQuadInit D_8085C394 = {
     {
-        COLTYPE_METAL,
+        COL_MATERIAL_METAL,
         AT_ON | AT_TYPE_PLAYER,
         AC_ON | AC_HARD | AC_TYPE_ENEMY,
         OC1_NONE,
@@ -150,11 +155,11 @@ ColliderQuadInit D_8085C394 = {
         COLSHAPE_QUAD,
     },
     {
-        ELEMTYPE_UNK2,
+        ELEM_MATERIAL_UNK2,
         { 0x00100000, 0x00, 0x00 },
         { 0xD7CFFFFF, 0x00, 0x00 },
-        TOUCH_ON | TOUCH_SFX_NORMAL,
-        BUMP_ON,
+        ATELEM_ON | ATELEM_SFX_NORMAL,
+        ACELEM_ON,
         OCELEM_NONE,
     },
     { { { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } } },
@@ -164,17 +169,17 @@ ColliderQuadInit D_8085C394 = {
 
 RECOMP_PATCH void Player_InitCommon(Player* this, PlayState* play, FlexSkeletonHeader* skelHeader) {
     Actor_ProcessInitChain(&this->actor, sInitChain);
-    this->currentYaw = this->actor.world.rot.y;
+    this->yaw = this->actor.world.rot.y;
 
-    if ((PLAYER_GET_INITMODE(&this->actor) != PLAYER_INITMODE_TELESCOPE) &&
-        ((gSaveContext.respawnFlag != 2) ||
-         (gSaveContext.respawn[RESPAWN_MODE_RETURN].playerParams != PLAYER_PARAMS(0xFF, PLAYER_INITMODE_TELESCOPE)))) {
+    if ((PLAYER_GET_START_MODE(&this->actor) != PLAYER_START_MODE_TELESCOPE) &&
+        ((gSaveContext.respawnFlag != 2) || (gSaveContext.respawn[RESPAWN_MODE_RETURN].playerParams !=
+                                             PLAYER_PARAMS(0xFF, PLAYER_START_MODE_TELESCOPE)))) {
         func_808309CC(play, this);
         SkelAnime_InitPlayer(play, &this->skelAnime, skelHeader, D_8085BE84[PLAYER_ANIMGROUP_wait][this->modelAnimType],
                              1 | 8, this->jointTableBuffer, this->morphTableBuffer, PLAYER_LIMB_MAX);
         this->skelAnime.baseTransl = sPlayerSkeletonBaseTransl;
 
-        SkelAnime_InitPlayer(play, &this->skelAnimeUpper, skelHeader, func_8082ED20(this), 1 | 8,
+        SkelAnime_InitPlayer(play, &this->skelAnimeUpper, skelHeader, Player_GetIdleAnim(this), 1 | 8,
                              this->jointTableUpperBuffer, this->morphTableUpperBuffer, PLAYER_LIMB_MAX);
         this->skelAnimeUpper.baseTransl = sPlayerSkeletonBaseTransl;
 
@@ -233,7 +238,7 @@ EquipSlot func_8082FDC4(void);
  * Handles the high level item usage and changing process based on the B and C buttons.
  */
 RECOMP_PATCH void Player_ProcessItemButtons(Player* this, PlayState* play) {
-    if (this->stateFlags1 & (PLAYER_STATE1_800 | PLAYER_STATE1_20000000)) {
+    if (this->stateFlags1 & (PLAYER_STATE1_CARRYING_ACTOR | PLAYER_STATE1_20000000)) {
         return;
     }
     if (this->stateFlags2 & PLAYER_STATE2_2000000) {
@@ -328,10 +333,10 @@ RECOMP_PATCH void Player_ProcessItemButtons(Player* this, PlayState* play) {
 }
 
 s32 func_80847880(PlayState* play, Player* this) {
-    if (play->unk_1887C != 0) {
+    if (play->bButtonAmmoPlusOne != 0) {
         if (play->sceneId == SCENE_20SICHITAI) {
             Player_SetAction(play, this, Player_Action_80, 0);
-            play->unk_1887C = 0;
+            play->bButtonAmmoPlusOne = 0;
             this->csAction = PLAYER_CSACTION_NONE;
             return true;
         }
@@ -341,7 +346,7 @@ s32 func_80847880(PlayState* play, Player* this) {
         if (!func_800B7118(this) || Player_IsHoldingHookshot(this)) {
             Player_UseItem(play, this, ITEM_BOW);
         }
-        Player_AnimationPlayOnce(play, this, func_8082ED20(this));
+        Player_Anim_PlayOnce(play, this, Player_GetIdleAnim(this));
         this->csAction = PLAYER_CSACTION_NONE;
         this->stateFlags1 |= PLAYER_STATE1_100000;
         Player_StopHorizontalMovement(this);
@@ -357,7 +362,7 @@ RECOMP_PATCH void Player_Action_11(Player* this, PlayState* play) {
     u8 shape_yaw = *((u8*) *((u8**) 0x8077FFD4));
     this->stateFlags2 |= PLAYER_STATE2_20;
 
-    if (this->linearVelocity < 1.0f) {
+    if (this->speedXZ < 1.0f) {
         this->skelAnime.animation = &gPlayerAnim_clink_normal_okarina_walk;
     } else {
         this->skelAnime.animation = &gPlayerAnim_clink_normal_okarina_walkB;
@@ -381,7 +386,7 @@ RECOMP_PATCH void Player_Action_11(Player* this, PlayState* play) {
             return;
         }
 
-        this->linearVelocity = this->unk_B48;
+        this->speedXZ = this->unk_B48;
         Player_GetMovementSpeedAndYaw(this, &dirs.calc_dir, &yawTarget, SPEED_MODE_CURVED, play);
         sp30 = yawTarget;
 
@@ -403,18 +408,18 @@ RECOMP_PATCH void Player_Action_11(Player* this, PlayState* play) {
         if (!func_8083A4A4(this, &dirs.calc_dir, &yawTarget, REG(43) / 100.0f)) {
             func_8083CB04(this, dirs.calc_dir, yawTarget, REG(19) / 100.0f, 1.5f, 0x3E8);
             func_8083C8E8(this, play);
-            if ((this->linearVelocity == 0.0f) && (dirs.calc_dir == 0.0f)) {
-                this->currentYaw = sp30;
-                this->actor.shape.rot.y = this->currentYaw;
+            if ((this->speedXZ == 0.0f) && (dirs.calc_dir == 0.0f)) {
+                this->yaw = sp30;
+                this->actor.shape.rot.y = this->yaw;
             }
         }
 
-        this->unk_B48 = this->linearVelocity;
+        this->unk_B48 = this->speedXZ;
         temp_fv0 = this->skelAnime.curFrame + 5.0f;
         temp_fv1 = this->skelAnime.animLength / 2.0f;
 
         // effectively an fmodf
         temp_fv0 -= temp_fv1 * (s32)(temp_fv0 / temp_fv1);
-        this->linearVelocity *= Math_CosS(temp_fv0 * 1000.0f) * 0.4f;
+        this->speedXZ *= Math_CosS(temp_fv0 * 1000.0f) * 0.4f;
     }
 }

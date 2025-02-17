@@ -13,7 +13,7 @@ struct EnMnk;
 typedef void (*EnMnkActionFunc)(struct EnMnk*, PlayState*);
 typedef void (*EnMnkFunc)(PlayState*, struct EnMnk*);
 
-#define FLAGS (ACTOR_FLAG_TARGETABLE | ACTOR_FLAG_FRIENDLY | ACTOR_FLAG_10)
+#define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_FRIENDLY | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
 #define THIS ((EnMnk*)thisx)
 
@@ -91,7 +91,7 @@ typedef struct EnMnk {
 
 static ColliderCylinderInit sCylinderInit = {
     {
-        COLTYPE_NONE,
+        COL_MATERIAL_NONE,
         AT_NONE,
         AC_ON | AC_TYPE_PLAYER,
         OC1_ON | OC1_TYPE_ALL,
@@ -99,11 +99,11 @@ static ColliderCylinderInit sCylinderInit = {
         COLSHAPE_CYLINDER,
     },
     {
-        ELEMTYPE_UNK0,
+        ELEM_MATERIAL_UNK0,
         { 0x00000000, 0x00, 0x00 },
         { 0x01000200, 0x00, 0x00 },
-        TOUCH_NONE | TOUCH_SFX_NORMAL,
-        BUMP_ON,
+        ATELEM_NONE | ATELEM_SFX_NORMAL,
+        ACELEM_ON,
         OCELEM_ON,
     },
     { 15, 30, 0, { 0, 0, 0 } },
@@ -215,7 +215,7 @@ s32 EnMnk_PlayerIsInTalkRange(EnMnk* this, PlayState* play);
 void EnMnk_MonkeyTiedUp_TransitionAfterTalk(EnMnk* this, PlayState* play);
 void EnMnk_MonkeyTiedUp_ReactToWrongInstrument(EnMnk* this, PlayState* play);
 
-s32 Actor_ProcessTalkRequest(Actor* this, GameState* play);
+s32 Actor_TalkOfferAccepted(Actor* this, GameState* play);
 
 RECOMP_PATCH void EnMnk_MonkeyTiedUp_Wait(EnMnk* this, PlayState* play) {
     s32 pad;
@@ -240,7 +240,7 @@ RECOMP_PATCH void EnMnk_MonkeyTiedUp_WaitForInstrument(EnMnk* this, PlayState* p
     SkelAnime_Update(&this->skelAnime);
     SkelAnime_Update(&this->propSkelAnime);
 
-    if (func_800B8718(&this->picto.actor, &play->state)) {
+    if (Actor_OcarinaInteractionAccepted(&this->picto.actor, &play->state)) {
         switch (gSaveContext.save.playerForm) {
             case PLAYER_FORM_HUMAN:
             case PLAYER_FORM_FIERCE_DEITY:
@@ -273,13 +273,13 @@ RECOMP_PATCH void EnMnk_MonkeyTiedUp_WaitForInstrument(EnMnk* this, PlayState* p
         this->picto.actor.csId = this->csIdList[0];
         Message_StartTextbox(play, this->picto.actor.textId, NULL);
         CutsceneManager_Queue(this->picto.actor.csId);
-    } else if (Actor_ProcessTalkRequest(&this->picto.actor, &play->state)) {
+    } else if (Actor_TalkOfferAccepted(&this->picto.actor, &play->state)) {
         this->actionFunc = EnMnk_MonkeyTiedUp_TransitionAfterTalk;
         EnMnk_MonkeyTiedUp_SetAnim(this, MONKEY_TIEDUP_ANIM_KICKAROUND);
     } else if (EnMnk_PlayerIsInTalkRange(this, play)) {
         this->picto.actor.textId = 0x8D3;
         Actor_OfferTalk(&this->picto.actor, play, 100.0f);
-        func_800B874C(&this->picto.actor, play, 100.0f, 100.0f);
+        Actor_OfferOcarinaInteraction(&this->picto.actor, play, 100.0f, 100.0f);
     }
 }
 
@@ -309,7 +309,7 @@ RECOMP_PATCH void EnMnk_MonkeyTiedUp_Init(Actor* thisx, PlayState* play) {
     s32 i;
 
     this->actionFunc = EnMnk_MonkeyTiedUp_WaitForInstrument;
-    this->picto.actor.flags |= ACTOR_FLAG_2000000;
+    this->picto.actor.flags |= ACTOR_FLAG_UPDATE_DURING_OCARINA;
     SkelAnime_InitFlex(play, &this->propSkelAnime, &gMonkeyTiedUpPoleSkel, &object_mnk_Anim_003584,
                        this->propJointTable, this->propMorphTable, OBJECT_MNK_1_LIMB_MAX);
     this->cueId = 4;
@@ -466,7 +466,7 @@ RECOMP_PATCH void EnMnk_Init(Actor* thisx, PlayState* play) {
             this->actionFunc = EnMnk_Monkey_WaitToFollowPath;
             this->unk_3C8 = 0;
             this->flags |= MONKEY_FLAGS_2;
-            this->picto.actor.flags &= ~ACTOR_FLAG_TARGETABLE;
+            this->picto.actor.flags &= ~ACTOR_FLAG_ATTENTION_ENABLED;
             this->picto.actor.velocity.y = 0.0f;
             this->picto.actor.terminalVelocity = 0.0f;
             this->picto.actor.gravity = 0.0f;

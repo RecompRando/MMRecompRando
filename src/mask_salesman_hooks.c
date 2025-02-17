@@ -35,7 +35,7 @@
 
 struct EnOsn;
 
-#define FLAGS (ACTOR_FLAG_TARGETABLE | ACTOR_FLAG_FRIENDLY | ACTOR_FLAG_10)
+#define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_FRIENDLY | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
 #define LOCATION_HEALING 0x040068
 
@@ -103,7 +103,7 @@ typedef enum {
 
 static ColliderCylinderInit sCylinderInit = {
     {
-        COLTYPE_NONE,
+        COL_MATERIAL_NONE,
         AT_NONE,
         AC_NONE,
         OC1_ON | OC1_TYPE_ALL,
@@ -111,11 +111,11 @@ static ColliderCylinderInit sCylinderInit = {
         COLSHAPE_CYLINDER,
     },
     {
-        ELEMTYPE_UNK0,
+        ELEM_MATERIAL_UNK0,
         { 0x00000000, 0x00, 0x00 },
         { 0xF7CFFFFF, 0x00, 0x00 },
-        TOUCH_NONE | TOUCH_SFX_NORMAL,
-        BUMP_ON,
+        ATELEM_NONE | ATELEM_SFX_NORMAL,
+        ACELEM_ON,
         OCELEM_ON,
     },
     { 30, 40, 0, { 0, 0, 0 } },
@@ -159,21 +159,21 @@ static DamageTable sDamageTable = {
 };
 
 static InitChainEntry sInitChain[] = {
-    ICHAIN_U8(targetMode, TARGET_MODE_0, ICHAIN_STOP),
+    ICHAIN_U8(attentionRangeType, ATTENTION_RANGE_0, ICHAIN_STOP),
 };
 
 extern AnimationInfo sHappyMaskSalesmanAnimationInfo[];
 extern FlexSkeletonHeader gHappyMaskSalesmanSkel;
 extern AnimationHeader gHappyMaskSalesmanIdleAnim;
 
-s32 Actor_ProcessTalkRequest(Actor* actor, GameState* gameState);
+s32 Actor_TalkOfferAccepted(Actor* actor, GameState* gameState);
 
 void EnOsn_DoNothing(EnOsn* this, PlayState* play);
 void EnOsn_StartCutscene(EnOsn* this, PlayState* play);
 s32 EnOsn_GetInitialText(EnOsn* this, PlayState* play);
 void EnOsn_Talk(EnOsn* this, PlayState* play);
 void EnOsn_InitCutscene(EnOsn* this);
-void EnOsn_HandleCsAction(EnOsn* this, PlayState* play);
+void EnOsn_HandleCutscene(EnOsn* this, PlayState* play);
 void EnOsn_ChooseAction(EnOsn* this, PlayState* play);
 
 static bool shouldSetForm = false;
@@ -208,7 +208,7 @@ RECOMP_PATCH void EnOsn_Init(Actor* thisx, PlayState* play) {
             if (play->sceneId == SCENE_INSIDETOWER) {
                 if ((gSaveContext.save.entrance == ENTRANCE(CLOCK_TOWER_INTERIOR, 2)) ||
                     (gSaveContext.save.entrance == ENTRANCE(CLOCK_TOWER_INTERIOR, 6))) {
-                    this->actionFunc = EnOsn_HandleCsAction;
+                    this->actionFunc = EnOsn_HandleCutscene;
                 } else if (gSaveContext.save.entrance == ENTRANCE(CLOCK_TOWER_INTERIOR, 3)) {
                     //EnOsn_InitCutscene(this);
                     //this->actionFunc = EnOsn_StartCutscene;
@@ -247,8 +247,8 @@ RECOMP_PATCH void EnOsn_Init(Actor* thisx, PlayState* play) {
             break;
 
         case OSN_TYPE_CUTSCENE:
-            this->actor.flags &= ~ACTOR_FLAG_TARGETABLE;
-            this->actionFunc = EnOsn_HandleCsAction;
+            this->actor.flags &= ~ACTOR_FLAG_ATTENTION_ENABLED;
+            this->actionFunc = EnOsn_HandleCutscene;
             break;
 
         default:
@@ -278,7 +278,7 @@ RECOMP_PATCH void EnOsn_Idle(EnOsn* this, PlayState* play) {
             //this->actionFunc = EnOsn_StartCutscene;
             EnOsn_GiveRandoItem(this, play);
         }
-    }/* else if (Actor_ProcessTalkRequest(&this->actor, &play->state)) {
+    }/* else if (Actor_TalkOfferAccepted(&this->actor, &play->state)) {
         this->textId = EnOsn_GetInitialText(this, play);
         Message_StartTextbox(play, this->textId, &this->actor);
         this->actionFunc = EnOsn_Talk;

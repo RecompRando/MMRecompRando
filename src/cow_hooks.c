@@ -5,6 +5,8 @@
 
 #define LOCATION_COW (0xBEEF00 | EnCow_GetCowID(&this->actor, play))
 
+#include "z64voice.h"
+
 struct EnCow;
 
 #define COW_LIMB_MAX 0x06
@@ -98,7 +100,7 @@ RECOMP_PATCH void EnCow_Idle(EnCow* this, PlayState* play) {
                        ABS_ALT(BINANG_SUB(this->actor.yawTowardsPlayer, this->actor.shape.rot.y)) < 25000) {
                 gHorsePlayedEponasSong = false;
                 this->actionFunc = EnCow_Talk;
-                this->actor.flags |= ACTOR_FLAG_10000;
+                this->actor.flags |= ACTOR_FLAG_TALK_OFFER_AUTO_ACCEPTED;
                 Actor_OfferTalk(&this->actor, play, 170.0f);
                 this->actor.textId = 0x32C8; // Text to give milk after playing Epona's Song.
 
@@ -115,20 +117,20 @@ RECOMP_PATCH void EnCow_Idle(EnCow* this, PlayState* play) {
     // "ミルク" activation
     if (this->actor.xzDistToPlayer < 150.0f &&
         ABS_ALT((s16)(this->actor.yawTowardsPlayer - this->actor.shape.rot.y)) < 25000) {
-        if (func_801A5100() == 4) {
-            if (!CHECK_WEEKEVENTREG(WEEKEVENTREG_87_01)) {
-                SET_WEEKEVENTREG(WEEKEVENTREG_87_01);
+        if (AudioVoice_GetWord() == 4) {
+            if (!CHECK_WEEKEVENTREG(WEEKEVENTREG_TALKING_TO_COW_WITH_VOICE)) {
+                SET_WEEKEVENTREG(WEEKEVENTREG_TALKING_TO_COW_WITH_VOICE);
                 if (Inventory_HasEmptyBottle()) {
                     this->actor.textId = 0x32C9; // Text to give milk.
                 } else {
                     this->actor.textId = 0x32CA; // Text if you don't have an empty bottle.
                 }
-                this->actor.flags |= ACTOR_FLAG_10000;
+                this->actor.flags |= ACTOR_FLAG_TALK_OFFER_AUTO_ACCEPTED;
                 Actor_OfferTalk(&this->actor, play, 170.0f);
                 this->actionFunc = EnCow_Talk;
             }
         } else {
-            CLEAR_WEEKEVENTREG(WEEKEVENTREG_87_01);
+            CLEAR_WEEKEVENTREG(WEEKEVENTREG_TALKING_TO_COW_WITH_VOICE);
         }
     }
 
@@ -151,8 +153,8 @@ RECOMP_PATCH void EnCow_GiveMilkWait(EnCow* this, PlayState* play) {
 }
 
 RECOMP_PATCH void EnCow_GiveMilk(EnCow* this, PlayState* play) {
-    if ((Message_GetState(&play->msgCtx) == TEXT_STATE_5) && Message_ShouldAdvance(play)) {
-        this->actor.flags &= ~ACTOR_FLAG_10000;
+    if ((Message_GetState(&play->msgCtx) == TEXT_STATE_EVENT) && Message_ShouldAdvance(play)) {
+        this->actor.flags &= ~ACTOR_FLAG_TALK_OFFER_AUTO_ACCEPTED;
         Message_CloseTextbox(play);
         this->actionFunc = EnCow_GiveMilkWait;
         if (rando_location_is_checked(LOCATION_COW) && rando_cows_enabled()) {
@@ -166,7 +168,7 @@ RECOMP_PATCH void EnCow_GiveMilk(EnCow* this, PlayState* play) {
 void EnCow_TalkEnd(EnCow* this, PlayState* play);
 
 RECOMP_PATCH void EnCow_CheckForEmptyBottle(EnCow* this, PlayState* play) {
-    if ((Message_GetState(&play->msgCtx) == TEXT_STATE_5) && Message_ShouldAdvance(play)) {
+    if ((Message_GetState(&play->msgCtx) == TEXT_STATE_EVENT) && Message_ShouldAdvance(play)) {
         if (Inventory_HasEmptyBottle() || rando_cows_enabled()) {
             Message_ContinueTextbox(play, 0x32C9); // Text to give milk.
             this->actionFunc = EnCow_GiveMilk;

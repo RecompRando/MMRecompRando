@@ -104,7 +104,7 @@ typedef struct EnIn {
     /* 0x4C0 */ s32 prevTalkState;
 } EnIn; // size = 0x4CC
 
-#define FLAGS (ACTOR_FLAG_TARGETABLE | ACTOR_FLAG_FRIENDLY | ACTOR_FLAG_10)
+#define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_FRIENDLY | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
 #define THIS ((EnIn*)thisx)
 

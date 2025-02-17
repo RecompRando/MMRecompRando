@@ -43,11 +43,11 @@ void func_80BBB354(EnZos* this, PlayState* play) {
     if (Actor_HasParent(&this->actor, play)) {
         this->actor.parent = NULL;
         this->actionFunc = func_80BBB2C4;
-        SET_WEEKEVENTREG(WEEKEVENTREG_39_20);
-        this->actor.flags |= ACTOR_FLAG_10000;
+        SET_WEEKEVENTREG(WEEKEVENTREG_RECEIVED_EVAN_HEART_PIECE);
+        this->actor.flags |= ACTOR_FLAG_TALK_OFFER_AUTO_ACCEPTED;
         Actor_OfferTalkExchange(&this->actor, play, 1000.0f, 1000.0f, PLAYER_IA_MINUS1);
     } else {
-        // if (CHECK_WEEKEVENTREG(WEEKEVENTREG_39_20)) {
+        // if (CHECK_WEEKEVENTREG(WEEKEVENTREG_RECEIVED_EVAN_HEART_PIECE)) {
         if (rando_location_is_checked(LOCATION_EVAN_SONG)) {
             getItemId = GI_RUPEE_PURPLE;
         } else {
@@ -77,12 +77,12 @@ RECOMP_PATCH void func_80BBBDE0(EnZos* this, PlayState* play) {
         this->actionFunc = func_80BBB354;
         EnZos_ChangeAnim(this, EN_ZOS_ANIM_TALK_HANDS_ON_HIPS, ANIMMODE_LOOP);
         // this->actionFunc = func_80BBBB84;
-        // this->actor.flags |= ACTOR_FLAG_10000;
+        // this->actor.flags |= ACTOR_FLAG_TALK_OFFER_AUTO_ACCEPTED;
         // Actor_OfferTalk(&this->actor, play, 120.0f);
         return;
     }
 
-    if (Actor_ProcessTalkRequest(&this->actor, &play->state)) {
+    if (Actor_TalkOfferAccepted(&this->actor, &play->state)) {
         this->actionFunc = func_80BBB8AC;
         func_80BBB15C(this, play);
     } else if (Cutscene_IsCueInChannel(play, CS_CMD_ACTOR_CUE_501)) {

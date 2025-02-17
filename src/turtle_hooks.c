@@ -40,7 +40,7 @@ typedef struct DmChar08 {
     /* 0x209 */ u8 dynapolyInitialized;
 } DmChar08; // size = 0x20C
 
-#define FLAGS (ACTOR_FLAG_2000000)
+#define FLAGS (ACTOR_FLAG_UPDATE_DURING_OCARINA)
 
 #define THIS ((DmChar08*)thisx)
 
@@ -70,7 +70,7 @@ typedef enum {
     /* 5 */ TURTLE_EYEMODE_LOOK_RIGHT
 } TurtleEyeMode;
 
-extern ActorInit Dm_Char08_InitVars;
+extern ActorProfile Dm_Char08_Profile;
 
 typedef enum {
     /*  0 */ TURTLE_ANIM_IDLE,
@@ -107,9 +107,9 @@ static AnimationInfo sAnimationInfo[TURTLE_ANIM_MAX] = {
 };
 
 static InitChainEntry sInitChain[] = {
-    ICHAIN_F32(uncullZoneForward, 4000, ICHAIN_CONTINUE),
-    ICHAIN_F32(uncullZoneScale, 4000, ICHAIN_CONTINUE),
-    ICHAIN_F32(uncullZoneDownward, 4000, ICHAIN_STOP),
+    ICHAIN_F32(cullingVolumeDistance, 4000, ICHAIN_CONTINUE),
+    ICHAIN_F32(cullingVolumeScale, 4000, ICHAIN_CONTINUE),
+    ICHAIN_F32(cullingVolumeDownward, 4000, ICHAIN_STOP),
 };
 
 // TODO: skip the spawning cutscene

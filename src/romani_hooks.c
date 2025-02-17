@@ -104,7 +104,7 @@ RECOMP_PATCH void EnMa4_StartDialogue(EnMa4* this, PlayState* play) {
                 }
             } else if (this->state == MA4_STATE_DEFAULT) {
                 // if (CHECK_WEEKEVENTREG(WEEKEVENTREG_21_40)) {
-                if (!CHECK_WEEKEVENTREG(WEEKEVENTREG_PROMISED_TO_HELP_WITH_THEM)) {
+                if (!CHECK_WEEKEVENTREG(WEEKEVENTREG_PROMISED_TO_HELP_WITH_ALIENS)) {
                     Message_StartTextbox(play, 0x3346, &this->actor);
                     this->textId = 0x3346;
                 } else {
@@ -137,12 +137,12 @@ RECOMP_PATCH void EnMa4_StartDialogue(EnMa4* this, PlayState* play) {
                     }
                 }
                 this->state = MA4_STATE_DEFAULT;
-                this->actor.flags &= ~ACTOR_FLAG_10000;
+                this->actor.flags &= ~ACTOR_FLAG_TALK_OFFER_AUTO_ACCEPTED;
             } else if (this->state == MA4_STATE_AFTERDESCRIBETHEMCS) {
                 // "Cremia doesn't believe me..."
                 Message_StartTextbox(play, 0x3340, &this->actor);
                 this->textId = 0x3340;
-                this->actor.flags &= ~ACTOR_FLAG_10000;
+                this->actor.flags &= ~ACTOR_FLAG_TALK_OFFER_AUTO_ACCEPTED;
             }
             break;
 
@@ -179,7 +179,7 @@ RECOMP_PATCH void EnMa4_StartDialogue(EnMa4* this, PlayState* play) {
                     }
                 }
                 this->state = MA4_STATE_DEFAULT;
-                this->actor.flags &= ~ACTOR_FLAG_10000;
+                this->actor.flags &= ~ACTOR_FLAG_TALK_OFFER_AUTO_ACCEPTED;
             }
             break;
 
@@ -207,7 +207,7 @@ RECOMP_PATCH void EnMa4_StartDialogue(EnMa4* this, PlayState* play) {
                     }
                 }
                 this->state = MA4_STATE_DEFAULT;
-                this->actor.flags &= ~ACTOR_FLAG_10000;
+                this->actor.flags &= ~ACTOR_FLAG_TALK_OFFER_AUTO_ACCEPTED;
             }
             break;
 

@@ -3,10 +3,6 @@
 
 #include "apcommon.h"
 
-#define WEEKEVENTREG_RECEIVED_ALIENS_BOTTLE WEEKEVENTREG_22_02
-#define BOMBERS_NOTEBOOK_EVENT_DEFENDED_AGAINST_ALIENS 0x1D
-#define TEXT_STATE_EVENT 0x5
-
 struct EnInvadepoh;
 struct EnInvadepohEffect;
 
@@ -181,13 +177,12 @@ typedef struct EnInvadepoh {
     /* 0x3BC */ s8 dogTargetPoint;
 } EnInvadepoh; // size = 0x3C0
 
-void func_80B4AF80(EnInvadepoh* this);
+void EnInvadepoh_RewardRomani_SetupAfterGivingBottle(EnInvadepoh* this);
 
 /**
  * Waits two frames, then offers the player the Milk Bottle.
  */
-// void EnInvadepoh_RewardRomani_GiveBottle(EnInvadepoh* this, PlayState* play) {
-RECOMP_PATCH void func_80B4AEDC(EnInvadepoh* this, PlayState* play) {
+RECOMP_PATCH void EnInvadepoh_RewardRomani_GiveBottle(EnInvadepoh* this, PlayState* play) {
     if (this->timer > 0) {
         this->timer--;
         if (this->timer == 0) {
@@ -198,39 +193,33 @@ RECOMP_PATCH void func_80B4AEDC(EnInvadepoh* this, PlayState* play) {
     if (Actor_HasParent(&this->actor, play)) {
         this->actor.parent = NULL;
         SET_WEEKEVENTREG(WEEKEVENTREG_RECEIVED_ALIENS_BOTTLE);
-        // EnInvadepoh_RewardRomani_SetupAfterGivingBottle(this);
-        func_80B4AF80(this);
+        EnInvadepoh_RewardRomani_SetupAfterGivingBottle(this);
     } else {
         // Actor_OfferGetItem(&this->actor, play, GI_MILK_BOTTLE, 2000.0f, 2000.0f);
 		Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(GI_MILK_BOTTLE), GI_MILK_BOTTLE, 2000.0f, 2000.0f, true, true);
     }
 }
 
-void func_80B4560C(EnInvadepoh* this, PlayState* play, u16 textId);
-void func_80B4AEC0(EnInvadepoh* this);
-void func_80B4B024(EnInvadepoh* this);
+void EnInvadepoh_Romani_StartTextbox(EnInvadepoh* this, PlayState* play, u16 textId);
+void EnInvadepoh_RewardRomani_SetupGiveBottle(EnInvadepoh* this);
+void EnInvadepoh_RewardRomani_SetupFinish(EnInvadepoh* this);
 
-// void EnInvadepoh_RewardRomani_Talk(EnInvadepoh* this, PlayState* play) {
-RECOMP_PATCH void func_80B4ADCC(EnInvadepoh* this, PlayState* play) {
+RECOMP_PATCH void EnInvadepoh_RewardRomani_Talk(EnInvadepoh* this, PlayState* play) {
     if ((Message_GetState(&play->msgCtx) == TEXT_STATE_EVENT) && Message_ShouldAdvance(play)) {
         if (this->textId == 0x3331) {
             // if (CHECK_WEEKEVENTREG(WEEKEVENTREG_RECEIVED_ALIENS_BOTTLE)) {
             if (rando_location_is_checked(GI_MILK_BOTTLE)) {
-                // EnInvadepoh_Romani_StartTextbox(this, play, 0x3334);
-                func_80B4560C(this, play, 0x3334);
+                EnInvadepoh_Romani_StartTextbox(this, play, 0x3334);
                 Message_BombersNotebookQueueEvent(play, BOMBERS_NOTEBOOK_EVENT_DEFENDED_AGAINST_ALIENS);
                 Message_BombersNotebookQueueEvent(play, BOMBERS_NOTEBOOK_EVENT_MET_ROMANI);
             } else {
-                // EnInvadepoh_Romani_StartTextbox(this, play, 0x3333);
-                func_80B4560C(this, play, 0x3333);
+                EnInvadepoh_Romani_StartTextbox(this, play, 0x3333);
             }
         } else if (this->textId == 0x3333) {
-            // EnInvadepoh_RewardRomani_SetupGiveBottle(this);
-            func_80B4AEC0(this);
+            EnInvadepoh_RewardRomani_SetupGiveBottle(this);
         } else if (this->textId == 0x3334) {
             Message_CloseTextbox(play);
-            // EnInvadepoh_RewardRomani_SetupFinish(this);
-            func_80B4B024(this);
+            EnInvadepoh_RewardRomani_SetupFinish(this);
         }
     }
 }

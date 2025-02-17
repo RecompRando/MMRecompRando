@@ -4,8 +4,8 @@
 #include "apcommon.h"
 
 // @ap send death link when moon crashes
-RECOMP_PATCH void Interface_StartMoonCrash(PlayState* play) {
-    if (play->actorCtx.flags & ACTORCTX_FLAG_1) {
+void Interface_StartMoonCrash(PlayState* play) {
+    if (play->actorCtx.flags & ACTORCTX_FLAG_TELESCOPE_ON) {
         SEQCMD_DISABLE_PLAY_SEQUENCES(false);
     }
 

@@ -23,7 +23,7 @@ void func_80931EEC(ObjIcePoly* this, PlayState* play);
 RECOMP_PATCH void func_80931E58(ObjIcePoly* this, PlayState* play) {
     if (CutsceneManager_IsNext(this->actor.csId)) {
         // CutsceneManager_StartWithPlayerCs(this->actor.csId, &this->actor);
-        func_800B7298(play, NULL, PLAYER_CSACTION_END);
+        Player_SetCsActionWithHaltedActors(play, NULL, PLAYER_CSACTION_END);
         if (this->unk_14A == 1) {
             func_80931828(this, play);
             Actor_Kill(&this->actor);

@@ -112,7 +112,7 @@ when set, gets cleared next EnBox_Update call and clip to the floor
 #define THIS ((EnBox*)thisx)
 
 static InitChainEntry sInitChain[] = {
-    ICHAIN_U8(targetMode, TARGET_MODE_0, ICHAIN_STOP),
+    ICHAIN_U8(attentionRangeType, ATTENTION_RANGE_0, ICHAIN_STOP),
 };
 
 // Custom rando function based off of Actor_IsSmallChest
@@ -222,7 +222,7 @@ RECOMP_PATCH void EnBox_Init(Actor* thisx, PlayState* play) {
         EnBox_SetupAction(this, EnBox_FallOnSwitchFlag);
         this->alpha = 0;
         this->movementFlags |= ENBOX_MOVE_IMMOBILE;
-        this->dyna.actor.flags |= ACTOR_FLAG_10;
+        this->dyna.actor.flags |= ACTOR_FLAG_UPDATE_CULLING_DISABLED;
     } else if (((vanillaType == ENBOX_TYPE_BIG_ROOM_CLEAR) || (vanillaType == ENBOX_TYPE_SMALL_ROOM_CLEAR)) &&
                !Flags_GetClear(play, this->dyna.actor.room)) {
         EnBox_SetupAction(this, EnBox_AppearOnRoomClear);
@@ -234,7 +234,7 @@ RECOMP_PATCH void EnBox_Init(Actor* thisx, PlayState* play) {
         }
         this->alpha = 0;
         this->movementFlags |= ENBOX_MOVE_IMMOBILE;
-        this->dyna.actor.flags |= ACTOR_FLAG_10;
+        this->dyna.actor.flags |= ACTOR_FLAG_UPDATE_CULLING_DISABLED;
     } else if ((vanillaType == ENBOX_TYPE_BIG_SONG_ZELDAS_LULLABY) || (vanillaType == ENBOX_TYPE_BIG_SONG_SUNS)) {
 
     } else if (((vanillaType == ENBOX_TYPE_BIG_SWITCH_FLAG) || (vanillaType == ENBOX_TYPE_SMALL_SWITCH_FLAG)) &&
@@ -248,7 +248,7 @@ RECOMP_PATCH void EnBox_Init(Actor* thisx, PlayState* play) {
         }
         this->alpha = 0;
         this->movementFlags |= ENBOX_MOVE_IMMOBILE;
-        this->dyna.actor.flags |= ACTOR_FLAG_10;
+        this->dyna.actor.flags |= ACTOR_FLAG_UPDATE_CULLING_DISABLED;
     } else {
         if ((vanillaType == ENBOX_TYPE_BIG_INVISIBLE) || (vanillaType == ENBOX_TYPE_SMALL_INVISIBLE)) {
             this->dyna.actor.flags |= ACTOR_FLAG_REACT_TO_LENS;
@@ -259,7 +259,7 @@ RECOMP_PATCH void EnBox_Init(Actor* thisx, PlayState* play) {
     }
 
     if ((this->getItemId == GI_STRAY_FAIRY) && !Flags_GetTreasure(play, ENBOX_GET_CHEST_FLAG(&this->dyna.actor))) {
-        this->dyna.actor.flags |= ACTOR_FLAG_10;
+        this->dyna.actor.flags |= ACTOR_FLAG_UPDATE_CULLING_DISABLED;
     }
 
     this->dyna.actor.shape.rot.y += 0x8000;
@@ -358,7 +358,7 @@ RECOMP_PATCH void EnBox_WaitOpen(EnBox* this, PlayState* play) {
         Player* player = GET_PLAYER(play);
         Vec3f offset;
 
-        Actor_OffsetOfPointInActorCoords(&this->dyna.actor, &offset, &player->actor.world.pos);
+        Actor_WorldToActorCoords(&this->dyna.actor, &offset, &player->actor.world.pos);
         if ((offset.z > -50.0f) && (offset.z < 0.0f) && (fabsf(offset.y) < 10.0f) && (fabsf(offset.x) < 20.0f) &&
             Player_IsFacingActor(&this->dyna.actor, 0x3000, play)) {
             if (((this->getItemId == GI_HEART_PIECE) || (this->getItemId == GI_BOTTLE)) &&
@@ -401,7 +401,7 @@ RECOMP_PATCH void EnBox_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList
     EnBox* this = THIS;
 
     if (limbIndex == OBJECT_BOX_CHEST_LIMB_01) {
-        gSPMatrix((*gfx)++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+        MATRIX_FINALIZE_AND_LOAD((*gfx)++, play->state.gfxCtx);
         if (rando_get_camc_enabled()) {
             switch (rando_get_item_id(LOCATION_ENBOX)) {
                 case GI_AP_FILLER:
@@ -442,7 +442,7 @@ RECOMP_PATCH void EnBox_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList
             gSPDisplayList((*gfx)++, &gBoxChestBaseGildedDL);
         }
     } else if (limbIndex == OBJECT_BOX_CHEST_LIMB_03) {
-        gSPMatrix((*gfx)++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+        MATRIX_FINALIZE_AND_LOAD((*gfx)++, play->state.gfxCtx);
         if (rando_get_camc_enabled()) {
             switch (rando_get_item_id(LOCATION_ENBOX)) {
                 case GI_AP_FILLER:

@@ -189,9 +189,9 @@ RECOMP_PATCH void func_80A725F8(EnDno* this, PlayState* play) {
             }
             break;
 
-        case TEXT_STATE_1:
+        case TEXT_STATE_NEXT:
         case TEXT_STATE_CLOSING:
-        case TEXT_STATE_3:
+        case TEXT_STATE_FADING:
             if (((play->msgCtx.currentTextId == 0x800) || (play->msgCtx.currentTextId == 0x801)) &&
                 (this->animIndex == EN_DNO_ANIM_OPEN_PARASOL)) {
                 Math_SmoothStepToF(&this->unk_454, 1.0f, 1.0f, 0.1f, 0.01f);
@@ -215,7 +215,7 @@ RECOMP_PATCH void func_80A725F8(EnDno* this, PlayState* play) {
             break;
 
         case TEXT_STATE_CHOICE:
-        case TEXT_STATE_5:
+        case TEXT_STATE_EVENT:
         case TEXT_STATE_DONE:
             switch (play->msgCtx.currentTextId) {
                 case 0x800:

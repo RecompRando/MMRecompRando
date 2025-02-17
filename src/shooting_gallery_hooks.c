@@ -117,12 +117,12 @@ RECOMP_PATCH void EnSyatekiMan_Town_GiveReward(EnSyatekiMan* this, PlayState* pl
             CLEAR_WEEKEVENTREG(WEEKEVENTREG_KICKOUT_TIME_PASSED);
             this->actionFunc = EnSyatekiMan_SetupIdle;
         }
-    } else if (Actor_ProcessTalkRequest(&this->actor, &play->state)) {
+    } else if (Actor_TalkOfferAccepted(&this->actor, &play->state)) {
         // This may be our last day in business...
         Message_StartTextbox(play, 0x408, &this->actor);
         this->prevTextId = 0x408;
         player->stateFlags1 &= ~PLAYER_STATE1_20;
-        this->actor.flags &= ~ACTOR_FLAG_10000;
+        this->actor.flags &= ~ACTOR_FLAG_TALK_OFFER_AUTO_ACCEPTED;
         this->score = 0;
         this->shootingGameState = SG_GAME_STATE_NONE;
         this->actionFunc = EnSyatekiMan_Town_Talk;
@@ -278,7 +278,7 @@ RECOMP_PATCH void EnSyatekiMan_Town_EndGame(EnSyatekiMan* this, PlayState* play)
     }
 
     if (this->talkWaitTimer < 5) {
-        play->unk_1887C = -10;
+        play->bButtonAmmoPlusOne = -10;
     }
 }
 

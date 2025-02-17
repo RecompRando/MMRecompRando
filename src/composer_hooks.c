@@ -3,8 +3,6 @@
 
 #include "z64player.h"
 
-#define PLAYER_STATE2_USING_OCARINA PLAYER_STATE2_8000000
-
 typedef enum {
     /*  1 */ POE_COMPOSER_CUEID_IDLE = 1,
     /*  2 */ POE_COMPOSER_CUEID_APPEAR_SPIN,
@@ -59,13 +57,12 @@ typedef struct EnPoComposer {
 
 static s32 sPlayerIsPlayingOcarina = false;
 
-// EnPoComposer_StartCutscene?
-void func_80BC52F0(EnPoComposer* this, PlayState* play);
+void EnPoComposer_StartCutscene(EnPoComposer* this, PlayState* play);
 
 void EnPoComposer_SetupStartCutscene(EnPoComposer* this) {
     this->inCutscene = true;
     // this->actionFunc = EnPoComposer_StartCutscene;
-    this->actionFunc = func_80BC52F0;
+    this->actionFunc = EnPoComposer_StartCutscene;
 }
 
 void EnPoComposer_SharpCutsceneDone(EnPoComposer* this) {
@@ -73,8 +70,7 @@ void EnPoComposer_SharpCutsceneDone(EnPoComposer* this) {
     Actor_Kill(&this->actor);
 }
 
-// EnPoComposer_PlayCurse?
-RECOMP_PATCH void func_80BC5404(EnPoComposer* this, PlayState* play) {
+RECOMP_PATCH void EnPoComposer_PlayCurse(EnPoComposer* this, PlayState* play) {
     Player* player = GET_PLAYER(play);
 
     // Damage the player every second

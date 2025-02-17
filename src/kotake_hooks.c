@@ -1,7 +1,7 @@
 #include "modding.h"
 #include "global.h"
 #include "overlays/actors/ovl_En_GirlA/z_en_girla.h"
-#include "objects/gameplay_keep/gameplay_keep.h"
+#include "assets/objects/gameplay_keep/gameplay_keep.h"
 
 #include "apcommon.h"
 
@@ -134,7 +134,7 @@ RECOMP_PATCH void EnTrt_TryToGiveRedPotionAfterSurprised(EnTrt* this, PlayState*
 }
 
 RECOMP_PATCH void EnTrt_TryToGiveRedPotion(EnTrt* this, PlayState* play) {
-    if ((Message_GetState(&play->msgCtx) == TEXT_STATE_5) && Message_ShouldAdvance(play)) {
+    if ((Message_GetState(&play->msgCtx) == TEXT_STATE_EVENT) && Message_ShouldAdvance(play)) {
         if (this->textId == 0x83C) {
             if (Inventory_HasEmptyBottle()) {
                 if (this->cutsceneState == ENTRT_CUTSCENESTATE_PLAYING) {
@@ -164,7 +164,7 @@ void EnTrt_TryToGiveRedPotion(EnTrt* this, PlayState* play);
 void EnTrt_Surprised(EnTrt* this, PlayState* play);
 
 RECOMP_PATCH void EnTrt_StartRedPotionConversation(EnTrt* this, PlayState* play) {
-    if ((Message_GetState(&play->msgCtx) == TEXT_STATE_5) && Message_ShouldAdvance(play)) {
+    if ((Message_GetState(&play->msgCtx) == TEXT_STATE_EVENT) && Message_ShouldAdvance(play)) {
         if (this->textId == 0x88F) {
             //if (Inventory_HasEmptyBottle() || !CHECK_WEEKEVENTREG(WEEKEVENTREG_RECEIVED_KOTAKE_BOTTLE)) {
             if (!rando_location_is_checked(GI_POTION_RED_BOTTLE) || !CHECK_WEEKEVENTREG(WEEKEVENTREG_RECEIVED_KOTAKE_BOTTLE)) {
@@ -247,7 +247,7 @@ static AnimationInfoS sAnimationInfo[TRT_ANIM_MAX] = {
     { &gKotakeFlyAnim, 1.0f, 0, -1, ANIMMODE_LOOP, 0 },            // TRT_ANIM_FLY
 };
 
-void func_8011552C(struct PlayState* play, u16 arg1);
+void Interface_SetAButtonDoAction(PlayState* play, u16 aButtonDoAction);
 
 void EnTrt_OpenEyesThenSetToBlink(EnTrt* this);
 void EnTrt_ChangeAnim(SkelAnime* skelAnime, AnimationInfoS* animationInfo, s32 animIndex);
@@ -292,7 +292,7 @@ RECOMP_PATCH void EnTrt_BeginInteraction(EnTrt* this, PlayState* play) {
                     !CHECK_WEEKEVENTREG(WEEKEVENTREG_RECEIVED_RED_POTION_FOR_KOUME) &&
                     !CHECK_WEEKEVENTREG(WEEKEVENTREG_TALKED_KOUME_INJURED) &&
                     !CHECK_WEEKEVENTREG(WEEKEVENTREG_TALKED_KOUME_KIOSK_EMPTY)) {
-                    func_8011552C(play, DO_ACTION_DECIDE);
+                    Interface_SetAButtonDoAction(play, DO_ACTION_DECIDE);
                     this->stickLeftPrompt.isEnabled = false;
                     this->stickRightPrompt.isEnabled = true;
                     this->actionFunc = EnTrt_Hello;
@@ -302,7 +302,7 @@ RECOMP_PATCH void EnTrt_BeginInteraction(EnTrt* this, PlayState* play) {
                 break;
 
             case 0x83E:
-                func_8011552C(play, DO_ACTION_DECIDE);
+                Interface_SetAButtonDoAction(play, DO_ACTION_DECIDE);
                 this->stickLeftPrompt.isEnabled = false;
                 this->stickRightPrompt.isEnabled = true;
                 this->actionFunc = EnTrt_FaceShopkeeper;
@@ -387,7 +387,7 @@ RECOMP_PATCH void func_80AD3EF0(EnTrt2* this, PlayState* play) {
                 this->unk_3B2 = 10;
             }
         }
-    } else if ((talkState == TEXT_STATE_5) && Message_ShouldAdvance(play)) {
+    } else if ((talkState == TEXT_STATE_EVENT) && Message_ShouldAdvance(play)) {
         play->msgCtx.msgMode = MSGMODE_TEXT_CLOSING;
         play->msgCtx.stateTimer = 4;
         this->unk_3B2 = 12;
@@ -481,8 +481,8 @@ RECOMP_PATCH void func_80AD381C(EnTrt2* this, PlayState* play) {
             this->actor.world.pos.y -= 50.0f;
             this->unk_3D9 = 0;
             this->unk_3B2 = 0;
-            this->actor.flags &= ~ACTOR_FLAG_TARGETABLE;
-            this->actor.flags |= ACTOR_FLAG_10;
+            this->actor.flags &= ~ACTOR_FLAG_ATTENTION_ENABLED;
+            this->actor.flags |= ACTOR_FLAG_UPDATE_CULLING_DISABLED;
         }
     } else {
         Actor_Kill(&this->actor);

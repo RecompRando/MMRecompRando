@@ -7,7 +7,7 @@
                 "${workspaceFolder}/include/dummy_headers",
                 "${workspaceFolder}/mm-decomp/include",
                 "${workspaceFolder}/mm-decomp/src",
-                "${workspaceFolder}/mm-decomp/assets"
+                "${workspaceFolder}/mm-decomp/extracted/n64-us"
             ],
             "defines": [
                 "F3DEX_GBI_2",

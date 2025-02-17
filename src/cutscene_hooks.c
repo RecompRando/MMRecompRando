@@ -6,7 +6,7 @@
 
 #define SHRT_MAX 32767.0f
 
-extern ActorCutscene sGlobalCutsceneList[];
+extern CutsceneEntry sGlobalCutsceneList[];
 
 typedef enum {
     /* 0 */ CS_START_0,
@@ -28,12 +28,12 @@ typedef struct {
 
 extern CutsceneManager sCutsceneMgr;
 
-extern ActorCutscene* sSceneCutsceneList;
+extern CutsceneEntry* sSceneCutsceneList;
 extern s16 sSceneCutsceneCount;
 extern u8 sWaitingCutsceneList[16];
 extern u8 sNextCutsceneList[16];
 
-ActorCutscene* CutsceneManager_GetCutsceneEntryImpl(s16 csId);
+CutsceneEntry* CutsceneManager_GetCutsceneEntryImpl(s16 csId);
 s16 CutsceneManager_SetHudVisibility(s16 csHudVisibility);
 
 // this sucks
@@ -45,7 +45,7 @@ void memcpy(u8* __dest, u8* __src, size_t __n) {
 }
 
 RECOMP_PATCH s16 CutsceneManager_Start(s16 csId, Actor* actor) {
-    ActorCutscene* csEntry;
+    CutsceneEntry* csEntry;
     Camera* subCam;
     Camera* retCam;
     s32 csType = 0;

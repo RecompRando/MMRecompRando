@@ -87,7 +87,7 @@ void func_80A0B290(BgDyYoseizo* this, PlayState* play);
 
 struct EnElfgrp;
 
-#define FLAGS (ACTOR_FLAG_10)
+#define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
 #define THIS ((EnElfgrp*)thisx)
 
@@ -157,7 +157,7 @@ RECOMP_PATCH void EnElfgrp_Init(Actor* thisx, PlayState* play) {
     this->unk_148 = 0;
     this->stateFlags = 0;
     this->actor.focus.pos.y += 40.0f;
-    this->actor.flags &= ~ACTOR_FLAG_TARGETABLE;
+    this->actor.flags &= ~ACTOR_FLAG_ATTENTION_ENABLED;
 
     if (numberInFountain < STRAY_FAIRY_TOTAL) {
         EnElfgrp_SpawnStrayFairies(this, play, numberInFountain, SPAWNED_STRAY_FAIRY_TYPE_PRESENT);

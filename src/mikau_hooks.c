@@ -46,7 +46,7 @@ typedef struct EnZog {
 
 static ColliderCylinderInit sCylinderInit = {
     {
-        COLTYPE_NONE,
+        COL_MATERIAL_NONE,
         AT_NONE,
         AC_ON | AC_TYPE_ENEMY,
         OC1_ON | OC1_TYPE_PLAYER,
@@ -54,11 +54,11 @@ static ColliderCylinderInit sCylinderInit = {
         COLSHAPE_CYLINDER,
     },
     {
-        ELEMTYPE_UNK0,
+        ELEM_MATERIAL_UNK0,
         { 0x00000000, 0x00, 0x00 },
         { 0xF7CFFFFF, 0x00, 0x00 },
-        TOUCH_NONE | TOUCH_SFX_NORMAL,
-        BUMP_ON,
+        ATELEM_NONE | ATELEM_SFX_NORMAL,
+        ACELEM_ON,
         OCELEM_ON,
     },
     { 30, 40, 0, { 0, 0, 0 } },
@@ -128,7 +128,7 @@ RECOMP_PATCH void EnZog_Init(Actor* thisx, PlayState* play) {
 
     this->actor.terminalVelocity = -4.0f;
     this->actor.gravity = -1.0f;
-    this->actor.uncullZoneScale = 3000.0f;
+    this->actor.cullingVolumeScale = 3000.0f;
     this->actor.shape.yOffset = 1000.0f;
     this->unk_308 = 0;
     this->unk_30A = 0;
@@ -170,7 +170,7 @@ RECOMP_PATCH void EnZog_Init(Actor* thisx, PlayState* play) {
         }
     }
 
-    this->actor.flags |= ACTOR_FLAG_10000;
+    this->actor.flags |= ACTOR_FLAG_TALK_OFFER_AUTO_ACCEPTED;
     this->actor.home.rot.z = 0;
     if (ENZOG_GET_F(&this->actor) != ENZOG_F_2) {
         for (i = 0; i < 5; i++) {
@@ -182,8 +182,8 @@ RECOMP_PATCH void EnZog_Init(Actor* thisx, PlayState* play) {
     if (ENZOG_GET_F(&this->actor) != ENZOG_F_2) {
         this->unk_302 = this->unk_300 = 0;
         this->unk_2FC = this->unk_2FE = 3;
-        this->actor.flags |= ACTOR_FLAG_2000000;
-        this->actor.flags &= ~ACTOR_FLAG_10000;
+        this->actor.flags |= ACTOR_FLAG_UPDATE_DURING_SOARING_AND_SOT_CS;
+        this->actor.flags &= ~ACTOR_FLAG_TALK_OFFER_AUTO_ACCEPTED;
         this->unk_31C = 2;
         this->unk_31E = 0;
 
@@ -213,7 +213,7 @@ RECOMP_PATCH void func_80B94A00(EnZog* this, PlayState* play) {
 
     if (func_80B93BE0(this, play)) {
         this->actionFunc = func_80B948A8;
-        this->actor.flags |= ACTOR_FLAG_2000000;
+        this->actor.flags |= ACTOR_FLAG_UPDATE_DURING_OCARINA;
         if (CHECK_WEEKEVENTREG(WEEKEVENTREG_29_20)) {
             this->actor.textId = 0x1009;
         } else {
@@ -306,7 +306,7 @@ RECOMP_PATCH void func_80B94E34(EnZog* this, PlayState* play) {
         this->unk_324--;
     }
 
-    if (Actor_ProcessTalkRequest(&this->actor, &play->state)) {
+    if (Actor_TalkOfferAccepted(&this->actor, &play->state)) {
         this->actionFunc = func_80B94D0C;
         this->actor.speed = 0.0f;
         this->unk_300 = 2;

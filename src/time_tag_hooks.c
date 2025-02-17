@@ -5,7 +5,7 @@
 
 struct EnTimeTag;
 
-#define FLAGS (ACTOR_FLAG_10)
+#define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
 #define THIS ((EnTimeTag*)thisx)
 
@@ -146,12 +146,12 @@ RECOMP_PATCH void EnTimeTag_Init(Actor* thisx, PlayState* play) {
 
         case TIMETAG_ROOFTOP_OATH:
             this->actionFunc = EnTimeTag_RooftopOath_Wait;
-            this->actor.flags |= ACTOR_FLAG_2000000;
+            this->actor.flags |= ACTOR_FLAG_UPDATE_DURING_OCARINA;
             break;
 
         case TIMETAG_SOARING_ENGRAVING:
             //this->actionFunc = EnTimeTag_SoaringEngraving_Wait;
-            this->actor.flags |= ACTOR_FLAG_2000000;
+            this->actor.flags |= ACTOR_FLAG_UPDATE_DURING_OCARINA;
             //if (CHECK_QUEST_ITEM(QUEST_SONG_SOARING)) {
             if (rando_location_is_checked(0x04006A)) {
                 this->actor.textId = 0;
@@ -173,7 +173,7 @@ RECOMP_PATCH void EnTimeTag_Init(Actor* thisx, PlayState* play) {
 }
 
 RECOMP_PATCH void EnTimeTag_SoaringEngraving_SubsequentInteraction(EnTimeTag* this, PlayState* play) {
-    /*if ((Message_GetState(&play->msgCtx) == TEXT_STATE_5) && Message_ShouldAdvance(play)) {
+    /*if ((Message_GetState(&play->msgCtx) == TEXT_STATE_EVENT) && Message_ShouldAdvance(play)) {
         Message_CloseTextbox(play);
         this->actionFunc = EnTimeTag_SoaringEngraving_Wait;
     }*/
@@ -189,7 +189,7 @@ RECOMP_PATCH void EnTimeTag_SoaringEngraving_Wait(EnTimeTag* this, PlayState* pl
     } else if ((this->actor.xzDistToPlayer < 100.0f) && Player_IsFacingActor(&this->actor, 0x3000, play) &&
                (Flags_GetSwitch(play, TIMETAG_SOARING_GET_SWITCH_FLAG(&this->actor)) ||
                 CHECK_QUEST_ITEM(QUEST_SONG_SOARING))) {
-        this->actor.flags |= ACTOR_FLAG_TARGETABLE;
+        this->actor.flags |= ACTOR_FLAG_ATTENTION_ENABLED;
         Actor_OfferTalk(&this->actor, play, 110.0f);
     }*/
     if (Actor_HasParent(&this->actor, play)) {

@@ -56,12 +56,12 @@ RECOMP_PATCH void func_8098DC60(ObjComb* this, PlayState* play) {
     }
 
     if (this->unk_1B3) {
-        if (this->collider.elements->info.acHitInfo->toucher.dmgFlags & 0x0182C29C) {
+        if (this->collider.elements[0].base.acHitElem->atDmgInfo.dmgFlags & 0x0182C29C) {
             func_8098CEAC(this, play);
             func_8098DA74(this, play);
             Actor_Kill(&this->actor);
         } else {
-            s32 dmgFlags = this->collider.elements->info.acHitInfo->toucher.dmgFlags;
+            s32 dmgFlags = this->collider.elements[0].base.acHitElem->atDmgInfo.dmgFlags;
 
             if (dmgFlags & 0x13820) {
                 this->unk_1A8 = 0xDAC;
@@ -74,7 +74,7 @@ RECOMP_PATCH void func_8098DC60(ObjComb* this, PlayState* play) {
             if ((this->unk_1B2 <= 0) && (dmgFlags & 0x13820)) {
                 if (this->unk_1B5 == 0) {
                     this->unk_1B5 = 1;
-                    this->actor.flags |= ACTOR_FLAG_10;
+                    this->actor.flags |= ACTOR_FLAG_UPDATE_CULLING_DISABLED;
                 }
                 this->unk_1B2 = 20;
             }

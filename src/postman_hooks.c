@@ -332,7 +332,7 @@ s32 func_80AF81E8(Actor* thisx, PlayState* play);
 s32 func_80AF8348(Actor* thisx, PlayState* play);
 s32 func_80AF8478(Actor* thisx, PlayState* play);
 
-RECOMP_PATCH u8* func_80AF8540(EnPm* this, PlayState* play) {
+RECOMP_PATCH u8* EnPm_GetMsgScript(EnPm* this, PlayState* play) {
     switch (this->scheduleResult) {
         case 28:
             this->msgScriptCallback = (MsgScriptCallback) func_80AF8348;

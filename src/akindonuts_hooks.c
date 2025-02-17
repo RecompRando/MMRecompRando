@@ -199,7 +199,7 @@ RECOMP_PATCH void func_80BEF518(EnAkindonuts* this, PlayState* play) {
 
     if (this->unk_35E == 0) {
         if (CutsceneManager_IsNext(this->csId)) {
-            func_800B7298(play, NULL, PLAYER_CSACTION_END);
+            Player_SetCsActionWithHaltedActors(play, NULL, PLAYER_CSACTION_END);
             this->unk_35E = 1;
         } else {
             if (CutsceneManager_GetCurrentCsId() == CS_ID_GLOBAL_TALK) {
@@ -223,7 +223,7 @@ RECOMP_PATCH void func_80BEF518(EnAkindonuts* this, PlayState* play) {
 }
 
 f32 func_80BECEAC(Path* path, s32 arg1, Vec3f* pos, Vec3s* arg3);
-s32 func_80BECD10(EnAkindonuts* this, Path* path, s32 arg2);
+s32 EnAkindonuts_HasReachedPoint(EnAkindonuts* this, Path* path, s32 pointIndex);
 void func_80BEFD74(EnAkindonuts* this, PlayState* play);
 void func_80BECBE0(EnAkindonuts* this, s16 arg1);
 
@@ -252,7 +252,7 @@ RECOMP_PATCH void func_80BEFAF0(EnAkindonuts* this, PlayState* play) {
         this->unk_352 += this->unk_362;
         this->actor.world.rot.x = -sp38.x;
 
-        if (func_80BECD10(this, this->path, this->unk_334) && (sp34 < 10.0f)) {
+        if (EnAkindonuts_HasReachedPoint(this, this->path, this->unk_334) && (sp34 < 10.0f)) {
             if (this->unk_334 >= (this->path->count - 1)) {
                 CutsceneManager_Stop(this->csId);
                 this->actionFunc = func_80BEFD74;
@@ -278,7 +278,7 @@ RECOMP_PATCH void func_80BEFAF0(EnAkindonuts* this, PlayState* play) {
 
     if (this->unk_35E == 2) {
         if (CutsceneManager_IsNext(this->csId)) {
-            func_800B7298(play, NULL, PLAYER_CSACTION_END);
+            Player_SetCsActionWithHaltedActors(play, NULL, PLAYER_CSACTION_END);
             this->unk_35E = 3;
         } else {
             CutsceneManager_Queue(this->csId);

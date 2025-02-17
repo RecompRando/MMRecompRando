@@ -5,7 +5,9 @@
 
 struct EnSellnuts;
 
-#define FLAGS (ACTOR_FLAG_TARGETABLE | ACTOR_FLAG_FRIENDLY | ACTOR_FLAG_10 | ACTOR_FLAG_20)
+#define FLAGS                                                                                  \
+    (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_FRIENDLY | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
+     ACTOR_FLAG_DRAW_CULLING_DISABLED)
 
 #define THIS ((EnSellnuts*)thisx)
 
@@ -115,7 +117,7 @@ RECOMP_PATCH void func_80ADBBEC(EnSellnuts* this, PlayState* play) {
     Player* player = GET_PLAYER(play);
     if (Actor_HasParent(&this->actor, play)) {
         this->actor.parent = NULL;
-        SET_WEEKEVENTREG(WEEKEVENTREG_17_80);
+        SET_WEEKEVENTREG(WEEKEVENTREG_RECEIVED_LAND_TITLE_DEED);
         this->actionFunc = func_80ADBCE4;
     } else {
         Actor_OfferGetItem(&this->actor, play, GI_DEED_LAND, 300.0f, 300.0f);
@@ -123,7 +125,7 @@ RECOMP_PATCH void func_80ADBBEC(EnSellnuts* this, PlayState* play) {
 }
 
 void func_80ADC580(EnSellnuts* this, PlayState* play);
-s32 func_80ADCE4C(EnSellnuts* this, Path* path, s32 arg2);
+s32 EnSellnuts_HasReachedPoint(EnSellnuts* this, Path* path, s32 pointIndex);
 f32 func_80ADCFE8(Path* path, s32 arg1, Vec3f* pos, Vec3s* arg3);
 
 RECOMP_PATCH void func_80ADC37C(EnSellnuts* this, PlayState* play) {
@@ -142,7 +144,7 @@ RECOMP_PATCH void func_80ADC37C(EnSellnuts* this, PlayState* play) {
         this->unk_342 = 0x1000;
         this->unk_344 += this->unk_364;
         this->actor.world.rot.x = -sp30.x;
-        if (func_80ADCE4C(this, this->path, this->unk_334) && (sp2C < 500.0f)) {
+        if (EnSellnuts_HasReachedPoint(this, this->path, this->unk_334) && (sp2C < 500.0f)) {
             if (this->unk_334 >= (this->path->count - 1)) {
                 CutsceneManager_Stop(this->csId);
                 this->actionFunc = func_80ADC580;
@@ -159,7 +161,7 @@ RECOMP_PATCH void func_80ADC37C(EnSellnuts* this, PlayState* play) {
     Actor_MoveWithoutGravity(&this->actor);
     if (this->unk_366 == 2) {
         if (CutsceneManager_IsNext(this->csId)) {
-            func_800B7298(play, NULL, PLAYER_CSACTION_END);
+            Player_SetCsActionWithHaltedActors(play, NULL, PLAYER_CSACTION_END);
             this->unk_366 = 3;
         } else {
             CutsceneManager_Queue(this->csId);
@@ -183,7 +185,7 @@ RECOMP_PATCH void func_80ADC7B4(EnSellnuts* this, PlayState* play) {
 
     if (this->unk_366 == 0) {
         if (CutsceneManager_IsNext(this->csId)) {
-            func_800B7298(play, NULL, PLAYER_CSACTION_END);
+            Player_SetCsActionWithHaltedActors(play, NULL, PLAYER_CSACTION_END);
             this->unk_366 = 1;
         } else {
             if (CutsceneManager_GetCurrentCsId() == CS_ID_GLOBAL_TALK) {
@@ -191,7 +193,7 @@ RECOMP_PATCH void func_80ADC7B4(EnSellnuts* this, PlayState* play) {
             }
             CutsceneManager_Queue(this->csId);
         }
-    } else if ((this->unk_366 == 1) && (talkState == TEXT_STATE_5) && Message_ShouldAdvance(play)) {
+    } else if ((this->unk_366 == 1) && (talkState == TEXT_STATE_EVENT) && Message_ShouldAdvance(play)) {
         play->msgCtx.msgMode = MSGMODE_TEXT_CLOSING;
         play->msgCtx.stateTimer = 4;
         this->unk_366 = 0;
@@ -213,7 +215,7 @@ RECOMP_PATCH void func_80ADBE80(EnSellnuts* this, PlayState* play) {
     func_80ADAE64(this);
     if (this->unk_366 == 0) {
         if (CutsceneManager_IsNext(this->csId)) {
-            func_800B7298(play, NULL, PLAYER_CSACTION_END);
+            Player_SetCsActionWithHaltedActors(play, NULL, PLAYER_CSACTION_END);
             this->unk_366 = 1;
         } else {
             if (CutsceneManager_GetCurrentCsId() == CS_ID_GLOBAL_TALK) {
@@ -243,7 +245,7 @@ RECOMP_PATCH void func_80ADC8C4(EnSellnuts* this, PlayState* play) {
 
     if (this->unk_366 == 0) {
         if (CutsceneManager_IsNext(this->csId)) {
-            func_800B7298(play, NULL, PLAYER_CSACTION_END);
+            Player_SetCsActionWithHaltedActors(play, NULL, PLAYER_CSACTION_END);
             this->unk_366 = 1;
         } else {
             if (CutsceneManager_GetCurrentCsId() == CS_ID_GLOBAL_TALK) {
@@ -264,7 +266,7 @@ RECOMP_PATCH void func_80ADC8C4(EnSellnuts* this, PlayState* play) {
         this->unk_342 = 0x1000;
         this->unk_344 += 0x1C71;
         this->actor.world.rot.x = -sp30.x;
-        if (func_80ADCE4C(this, this->path, this->unk_334)) {
+        if (EnSellnuts_HasReachedPoint(this, this->path, this->unk_334)) {
             if (this->unk_334 >= (this->path->count - 1)) {
                 this->unk_34C = 22;
                 this->actor.gravity = -1.0f;

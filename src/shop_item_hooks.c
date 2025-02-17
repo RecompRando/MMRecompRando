@@ -16,7 +16,7 @@ void EnGirlA_Destroy(Actor* thisx, PlayState* play);
 void EnGirlA_Update(Actor* thisx, PlayState* play);
 void EnGirlA_Draw(Actor* thisx, PlayState* play);
 
-void EnGirlA_InitalUpdate(EnGirlA* this, PlayState* play);
+void EnGirlA_InitialUpdate(EnGirlA* this, PlayState* play);
 void EnGirlA_Update2(EnGirlA* this, PlayState* play);
 
 s32 EnGirlA_CanBuyPotionRed(PlayState* play, EnGirlA* this) {
@@ -582,7 +582,7 @@ void EnGirlA_SetupAction(EnGirlA* this, EnGirlAActionFunc action);
 void EnGirlA_Bought(PlayState* play, EnGirlA* this);
 void EnGirlA_Restock(PlayState* play, EnGirlA* this);
 
-RECOMP_PATCH void EnGirlA_InitalUpdate(EnGirlA* this, PlayState* play) {
+RECOMP_PATCH void EnGirlA_InitialUpdate(EnGirlA* this, PlayState* play) {
     s16 params = this->actor.params;
     if (rando_shopsanity_enabled()
         && !(this->actor.params == SI_BOTTLE ||
@@ -597,7 +597,7 @@ RECOMP_PATCH void EnGirlA_InitalUpdate(EnGirlA* this, PlayState* play) {
         ShopItemEntry* shopItem = &item;
 
         if (Object_IsLoaded(&play->objectCtx, this->objectSlot)) {
-            this->actor.flags &= ~ACTOR_FLAG_10;
+            this->actor.flags &= ~ACTOR_FLAG_UPDATE_CULLING_DISABLED;
             this->actor.objectSlot = this->objectSlot;
             this->actor.textId = shopItem->descriptionTextId;
             this->choiceTextId = shopItem->choiceTextId;
@@ -618,7 +618,7 @@ RECOMP_PATCH void EnGirlA_InitalUpdate(EnGirlA* this, PlayState* play) {
             this->itemParams = this->actor.params;
             this->drawFunc = shopItem->drawFunc;
             this->getItemDrawId = shopItem->getItemDrawId;
-            this->actor.flags &= ~ACTOR_FLAG_TARGETABLE;
+            this->actor.flags &= ~ACTOR_FLAG_ATTENTION_ENABLED;
             Actor_SetScale(&this->actor, 0.25f);
             this->actor.shape.yOffset = 24.0f;
             this->actor.shape.shadowScale = 4.0f;
@@ -641,7 +641,7 @@ RECOMP_PATCH void EnGirlA_InitalUpdate(EnGirlA* this, PlayState* play) {
         ShopItemEntry* shopItem = &sShopItemEntries[params];
 
         if (Object_IsLoaded(&play->objectCtx, this->objectSlot)) {
-            this->actor.flags &= ~ACTOR_FLAG_10;
+            this->actor.flags &= ~ACTOR_FLAG_UPDATE_CULLING_DISABLED;
             this->actor.objectSlot = this->objectSlot;
             this->actor.textId = shopItem->descriptionTextId;
             this->choiceTextId = shopItem->choiceTextId;
@@ -661,7 +661,7 @@ RECOMP_PATCH void EnGirlA_InitalUpdate(EnGirlA* this, PlayState* play) {
             this->itemParams = shopItem->params;
             this->drawFunc = shopItem->drawFunc;
             this->getItemDrawId = shopItem->getItemDrawId;
-            this->actor.flags &= ~ACTOR_FLAG_TARGETABLE;
+            this->actor.flags &= ~ACTOR_FLAG_ATTENTION_ENABLED;
             Actor_SetScale(&this->actor, 0.25f);
             this->actor.shape.yOffset = 24.0f;
             this->actor.shape.shadowScale = 4.0f;

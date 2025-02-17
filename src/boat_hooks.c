@@ -5,7 +5,7 @@
 
 struct BgIngate;
 
-#define FLAGS (ACTOR_FLAG_10 | ACTOR_FLAG_20)
+#define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_DRAW_CULLING_DISABLED)
 
 #define THIS ((BgIngate*)thisx)
 
@@ -81,7 +81,7 @@ RECOMP_PATCH void func_80953F9C(BgIngate* this, PlayState* play) {
 
             if (this->timePath->additionalPathIndex != ADDITIONAL_PATH_INDEX_NONE) {
                 func_80953E38(play);
-                func_800B7298(play, &this->dyna.actor, PLAYER_CSACTION_WAIT);
+                Player_SetCsActionWithHaltedActors(play, &this->dyna.actor, PLAYER_CSACTION_WAIT);
                 this->dyna.actor.textId = 0x9E4;
                 Message_StartTextbox(play, this->dyna.actor.textId, NULL);
                 this->unk16C += 1;

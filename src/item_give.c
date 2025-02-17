@@ -2,7 +2,7 @@
 #include "global.h"
 #include "ultra64.h"
 
-#include "objects/gameplay_keep/gameplay_keep.h"
+#include "assets/objects/gameplay_keep/gameplay_keep.h"
 
 #include "apcommon.h"
 
@@ -35,9 +35,9 @@ s32 func_8085B28C(PlayState* play, Player* this, PlayerCsAction csAction);
 void Player_DetachHeldActor(PlayState* play, Player* this);
 void func_80838830(Player* this, s16 objectId);
 void Player_StopCutscene(Player* this);
-s32 func_808324EC(PlayState* play, Player* this, PlayerFuncD58 arg2, s32 csId);
+s32 Player_SetupWaitForPutAwayWithCs(PlayState* play, Player* this, AfterPutAwayFunc afterPutAwayFunc, s32 csId);
 void func_80837C78(PlayState* play, Player* this);
-void func_8082DB90(PlayState* play, Player* this, PlayerAnimationHeader* anim);
+void Player_Anim_PlayOnceAdjusted(PlayState* play, Player* this, PlayerAnimationHeader* anim);
 
 #undef GET_ITEM
 
@@ -724,7 +724,7 @@ RECOMP_PATCH void func_80838830(Player* this, s16 objectId) {
         objectSize = gObjectTable[objectId].vromEnd - gObjectTable[objectId].vromStart;
         this->giObjectSegment = ZeldaArena_Malloc(objectSize);
         osCreateMesgQueue(&this->giObjectLoadQueue, &this->giObjectLoadMsg, 1);
-        DmaMgr_SendRequestImpl(&this->giObjectDmaRequest, this->giObjectSegment, gObjectTable[objectId].vromStart,
+        DmaMgr_RequestAsync(&this->giObjectDmaRequest, this->giObjectSegment, gObjectTable[objectId].vromStart,
                                gObjectTable[objectId].vromEnd - gObjectTable[objectId].vromStart, 0,
                                &this->giObjectLoadQueue, NULL);
     } else {
@@ -821,7 +821,7 @@ s32 Player_GrabPlayer(PlayState* play, Player* this);
 s32 func_8085B28C(PlayState* play, Player* this, PlayerCsAction csAction);
 void func_8085B384(Player* this, PlayState* play);
 s32 Player_InflictDamage(PlayState* play, s32 damage);
-void Player_TalkWithPlayer(PlayState* play, Actor* actor);
+void Player_StartTalking(PlayState* play, Actor* actor);
 void func_8085B74C(PlayState* play);
 void func_8085B820(PlayState* play, s16 arg1);
 PlayerItemAction func_8085B854(PlayState* play, Player* this, ItemId itemId);
@@ -846,11 +846,11 @@ void func_80839A10(PlayState* play, Player* this);
 s32 func_8083249C(Player* this);
 s32 func_80847994(PlayState* play, Player* this);
 void func_80848294(PlayState* play, Player* this);
-void func_8082E794(Player* this);
+void Player_Anim_ResetMove(Player* this);
 void func_80839E74(Player* this, PlayState* play);
 void func_80833B18(PlayState* play, Player* this, s32 arg2, f32 speed, f32 velocityY, s16 arg5,
                    s32 invincibilityTimer);
-void func_8082E920(PlayState* play, Player* this, s32 moveFlags);
+void Player_AnimReplace_Setup(PlayState* play, Player* this, s32 movementFlags);
 void Player_PlayAnimSfx(Player* this, AnimSfxEntry* entry);
 void Player_AnimSfx_PlayFloorLand(Player* this);
 
@@ -885,7 +885,7 @@ RECOMP_PATCH void Player_Action_65(Player* this, PlayState* play) {
                             func_80848250(play, this);
                             this->exchangeItemAction = PLAYER_IA_NONE;
                             if (!func_80847994(play, this)) {
-                                Player_TalkWithPlayer(play, this->talkActor);
+                                Player_StartTalking(play, this->talkActor);
                             }
                         } else {
                             func_80848294(play, this);
@@ -894,12 +894,12 @@ RECOMP_PATCH void Player_Action_65(Player* this, PlayState* play) {
                 }
             }
         } else {
-            func_8082E794(this);
+            Player_Anim_ResetMove(this);
 
             if ((this->getItemId == GI_STRAY_FAIRY) || (this->getItemId == GI_SKULL_TOKEN) ||
                 (this->getItemId == GI_ICE_TRAP)) {
                 Player_StopCutscene(this);
-                this->stateFlags1 &= ~(PLAYER_STATE1_400 | PLAYER_STATE1_800);
+                this->stateFlags1 &= ~(PLAYER_STATE1_400 | PLAYER_STATE1_CARRYING_ACTOR);
                 if (this->getItemId == GI_STRAY_FAIRY) {
                     func_80839E74(this, play);
                 } else {
@@ -908,17 +908,17 @@ RECOMP_PATCH void Player_Action_65(Player* this, PlayState* play) {
                 }
             } else {
                 if (this->skelAnime.animation == &gPlayerAnim_link_normal_box_kick) {
-                    func_8082DB90(play, this,
+                    Player_Anim_PlayOnceAdjusted(play, this,
                                   (this->transformation == PLAYER_FORM_DEKU) ? &gPlayerAnim_pn_getB
                                                                              : &gPlayerAnim_link_demo_get_itemB);
                 } else {
-                    func_8082DB90(play, this,
+                    Player_Anim_PlayOnceAdjusted(play, this,
                                   (this->transformation == PLAYER_FORM_DEKU) ? &gPlayerAnim_pn_getA
                                                                              : &gPlayerAnim_link_demo_get_itemA);
                 }
 
-                func_8082E920(play, this,
-                              ANIM_FLAG_1 | ANIM_FLAG_UPDATE_Y | ANIM_FLAG_4 | ANIM_FLAG_8 | ANIM_FLAG_NOMOVE |
+                Player_AnimReplace_Setup(play, this,
+                              ANIM_FLAG_1 | ANIM_FLAG_UPDATE_Y | ANIM_FLAG_4 | ANIM_FLAG_ENABLE_MOVEMENT | ANIM_FLAG_NOMOVE |
                                   ANIM_FLAG_80);
                 Player_StopCutscene(this);
                 this->csId = play->playerCsIds[PLAYER_CS_ID_ITEM_GET];
@@ -969,7 +969,7 @@ RECOMP_PATCH void Player_Action_60(Player* this, PlayState* play) {
     }
 
     func_808475B4(this);
-    func_8084748C(this, &this->linearVelocity, 0.0f, this->actor.shape.rot.y);
+    func_8084748C(this, &this->speedXZ, 0.0f, this->actor.shape.rot.y);
 }
 
 RECOMP_PATCH u8 Item_CheckObtainabilityImpl(u8 item) {
@@ -1210,12 +1210,12 @@ typedef struct EnBom {
 
 void func_8082DAD4(Player* this);
 void func_8083D168(PlayState* play, Player* this, GetItemEntry* giEntry);
-s32 func_80832558(PlayState* play, Player* this, PlayerFuncD58 arg2);
-void func_8082E920(PlayState* play, Player* this, s32 moveFlags);
-void Player_AnimationPlayOnce(PlayState* play, Player* this, PlayerAnimationHeader* anim);
+s32 Player_SetupWaitForPutAway(PlayState* play, Player* this, AfterPutAwayFunc afterPutAwayFunc);
+void Player_AnimReplace_Setup(PlayState* play, Player* this, s32 moveFlags);
+void Player_Anim_PlayOnce(PlayState* play, Player* this, PlayerAnimationHeader* anim);
 void func_808379C0(PlayState* play, Player* this);
 
-RECOMP_PATCH s32 Player_ActionChange_2(Player* this, PlayState* play) {
+RECOMP_PATCH s32 Player_ActionHandler_2(Player* this, PlayState* play) {
     if (gSaveContext.save.saveInfo.playerData.health != 0) {
         Actor* interactRangeActor = this->interactRangeActor;
 
@@ -1236,14 +1236,14 @@ RECOMP_PATCH s32 Player_ActionChange_2(Player* this, PlayState* play) {
                         if (!(this->stateFlags2 & PLAYER_STATE2_400) ||
                             (this->currentBoots == PLAYER_BOOTS_ZORA_UNDERWATER)) {
                             Player_StopCutscene(this);
-                            func_808324EC(play, this, func_80837C78, play->playerCsIds[PLAYER_CS_ID_ITEM_GET]);
-                            func_8082DB90(play, this,
+                            Player_SetupWaitForPutAwayWithCs(play, this, func_80837C78, play->playerCsIds[PLAYER_CS_ID_ITEM_GET]);
+                            Player_Anim_PlayOnceAdjusted(play, this,
                                           (this->transformation == PLAYER_FORM_DEKU)
                                               ? &gPlayerAnim_pn_getB
                                               : &gPlayerAnim_link_demo_get_itemB);
                         }
 
-                        this->stateFlags1 |= (PLAYER_STATE1_400 | PLAYER_STATE1_800 | PLAYER_STATE1_20000000);
+                        this->stateFlags1 |= (PLAYER_STATE1_400 | PLAYER_STATE1_CARRYING_ACTOR | PLAYER_STATE1_20000000);
                         func_8082DAD4(this);
 
                         return true;
@@ -1253,7 +1253,7 @@ RECOMP_PATCH s32 Player_ActionChange_2(Player* this, PlayState* play) {
                     this->getItemId = GI_NONE;
                 }
             } else if (this->csAction == PLAYER_CSACTION_NONE) {
-                if (!(this->stateFlags1 & PLAYER_STATE1_800)) {
+                if (!(this->stateFlags1 & PLAYER_STATE1_CARRYING_ACTOR)) {
                     if (this->getItemId != GI_NONE) {
                         //if (CHECK_BTN_ALL(sPlayerControlInput->press.button, BTN_A)) {
                         if (CHECK_BTN_ALL(CONTROLLER1(&play->state)->press.button, BTN_A)) {
@@ -1273,8 +1273,8 @@ RECOMP_PATCH s32 Player_ActionChange_2(Player* this, PlayState* play) {
                                 giEntry = &sGetItemTable_ap[-this->getItemId - 1];
                             }*/
 
-                            func_80832558(play, this, func_80837C78);
-                            this->stateFlags1 |= (PLAYER_STATE1_400 | PLAYER_STATE1_800 | PLAYER_STATE1_20000000);
+                            Player_SetupWaitForPutAway(play, this, func_80837C78);
+                            this->stateFlags1 |= (PLAYER_STATE1_400 | PLAYER_STATE1_CARRYING_ACTOR | PLAYER_STATE1_20000000);
                             func_80838830(this, giEntry->objectId);
 
                             this->actor.world.pos.x =
@@ -1284,20 +1284,20 @@ RECOMP_PATCH s32 Player_ActionChange_2(Player* this, PlayState* play) {
                                 interactRangeActor->world.pos.z -
                                 (Math_CosS(interactRangeActor->shape.rot.y) * this->ageProperties->unk_9C);
                             this->actor.world.pos.y = interactRangeActor->world.pos.y;
-                            this->currentYaw = this->actor.shape.rot.y = interactRangeActor->shape.rot.y;
+                            this->yaw = this->actor.shape.rot.y = interactRangeActor->shape.rot.y;
 
                             func_8082DAD4(this);
                             if ((giEntry->itemId != ITEM_NONE) && (giEntry->gid >= 0) &&
                                 (Item_CheckObtainability(giEntry->itemId) == ITEM_NONE)) {
                                 this->csId = chest->csId2;
-                                func_8082DB90(play, this, this->ageProperties->openChestAnim);
-                                func_8082E920(play, this,
-                                              ANIM_FLAG_1 | ANIM_FLAG_UPDATE_Y | ANIM_FLAG_4 | ANIM_FLAG_8 |
+                                Player_Anim_PlayOnceAdjusted(play, this, this->ageProperties->openChestAnim);
+                                Player_AnimReplace_Setup(play, this,
+                                              ANIM_FLAG_1 | ANIM_FLAG_UPDATE_Y | ANIM_FLAG_4 | ANIM_FLAG_ENABLE_MOVEMENT |
                                                   ANIM_FLAG_NOMOVE | ANIM_FLAG_80);
                                 this->actor.bgCheckFlags &= ~BGCHECKFLAG_WATER;
                                 chest->unk_1EC = 1;
                             } else {
-                                Player_AnimationPlayOnce(play, this, &gPlayerAnim_link_normal_box_kick);
+                                Player_Anim_PlayOnce(play, this, &gPlayerAnim_link_normal_box_kick);
                                 chest->unk_1EC = -1;
                             }
 
@@ -1317,9 +1317,9 @@ RECOMP_PATCH s32 Player_ActionChange_2(Player* this, PlayState* play) {
 
                             this->stateFlags2 |= PLAYER_STATE2_10000;
                             if (CHECK_BTN_ALL(CONTROLLER1(&play->state)->press.button, BTN_A)) {
-                                func_80832558(play, this, func_808379C0);
+                                Player_SetupWaitForPutAway(play, this, func_808379C0);
                                 func_8082DAD4(this);
-                                this->stateFlags1 |= PLAYER_STATE1_800;
+                                this->stateFlags1 |= PLAYER_STATE1_CARRYING_ACTOR;
 
                                 return true;
                             }
@@ -1348,7 +1348,7 @@ RECOMP_PATCH s32 Actor_OfferGetItem(Actor* actor, PlayState* play, GetItemId get
     u8 item;
 
     if (!(player->stateFlags1 &
-          (PLAYER_STATE1_80 | PLAYER_STATE1_1000 | PLAYER_STATE1_2000 | PLAYER_STATE1_4000 | PLAYER_STATE1_40000 |
+          (PLAYER_STATE1_DEAD | PLAYER_STATE1_CHARGING_SPIN_ATTACK | PLAYER_STATE1_2000 | PLAYER_STATE1_4000 | PLAYER_STATE1_40000 |
            PLAYER_STATE1_80000 | PLAYER_STATE1_100000 | PLAYER_STATE1_200000)) &&
         (Player_GetExplosiveHeld(player) <= PLAYER_EXPLOSIVE_NONE)) {
         if ((actor->xzDistToPlayer <= xzRange) && (fabsf(actor->playerHeightRel) <= fabsf(yRange))) {
@@ -1356,7 +1356,7 @@ RECOMP_PATCH s32 Actor_OfferGetItem(Actor* actor, PlayState* play, GetItemId get
                  (getItemId == GI_DEED_LAND) ||
                  (((player->heldActor != NULL) || (actor == player->talkActor)) &&
                   (((getItemId > GI_NONE) && (getItemId < GI_MAX)) || getItemId > GI_MAX))) ||
-                !(player->stateFlags1 & (PLAYER_STATE1_800 | PLAYER_STATE1_20000000))) {
+                !(player->stateFlags1 & (PLAYER_STATE1_CARRYING_ACTOR | PLAYER_STATE1_20000000))) {
                 s16 yawDiff = actor->yawTowardsPlayer - player->actor.shape.rot.y;
                 s32 absYawDiff = ABS_ALT(yawDiff);
 
@@ -1454,7 +1454,7 @@ s32 Actor_OfferGetItemHook(Actor* actor, PlayState* play, GetItemId getItemId, u
     Player* player = GET_PLAYER(play);
 
     if (!(player->stateFlags1 &
-          (PLAYER_STATE1_80 | PLAYER_STATE1_1000 | PLAYER_STATE1_2000 | PLAYER_STATE1_4000 | PLAYER_STATE1_40000 |
+          (PLAYER_STATE1_DEAD | PLAYER_STATE1_CHARGING_SPIN_ATTACK | PLAYER_STATE1_2000 | PLAYER_STATE1_4000 | PLAYER_STATE1_40000 |
            PLAYER_STATE1_80000 | PLAYER_STATE1_100000 | PLAYER_STATE1_200000)) &&
         (Player_GetExplosiveHeld(player) <= PLAYER_EXPLOSIVE_NONE)) {
         if ((actor->xzDistToPlayer <= xzRange) && (fabsf(actor->playerHeightRel) <= fabsf(yRange))) {
@@ -1462,7 +1462,7 @@ s32 Actor_OfferGetItemHook(Actor* actor, PlayState* play, GetItemId getItemId, u
                  (getItemId == GI_DEED_LAND) ||
                  (((player->heldActor != NULL) || (actor == player->talkActor)) &&
                   (((getItemId > GI_NONE) && (getItemId < GI_MAX)) || (getItemId > GI_MAX)))) ||
-                !(player->stateFlags1 & (PLAYER_STATE1_800 | PLAYER_STATE1_20000000))) {
+                !(player->stateFlags1 & (PLAYER_STATE1_CARRYING_ACTOR | PLAYER_STATE1_20000000))) {
                 s16 yawDiff = actor->yawTowardsPlayer - player->actor.shape.rot.y;
                 s32 absYawDiff = ABS_ALT(yawDiff);
 
