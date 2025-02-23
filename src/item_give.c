@@ -633,14 +633,13 @@ RECOMP_PATCH void Player_DrawGetItemImpl(PlayState* play, Player* player, Vec3f*
 
     OPEN_DISPS(play->state.gfxCtx);
 
-    gSegments[6] = OS_K0_TO_PHYSICAL(segment);
-
     Matrix_Translate((Math_SinS(player->actor.shape.rot.y) * 3.3f) + refPos->x, refPos->y + sp34,
                      (Math_CosS(player->actor.shape.rot.y) * 3.3f) + refPos->z, MTXMODE_NEW);
     Matrix_RotateZYX(0, (play->gameplayFrames * 1000), 0, MTXMODE_APPLY);
     Matrix_Scale(0.2f, 0.2f, 0.2f, MTXMODE_APPLY);
 
     if (playerObjectStatic) {
+        gSegments[6] = OS_K0_TO_PHYSICAL(segment);
         GetItem_Draw(play, drawIdPlusOne - 1);
     } else {
         GetItem_DrawDynamic(play, segment, drawIdPlusOne - 1);
@@ -683,6 +682,146 @@ RECOMP_PATCH void Player_DrawGetItem(PlayState* play, Player* player) {
         }
         Player_DrawGetItemImpl(play, player, &refPos, drawIdPlusOne);
     }
+}
+
+extern PlayerAnimationHeader gPlayerAnim_link_normal_give_other;
+
+extern u8 D_8085D1A4[];
+typedef struct AnimSfxEntry {
+    /* 0x0 */ u16 sfxId;
+    /* 0x2 */ s16 flags; // negative marks the end
+} AnimSfxEntry;          // size = 0x4
+extern AnimSfxEntry D_8085D840[];
+
+s32 func_8083249C(Player* this);
+void Player_TalkWithPlayer(PlayState* play, Actor* actor);
+void func_80839E74(Player* this, PlayState* play);
+void Player_PlayAnimSfx(Player* this, AnimSfxEntry* entry);
+s32 func_8083C62C(Player* this, s32 arg1);
+
+PlayerItemAction Player_ItemToItemAction(Player* this, ItemId item);
+void Player_SetAction_PreserveItemAction(PlayState* play, Player* this, PlayerActionFunc actionFunc, s32 arg3);
+void Player_Action_71(Player* this, PlayState* play);
+void Player_AnimationPlayOnce(PlayState* play, Player* this, PlayerAnimationHeader* anim);
+
+RECOMP_PATCH void func_80848250(PlayState* play, Player* this) {
+    this->getItemDrawIdPlusOne = GID_NONE + 1;
+    playerUseExtended = false;
+    this->stateFlags1 &= ~(PLAYER_STATE1_400 | PLAYER_STATE1_800);
+    this->getItemId = GI_NONE;
+    func_800E0238(Play_GetCamera(play, CAM_ID_MAIN));
+}
+
+RECOMP_PATCH void Player_Action_71(Player* this, PlayState* play) {
+    this->stateFlags2 |= PLAYER_STATE2_20;
+    this->stateFlags3 |= PLAYER_STATE3_4000000;
+
+    func_8083249C(this);
+
+    if (PlayerAnimation_Update(play, &this->skelAnime)) {
+        if (this->exchangeItemAction == PLAYER_IA_NONE) {
+            Actor* talkActor = this->talkActor;
+
+            Player_StopCutscene(this);
+            this->getItemDrawIdPlusOne = GID_NONE + 1;
+            recomp_printf("disable extended 2\n");
+            playerUseExtended = false;
+
+            if ((talkActor->textId != 0) && (talkActor->textId != 0xFFFF)) {
+                this->actor.flags |= ACTOR_FLAG_TALK_REQUESTED;
+            }
+            Player_TalkWithPlayer(play, talkActor);
+        } else {
+            GetItemEntry* giEntry = &sGetItemTable_ap[D_8085D1A4[this->exchangeItemAction] - 1];
+
+            if (Player_BottleFromIA(this, this->itemAction) <= PLAYER_BOTTLE_NONE) {
+                this->getItemDrawIdPlusOne = ABS_ALT(giEntry->gid);
+            }
+
+            if (this->av2.actionVar2 == 0) {
+                if ((this->actor.textId != 0) && (this->actor.textId != 0xFFFF)) {
+                    Message_StartTextbox(play, this->actor.textId, &this->actor);
+                }
+
+                this->av2.actionVar2 = 1;
+            } else if (Message_GetState(&play->msgCtx) == TEXT_STATE_CLOSING) {
+                Player_StopCutscene(this);
+                this->getItemDrawIdPlusOne = GID_NONE + 1;
+                recomp_printf("disable extended 3\n");
+                playerUseExtended = false;
+                this->actor.flags &= ~ACTOR_FLAG_TALK_REQUESTED;
+                func_80839E74(this, play);
+                this->unk_B5E = 0xA;
+            }
+        }
+    } else if (this->av2.actionVar2 >= 0) {
+        if ((Player_BottleFromIA(this, this->itemAction) > PLAYER_BOTTLE_NONE) &&
+            PlayerAnimation_OnFrame(&this->skelAnime, 36.0f)) {
+            Player_SetModels(this, PLAYER_MODELGROUP_BOTTLE);
+        } else if (PlayerAnimation_OnFrame(&this->skelAnime, 2.0f)) {
+            GetItemEntry* giEntry = &sGetItemTable_ap[D_8085D1A4[this->itemAction] - 1];
+
+            func_80838830(this, giEntry->objectId);
+        }
+        Player_PlayAnimSfx(this, D_8085D840);
+    }
+
+    if ((this->av1.actionVar1 == 0) && (this->lockOnActor != NULL)) {
+        this->currentYaw = func_8083C62C(this, 0);
+        this->actor.shape.rot.y = this->currentYaw;
+    }
+}
+
+RECOMP_PATCH void Player_CsAction_41(PlayState* play, Player* this, CsCmdActorCue* cue) {
+    if (PlayerAnimation_Update(play, &this->skelAnime)) {
+        if (this->av2.actionVar2 == 0) {
+            if ((Message_GetState(&play->msgCtx) == TEXT_STATE_CLOSING) ||
+                (Message_GetState(&play->msgCtx) == TEXT_STATE_NONE)) {
+                this->getItemDrawIdPlusOne = GID_NONE + 1;
+                recomp_printf("disable extended 4\n");
+                playerUseExtended = false;
+                this->av2.actionVar2 = -1;
+            } else {
+                this->getItemDrawIdPlusOne = GID_PENDANT_OF_MEMORIES + 1;
+            }
+        } else if (this->av2.actionVar2 < 0) {
+            if (Actor_HasParent(&this->actor, play)) {
+                this->actor.parent = NULL;
+                this->av2.actionVar2 = 1;
+            } else {
+                Actor_OfferGetItem(&this->actor, play, GI_PENDANT_OF_MEMORIES, 9999.9f, 9999.9f);
+            }
+        }
+    } else if (PlayerAnimation_OnFrame(&this->skelAnime, 4.0f)) {
+        SET_WEEKEVENTREG(WEEKEVENTREG_RECEIVED_PENDANT_OF_MEMORIES);
+    }
+}
+
+RECOMP_PATCH PlayerItemAction func_8085B854(PlayState* play, Player* this, ItemId itemId) {
+    PlayerItemAction itemAction = Player_ItemToItemAction(this, itemId);
+
+    if ((itemAction >= PLAYER_IA_MASK_MIN) && (itemAction <= PLAYER_IA_MASK_MAX) &&
+        (itemAction == GET_IA_FROM_MASK(this->currentMask))) {
+        itemAction = PLAYER_IA_NONE;
+    }
+
+    if ((itemAction <= PLAYER_IA_NONE) || (itemAction >= PLAYER_IA_MAX)) {
+        return PLAYER_IA_MINUS1;
+    }
+
+    this->itemAction = PLAYER_IA_NONE;
+    this->actionFunc = NULL;
+    Player_SetAction_PreserveItemAction(play, this, Player_Action_71, 0);
+    this->csId = CS_ID_GLOBAL_TALK;
+    this->itemAction = itemAction;
+    Player_AnimationPlayOnce(play, this, &gPlayerAnim_link_normal_give_other);
+    this->stateFlags1 |= (PLAYER_STATE1_40 | PLAYER_STATE1_20000000);
+    this->getItemDrawIdPlusOne = GID_NONE + 1;
+    recomp_printf("disable extended 5\n");
+    playerUseExtended = false;
+    this->exchangeItemAction = itemAction;
+
+    return itemAction;
 }
 
 // Player_UpdateCurrentGetItemDrawId?
@@ -802,11 +941,6 @@ RECOMP_PATCH s32 func_808482E0(PlayState* play, Player* this) {
 
     return false;
 }
-
-typedef struct AnimSfxEntry {
-    /* 0x0 */ u16 sfxId;
-    /* 0x2 */ s16 flags; // negative marks the end
-} AnimSfxEntry;          // size = 0x4
 
 extern LinkAnimationHeader gPlayerAnim_pn_getA;
 extern LinkAnimationHeader gPlayerAnim_pn_getB;
