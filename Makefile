@@ -3,6 +3,8 @@ LIB_DIRS := lib
 OUTPUT_NAME := mm_recomp_rando
 MOD_TOML := mod.toml
 
+# Allow the user to specify the compiler and linker on macOS
+# as Apple Clang does not support MIPS architecture
 ifeq ($(shell uname),Darwin)
     CC      ?= clang
     LD      ?= ld.lld
