@@ -3,8 +3,16 @@ LIB_DIRS := lib
 OUTPUT_NAME := mm_recomp_rando
 MOD_TOML := mod.toml
 
-CC      := clang
-LD      := ld.lld
+# Allow the user to specify the compiler and linker on macOS
+# as Apple Clang does not support MIPS architecture
+ifeq ($(shell uname),Darwin)
+    CC      ?= clang
+    LD      ?= ld.lld
+else
+    CC      := clang
+    LD      := ld.lld
+endif
+
 MOD_TOOL := ./RecompModTool
 OFFLINE_RECOMP := ./OfflineModRecomp
 TARGET  := $(BUILD_DIR)/mod.elf
