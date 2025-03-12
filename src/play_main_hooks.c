@@ -14,7 +14,6 @@ RECOMP_IMPORT("*", int recomp_set_no_bow_epona_fix(bool new_val));
 RECOMP_IMPORT("*", int recomp_set_allow_no_ocarina_tf(bool new_val));
 RECOMP_IMPORT("*", int recomp_set_h_and_d_no_sword_fix(bool new_val));
 
-RECOMP_IMPORT(".", void rando_init());
 RECOMP_IMPORT(".", int rando_get_starting_heart_locations());
 RECOMP_IMPORT(".", int rando_get_tunic_color());
 
@@ -25,10 +24,8 @@ RECOMP_IMPORT("mm_recomp_colors", void colors_set_human_tunic(u8 r, u8 g, u8 b))
 PlayState* gPlay;
 
 RECOMP_CALLBACK("*", recomp_on_init)
-void call_rando_init()
+void init_rando()
 {
-    rando_init();
-
     recomp_set_moon_crash_resets_save(false);
     recomp_set_fd_anywhere(true);
     recomp_set_no_bow_epona_fix(true);
@@ -37,7 +34,7 @@ void call_rando_init()
 
     dsot_set_skip_dsot_cutscene(true);
 
-    colors_set_human_tunic(C_TO_PARAMS(rando_get_tunic_color()));
+    randoCreateMenus();
 }
 
 s8 giToItemId[GI_MAX] = {

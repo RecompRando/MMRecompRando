@@ -158,4 +158,6 @@ u8 getTextId(s16 gi);
 
 extern s8 giToItemId[];
 
+void randoCreateMenus();
+
 #endif
