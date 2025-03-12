@@ -352,6 +352,7 @@ RECOMP_PATCH void EnItem00_Update(Actor* thisx, PlayState* play) {
     params = this->actor.params;
     if (params == ITEM00_HEART_PIECE && !objectLoaded) {
         EnItem00_WaitForObject(this, play);
+        return;
     }
 
     this->actionFunc(this, play);
