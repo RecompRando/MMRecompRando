@@ -28,7 +28,6 @@ void connect_pressed(RecompuiResource resource, const RecompuiEventData* data, v
     if (data->type == UI_EVENT_CLICK) {
         char* server_text = recompui_get_input_text(server_textinput);
         char* slot_text = recompui_get_input_text(slot_textinput);
-        recomp_printf("Connecting to %s as %s\n", server_text, slot_text);
         bool success = rando_init(server_text, slot_text, "");
         recomp_free(server_text);
         recomp_free(slot_text);

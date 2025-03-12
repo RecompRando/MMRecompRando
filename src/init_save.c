@@ -112,7 +112,14 @@ void Sram_SetInitialWeekEvents(void) {
     }
 }
 
-void initSave(void) {
+RECOMP_PATCH void Sram_InitNewSave(void) {
+    Lib_MemCpy(&gSaveContext.save.saveInfo.playerData, &sSaveDefaultPlayerData, sizeof(SavePlayerData));
+    Lib_MemCpy(&gSaveContext.save.saveInfo.equips, &sSaveDefaultItemEquips, sizeof(ItemEquips));
+    Lib_MemCpy(&gSaveContext.save.saveInfo.inventory, &sSaveDefaultInventory, sizeof(Inventory));
+    gSaveContext.save.saveInfo.checksum = 0;
+
+    gSaveContext.save.playerForm = PLAYER_FORM_HUMAN;
+
     gSaveContext.save.hasTatl = true;
 
     if (rando_get_start_with_consumables_enabled()) {
@@ -130,6 +137,12 @@ void initSave(void) {
 
     // TODO: hide song on quest screen + add playback text
     SET_QUEST_ITEM(QUEST_SONG_SUN);
+
+    gSaveContext.save.saveInfo.horseData.sceneId = SCENE_F01;
+    gSaveContext.save.saveInfo.horseData.pos.x = -1420;
+    gSaveContext.save.saveInfo.horseData.pos.y = 257;
+    gSaveContext.save.saveInfo.horseData.pos.z = -1285;
+    gSaveContext.save.saveInfo.horseData.yaw = -0x7554;
 
     gSaveContext.save.isFirstCycle = true;
 
@@ -150,13 +163,10 @@ void initSave(void) {
 
     SET_EQUIP_VALUE(EQUIP_TYPE_SHIELD, EQUIP_VALUE_SHIELD_NONE);
 
+    Sram_GenerateRandomSaveFields();
+
     gSaveContext.save.saveInfo.playerData.threeDayResetCount = 1;
     gSaveContext.save.cutsceneIndex = 0;
-}
-
-RECOMP_CALLBACK("*", recomp_after_init_save)
-void after_init_save(FileSelectState* fileSelect, SramContext* sramCtx) {
-    initSave();
 }
 
 extern u16 sPersistentCycleWeekEventRegs[ARRAY_COUNT(gSaveContext.save.saveInfo.weekEventReg)];
