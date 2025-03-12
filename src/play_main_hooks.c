@@ -24,8 +24,6 @@ RECOMP_IMPORT("mm_recomp_colors", void colors_set_human_tunic(u8 r, u8 g, u8 b))
 
 PlayState* gPlay;
 
-
-
 RECOMP_CALLBACK("*", recomp_on_init)
 void call_rando_init()
 {
