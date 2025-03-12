@@ -1,0 +1,10 @@
+[[section]]
+name = "..ovl_En_Test4"
+rom = 0x00EAB870
+vram = 0x80A41D70
+size = 0x1760
+
+symbols = [
+    { name = "D_80A43364", vram = 0x80A43364 },
+    { name = "sCsIdList", vram = 0x80A434D0 },
+]

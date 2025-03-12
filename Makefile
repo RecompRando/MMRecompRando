@@ -34,7 +34,7 @@ C_OBJS := $(addprefix $(BUILD_DIR)/, $(C_SRCS:.c=.o))
 C_DEPS := $(addprefix $(BUILD_DIR)/, $(C_SRCS:.c=.d))
 
 
-$(OUTPUT_NAME)/mod_binary.bin: $(TARGET) $(MOD_TOML) $(LIBFILES) | $(OUTPUT_NAME)
+$(OUTPUT_NAME)/mod_binary.bin: $(TARGET) $(MOD_TOML) rando_syms.toml $(LIBFILES) | $(OUTPUT_NAME)
 	$(MOD_TOOL) $(MOD_TOML) $(OUTPUT_NAME)
 
 ifeq ($(OS),Windows_NT)

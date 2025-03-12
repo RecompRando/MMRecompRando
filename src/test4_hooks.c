@@ -1,7 +1,13 @@
 #include "modding.h"
 #include "global.h"
 
+#include "../mm-decomp/src/overlays/actors/ovl_En_Horse/z_en_horse.h"
+#include "z64horse.h"
+
 #include "apcommon.h"
+
+#define FLAGS (ACTOR_FLAG_10 | ACTOR_FLAG_20 | ACTOR_FLAG_100000)
+#define THIS ((EnTest4*)thisx)
 
 struct ObjTokeiStep;
 
@@ -53,25 +59,99 @@ void ObjTokeiStep_Destroy(Actor* thisx, PlayState* play) {
     tokei_steps = NULL;
 }
 
-RECOMP_HOOK("func_80A42AB8")
-void setupClocktowerSkip(EnTest4* this, PlayState* play) {
-    ocarina_item = gSaveContext.save.saveInfo.inventory.items[SLOT_OCARINA];
-    test4_scene_id = play->sceneId;
+RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
 
-    gSaveContext.save.saveInfo.inventory.items[SLOT_OCARINA] = ITEM_OCARINA_OF_TIME;
-    play->sceneId = 0;
-}
+extern u16 D_80A43364[];
+extern s16 sCsIdList[2];
+
+void func_80A41FA4(EnTest4 *this, PlayState *play);
+void func_80A42198(EnTest4 *this);
+void func_80A425E4(EnTest4 *this, PlayState *play);
 
 void ObjTokeiStep_SetupOpen(ObjTokeiStep* this);
 void ObjTokeiStep_DrawOpen(Actor* thisx, PlayState* play);
 
-RECOMP_HOOK_RETURN("func_80A42AB8")
-void resetClocktowerSkip(EnTest4* this, PlayState* play) {
-    gSaveContext.save.saveInfo.inventory.items[SLOT_OCARINA] = ocarina_item;
-    play->sceneId = test4_scene_id;
+RECOMP_PATCH void func_80A42AB8(EnTest4* this, PlayState* play) {
+    Player* player = GET_PLAYER(play);
 
-    if (CURRENT_DAY == 3 && gSaveContext.save.time < CLOCK_TIME(0, 1) && tokei_steps != NULL && tokei_steps->dyna.actor.draw != ObjTokeiStep_DrawOpen) {
-        ObjTokeiStep_SetupOpen(tokei_steps);
-        tokei_steps->dyna.actor.draw = ObjTokeiStep_DrawOpen;
+    if ((play->transitionMode == TRANS_MODE_OFF) && !Play_InCsMode(play) && (play->numSetupActors <= 0) &&
+        (play->roomCtx.status == 0) && !Play_IsDebugCamEnabled()) {
+        s16 temp_a2;
+        u16 temp_a0 = D_80A43364[this->csIdIndex];
+        s16 temp_a3;
+        s16 bellDiff;
+        s16 new_var;
+
+        temp_a3 = gSaveContext.save.time - temp_a0;
+        temp_a2 = this->unk_146 - temp_a0;
+        bellDiff = this->lastBellTime - this->nextBellTime;
+        new_var = gSaveContext.save.time - this->nextBellTime;
+
+        if ((temp_a3 * temp_a2) <= 0) {
+            gSaveContext.unk_3CA7 = 1;
+            if (play->actorCtx.flags & ACTORCTX_FLAG_PICTO_BOX_ON) {
+                play->actorCtx.flags &= ~ACTORCTX_FLAG_PICTO_BOX_ON;
+            }
+
+            if (temp_a0 != CLOCK_TIME(6, 0)) {
+                func_80A41FA4(this, play);
+            } else if (temp_a0 == CLOCK_TIME(6, 0)) {
+                if (CURRENT_DAY == 3) {
+                    Interface_StartMoonCrash(play);
+                    Actor_Kill(&this->actor);
+                    SET_EVENTINF(EVENTINF_17);
+                } else if (((sCsIdList[this->csIdIndex] < 0) || (play->actorCtx.flags & ACTORCTX_FLAG_1)) &&
+                           (CURRENT_DAY != 3)) {
+                    func_80A41FA4(this, play);
+                } else {
+                    gSaveContext.screenScale = 0.0f;
+                    Play_SetRespawnData(&play->state, RESPAWN_MODE_DOWN, Entrance_CreateFromSpawn(0), player->unk_3CE,
+                                        PLAYER_PARAMS(0xFF, PLAYER_INITMODE_B), &player->unk_3C0, player->unk_3CC);
+                    func_80169EFC(&play->state);
+                    if (player->stateFlags1 & PLAYER_STATE1_800000) {
+                        EnHorse* rideActor = (EnHorse*)player->rideActor;
+
+                        if ((rideActor->type == HORSE_TYPE_EPONA) || (rideActor->type == HORSE_TYPE_2)) {
+                            if (CURRENT_DAY < 3) {
+                                gHorseIsMounted = true;
+                            } else {
+                                gHorseIsMounted = false;
+                            }
+                        }
+                    }
+
+                    gSaveContext.respawnFlag = -4;
+                    SET_EVENTINF(EVENTINF_TRIGGER_DAYTELOP);
+                    Actor_Kill(&this->actor);
+                }
+            }
+
+            if ((sCsIdList[this->csIdIndex] >= 0) && !(play->actorCtx.flags & ACTORCTX_FLAG_1)) {
+                player->stateFlags1 |= PLAYER_STATE1_200;
+                this->unk_146 = gSaveContext.save.time;
+            } else {
+                if (this->csIdIndex == 0) {
+                    this->csIdIndex = 1;
+                } else {
+                    this->csIdIndex = 0;
+                }
+
+                this->unk_146 = gSaveContext.save.time += CLOCK_TIME_MINUTE;
+            }
+        } else if ((new_var * bellDiff) <= 0) {
+            Audio_PlaySfx_BigBells(&this->actor.projectedPos, (this->actor.params >> 5) & 0xF);
+            this->lastBellTime = gSaveContext.save.time;
+
+            if (CURRENT_DAY == 3) {
+                // @rando replace clock tower cutscene with open animation
+                if (gSaveContext.save.time < CLOCK_TIME(0, 1) && tokei_steps != NULL && tokei_steps->dyna.actor.draw != ObjTokeiStep_DrawOpen) {
+                    ObjTokeiStep_SetupOpen(tokei_steps);
+                    tokei_steps->dyna.actor.draw = ObjTokeiStep_DrawOpen;
+                }
+                func_80A42198(this);
+            } else {
+                func_80A425E4(this, play);
+            }
+        }
     }
 }
