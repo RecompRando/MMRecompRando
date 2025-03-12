@@ -2,7 +2,6 @@
 *.o
 *.elf
 *.bin
-*.exe
 *.dll
 *.lib
 *.pdb
@@ -13,5 +12,5 @@ build/
 .vscode/settings.json
 mm_recomp_rando/
 .vs/
-RecompModTool
-OfflineModRecomp
+RecompModTool*
+OfflineModRecomp*

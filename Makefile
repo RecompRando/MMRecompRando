@@ -3,16 +3,6 @@ LIB_DIRS := lib
 OUTPUT_NAME := mm_recomp_rando
 MOD_TOML := mod.toml
 
-# Allow the user to specify the compiler and linker on macOS
-# as Apple Clang does not support MIPS architecture
-ifeq ($(shell uname),Darwin)
-    CC      ?= clang
-    LD      ?= ld.lld
-else
-    CC      := clang
-    LD      := ld.lld
-endif
-
 MOD_TOOL := ./RecompModTool
 OFFLINE_RECOMP := ./OfflineModRecomp
 TARGET  := $(BUILD_DIR)/mod.elf
@@ -39,6 +29,9 @@ $(OUTPUT_NAME)/mod_binary.bin: $(TARGET) $(MOD_TOML) rando_syms.toml $(LIBFILES)
 
 ifeq ($(OS),Windows_NT)
 
+CC      = ./bin/clang
+LD      = ./bin/ld.lld
+
 define make_folder
 	mkdir $(subst /,\,$(1))
 endef
@@ -62,9 +55,17 @@ define make_folder
 endef
 
 ifeq ($(shell uname),Darwin)
+	# Allow the user to specify the compiler and linker on macOS
+	# as Apple Clang does not support MIPS architecture
+	CC         ?= clang
+	LD         ?= ld.lld
+
 	LIB_SUFFIX := .dylib
 	ARCH_FLAGS := -arch x86_64 -arch arm64
 else
+	CC         := clang
+	LD         := ld.lld
+
 	LIB_SUFFIX := .so
 	ARCH_FLAGS :=
 endif
