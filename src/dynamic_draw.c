@@ -754,8 +754,6 @@ bool loadObject(PlayState* play, void** objectSegment, OSMesgQueue* objectLoadQu
     return false;
 }
 
-RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
-
 /**
  * Draw "Get Item" Model
  * Calls the corresponding draw function for the given draw ID
