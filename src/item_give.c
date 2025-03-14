@@ -1400,6 +1400,8 @@ RECOMP_PATCH s32 Player_ActionChange_2(Player* this, PlayState* play) {
 #define LOCATION_QUEST_BOTTLE (0x090000 | (actor->id))
 #define LOCATION_MILK ((actor->id) << 8 | GI_MILK)
 
+extern bool rChecked[4];
+
 RECOMP_PATCH s32 Actor_OfferGetItem(Actor* actor, PlayState* play, GetItemId getItemId, f32 xzRange, f32 yRange) {
     Player* player = GET_PLAYER(play);
     u32 i;
@@ -1458,6 +1460,8 @@ RECOMP_PATCH s32 Actor_OfferGetItem(Actor* actor, PlayState* play, GetItemId get
                         } else {
                             rando_send_location(LOCATION_QUEST_HEART_PIECE);
                         }
+                    } else if (getItemId >= GI_REMAINS_ODOLWA && getItemId <= GI_REMAINS_TWINMOLD) {
+                        rChecked[getItemId - GI_REMAINS_ODOLWA] = true;
                     } else if (getItemId == GI_BOTTLE) {
                         recomp_printf("Actor bottle: 0x%06X\n", LOCATION_QUEST_BOTTLE);
                         itemWorkaround = true;
