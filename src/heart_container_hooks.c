@@ -46,7 +46,7 @@ static InitChainEntry sInitChain[] = {
 RECOMP_PATCH void ItemBHeart_Init(Actor* thisx, PlayState* play) {
     ItemBHeart* this = THIS;
 
-    if (Flags_GetCollectible(play, 0x1F) || rando_location_is_checked(LOCATION_HEART_CONTAINER)) {
+    if (rando_location_is_checked(LOCATION_HEART_CONTAINER)) {
         Actor_Kill(&this->actor);
         return;
     }
