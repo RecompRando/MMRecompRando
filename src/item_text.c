@@ -51,6 +51,7 @@ static unsigned char sk_msg[128] = "You got a\x01 Small Key\x00! \xbf";
 static unsigned char bk_msg[128] = "You got the\x01 Boss Key\x00! \xbf";
 static unsigned char map_msg[128] = "You found a\x01 Map\x00! \xbf";
 static unsigned char compass_msg[128] = "You found a\x01 Compass\x00! \xbf";
+static unsigned char bb_msg[128] = "You found a\x05 Bombchu Bag\x00! \xbf";
 
 static unsigned char p_monkey_msg[128] = "Keep this\x01 picture of a monkey\x00?\x02\x11\x11\xc2Yes\x11No\xbf";
 static unsigned char p_big_octo_msg[128] = "Keep this\x01 picture of a Big Octo\x00?\x02\x11\x11\xc2Yes\x11No\xbf";
@@ -296,6 +297,9 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
             break;
         case 0x3F:
             msg = compass_msg;
+            break;
+        case 0x54:
+            msg = bb_msg;
             break;
         case 0x74:
             msg = fool_msg;
