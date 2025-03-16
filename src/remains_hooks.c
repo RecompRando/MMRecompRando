@@ -44,6 +44,12 @@ void func_80A1F470(DmHina* this, PlayState* play);
 RECOMP_PATCH void DmHina_Init(Actor* thisx, PlayState* play) {
     DmHina* this = THIS;
 
+    rGetItemId = rando_get_item_id(LOCATION_REMAINS(this->actor.params));
+    rObjectStatic = false;
+    rObjectLoading = false;
+    rObjectLoaded = false;
+    rObjectSegment = NULL;
+
     this->isDrawn = true;
     this->actionFunc = func_80A1F470;
     this->unk158 = this->actor.world.pos.y;
@@ -63,6 +69,12 @@ void DmHina_WaitForObject(DmHina* this, PlayState* play) {
         rGetItemId = getItemId;
         rObjectStatic = true;
         rObjectLoaded = true;
+    } else if (!rObjectLoaded && !rObjectLoading && Object_IsLoaded(&play->objectCtx, objectSlot)) {
+        this->actor.objectSlot = objectSlot;
+        Actor_SetObjectDependency(play, &this->actor);
+        rObjectStatic = true;
+        rObjectLoaded = true;
+        rGetItemId = getItemId;
     } else if (!rObjectLoading && !rObjectLoaded) {
         loadObject(play, &rObjectSegment, &rObjectLoadQueue, objectId);
         rObjectLoading = true;
@@ -80,7 +92,6 @@ RECOMP_PATCH void DmHina_Update(Actor* thisx, PlayState* play) {
 
     if (!rObjectLoaded) {
         DmHina_WaitForObject(this, play);
-        return;
     }
 
     this->actionFunc(this, play);

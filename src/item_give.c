@@ -1462,6 +1462,10 @@ RECOMP_PATCH s32 Actor_OfferGetItem(Actor* actor, PlayState* play, GetItemId get
                             rando_send_location(LOCATION_QUEST_HEART_PIECE);
                         }
                     } else if (getItemId >= GI_REMAINS_ODOLWA && getItemId <= GI_REMAINS_TWINMOLD) {
+                        itemWorkaround = true;
+                        itemShuffled = true;
+                        trueGI = rando_get_item_id(getItemId);
+                        rando_send_location(getItemId);
                         rChecked[getItemId - GI_REMAINS_ODOLWA] = true;
                     } else if (getItemId == GI_BOTTLE) {
                         recomp_printf("Actor bottle: 0x%06X\n", LOCATION_QUEST_BOTTLE);
