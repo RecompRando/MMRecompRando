@@ -94,13 +94,8 @@ RECOMP_PATCH void EnItem00_Init(Actor* thisx, PlayState* play) {
     }
 
     if (/*Flags_GetCollectible(play, this->collectibleFlag) || */(thisx->params == ITEM00_HEART_PIECE && rando_location_is_checked(LOCATION_HEART_PIECE))) {
-        if (thisx->params == ITEM00_HEART_PIECE) {
-            Actor_Kill(thisx);
-            return;
-        } else {
-            Actor_Kill(thisx);
-            return;
-        }
+        Actor_Kill(thisx);
+        return;
     } else if (shuffled) {
         this->getItemId = rando_get_item_id(LOCATION_HEART_PIECE);
         objectStatic = false;
