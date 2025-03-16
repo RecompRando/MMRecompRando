@@ -74,6 +74,12 @@ void ItemBHeart_WaitForObject(ItemBHeart* this, PlayState* play) {
         hcGetItemId = getItemId;
         hcObjectStatic = true;
         hcObjectLoaded = true;
+    } else if (!hcObjectLoaded && !hcObjectLoading && Object_IsLoaded(&play->objectCtx, objectSlot)) {
+        this->actor.objectSlot = objectSlot;
+        Actor_SetObjectDependency(play, &this->actor);
+        hcObjectStatic = true;
+        hcObjectLoaded = true;
+        hcGetItemId = getItemId;
     } else if (!hcObjectLoading && !hcObjectLoaded) {
         loadObject(play, &hcObjectSegment, &hcObjectLoadQueue, objectId);
         hcObjectLoading = true;
