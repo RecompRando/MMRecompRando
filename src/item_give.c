@@ -1684,7 +1684,7 @@ RECOMP_PATCH u8 Item_Give(PlayState* play, u8 item) {
         return ITEM_NONE;
 
     } else if (item == ITEM_BOMBCHU) {
-        u8 max_bombchus = MAX(CUR_CAPACITY(UPG_BOMB_BAG), 10);
+        u8 max_bombchus = 10*rando_has_item_async(GI_BAG_BOMBCHU);
         if (INV_CONTENT(ITEM_BOMBCHU) != ITEM_BOMBCHU) {
             INV_CONTENT(ITEM_BOMBCHU) = ITEM_BOMBCHU;
             AMMO(ITEM_BOMBCHU) = 10;
@@ -1696,7 +1696,7 @@ RECOMP_PATCH u8 Item_Give(PlayState* play, u8 item) {
         return ITEM_NONE;
 
     } else if ((item >= ITEM_BOMBCHUS_20) && (item <= ITEM_BOMBCHUS_5)) {
-        u8 max_bombchus = MAX(CUR_CAPACITY(UPG_BOMB_BAG), 10);
+        u8 max_bombchus = 10*rando_has_item_async(GI_BAG_BOMBCHU);
         if (gSaveContext.save.saveInfo.inventory.items[SLOT_BOMBCHU] != ITEM_BOMBCHU) {
             INV_CONTENT(ITEM_BOMBCHU) = ITEM_BOMBCHU;
             AMMO(ITEM_BOMBCHU) += sBombchuRefillCounts[item - ITEM_BOMBCHUS_20];

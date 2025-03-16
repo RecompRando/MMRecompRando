@@ -724,6 +724,8 @@ RECOMP_PATCH void Interface_DrawAmmoCount(PlayState* play, s16 button, s16 alpha
         //! but prior to that, when certain conditions are met, the color will have last been set by the wallet icon
         //! causing the ammo count to be drawn incorrectly. This is most obvious when you get deku nuts early on, and
         //! the ammo count is drawn with a shade of green.
+        //!! not anymore dumbass
+        gDPSetEnvColor(OVERLAY_DISP++, 0, 0, 0, 255);
 
         if ((button == EQUIP_SLOT_B) && (gSaveContext.minigameStatus == MINIGAME_STATUS_ACTIVE)) {
             ammo = play->interfaceCtx.minigameAmmo;
@@ -734,7 +736,7 @@ RECOMP_PATCH void Interface_DrawAmmoCount(PlayState* play, s16 button, s16 alpha
                    ((i == ITEM_DEKU_STICK) && (AMMO(i) == CUR_CAPACITY(UPG_DEKU_STICKS))) ||
                    ((i == ITEM_DEKU_NUT) && (AMMO(i) == CUR_CAPACITY(UPG_DEKU_NUTS))) ||
                    // @ap Draw green 10 Bombchu ammo count if no bomb bag.
-                   ((i == ITEM_BOMBCHU) && (AMMO(i) == MAX(CUR_CAPACITY(UPG_BOMB_BAG), 10))) ||
+                   ((i == ITEM_BOMBCHU) && (AMMO(i) == (s8) (10*rando_has_item_async(GI_BAG_BOMBCHU)))) ||
                    ((i == ITEM_POWDER_KEG) && (ammo == 1)) || ((i == ITEM_PICTOGRAPH_BOX) && (ammo == 1)) ||
                    ((i == ITEM_MAGIC_BEANS) && (ammo == 20))) {
             gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 120, 255, 0, alpha);
