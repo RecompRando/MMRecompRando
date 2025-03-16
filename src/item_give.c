@@ -281,8 +281,8 @@ GetItemEntry sGetItemTable_ap[] = {
              CHEST_ANIM_SHORT),
     // GI_53
     GET_ITEM(ITEM_NONE, OBJECT_UNSET_0, GID_NONE, 0x53, 0, 0),
-    // GI_54
-    GET_ITEM(ITEM_NONE, OBJECT_UNSET_0, GID_NONE, 0x54, 0, 0),
+    // GI_BAG_BOMBCHU
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_UNSET_0, GID_BAG_BOMBCHU, 0x54, 0, 0),
     // GI_REMAINS_ODOLWA
     GET_ITEM(ITEM_REMAINS_ODOLWA, OBJECT_BSMASK, GID_REMAINS_ODOLWA, 0x55, GIFIELD(GIFIELD_NO_COLLECTIBLE, 0),
              CHEST_ANIM_LONG),
@@ -609,6 +609,7 @@ bool isAP(s16 gi) {
         case GI_AP_FILLER:
         case GI_AP_USEFUL:
         case GI_AP_PROG:
+        case GI_BAG_BOMBCHU:
             return true;
     }
 
@@ -1862,6 +1863,8 @@ u8 randoItemGive(u32 gi) {
     u8 dungeonIndex;
     s16 old_health;
 
+    gi &= 0xFFFFFF;
+
     switch (gi & 0xFF0000) {
         case 0x010000:
             Health_ChangeBy(play, 0x30);
@@ -1935,6 +1938,11 @@ u8 randoItemGive(u32 gi) {
                 return ITEM_NONE;
             } else if (gi == GI_OCEAN_SKULL_TOKEN) {
                 Inventory_IncrementSkullTokenCount(SCENE_KINDAN2);
+                return ITEM_NONE;
+            } else if (gi == GI_BAG_BOMBCHU) {
+                if (!INV_HAS(ITEM_BOMBCHU)) {
+                    INV_CONTENT(ITEM_BOMBCHU) = ITEM_BOMBCHU;
+                }
                 return ITEM_NONE;
             }
             item = giToItemId[gi & 0xFF];
@@ -2205,6 +2213,9 @@ u8 randoItemGive(u32 gi) {
         return ITEM_NONE;
 
     } else if (item == ITEM_BOMB) {
+        if (gSaveContext.save.saveInfo.inventory.items[SLOT_BOMB] != ITEM_BOMB) {
+            return ITEM_NONE;
+        }
         if ((AMMO(ITEM_BOMB) += 1) > CUR_CAPACITY(UPG_BOMB_BAG)) {
             AMMO(ITEM_BOMB) = CUR_CAPACITY(UPG_BOMB_BAG);
         }
@@ -2212,7 +2223,7 @@ u8 randoItemGive(u32 gi) {
 
     } else if ((item >= ITEM_BOMBS_5) && (item <= ITEM_BOMBS_30)) {
         if (gSaveContext.save.saveInfo.inventory.items[SLOT_BOMB] != ITEM_BOMB) {
-            INV_CONTENT(ITEM_BOMB) = ITEM_BOMB;
+            //~ INV_CONTENT(ITEM_BOMB) = ITEM_BOMB;
             AMMO(ITEM_BOMB) += sAmmoRefillCounts[item - ITEM_BOMBS_5];
             return ITEM_NONE;
         }
@@ -2223,9 +2234,9 @@ u8 randoItemGive(u32 gi) {
         return ITEM_NONE;
 
     } else if (item == ITEM_BOMBCHU) {
-        u8 max_bombchus = MAX(CUR_CAPACITY(UPG_BOMB_BAG), 10);
+        u8 max_bombchus = 10*rando_has_item_async(GI_BAG_BOMBCHU);
         if (INV_CONTENT(ITEM_BOMBCHU) != ITEM_BOMBCHU) {
-            INV_CONTENT(ITEM_BOMBCHU) = ITEM_BOMBCHU;
+            //~ INV_CONTENT(ITEM_BOMBCHU) = ITEM_BOMBCHU;
             AMMO(ITEM_BOMBCHU) = 10;
             return ITEM_NONE;
         }
@@ -2235,9 +2246,9 @@ u8 randoItemGive(u32 gi) {
         return ITEM_NONE;
 
     } else if ((item >= ITEM_BOMBCHUS_20) && (item <= ITEM_BOMBCHUS_5)) {
-        u8 max_bombchus = MAX(CUR_CAPACITY(UPG_BOMB_BAG), 10);
+        u8 max_bombchus = 10*rando_has_item_async(GI_BAG_BOMBCHU);
         if (gSaveContext.save.saveInfo.inventory.items[SLOT_BOMBCHU] != ITEM_BOMBCHU) {
-            INV_CONTENT(ITEM_BOMBCHU) = ITEM_BOMBCHU;
+            //~ INV_CONTENT(ITEM_BOMBCHU) = ITEM_BOMBCHU;
             AMMO(ITEM_BOMBCHU) += sBombchuRefillCounts[item - ITEM_BOMBCHUS_20];
 
             if (AMMO(ITEM_BOMBCHU) > max_bombchus) {
@@ -2442,7 +2453,7 @@ RECOMP_PATCH void Inventory_ChangeAmmo(s16 item, s16 ammoChange) {
         }
 
     } else if (item == ITEM_BOMBCHU) {
-        u8 max_bombchus = MAX(CUR_CAPACITY(UPG_BOMB_BAG), 10);
+        u8 max_bombchus = 10*rando_has_item_async(GI_BAG_BOMBCHU);
         AMMO(ITEM_BOMBCHU) += ammoChange;
 
         if (AMMO(ITEM_BOMBCHU) >= max_bombchus) {

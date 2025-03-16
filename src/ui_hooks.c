@@ -655,7 +655,7 @@ RECOMP_PATCH void KaleidoScope_DrawAmmoCount(PauseContext* pauseCtx, GraphicsCon
                    ((item == ITEM_DEKU_STICK) && (AMMO(item) == CUR_CAPACITY(UPG_DEKU_STICKS))) ||
                    ((item == ITEM_DEKU_NUT) && (AMMO(item) == CUR_CAPACITY(UPG_DEKU_NUTS))) ||
                    // @ap Draw green 10 Bombchu ammo count.
-                   ((item == ITEM_BOMBCHU) && (AMMO(item) == MAX(CUR_CAPACITY(UPG_BOMB_BAG), 10))) ||
+                   ((item == ITEM_BOMBCHU) && (AMMO(item) == (s8) (10*rando_has_item_async(GI_BAG_BOMBCHU)))) ||
                    ((item == ITEM_POWDER_KEG) && (ammo == 1)) || ((item == ITEM_PICTOGRAPH_BOX) && (ammo == 1)) ||
                    ((item == ITEM_MAGIC_BEANS) && (ammo == 20))) {
             // Ammo at capacity

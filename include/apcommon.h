@@ -4,6 +4,8 @@
 #include "modding.h"
 #include "global.h"
 
+#define GI_BAG_BOMBCHU GI_54
+
 #define GI_SPIN_ATTACK GI_71
 #define GI_OCEAN_SKULL_TOKEN GI_72
 #define GI_DEFENSE_DOUBLE GI_73
@@ -104,6 +106,7 @@
 #define LOCATION_SWAMP_GUIDE_OKAY 0x071C52
 
 RECOMP_IMPORT(".", bool rando_location_is_checked(u32 location_id));
+RECOMP_IMPORT(".", bool rando_location_is_checked_async(u32 location_id));
 RECOMP_IMPORT(".", bool rando_get_death_link_pending());
 RECOMP_IMPORT(".", void rando_reset_death_link_pending());
 RECOMP_IMPORT(".", bool rando_get_death_link_enabled());
@@ -119,6 +122,7 @@ RECOMP_IMPORT(".", u32 rando_get_item_id(u32 location_id));
 RECOMP_IMPORT(".", void rando_send_location(u32 location_id));
 RECOMP_IMPORT(".", void rando_complete_goal());
 RECOMP_IMPORT(".", u32 rando_has_item(u32 item_id));
+RECOMP_IMPORT(".", u32 rando_has_item_async(u32 item_id));
 RECOMP_IMPORT(".", u32 rando_get_items_size());
 RECOMP_IMPORT(".", u32 rando_get_item(u32 items_i));
 
