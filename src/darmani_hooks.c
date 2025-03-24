@@ -161,3 +161,45 @@ RECOMP_PATCH void EnGg_Init(Actor* thisx, PlayState* play) {
     func_80B35B24(&this->unk_344, play);
     func_80B35250(this);
 }
+
+RECOMP_PATCH void func_80B359DC(EnGg* this, PlayState* play) {
+    Player* player = GET_PLAYER(play);
+
+    if (this->actor.xzDistToPlayer < 200.0f) {
+        if (this->unk_306 == 0) {
+            if (player->stateFlags2 & PLAYER_STATE2_8000000) {
+                this->unk_306 = 1;
+                Audio_PlaySfx(NA_SE_SY_TRE_BOX_APPEAR);
+            }
+        } else if (!(player->stateFlags2 & PLAYER_STATE2_8000000)) {
+            this->unk_306 = 0;
+        }
+
+        if ((player->transformation == PLAYER_FORM_HUMAN) && (play->msgCtx.ocarinaMode == OCARINA_MODE_EVENT) &&
+            (play->msgCtx.lastPlayedSong == OCARINA_SONG_HEALING)) {
+            if (!CHECK_WEEKEVENTREG(WEEKEVENTREG_19_80)) {
+                SET_WEEKEVENTREG(WEEKEVENTREG_19_80);
+            }
+            this->unk_307 = true;
+        }
+
+        if (CutsceneManager_IsNext(this->csId)) {
+            CutsceneManager_Start(this->csId, &this->actor);
+            this->unk_307 = false;
+        } else {
+            if (CutsceneManager_GetCurrentCsId() == CS_ID_GLOBAL_TALK) {
+                CutsceneManager_Stop(CS_ID_GLOBAL_TALK);
+            }
+
+            if (this->unk_307) {
+                // CutsceneManager_Queue(this->csId);
+                play->nextEntrance = ENTRANCE(GORON_GRAVERYARD, 1);
+                play->transitionType = TRANS_TYPE_FADE_BLACK_FAST;
+                gSaveContext.nextTransitionType = TRANS_TYPE_FADE_BLACK_FAST;
+                play->transitionTrigger = TRANS_TRIGGER_START;
+            }
+        }
+    } else {
+        this->unk_307 = false;
+    }
+}
