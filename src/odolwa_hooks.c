@@ -235,7 +235,7 @@ static DamageTable sOdolwaDamageTable = {
     /* Zora punch     */ DMG_ENTRY(1, ODOLWA_DMGEFF_DAMAGE_TIMER_CHECK),
     /* Spin attack    */ DMG_ENTRY(1, ODOLWA_DMGEFF_DAMAGE),
     /* Sword beam     */ DMG_ENTRY(2, ODOLWA_DMGEFF_BLUE_LIGHT_ORB),
-    /* Normal Roll    */ DMG_ENTRY(69, ODOLWA_DMGEFF_BLUE_LIGHT_ORB),
+    /* UNK_DMG_0x1A   */ DMG_ENTRY(2, ODOLWA_DMGEFF_BLUE_LIGHT_ORB),
     /* UNK_DMG_0x1B   */ DMG_ENTRY(0, ODOLWA_DMGEFF_IMMUNE),
     /* UNK_DMG_0x1C   */ DMG_ENTRY(0, ODOLWA_DMGEFF_IMMUNE),
     /* Unblockable    */ DMG_ENTRY(0, ODOLWA_DMGEFF_IMMUNE),
@@ -592,7 +592,7 @@ static DamageTable sBugDamageTable = {
     /* Zora punch     */ DMG_ENTRY(1, BUG_DMGEFF_ZORA_PUNCH),
     /* Spin attack    */ DMG_ENTRY(2, BUG_DMGEFF_SPIN_ATTACK_AND_SWORD_BEAM),
     /* Sword beam     */ DMG_ENTRY(2, BUG_DMGEFF_SPIN_ATTACK_AND_SWORD_BEAM),
-    /* Normal Roll    */ DMG_ENTRY(69, BUG_DMGEFF_DAMAGE),
+    /* UNK_DMG_0x1A   */ DMG_ENTRY(6, BUG_DMGEFF_DAMAGE),
     /* UNK_DMG_0x1B   */ DMG_ENTRY(0, BUG_DMGEFF_IMMUNE),
     /* UNK_DMG_0x1C   */ DMG_ENTRY(0, BUG_DMGEFF_IMMUNE),
     /* Unblockable    */ DMG_ENTRY(0, BUG_DMGEFF_IMMUNE),
@@ -830,6 +830,9 @@ RECOMP_PATCH void Boss01_UpdateDamage(Boss01* this, PlayState* play) {
                         goto stunned;
 
                     case ODOLWA_DMGEFF_BLUE_LIGHT_ORB:
+                        if (this->actor.colChkInfo.damage == 2) {
+                            this->actor.colChkInfo.health = 0;
+                        }
                         this->drawDmgEffState = ODOLWA_DRAW_DMGEFF_STATE_BLUE_LIGHT_ORB_INIT;
                         Actor_Spawn(&play->actorCtx, play, ACTOR_EN_CLEAR_TAG, this->actor.focus.pos.x,
                                     this->actor.focus.pos.y, this->actor.focus.pos.z, 0, 0, 3,
@@ -850,10 +853,6 @@ RECOMP_PATCH void Boss01_UpdateDamage(Boss01* this, PlayState* play) {
 
                 damage = this->actor.colChkInfo.damage;
                 sMothSwarm->unk_148 = 0;
-
-                if (damage == 3) {
-                    this->actor.colChkInfo.health = 0;
-                }
 
                 if (this->actor.colChkInfo.damageEffect == ODOLWA_DMGEFF_STUN) {
                     //! @bug: unreachable code. If Odolwa's damage effect is ODOLWA_DMGEFF_STUN, we early-return out of
