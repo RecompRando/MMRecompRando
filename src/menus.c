@@ -3,6 +3,7 @@
 #include "recompui.h"
 #include "sys_cfb.h"
 #include "idle.h"
+#include "yaml_generation.h"
 
 RECOMP_IMPORT("*", void recomp_free(void* mem));
 RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
@@ -21,6 +22,7 @@ RecompuiContext context;
 RecompuiResource root;
 RecompuiResource container;
 
+// APConnect Menu:
 RecompuiResource server_label;
 RecompuiResource slotname_label;
 RecompuiResource password_label;
@@ -61,7 +63,7 @@ RecompuiResource create_spacer(RecompuiContext context, RecompuiResource parent,
     return ret;
 }
 
-void randoCreateMenus() {
+void randoCreateAPConnectMenu() {
     RecompuiColor bg_color;
     bg_color.r = 255;
     bg_color.g = 255;
@@ -178,6 +180,7 @@ void randoCreateMenus() {
     recompui_close_context(context);
 }
 
+// Singleplayer Menu
 void Setup_InitImpl(SetupState* this);
 
 void RandoMenu_Main(GameState* thisx) {
@@ -203,6 +206,7 @@ RECOMP_PATCH void Setup_Init(GameState* thisx) {
     SetupState* this = (SetupState*)thisx;
 
     recompui_show_context(context);
+    recomp_printf("Context Shown\n");
     connected = false;
 
     this->state.main = RandoMenu_Main;

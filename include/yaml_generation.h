@@ -2,7 +2,7 @@
 #define __YAML_GEN__
 
 #include "apcommon.h"
-
+#include "recompui.h"
 
 typedef enum {
     RANDO_ACCESSABILITY_FULL = 0,
@@ -88,7 +88,12 @@ typedef struct {
 
 } RandoYamlConfig;
 
+extern RecompuiContext yaml_menu_context;
+extern RecompuiResource yaml_menu_root;
+extern RecompuiResource yaml_menu_container;
+
 RandoYamlConfig* RandoYamlConfig_Create();
-RandoYamlConfig* RandoYamlConfig_Destroy(RandoYamlConfig* config)
+void RandoYamlConfig_Destroy(RandoYamlConfig* config);
+void randoCreateYamlConfigMenu();
 
 #endif

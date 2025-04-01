@@ -2,6 +2,7 @@
 #include "global.h"
 
 #include "apcommon.h"
+#include "yaml_generation.h"
 
 #define LOCATION_INVENTORY_SWORD 0x000037
 #define LOCATION_INVENTORY_SHIELD 0x000032
@@ -34,7 +35,8 @@ void init_rando()
 
     dsot_set_skip_dsot_cutscene(true);
 
-    randoCreateMenus();
+    randoCreateYamlConfigMenu();
+    // randoCreateAPConnectMenu();
 }
 
 s8 giToItemId[GI_MAX] = {
