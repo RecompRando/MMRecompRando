@@ -6,6 +6,7 @@
 
 typedef unsigned long RecompuiContext;
 typedef unsigned long RecompuiResource;
+typedef unsigned long RecompuiTextureHandle;
 
 // Height of the window in DP units. This is fixed regardless of window size and aspect ratio.
 #define RECOMPUI_TOTAL_HEIGHT 1080.0f
@@ -31,6 +32,11 @@ typedef enum {
     DISPLAY_TABLE_COLUMN_GROUP,
     DISPLAY_TABLE_CELL
 } RecompuiDisplay;
+
+typedef enum {
+    VISIBILITY_VISIBLE,
+    VISIBILITY_HIDDEN
+} RecompuiVisibility;
 
 typedef enum {
     POSITION_ABSOLUTE,
@@ -138,16 +144,20 @@ RECOMP_IMPORT("*", void recompui_close_context(RecompuiContext context));
 RECOMP_IMPORT("*", RecompuiResource recompui_context_root(RecompuiContext context));
 RECOMP_IMPORT("*", void recompui_show_context(RecompuiContext context));
 RECOMP_IMPORT("*", void recompui_hide_context(RecompuiContext context));
+RECOMP_IMPORT("*", void recompui_set_context_captures_input(RecompuiContext context, int captures_input));
+RECOMP_IMPORT("*", void recompui_set_context_captures_mouse(RecompuiContext context, int captures_mouse));
 
 // Resources
 RECOMP_IMPORT("*", RecompuiResource recompui_create_style(RecompuiContext context));
 RECOMP_IMPORT("*", RecompuiResource recompui_create_element(RecompuiContext context, RecompuiResource parent));
+RECOMP_IMPORT("*", RecompuiResource recompui_destroy_element(RecompuiResource parent, RecompuiResource element));
 RECOMP_IMPORT("*", RecompuiResource recompui_create_button(RecompuiContext context, RecompuiResource parent, const char* text, RecompuiButtonStyle style));
 RECOMP_IMPORT("*", RecompuiResource recompui_create_label(RecompuiContext context, RecompuiResource parent, const char* text, RecompuiLabelStyle label_style));
-RECOMP_IMPORT("*", RecompuiResource recompui_create_span(RecompuiContext context, RecompuiResource parent, const char* text));
 RECOMP_IMPORT("*", RecompuiResource recompui_create_textinput(RecompuiContext context, RecompuiResource parent));
+RECOMP_IMPORT("*", RecompuiResource recompui_create_imageview(RecompuiContext context, RecompuiResource parent, RecompuiTextureHandle texture));
 
 // Position and Layout
+RECOMP_IMPORT("*", void recompui_set_visibility(RecompuiResource id, RecompuiVisibility visibility));
 RECOMP_IMPORT("*", void recompui_set_position(RecompuiResource id, RecompuiPosition position));
 RECOMP_IMPORT("*", void recompui_set_left(RecompuiResource id, float left, RecompuiUnit unit));
 RECOMP_IMPORT("*", void recompui_set_top(RecompuiResource id, float top, RecompuiUnit unit));
@@ -224,6 +234,7 @@ RECOMP_IMPORT("*", void recompui_set_overflow_x(RecompuiResource id, RecompuiOve
 RECOMP_IMPORT("*", void recompui_set_overflow_y(RecompuiResource id, RecompuiOverflow overflow));
 
 // Text and Fonts
+RECOMP_IMPORT("*", void recompui_set_text(RecompuiResource id, const char* text));
 RECOMP_IMPORT("*", void recompui_set_font_size(RecompuiResource id, float size, RecompuiUnit unit));
 RECOMP_IMPORT("*", void recompui_set_letter_spacing(RecompuiResource id, float spacing, RecompuiUnit unit));
 RECOMP_IMPORT("*", void recompui_set_line_height(RecompuiResource id, float height, RecompuiUnit unit));
@@ -244,6 +255,11 @@ RECOMP_IMPORT("*", void recompui_set_tab_index(RecompuiResource id, RecompuiTabI
 // !! You must call `recomp_free` on the return value of `recompui_get_input_text` when you're finished with it!
 RECOMP_IMPORT("*", char* recompui_get_input_text(RecompuiResource id));
 RECOMP_IMPORT("*", void recompui_set_input_text(RecompuiResource id, const char* text));
+
+// Images
+RECOMP_IMPORT("*", RecompuiTextureHandle recompui_create_texture_rgba32(void* data, unsigned long width, unsigned long height));
+RECOMP_IMPORT("*", void recompui_destroy_texture(RecompuiTextureHandle texture));
+RECOMP_IMPORT("*", void recompui_set_imageview_texture(RecompuiResource id, RecompuiTextureHandle texture));
 
 // Callbacks
 typedef void RecompuiEventHandler(RecompuiResource resource, const RecompuiEventData* event, void* userdata);
