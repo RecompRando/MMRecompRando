@@ -5,34 +5,38 @@
 #include "recomputils.h"
 #include "yaml_generation.h"
 
+void RandoYamlConfig_Init(RandoYamlConfig* config) {
+    config->accessability = RANDO_ACCESSABILITY_FULL;
+    config->logicDifficulty = RANDO_LOGIC_DIFFICULTY_NORMAL;
+    config->chestsMatchContents = true;
+    config->startSwordless = false;
+    config->startShieldless = false;
+    config->startWithSoaring = true;
+    config->startingHeartsAreRandom = false;
+    config->startingHeartsMin = 4;
+    config->startingHeartsMax = 12;
+    config->startingHearts = 12;
+    config->startingHeartsAreContainersOrPieces = RANDO_STARTING_HEARTS_ARE_CONTAINERS;
+    config->shuffleRegionalMaps = RANDO_SHUFFLE_REGIONAL_MAPS_VANILLA;
+    config->shuffleBossRemains = RANDO_SHUFFLE_BOSS_REMAINS_VANILLA;
+    config->shuffleSpiderHouseRewards = false;
+    config->skullSanity = RANDO_SKULLSANITY_VANILLA;
+    config->shopSanity = RANDO_SHOPSANITY_VANILLA;
+    config->scrubSanity = false;
+    config->cowSanity = false;
+    config->shuffleCreatFairyRewards = false;
+    config->fairySanity = false;
+    config->startWithConsumables = false;
+    config->permanentChateauRomani = true;
+    config->startWithInvertedTime = true;
+    config->recieveFilledWallets = true;
+    config->damageMultiplier = RANDO_DAMAGE_MULITPLIER_NORMAL;
+    config->deathBehavior = RANDO_DEATH_BEHAVIOR_VANILLA;
+}
+
 RandoYamlConfig* RandoYamlConfig_Create() {
     RandoYamlConfig* retVal = recomp_alloc(sizeof(RandoYamlConfig));
-    retVal->accessability = RANDO_ACCESSABILITY_FULL;
-    retVal->logicDifficulty = RANDO_LOGIC_DIFFICULTY_NORMAL;
-    retVal->chestsMatchContents = true;
-    retVal->startSwordless = false;
-    retVal->startShieldless = false;
-    retVal->startWithSoaring = true;
-    retVal->startingHeartsAreRandom = false;
-    retVal->startingHeartsMin = 4;
-    retVal->startingHeartsMax = 12;
-    retVal->startingHearts = 12;
-    retVal->startingHeartsAreContainersOrPieces = RANDO_STARTING_HEARTS_ARE_CONTAINERS;
-    retVal->shuffleRegionalMaps = RANDO_SHUFFLE_REGIONAL_MAPS_VANILLA;
-    retVal->shuffleBossRemains = RANDO_SHUFFLE_BOSS_REMAINS_VANILLA;
-    retVal->shuffleSpiderHouseRewards = false;
-    retVal->skullSanity = RANDO_SKULLSANITY_VANILLA;
-    retVal->shopSanity = RANDO_SHOPSANITY_VANILLA;
-    retVal->scrubSanity = false;
-    retVal->cowSanity = false;
-    retVal->shuffleCreatFairyRewards = false;
-    retVal->fairySanity = false;
-    retVal->startWithConsumables = false;
-    retVal->permanentChateauRomani = true;
-    retVal->startWithInvertedTime = true;
-    retVal->recieveFilledWallets = true;
-    retVal->damageMultiplier = RANDO_DAMAGE_MULITPLIER_NORMAL;
-    retVal->deathBehavior = RANDO_DEATH_BEHAVIOR_VANILLA;
+    RandoYamlConfig_Init(retVal);
 
     return retVal;
 }
@@ -41,11 +45,66 @@ void RandoYamlConfig_Destroy(RandoYamlConfig* config) {
     recomp_free(config);
 }
 
-RecompuiContext yaml_menu_context;
-RecompuiResource yaml_menu_root;
-RecompuiResource yaml_menu_container;
+RandoYamlConfig yaml_config;
+RandoYamlConfigMenu yaml_config_menu;
+
+static UIntRangeController startingHearts = {
+    1,
+    12,
+    &yaml_config.accessability
+};
+
+static RecompuiColor test_color = {0, 255, 0, 255}; 
+
+void randoSetToggleButton(RecompuiResource button, u32 value) {
+    if (value) {
+        recompui_set_text(button, "On");
+    } else {
+        recompui_set_text(button, "Off");
+    }
+}
+
+void randoYAMLToggleButtonCallback(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
+    u32* config_option = userdata;
+    if (data->type == UI_EVENT_CLICK) {
+        *config_option = !*config_option;
+        randoSetToggleButton(button, *config_option);
+        // recomp_printf("Toggle = %i\n", *config_option);
+    }
+}
+
+RecompuiResource randoCreateToggleButtonOption(RecompuiContext context, RecompuiResource parent, char* display_name, u32* config_option) {
+    RecompuiResource button_area = recompui_create_element(context, parent);
+
+    // recompui_set_background_color(button_area, &test_color);
+    recompui_set_width(button_area, 100.0f, UNIT_PERCENT);
+    recompui_set_height(button_area, 60.0f, UNIT_PX);
+    recompui_set_display(button_area, DISPLAY_BLOCK);
+    // recompui_set_justify_content(button_area, JUSTIFY_CONTENT_SPACE_EVENLY);
+    // recompui_set_flex_direction(button_area, FLEX_DIRECTION_ROW);
+    // recompui_set_padding(button_area, 16.0f, UNIT_DP);
+    // recompui_set_gap(button_area, 80.0f, UNIT_DP);
+    recompui_set_align_items(button_area, ALIGN_ITEMS_BASELINE);
+
+    RecompuiResource button = recompui_create_button(context, button_area, display_name, BUTTONSTYLE_PRIMARY);
+    recompui_set_display(button, DISPLAY_INLINE);
+    recompui_set_text_align(button, TEXT_ALIGN_CENTER);
+    recompui_register_callback(button, randoYAMLToggleButtonCallback, config_option);
+    randoSetToggleButton(button, *config_option);
+
+    RecompuiResource label = recompui_create_label(context, button_area, display_name, LABELSTYLE_NORMAL);
+    recompui_set_display(label, DISPLAY_INLINE);
+    // recompui_set_text_align(label, TEXT_ALIGN_CENTER);
+
+    recomp_printf("%s button created.\n", display_name);
+    return button;
+}
+
+
 
 void randoCreateYamlConfigMenu() {
+    RandoYamlConfig_Init(&yaml_config);
+
     RecompuiColor bg_color;
     bg_color.r = 255;
     bg_color.g = 255;
@@ -70,30 +129,45 @@ void randoCreateYamlConfigMenu() {
     const float modal_border_width = 5.1f;
     const float modal_border_radius = 16.0f;
 
-    yaml_menu_context = recompui_create_context();
-    recompui_open_context(yaml_menu_context);
+    yaml_config_menu.context = recompui_create_context();
+    recompui_open_context(yaml_config_menu.context);
 
-    yaml_menu_root = recompui_context_root(yaml_menu_context);
-    yaml_menu_container = recompui_create_element(yaml_menu_context, yaml_menu_root);
+    yaml_config_menu.root = recompui_context_root(yaml_config_menu.context);
+    yaml_config_menu.container = recompui_create_element(yaml_config_menu.context, yaml_config_menu.root);
+    recompui_set_display(yaml_config_menu.container, DISPLAY_BLOCK);
+    recompui_set_overflow_y(yaml_config_menu.container, OVERFLOW_AUTO);
 
     // Take up the full height and full width, up to a maximum width.
-    recompui_set_height(yaml_menu_container, 96.5f, UNIT_PERCENT);
-    recompui_set_width(yaml_menu_container, 90.0f, UNIT_PERCENT);
-    recompui_set_flex_grow(yaml_menu_container, 1.0f);
-    // recompui_set_max_width(container, modal_max_width, UNIT_DP);
-    // Set up the flexbox properties of the container.
-    recompui_set_display(yaml_menu_container, DISPLAY_FLEX);
-    recompui_set_justify_content(yaml_menu_container, JUSTIFY_CONTENT_FLEX_START);
-    recompui_set_flex_direction(yaml_menu_container, FLEX_DIRECTION_ROW);
-    recompui_set_padding(yaml_menu_container, 16.0f, UNIT_DP);
-    recompui_set_gap(yaml_menu_container, 16.0f, UNIT_DP);
-    recompui_set_align_items(yaml_menu_container, ALIGN_ITEMS_BASELINE);
+    recompui_set_height(yaml_config_menu.container, 100.0f, UNIT_PERCENT);
+    recompui_set_width(yaml_config_menu.container, 100.0f, UNIT_PERCENT);
+
+    RecompuiResource header = recompui_create_label(yaml_config_menu.context, yaml_config_menu.container, "Randomizer: Configure", LABELSTYLE_LARGE);
+    recompui_set_padding(header, 40.0f, UNIT_DP);
+    recompui_set_gap(header, 40.0f, UNIT_DP);
+    recompui_set_align_items(header, ALIGN_ITEMS_BASELINE);
+
+    // yaml_config_menu.wrapper = recompui_create_element(yaml_config_menu.context, yaml_config_menu.container);
 
     // Set up the container to be the modal's background.
-    recompui_set_border_width(yaml_menu_container, modal_border_width, UNIT_DP);
-    recompui_set_border_radius(yaml_menu_container, modal_border_radius, UNIT_DP);
-    recompui_set_border_color(yaml_menu_container, &border_color);
-    recompui_set_background_color(yaml_menu_container, &modal_color);
+    recompui_set_border_width(yaml_config_menu.container, modal_border_width, UNIT_DP);
+    recompui_set_border_radius(yaml_config_menu.container, modal_border_radius, UNIT_DP);
+    recompui_set_border_color(yaml_config_menu.container, &border_color);
+    recompui_set_background_color(yaml_config_menu.container, &modal_color);
 
-    recompui_close_context(yaml_menu_context);
+    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.container, "Chests Match Contents", &(yaml_config.chestsMatchContents));
+    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.container, "Start Swordless", &(yaml_config.startSwordless));
+    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.container, "Start Shieldless", &(yaml_config.startShieldless));
+    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.container, "Start with Song of Soaring", &(yaml_config.startWithSoaring));
+    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.container, "Starting Hearts are Random", &(yaml_config.startingHeartsAreRandom));
+    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.container, "Shuffle Spiderhouse Rewards", &(yaml_config.shuffleSpiderHouseRewards));
+    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.container, "ScrubSanity", &(yaml_config.scrubSanity));
+    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.container, "CowSanity", &(yaml_config.cowSanity));
+    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.container, "Shuffle Great Fairy Rewards", &(yaml_config.shuffleCreatFairyRewards));
+    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.container, "FairySanity", &(yaml_config.fairySanity));
+    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.container, "startWithConsumables", &(yaml_config.startWithConsumables));
+    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.container, "Permanent Chateau Romani", &(yaml_config.permanentChateauRomani));
+    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.container, "Start With Inverted Time", &(yaml_config.startWithInvertedTime));
+    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.container, "Recieve Filled Wallets", &(yaml_config.recieveFilledWallets));
+    
+    recompui_close_context(yaml_config_menu.context);
 }

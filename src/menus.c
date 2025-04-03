@@ -188,7 +188,7 @@ void RandoMenu_Main(GameState* thisx) {
 
     // Perform the original setup init after connection.
     if (connected) {
-        recompui_hide_context(context);
+        recompui_hide_context(yaml_config_menu.context);
         Setup_InitImpl(this);
     }
     // Show an error if connection failed.
@@ -205,7 +205,8 @@ void RandoMenu_Main(GameState* thisx) {
 RECOMP_PATCH void Setup_Init(GameState* thisx) {
     SetupState* this = (SetupState*)thisx;
 
-    recompui_show_context(context);
+    // recompui_show_context(context);
+    recompui_show_context(yaml_config_menu.context);
     recomp_printf("Context Shown\n");
     connected = false;
 
