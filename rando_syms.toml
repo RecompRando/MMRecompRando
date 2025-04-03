@@ -18,3 +18,13 @@ size = 0x5450
 symbols = [
     { name = "D_80AEF868", vram = 0x80A99010 },
 ]
+
+[[section]]
+name = "..ovl_En_GirlA"
+rom = 0x00CDDC60
+vram = 0x80863870
+size = 0x1B00
+
+symbols = [
+    { name = "sShopItemEntries", vram = 0x80864A50 }
+]
