@@ -8,3 +8,13 @@ symbols = [
     { name = "D_80A43364", vram = 0x80A43364 },
     { name = "sCsIdList", vram = 0x80A434D0 },
 ]
+
+[[section]]
+name = "..ovl_En_Az"
+rom = 0x00EFC060
+vram = 0x80A94A30
+size = 0x5450
+
+symbols = [
+    { name = "D_80AEF868", vram = 0x80A99010 },
+]

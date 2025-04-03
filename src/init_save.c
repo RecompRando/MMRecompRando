@@ -93,6 +93,9 @@ void Sram_SetInitialWeekEvents(void) {
 
     // skip feeding fish in marine lab
     SET_WEEKEVENTREG(WEEKEVENTREG_81_40);
+    
+    // skip little brother beaver
+    SET_WEEKEVENTREG(WEEKEVENTREG_24_04);
 
     // skip secret shrine entrance guy text
     SET_WEEKEVENTREG(WEEKEVENTREG_76_80);
