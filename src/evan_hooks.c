@@ -37,7 +37,7 @@ void func_80BBB15C(EnZos* this, PlayState* play);
 s32 func_80BBAF5C(EnZos* this, PlayState* play);
 void func_80BBB2C4(EnZos* this, PlayState* play);
 
-void func_80BBB354(EnZos* this, PlayState* play) {
+RECOMP_PATCH void func_80BBB354(EnZos* this, PlayState* play) {
     s32 getItemId;
 
     if (Actor_HasParent(&this->actor, play)) {
