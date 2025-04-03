@@ -121,13 +121,16 @@ void EnJg_Talk(EnJg* this, PlayState* play);
 void EnJg_AlternateTalkOrWalkInPlace(EnJg* this, PlayState* play);
 
 void EnJg_FinishOffer(EnJg* this, PlayState* play) {
-    play->msgCtx.msgMode = MSGMODE_TEXT_CLOSING;
-    play->msgCtx.stateTimer = 4;
-    this->flags &= ~FLAG_LOOKING_AT_PLAYER;
-    this->actionFunc = EnJg_SetupWalk;
+    if (play->msgCtx.msgMode == MSGMODE_TEXT_CLOSING) {
+        this->flags &= ~FLAG_LOOKING_AT_PLAYER;
+        this->actionFunc = EnJg_SetupWalk;
+    }
 }
 
 void EnJg_OfferLullabyIntro(EnJg* this, PlayState* play) {
+    this->animIndex = EN_JG_ANIM_IDLE;
+    SubS_ChangeAnimationByInfoS(&this->skelAnime, sAnimationInfo, this->animIndex);
+    
     if (Actor_HasParent(&this->actor, play)) {
         this->actor.parent = NULL;
         this->actionFunc = EnJg_FinishOffer;
@@ -140,7 +143,7 @@ RECOMP_PATCH void EnJg_SetupTalk(EnJg* this, PlayState* play) {
     Player* player = GET_PLAYER(play);
     switch (this->textId) {
         case 0xDAC: // What was I doing?
-            if (!rando_location_is_checked(GI_AD) && player->transformation == PLAYER_FORM_GORON && CHECK_WEEKEVENTREG(WEEKEVENTREG_24_80)) {
+            if (!rando_location_is_checked(LOCATION_LULLABY_INTRO) && player->transformation == PLAYER_FORM_GORON && CHECK_WEEKEVENTREG(WEEKEVENTREG_24_80)) {
                 Message_CloseTextbox(play);
                 this->actionFunc = EnJg_OfferLullabyIntro;
                 break;
