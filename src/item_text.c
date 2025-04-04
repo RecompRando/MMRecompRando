@@ -644,3 +644,18 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         Message_BombersNotebookQueueEvent(play, BOMBERS_NOTEBOOK_EVENT_RECEIVED_COUPLES_MASK);
     }
 }
+
+// not really an item, but nice QOL text modification
+extern u16 sReactionTextIds[][PLAYER_MASK_GIANT - 1];
+
+RECOMP_PATCH u16 Text_GetFaceReaction(PlayState* play, FaceReactionSet reactionSet) {
+    // ease up on trading post mask restriction
+    if (reactionSet == FACE_REACTION_SET_CURIOSITY_SHOP_MAN) {
+        return 0;
+    }
+    
+    if ((Player_GetMask(play) > PLAYER_MASK_NONE) && (Player_GetMask(play) < PLAYER_MASK_GIANT)) {
+        return sReactionTextIds[reactionSet][Player_GetMask(play) - 1];
+    }
+    return 0;
+}

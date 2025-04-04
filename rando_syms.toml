@@ -28,3 +28,13 @@ size = 0x1B00
 symbols = [
     { name = "sShopItemEntries", vram = 0x80864A50 }
 ]
+
+[[section]]
+name = "..boot"
+rom = 0x00001060
+vram = 0x80080060
+size = 0x194A0
+
+symbols = [
+    { name = "sReactionTextIds", vram = 0x801BC420}
+]
