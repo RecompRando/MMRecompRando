@@ -121,6 +121,13 @@ void EnElforg_HiddenByCollider(EnElforg* this, PlayState* play);
 void func_80ACCBB8(EnElforg* this, PlayState* play);
 void EnElforg_InitializeParams(EnElforg* this);
 
+static u32 fairyGI[15];
+static bool townFairyObjectStatic[15];
+static bool townFairyObjectLoading[15];
+static bool townFairyObjectLoaded[15];
+static OSMesgQueue townFairyObjectLoadQueue[15];
+static void* townFairyObjectSegment[15];
+
 RECOMP_PATCH void EnElforg_Init(Actor* thisx, PlayState* play) {
     s32 pad;
     EnElforg* this = THIS;
@@ -133,6 +140,23 @@ RECOMP_PATCH void EnElforg_Init(Actor* thisx, PlayState* play) {
     this->skelAnime.playSpeed = 1.0f;
     ActorShape_Init(&thisx->shape, 0.0f, NULL, 0.0f);
     thisx->shape.shadowAlpha = 255;
+
+    s16 getItemId;
+    switch (this->area) {
+        case STRAY_FAIRY_AREA_WOODFALL:
+        case STRAY_FAIRY_AREA_SNOWHEAD:
+        case STRAY_FAIRY_AREA_GREAT_BAY:
+        case STRAY_FAIRY_AREA_STONE_TOWER:
+            getItemId = rando_get_item_id(LOCATION_STRAY_FAIRY);
+            break;
+        default:
+            getItemId = rando_get_item_id(LOCATION_CLOCK_TOWN_STRAY_FAIRY);
+    }
+
+    fairyGI[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = getItemId;
+    townFairyObjectStatic[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = false;
+    townFairyObjectLoading[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = false;
+    townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = false;
 
     if (rando_location_is_checked(LOCATION_STRAY_FAIRY)) {
         if (Actor_HasParent(thisx, play)) {
@@ -348,4 +372,68 @@ RECOMP_PATCH void EnElforg_FairyCollected(EnElforg* this, PlayState* play) {
     }
 
     Actor_PlaySfx_Flagged(&this->actor, NA_SE_PL_CHIBI_FAIRY_HEAL - SFX_FLAG);
+}
+
+
+void EnElforg_WaitForObject(EnElforg* this, PlayState* play) {
+    s16 getItemId;
+    switch (this->area) {
+        case STRAY_FAIRY_AREA_WOODFALL:
+        case STRAY_FAIRY_AREA_SNOWHEAD:
+        case STRAY_FAIRY_AREA_GREAT_BAY:
+        case STRAY_FAIRY_AREA_STONE_TOWER:
+            getItemId = rando_get_item_id(LOCATION_STRAY_FAIRY);
+            break;
+        default:
+            getItemId = rando_get_item_id(LOCATION_CLOCK_TOWN_STRAY_FAIRY);
+    }
+    s16 objectSlot = Object_GetSlot(&play->objectCtx, getObjectId(getItemId));
+
+    if (isAP(getItemId)) {
+        townFairyObjectStatic[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
+        townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
+        fairyGI[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = getItemId;
+    } else if (!townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] && !townFairyObjectLoading[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] && Object_IsLoaded(&play->objectCtx, objectSlot)) {
+        this->actor.objectSlot = objectSlot;
+        Actor_SetObjectDependency(play, &this->actor);
+        townFairyObjectStatic[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
+        townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
+        fairyGI[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = getItemId;
+    } else if (!townFairyObjectLoading[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] && !townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15]) {
+        loadObject(play, &townFairyObjectSegment[STRAY_FAIRY_GET_FLAG(&this->actor) % 15], &townFairyObjectLoadQueue[STRAY_FAIRY_GET_FLAG(&this->actor) % 15], getObjectId(getItemId));
+        townFairyObjectLoading[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
+    } else if (osRecvMesg(&townFairyObjectLoadQueue[STRAY_FAIRY_GET_FLAG(&this->actor) % 15], NULL, OS_MESG_NOBLOCK) == 0) {
+        townFairyObjectLoading[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = false;
+        townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
+        fairyGI[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = getItemId;
+    }
+}
+
+RECOMP_HOOK("EnElforg_Update")
+void EnElforg_CheckLoaded(Actor* thisx, PlayState* play) {
+    EnElforg* this = THIS;
+
+    if (!townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15]) {
+        EnElforg_WaitForObject(this, play);
+    }
+}
+
+RECOMP_PATCH void EnElforg_Draw(Actor* thisx, PlayState* play) {
+    s32 pad;
+    EnElforg* this = THIS;
+
+    if (townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15]) {
+        Matrix_Translate(this->actor.world.pos.x,
+                         this->actor.world.pos.y + 10.0f,
+                         this->actor.world.pos.z, MTXMODE_NEW);
+        // Matrix_Scale(30.0f, 30.0f, 30.0f, MTXMODE_APPLY);
+        Matrix_Scale(0.5f, 0.5f, 0.5f, MTXMODE_APPLY);
+        Matrix_RotateZYX(0, play->gameplayFrames * 0x3E8, 0, MTXMODE_APPLY);
+
+        if (townFairyObjectStatic[STRAY_FAIRY_GET_FLAG(&this->actor) % 15]) {
+            GetItem_Draw(play, getGid(fairyGI[STRAY_FAIRY_GET_FLAG(&this->actor) % 15]));
+        } else {
+            GetItem_DrawDynamic(play, townFairyObjectSegment[STRAY_FAIRY_GET_FLAG(&this->actor) % 15], getGid(fairyGI[STRAY_FAIRY_GET_FLAG(&this->actor) % 15]));
+        }
+    }
 }
