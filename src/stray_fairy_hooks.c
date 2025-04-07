@@ -26,6 +26,7 @@ RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
 #define STRAY_FAIRY_FLAG_GREAT_FAIRYS_MASK_EQUIPPED (1 << 3)
 
 #define LOCATION_STRAY_FAIRY (0x010000 | (play->sceneId << 8) | STRAY_FAIRY_GET_FLAG(&this->actor))
+#define LOCATION_CLOCK_TOWN_STRAY_FAIRY 0x01007F
 
 extern FlexSkeletonHeader gStrayFairySkel;
 extern AnimationHeader gStrayFairyFlyingAnim;
@@ -134,6 +135,9 @@ RECOMP_PATCH void EnElforg_Init(Actor* thisx, PlayState* play) {
     thisx->shape.shadowAlpha = 255;
 
     if (rando_location_is_checked(LOCATION_STRAY_FAIRY)) {
+        if (Actor_HasParent(thisx, play)) {
+            Actor_Kill(thisx->parent);
+        }
         Actor_Kill(thisx);
         return;
     }
@@ -144,7 +148,7 @@ RECOMP_PATCH void EnElforg_Init(Actor* thisx, PlayState* play) {
                 Actor_Kill(thisx);
                 return;
             }*/
-            if (rando_location_is_checked(0x01007F)) {
+            if (rando_location_is_checked(LOCATION_CLOCK_TOWN_STRAY_FAIRY)) {
                 Actor_Kill(thisx);
                 return;
             }
@@ -288,9 +292,9 @@ RECOMP_PATCH void EnElforg_FreeFloating(EnElforg* this, PlayState* play) {
             if (STRAY_FAIRY_TYPE(&this->actor) == STRAY_FAIRY_TYPE_CLOCK_TOWN) {
                 player->actor.freezeTimer = 100;
                 player->stateFlags1 |= PLAYER_STATE1_20000000;
-                rando_send_location(0x01007F);
+                rando_send_location(LOCATION_CLOCK_TOWN_STRAY_FAIRY);
                 // Bring me back to North Clock Town!
-                Message_StartTextbox(play, rando_get_item_id(0x01007F), NULL);
+                Message_StartTextbox(play, rando_get_item_id(LOCATION_CLOCK_TOWN_STRAY_FAIRY), NULL);
                 this->actionFunc = EnElforg_ClockTownFairyCollected;
                 CutsceneManager_Queue(CS_ID_GLOBAL_TALK);
                 return;
