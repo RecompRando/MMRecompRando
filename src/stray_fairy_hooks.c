@@ -10,8 +10,6 @@ RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
 
 #define THIS ((EnElforg*)thisx)
 
-#define STRAY_FAIRY_LIMB_MAX 0x0A
-
 #define STRAY_FAIRY_TYPE(thisx) ((thisx)->params & 0xF)
 #define STRAY_FAIRY_GET_NON_DUNGEON_AREA(thisx) (((thisx)->params & 0x1C0) >> 6)
 #define STRAY_FAIRY_GET_FLAG(thisx) (((thisx)->params & 0xFE00) >> 9)
@@ -60,6 +58,20 @@ typedef enum StrayFairyArea {
     /* 4 */ STRAY_FAIRY_AREA_STONE_TOWER = GREAT_FAIRY_TYPE_KINDNESS,
     /* 5 */ STRAY_FAIRY_AREA_MAX
 } StrayFairyArea;
+
+typedef enum StrayFairyLimb {
+    /* 0x00 */ STRAY_FAIRY_LIMB_NONE,
+    /* 0x01 */ STRAY_FAIRY_LIMB_RIGHT_FACING_HEAD,
+    /* 0x02 */ STRAY_FAIRY_LIMB_LEFT_WING,
+    /* 0x03 */ STRAY_FAIRY_LIMB_RIGHT_WING,
+    /* 0x04 */ STRAY_FAIRY_LIMB_GLOW,
+    /* 0x05 */ STRAY_FAIRY_LIMB_TORSO,
+    /* 0x06 */ STRAY_FAIRY_LIMB_RIGHT_ARM,
+    /* 0x07 */ STRAY_FAIRY_LIMB_PELVIS_AND_LEGS,
+    /* 0x08 */ STRAY_FAIRY_LIMB_LEFT_ARM,
+    /* 0x09 */ STRAY_FAIRY_LIMB_LEFT_FACING_HEAD,
+    /* 0x0A */ STRAY_FAIRY_LIMB_MAX
+} StrayFairyLimb;
 
 struct EnElforg;
 
@@ -125,6 +137,7 @@ static u32 fairyGI[15];
 static bool townFairyObjectStatic[15];
 static bool townFairyObjectLoading[15];
 static bool townFairyObjectLoaded[15];
+static bool townFairyRenderNormal[15];
 static OSMesgQueue townFairyObjectLoadQueue[15];
 static void* townFairyObjectSegment[15];
 
@@ -157,6 +170,7 @@ RECOMP_PATCH void EnElforg_Init(Actor* thisx, PlayState* play) {
     townFairyObjectStatic[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = false;
     townFairyObjectLoading[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = false;
     townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = false;
+    townFairyRenderNormal[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = false;
 
     if (rando_location_is_checked(LOCATION_STRAY_FAIRY)) {
         if (Actor_HasParent(thisx, play)) {
@@ -387,6 +401,42 @@ void EnElforg_WaitForObject(EnElforg* this, PlayState* play) {
         default:
             getItemId = rando_get_item_id(LOCATION_CLOCK_TOWN_STRAY_FAIRY);
     }
+
+    if (play->sceneId == SCENE_YOUSEI_IZUMI) {
+        townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
+        return;
+    }
+
+    switch (getItemId) {
+        case GI_B2:
+            this->area = STRAY_FAIRY_AREA_CLOCK_TOWN;
+            townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
+            townFairyRenderNormal[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
+            break;
+        case GI_46:
+            this->area = STRAY_FAIRY_AREA_WOODFALL;
+            townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
+            townFairyRenderNormal[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
+            break;
+        case GI_47:
+            this->area = STRAY_FAIRY_AREA_SNOWHEAD;
+            townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
+            townFairyRenderNormal[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
+        case GI_48:
+            this->area = STRAY_FAIRY_AREA_GREAT_BAY;
+            townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
+            townFairyRenderNormal[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
+            break;
+        case GI_49:
+            this->area = STRAY_FAIRY_AREA_STONE_TOWER;
+            townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
+            townFairyRenderNormal[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
+            break;
+        
+        default:
+            break;
+    }
+
     s16 objectSlot = Object_GetSlot(&play->objectCtx, getObjectId(getItemId));
 
     if (isAP(getItemId)) {
@@ -418,22 +468,48 @@ void EnElforg_CheckLoaded(Actor* thisx, PlayState* play) {
     }
 }
 
-RECOMP_PATCH void EnElforg_Draw(Actor* thisx, PlayState* play) {
-    s32 pad;
+RECOMP_PATCH s32 EnElforg_OverrideLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot, Actor* thisx,
+                              Gfx** gfx) {
     EnElforg* this = THIS;
 
-    if (townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15]) {
-        Matrix_Translate(this->actor.world.pos.x,
-                         this->actor.world.pos.y + 10.0f,
-                         this->actor.world.pos.z, MTXMODE_NEW);
-        // Matrix_Scale(30.0f, 30.0f, 30.0f, MTXMODE_APPLY);
-        Matrix_Scale(0.5f, 0.5f, 0.5f, MTXMODE_APPLY);
-        Matrix_RotateZYX(0, play->gameplayFrames * 0x3E8, 0, MTXMODE_APPLY);
-
-        if (townFairyObjectStatic[STRAY_FAIRY_GET_FLAG(&this->actor) % 15]) {
-            GetItem_Draw(play, getGid(fairyGI[STRAY_FAIRY_GET_FLAG(&this->actor) % 15]));
-        } else {
-            GetItem_DrawDynamic(play, townFairyObjectSegment[STRAY_FAIRY_GET_FLAG(&this->actor) % 15], getGid(fairyGI[STRAY_FAIRY_GET_FLAG(&this->actor) % 15]));
+    if (play->sceneId == SCENE_YOUSEI_IZUMI || townFairyRenderNormal[STRAY_FAIRY_GET_FLAG(&this->actor) % 15]) {
+        if (this->direction < 0) {
+            if (limbIndex == STRAY_FAIRY_LIMB_LEFT_FACING_HEAD) {
+                *dList = NULL;
+            }
+        } else if (limbIndex == STRAY_FAIRY_LIMB_RIGHT_FACING_HEAD) {
+            *dList = NULL;
         }
+
+        return false;
     }
+
+    // sometime draws with the wrong wing color?
+    switch (limbIndex) {
+        case STRAY_FAIRY_LIMB_LEFT_WING:
+        case STRAY_FAIRY_LIMB_RIGHT_WING:
+        case STRAY_FAIRY_LIMB_GLOW:
+            return false;
+        
+        case STRAY_FAIRY_LIMB_TORSO:
+            if (townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15]) {
+                Matrix_Translate(this->actor.world.pos.x,
+                                this->actor.world.pos.y + (this->actor.shape.yOffset * this->actor.scale.y),
+                                this->actor.world.pos.z, MTXMODE_NEW);
+                Matrix_Scale(0.5f, 0.5f, 0.5f, MTXMODE_APPLY);
+                Matrix_RotateZYX(0, play->gameplayFrames * 0x3E8, 0, MTXMODE_APPLY);
+
+                if (townFairyObjectStatic[STRAY_FAIRY_GET_FLAG(&this->actor) % 15]) {
+                    GetItem_Draw(play, getGid(fairyGI[STRAY_FAIRY_GET_FLAG(&this->actor) % 15]));
+                } else {
+                    GetItem_DrawDynamic(play, townFairyObjectSegment[STRAY_FAIRY_GET_FLAG(&this->actor) % 15], getGid(fairyGI[STRAY_FAIRY_GET_FLAG(&this->actor) % 15]));
+                }
+            }
+
+        default:
+            *dList = NULL;
+            break;
+    }
+
+    return true;
 }
