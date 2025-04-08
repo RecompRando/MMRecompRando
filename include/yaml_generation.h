@@ -68,8 +68,10 @@ typedef enum {
 } RandoDeathBehavior;
 
 typedef struct {
-    RandoAccessability accessability;
-    RandoLogicDifficulty logicDifficulty;
+    /* RandoAccessability */ 
+    u32 accessability;
+    /* RandoLogicDifficulty */ 
+    u32 logicDifficulty;
     bool chestsMatchContents;
     bool startSwordless;
     bool startShieldless;
@@ -78,12 +80,17 @@ typedef struct {
     int startingHeartsMin;
     int startingHeartsMax;
     int startingHearts;
-    RandoStartingHeartsAreContainersOrPieces startingHeartsAreContainersOrPieces;
-    RandoShuffleRegionalMaps shuffleRegionalMaps;
-    RandoShuffleBossRemains shuffleBossRemains;
+    /* RandoStartingHeartsAreContainersOrPieces */ 
+    u32 startingHeartsAreContainersOrPieces;
+    /*RandoShuffleRegionalMaps */ 
+    u32 shuffleRegionalMaps;
+    /* RandoShuffleBossRemains */ 
+    u32 shuffleBossRemains;
     bool shuffleSpiderHouseRewards;
-    RandoSkullSanity skullSanity;
-    RandoShopSanity shopSanity;
+    /* RandoSkullSanity */ 
+    u32 skullSanity;
+    /* RandoShopSanity */
+    u32 shopSanity;
     bool scrubSanity;
     bool cowSanity;
     bool shuffleCreatFairyRewards;
@@ -92,28 +99,23 @@ typedef struct {
     bool permanentChateauRomani;
     bool startWithInvertedTime;
     bool recieveFilledWallets;
-    RandoDamageMultiplier damageMultiplier;
-    RandoDeathBehavior deathBehavior;
+    /* RandoDamageMultiplier */ 
+    u32 damageMultiplier;
+    /* RandoDeathBehavior */ 
+    u32 deathBehavior;
 
 } RandoYamlConfig;
 
 typedef struct {
     RecompuiContext context;
     RecompuiResource root;
+    RecompuiResource frame;
     RecompuiResource container;
-    RecompuiResource wrapper;
-
-    RecompuiResource button_chestsMatchContents;
 } RandoYamlConfigMenu;
 
 extern RandoYamlConfig yaml_config;
 extern RandoYamlConfigMenu yaml_config_menu;
 
-typedef struct {
-    u32 min;
-    u32 max;
-    u32* value;
-} UIntRangeController;
 
 void RandoYamlConfig_Init(RandoYamlConfig* config);
 RandoYamlConfig* RandoYamlConfig_Create();

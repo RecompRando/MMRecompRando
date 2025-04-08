@@ -48,14 +48,23 @@ void RandoYamlConfig_Destroy(RandoYamlConfig* config) {
 RandoYamlConfig yaml_config;
 RandoYamlConfigMenu yaml_config_menu;
 
-static UIntRangeController startingHearts = {
-    1,
-    12,
-    &yaml_config.accessability
-};
+RecompuiResource randoYAMLCreateMenuEntryArea (RecompuiContext context, RecompuiResource parent) {
+    RecompuiResource retVal = recompui_create_element(context, parent);
 
-static RecompuiColor test_color = {0, 255, 0, 255}; 
+    // recompui_set_background_color(button_area, &test_color);
+    // recompui_set_width(retVal, 100.0f, UNIT_PERCENT);
+    // recompui_set_height(retVal, 60.0f, UNIT_PX);
+    recompui_set_display(retVal, DISPLAY_BLOCK);
+    recompui_set_justify_content(retVal, JUSTIFY_CONTENT_SPACE_EVENLY);
+    recompui_set_flex_direction(retVal, FLEX_DIRECTION_ROW);
+    recompui_set_padding(retVal, 20.0f, UNIT_DP);
+    recompui_set_gap(retVal, 20.0f, UNIT_DP);
+    recompui_set_align_items(retVal, ALIGN_ITEMS_BASELINE);
 
+    return retVal;
+}
+
+// Toggle Button Helpers:
 void randoSetToggleButton(RecompuiResource button, u32 value) {
     if (value) {
         recompui_set_text(button, "On");
@@ -74,33 +83,59 @@ void randoYAMLToggleButtonCallback(RecompuiResource button, const RecompuiEventD
 }
 
 RecompuiResource randoCreateToggleButtonOption(RecompuiContext context, RecompuiResource parent, char* display_name, u32* config_option) {
-    RecompuiResource button_area = recompui_create_element(context, parent);
-
-    // recompui_set_background_color(button_area, &test_color);
-    recompui_set_width(button_area, 100.0f, UNIT_PERCENT);
-    recompui_set_height(button_area, 60.0f, UNIT_PX);
-    recompui_set_display(button_area, DISPLAY_BLOCK);
-    // recompui_set_justify_content(button_area, JUSTIFY_CONTENT_SPACE_EVENLY);
-    // recompui_set_flex_direction(button_area, FLEX_DIRECTION_ROW);
-    // recompui_set_padding(button_area, 16.0f, UNIT_DP);
-    // recompui_set_gap(button_area, 80.0f, UNIT_DP);
-    recompui_set_align_items(button_area, ALIGN_ITEMS_BASELINE);
+    RecompuiResource button_area = randoYAMLCreateMenuEntryArea(context, parent);
 
     RecompuiResource button = recompui_create_button(context, button_area, display_name, BUTTONSTYLE_PRIMARY);
+    // RecompuiResource button = recompui_create_button(context, parent, display_name, BUTTONSTYLE_PRIMARY);
     recompui_set_display(button, DISPLAY_INLINE);
     recompui_set_text_align(button, TEXT_ALIGN_CENTER);
     recompui_register_callback(button, randoYAMLToggleButtonCallback, config_option);
+    recompui_set_padding(button, 16.0f, UNIT_DP);
     randoSetToggleButton(button, *config_option);
 
     RecompuiResource label = recompui_create_label(context, button_area, display_name, LABELSTYLE_NORMAL);
+    // RecompuiResource label = recompui_create_label(context, parent, display_name, LABELSTYLE_NORMAL);
     recompui_set_display(label, DISPLAY_INLINE);
+    recompui_set_padding(label, 16.0f, UNIT_DP);
     // recompui_set_text_align(label, TEXT_ALIGN_CENTER);
 
     recomp_printf("%s button created.\n", display_name);
     return button;
 }
 
+// Radio Helpers:
+void randoYAMLEnumCallback(RecompuiResource labelenum, const RecompuiEventData* data, void* userdata) {
+    u32* config_option = userdata;
+    if (data->type == UI_EVENT_CLICK) {
+        *config_option = recompui_get_input_value_u32(labelenum);
+    }
+}
 
+RecompuiResource randoCreateRadioOption(RecompuiContext context, RecompuiResource parent, char* display_name,
+    char** options, unsigned long num_options, u32* config_option) {
+    RecompuiResource radio_area = randoYAMLCreateMenuEntryArea(context, parent);
+
+    RecompuiResource label = recompui_create_label(context, radio_area, display_name, LABELSTYLE_NORMAL);
+    recompui_set_display(label, DISPLAY_INLINE);
+    recompui_set_padding(label, 16.0f, UNIT_DP);
+    
+    for (int i = 0; i < num_options; i++) {
+        recomp_printf("Option %i: %s\n", i, options[0]);
+    }
+
+    RecompuiResource radio = recompui_create_labelradio(context, parent, options, num_options);
+    recompui_set_display(radio, DISPLAY_BLOCK);
+    // recompui_set_text_align(radio, TEXT_ALIGN_CENTER);
+    recompui_register_callback(radio, randoYAMLEnumCallback, config_option);
+    recompui_set_padding(radio, 16.0f, UNIT_DP);
+    recompui_set_input_value_u32(radio, *config_option);
+
+    recomp_printf("%s radio created.\n", display_name);
+    return 0;
+}
+
+
+static char* rando_accessability_names[] = {"Full", "Minimal"};
 
 void randoCreateYamlConfigMenu() {
     RandoYamlConfig_Init(&yaml_config);
@@ -133,27 +168,32 @@ void randoCreateYamlConfigMenu() {
     recompui_open_context(yaml_config_menu.context);
 
     yaml_config_menu.root = recompui_context_root(yaml_config_menu.context);
-    yaml_config_menu.container = recompui_create_element(yaml_config_menu.context, yaml_config_menu.root);
-    recompui_set_display(yaml_config_menu.container, DISPLAY_BLOCK);
-    recompui_set_overflow_y(yaml_config_menu.container, OVERFLOW_AUTO);
+    yaml_config_menu.frame = recompui_create_element(yaml_config_menu.context, yaml_config_menu.root);
+    recompui_set_display(yaml_config_menu.frame, DISPLAY_BLOCK);
+    recompui_set_max_height(yaml_config_menu.frame, 100.0f, UNIT_PERCENT);
+    recompui_set_max_width(yaml_config_menu.frame, 100.0f, UNIT_PERCENT);
 
-    // Take up the full height and full width, up to a maximum width.
-    recompui_set_height(yaml_config_menu.container, 100.0f, UNIT_PERCENT);
-    recompui_set_width(yaml_config_menu.container, 100.0f, UNIT_PERCENT);
-
-    RecompuiResource header = recompui_create_label(yaml_config_menu.context, yaml_config_menu.container, "Randomizer: Configure", LABELSTYLE_LARGE);
+    RecompuiResource header = recompui_create_label(yaml_config_menu.context, yaml_config_menu.frame, "Randomizer: Configure", LABELSTYLE_LARGE);
+    recompui_set_display(yaml_config_menu.frame, DISPLAY_BLOCK);
     recompui_set_padding(header, 40.0f, UNIT_DP);
     recompui_set_gap(header, 40.0f, UNIT_DP);
     recompui_set_align_items(header, ALIGN_ITEMS_BASELINE);
 
+    yaml_config_menu.container = recompui_create_element(yaml_config_menu.context, yaml_config_menu.frame);
+    recompui_set_display(yaml_config_menu.container, DISPLAY_BLOCK);
+    recompui_set_overflow_y(yaml_config_menu.container, OVERFLOW_SCROLL);
+    // Take up the full height and full width, up to a maximum width.
+    recompui_set_max_height(yaml_config_menu.container, 100.0f, UNIT_PERCENT);
+    recompui_set_max_width(yaml_config_menu.container, 100.0f, UNIT_PERCENT);
+
     // yaml_config_menu.wrapper = recompui_create_element(yaml_config_menu.context, yaml_config_menu.container);
 
     // Set up the container to be the modal's background.
-    recompui_set_border_width(yaml_config_menu.container, modal_border_width, UNIT_DP);
-    recompui_set_border_radius(yaml_config_menu.container, modal_border_radius, UNIT_DP);
-    recompui_set_border_color(yaml_config_menu.container, &border_color);
-    recompui_set_background_color(yaml_config_menu.container, &modal_color);
-
+    recompui_set_border_width(yaml_config_menu.frame, modal_border_width, UNIT_DP);
+    recompui_set_border_radius(yaml_config_menu.frame, modal_border_radius, UNIT_DP);
+    recompui_set_border_color(yaml_config_menu.frame, &border_color);
+    recompui_set_background_color(yaml_config_menu.frame, &modal_color);
+    randoCreateRadioOption(yaml_config_menu.context, yaml_config_menu.container, "Accessability", rando_accessability_names, 2, &yaml_config.accessability);
     randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.container, "Chests Match Contents", &(yaml_config.chestsMatchContents));
     randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.container, "Start Swordless", &(yaml_config.startSwordless));
     randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.container, "Start Shieldless", &(yaml_config.startShieldless));
