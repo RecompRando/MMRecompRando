@@ -1,3 +1,4 @@
+
 #ifndef __UI_FUNCS_H__
 #define __UI_FUNCS_H__
 
@@ -9,8 +10,8 @@ typedef enum {
     UI_EVENT_HOVER,
     UI_EVENT_ENABLE,
     UI_EVENT_DRAG,
-    UI_EVENT_RESERVED1, // Would be UI_EVENT_TEXT but text events aren't usable in mods currently
-    UI_EVENT_UPDATE,
+    UI_EVENT_RESERVED1, // Would be UI_EVENT_TEXT but text events aren't available in mods currently
+    UI_EVENT_RESERVED2, // Would be UI_EVENT_UPDATE but manual updats aren't available in mods currently
     UI_EVENT_COUNT
 } RecompuiEventType;
 
