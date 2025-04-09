@@ -172,7 +172,7 @@ void EnElfgrp_OfferLoop(EnElfgrp* this, PlayState* play) {
 
     if (hasFairies && !rando_location_is_checked(LOCATION_GREAT_FAIRY)) {
         func_80A3A398(this, play);
-    } else if (type == ENELFGRP_TYPE_MAGIC && Player_HasTransformationMask(play) && !rando_location_is_checked(LOCATION_GREAT_FAIRY_HUMAN)) {
+    } else if (type == ENELFGRP_TYPE_MAGIC && rando_has_item(0x01007F) && Player_HasTransformationMask(play) && !rando_location_is_checked(LOCATION_GREAT_FAIRY_HUMAN)) {
         EnElfgrp_OfferTransformItem(this, play);
     }
 }
