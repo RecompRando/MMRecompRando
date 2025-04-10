@@ -1,6 +1,8 @@
 #include "modding.h"
 #include "global.h"
 
+#include "apcommon.h"
+
 void ShrinkWindow_Letterbox_SetSizeTarget(s32 target);
 
 static s16 sGameOverTimer = 0;
@@ -57,7 +59,7 @@ RECOMP_PATCH void GameOver_Update(PlayState* play) {
             break;
 
         case GAMEOVER_DEATH_FADE_OUT:
-            // if (AudioSeq_GetActiveSeqId(SEQ_PLAYER_FANFARE) != NA_BGM_GAME_OVER) {
+            if (AudioSeq_GetActiveSeqId(SEQ_PLAYER_FANFARE) != NA_BGM_GAME_OVER || rando_death_behavior() >= 1) {
                 func_80169F78(&play->state);
                 if (gSaveContext.respawnFlag != -7) {
                     gSaveContext.respawnFlag = -6;
@@ -70,7 +72,7 @@ RECOMP_PATCH void GameOver_Update(PlayState* play) {
                     gSaveContext.save.equippedMask = PLAYER_MASK_NONE;
                 }
                 Rumble_StateReset();
-            // }
+            }
             break;
 
         case GAMEOVER_REVIVE_START:
@@ -121,6 +123,7 @@ void Player_Action_24(Player* this, PlayState* play);
 void func_8082DE50(PlayState *play, Player *this);
 void func_8082DAD4(Player *this);
 
+extern LinkAnimationHeader gPlayerAnim_link_derth_rebirth;
 
 RECOMP_PATCH void func_80831F34(PlayState* play, Player* this, PlayerAnimationHeader* anim) {
     s32 sp24 = func_801242B4(this);
@@ -129,10 +132,13 @@ RECOMP_PATCH void func_80831F34(PlayState* play, Player* this, PlayerAnimationHe
     Player_SetAction(play, this, sp24 ? Player_Action_62 : Player_Action_24, 0);
     Player_AnimationPlayOnce(play, this, anim);
 
-    // TODO: implement yaml option for this
-    // if (anim == &gPlayerAnim_link_derth_rebirth) {
-    this->skelAnime.endFrame = 0.0f;
-    // }
+    if (rando_death_behavior() >= 2) {
+        this->skelAnime.endFrame = 0.0f;
+    } else {
+        if (anim == &gPlayerAnim_link_derth_rebirth) {
+            this->skelAnime.endFrame = 84.0f;
+        }
+    }
 
     this->stateFlags1 |= PLAYER_STATE1_80;
 

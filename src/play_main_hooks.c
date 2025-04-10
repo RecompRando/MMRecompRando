@@ -267,11 +267,14 @@ RECOMP_PATCH s32 Health_ChangeBy(PlayState* play, s16 healthChange) {
 
     if (gSaveContext.save.saveInfo.playerData.health <= 0) {
         gSaveContext.save.saveInfo.playerData.health = 0;
-        if (rando_death_behavior() == 2) {
-            Interface_StartMoonCrash(play);
-        } else if (rando_get_death_link_enabled()) {
+        if (rando_get_death_link_enabled()) {
             rando_send_death_link();
         }
+
+        if (rando_death_behavior() == 3) {
+            Interface_StartMoonCrash(play);
+        }
+
         return false;
     } else {
         return true;
@@ -436,10 +439,10 @@ void update_rando(PlayState* play) {
 
         if (play->pauseCtx.state == 0 && rando_get_death_link_enabled() && rando_get_death_link_pending()) {
             Play_KillPlayer();
-            rando_reset_death_link_pending();
-            if (rando_death_behavior() == 2) {
+            if (rando_death_behavior() == 3) {
                 Interface_StartMoonCrash(play);
             }
+            rando_reset_death_link_pending();
         }
     }
 }

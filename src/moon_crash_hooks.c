@@ -9,9 +9,8 @@ RECOMP_PATCH void Interface_StartMoonCrash(PlayState* play) {
         SEQCMD_DISABLE_PLAY_SEQUENCES(false);
     }
 
-    if (rando_get_death_link_enabled()) {
+    if (rando_get_death_link_enabled() && !rando_get_death_link_pending()) {
         rando_send_death_link();
-        rando_reset_death_link_pending();
     }
 
     gSaveContext.save.day = 4;
