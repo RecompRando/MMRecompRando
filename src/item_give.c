@@ -1396,6 +1396,8 @@ RECOMP_PATCH s32 Player_ActionChange_2(Player* this, PlayState* play) {
 #define ACTOR_ID_BEAN_DADDY 0x0A5
 #define ACTOR_ID_COW 0x0F3
 #define ACTOR_ID_SWAMP_GUIDE 0x1C5
+#define ACTOR_ID_MEDIGORON 0x138
+#define ACTOR_ID_BOMBGORON 0x242
 
 #define LOCATION_QUEST_HEART_PIECE (0x070000 | (actor->id))
 #define LOCATION_QUEST_BOTTLE (0x090000 | (actor->id))
@@ -1501,6 +1503,13 @@ RECOMP_PATCH s32 Actor_OfferGetItem(Actor* actor, PlayState* play, GetItemId get
                         // Swamp Pictograph Contest Okay Picture
                         rando_send_location(LOCATION_SWAMP_GUIDE_OKAY);
                         trueGI = rando_get_item_id(LOCATION_SWAMP_GUIDE_OKAY);
+                    } else if (getItemId == GI_POWDER_KEG && ((actor->id == ACTOR_ID_MEDIGORON && rando_location_is_checked(GI_POWDER_KEG)) || actor->id == ACTOR_ID_BOMBGORON)) {
+                        // Goron Village Medigoron Sale + Bomb Shop Goron Rebuy
+                        itemWorkaround = false;
+                        itemShuffled = false;
+                        trueGI = GI_POWDER_KEG;
+                        item = GI_POWDER_KEG;
+                        AMMO(ITEM_POWDER_KEG) = 1;
                     } else if (itemShuffled) {
                         rando_send_location(getItemId);
                     }
