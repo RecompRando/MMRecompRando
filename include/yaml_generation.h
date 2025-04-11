@@ -4,6 +4,9 @@
 #include "apcommon.h"
 #include "recompui.h"
 
+#include "modding.h"
+RECOMP_IMPORT(".", void rando_save_run_yaml(char* save_path, u32 slot, char* yaml));
+
 typedef enum {
     RANDO_ACCESSABILITY_FULL = 0,
     RANDO_ACCESSABILITY_MINIMAL = 1,

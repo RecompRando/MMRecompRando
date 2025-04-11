@@ -4,6 +4,7 @@
 #include "idle.h"
 #include "recomputils.h"
 #include "yaml_generation.h"
+#include "recompconfig.h"
 
 void RandoYamlConfig_Init(RandoYamlConfig* config) {
     config->accessability = RANDO_ACCESSABILITY_FULL;
@@ -47,6 +48,17 @@ void RandoYamlConfig_Destroy(RandoYamlConfig* config) {
 
 RandoYamlConfig yaml_config;
 RandoYamlConfigMenu yaml_config_menu;
+
+void randoYAMLGenerateCallback(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
+    u32* config_option = userdata;
+    if (data->type == UI_EVENT_CLICK) {
+        char* yaml_str = recomp_get_save_file_path();
+        char yaml_text[14] = "HELLO WORLD!\n";
+        recomp_printf("GENERATE: %s\n", yaml_str);
+        rando_save_run_yaml(yaml_str, 1, yaml_text);
+        recomp_free(yaml_str);
+    }
+}
 
 RecompuiResource randoYAMLCreateMenuEntryArea (RecompuiContext context, RecompuiResource parent) {
     RecompuiResource retVal = recompui_create_element(context, parent);
@@ -256,6 +268,7 @@ void randoCreateYamlConfigMenu() {
     recompui_set_height(submit_button, 80.0f, UNIT_DP);
     recompui_set_gap(submit_button, 40.0f, UNIT_DP);
     recompui_set_align_items(submit_button, ALIGN_ITEMS_BASELINE);
+    recompui_register_callback(submit_button, randoYAMLGenerateCallback, NULL);
 
     // yaml_config_menu.wrapper = recompui_create_element(yaml_config_menu.context, yaml_config_menu.container);
 
