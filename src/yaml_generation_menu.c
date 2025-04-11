@@ -63,9 +63,6 @@ void randoYAMLGenerateCallback(RecompuiResource button, const RecompuiEventData*
 RecompuiResource randoYAMLCreateMenuEntryArea (RecompuiContext context, RecompuiResource parent) {
     RecompuiResource retVal = recompui_create_element(context, parent);
 
-    // recompui_set_background_color(button_area, &test_color);
-    // recompui_set_width(retVal, 100.0f, UNIT_PERCENT);
-    // recompui_set_height(retVal, 60.0f, UNIT_PX);
     recompui_set_display(retVal, DISPLAY_BLOCK);
     recompui_set_justify_content(retVal, JUSTIFY_CONTENT_SPACE_EVENLY);
     recompui_set_flex_direction(retVal, FLEX_DIRECTION_ROW);
@@ -83,11 +80,9 @@ void randoSetToggleButton(RecompuiResource button, u32 value) {
     if (value) {
         recompui_set_text(button, "On");
         recompui_set_color(button, &on_color);
-        // recompui_set_background_color(button, &on_color);
     } else {
         recompui_set_text(button, "Off");
         recompui_set_color(button, &off_color);
-        // recompui_set_background_color(button, &off_color);
     }
 }
 
@@ -96,7 +91,6 @@ void randoYAMLToggleButtonCallback(RecompuiResource button, const RecompuiEventD
     if (data->type == UI_EVENT_CLICK) {
         *config_option = !*config_option;
         randoSetToggleButton(button, *config_option);
-        // recomp_printf("Toggle = %i\n", *config_option);
     }
 }
 
@@ -135,10 +129,6 @@ RecompuiResource randoCreateRadioOption(RecompuiContext context, RecompuiResourc
     recompui_set_display(label, DISPLAY_BLOCK);
     recompui_set_padding_top(label, 16.0f, UNIT_DP);
     recompui_set_padding_bottom(label, 8.0f, UNIT_DP);
-    
-    // for (int i = 0; i < num_options; i++) {
-    //     recomp_printf("Option %i: %s\n", i, options[0]);
-    // }
 
     RecompuiResource radio = recompui_create_labelradio(context, radio_area, options, num_options);
     recompui_set_display(radio, DISPLAY_BLOCK);
@@ -171,7 +161,6 @@ RecompuiResource randoCreateSliderOption(RecompuiContext context, RecompuiResour
     recompui_set_padding_bottom(label, 8.0f, UNIT_DP);
 
     RecompuiResource slider = recompui_create_slider(context, slider_area, SLIDERTYPE_NUMBER, min, max, step, (float)*config_option);
-    // RecompuiResource slider = recompui_create_slider(context, parent, SLIDERTYPE_NUMBER, min, max, step, (float)*config_option);
 
     recompui_set_display(slider, DISPLAY_BLOCK);
     // recompui_set_text_align(radio, TEXT_ALIGN_CENTER);
@@ -269,8 +258,6 @@ void randoCreateYamlConfigMenu() {
     recompui_set_gap(submit_button, 40.0f, UNIT_DP);
     recompui_set_align_items(submit_button, ALIGN_ITEMS_BASELINE);
     recompui_register_callback(submit_button, randoYAMLGenerateCallback, NULL);
-
-    // yaml_config_menu.wrapper = recompui_create_element(yaml_config_menu.context, yaml_config_menu.container);
 
     // Set up the container to be the modal's background.
     recompui_set_border_width(yaml_config_menu.frame, modal_border_width, UNIT_DP);
