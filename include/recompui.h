@@ -162,7 +162,7 @@ RECOMP_IMPORT("*", RecompuiResource recompui_create_label(RecompuiContext contex
 RECOMP_IMPORT("*", RecompuiResource recompui_create_textinput(RecompuiContext context, RecompuiResource parent));
 RECOMP_IMPORT("*", RecompuiResource recompui_create_passwordinput(RecompuiContext context, RecompuiResource parent));
 RECOMP_IMPORT("*", RecompuiResource recompui_create_labelradio(RecompuiContext context, RecompuiResource parent,
-    const char** options, unsigned long num_options));
+    char** options, unsigned long num_options));
 RECOMP_IMPORT("*", RecompuiResource recompui_create_slider(RecompuiContext context, RecompuiResource parent,
     RecompuiSliderType type, float min_value, float max_value, float step, float initial_value));
 RECOMP_IMPORT("*", RecompuiResource recompui_create_imageview(RecompuiContext context, RecompuiResource parent, RecompuiTextureHandle texture));

@@ -56,7 +56,7 @@ typedef enum {
     RANDO_DAMAGE_MULITPLIER_NORMAL = 1,
     RANDO_DAMAGE_MULITPLIER_DOUBLE = 2,
     RANDO_DAMAGE_MULITPLIER_QUAD = 3,
-    RANDO_DAMAGE_MULITPLIER_ONE_HOT_KO = 4,
+    RANDO_DAMAGE_MULITPLIER_ONE_HIT_KO = 4,
     RANDO_DAMAGE_MULITPLIER_MAX = 0xFFFFFFFF
 } RandoDamageMultiplier;
 
@@ -77,9 +77,9 @@ typedef struct {
     bool startShieldless;
     bool startWithSoaring;
     bool startingHeartsAreRandom;
-    int startingHeartsMin;
-    int startingHeartsMax;
-    int startingHearts;
+    u32 startingHeartsMin;
+    u32 startingHeartsMax;
+    u32 startingHearts;
     /* RandoStartingHeartsAreContainersOrPieces */ 
     u32 startingHeartsAreContainersOrPieces;
     /*RandoShuffleRegionalMaps */ 
@@ -110,7 +110,8 @@ typedef struct {
     RecompuiContext context;
     RecompuiResource root;
     RecompuiResource frame;
-    RecompuiResource container;
+    RecompuiResource header;
+    RecompuiResource body;
 } RandoYamlConfigMenu;
 
 extern RandoYamlConfig yaml_config;
