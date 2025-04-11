@@ -76,6 +76,7 @@ native_libraries = [
                                     "rando_get_items_size",
                                     "rando_get_item",
                                     "rando_save_run_yaml",
+                                    "rando_append_run_yaml",
                                     "rando_get_location_item_player",
                                     "rando_get_location_item_name",
                                     "rando_get_last_location_sent"] }
