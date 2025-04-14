@@ -10,7 +10,7 @@
 
 ### Mod Setup
 1. Download the latest [Visual Studio C++ Redist](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-microsoft-visual-c-redistributable-version).
-2. Download the (for now) required build of [Zelda64Recomp](https://nightly.link/Zelda64Recomp/Zelda64Recomp/actions/runs/12742376475) (on windows you'll likely want `Zelda64Recompiled-Windows-RelWithDebInfo`).
+2. Download the (for now) required build of [Zelda64Recomp](https://github.com/user-attachments/files/19744271/Zelda64Recomp-Release-Mods-Old.zip).
     - Optionally download a texture pack from [this PR](https://github.com/Zelda64Recomp/Zelda64Recomp/pull/499).
         1. Download both `.7z` files from one of the `.rtz` links farther down in the PR.
         2. Unzip the file ending in .001, and place the resulting `.rtz` in your mods folder.
