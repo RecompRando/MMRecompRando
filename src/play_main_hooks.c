@@ -35,6 +35,7 @@ void init_rando()
     dsot_set_skip_dsot_cutscene(true);
 
     randoCreateMenus();
+    randoCreateNotificationContainer();
 }
 
 s8 giToItemId[GI_MAX] = {
@@ -445,4 +446,6 @@ void update_rando(PlayState* play) {
             rando_reset_death_link_pending();
         }
     }
+
+    notificationUpdateCycle();
 }

@@ -42,6 +42,10 @@
 #define GI_AP_FILLER GI_90
 #define GI_AP_USEFUL GI_B3
 
+#define ITEM_AP_PROG 0xCD
+#define ITEM_AP_FILLER 0xCE
+#define ITEM_AP_USEFUL 0xCF
+
 #define GID_SONG_SONATA (GID_MASK_FIERCE_DEITY + 1)
 #define GID_SONG_LULLABY (GID_MASK_FIERCE_DEITY + 2)
 #define GID_SONG_NOVA (GID_MASK_FIERCE_DEITY + 3)
@@ -162,6 +166,19 @@ u8 getTextId(s16 gi);
 
 extern s8 giToItemId[];
 
+typedef enum {
+    RANDO_ITEM_CLASS_PROGRESSIVE,
+    RANDO_ITEM_CLASS_USEFUL,
+    RANDO_ITEM_CLASS_JUNK,
+    RANDO_ITEM_CLASS_TRAP
+} RandoItemClassification;
+
 void randoCreateMenus();
+void notificationUpdateCycle();
+void randoCreateNotificationContainer();
+void randoEmitRecieveNotification(const char* item_name, const char* from_name, const ItemId item, RandoItemClassification item_class);
+void randoEmitSendNotification(const char* item_name, const char* to_name, const ItemId item, RandoItemClassification item_class);
+void randoEmitNormalNotification(const char* notif_text);
+void randoEmitErrorNotification(const char* error_text);
 
 #endif
