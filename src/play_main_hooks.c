@@ -285,7 +285,10 @@ RECOMP_CALLBACK("*", recomp_on_play_main)
 void update_rando(PlayState* play) {
     u32 new_items_size;
     u32 i;
+    u8 has_unlocked_magic;
     u8* save_ptr;
+
+    u8 gMagicFix = 1; // REPLACE WITH YAML CHECK
 
     gPlay = play;
 
@@ -303,6 +306,13 @@ void update_rando(PlayState* play) {
             u8 bottle_count = 0;
 
             s16 old_health = gSaveContext.save.saveInfo.playerData.health;
+
+            if (gMagicFix) { // REPLACE WITH YAML CHECK
+                if (!gSaveContext.save.saveInfo.playerData.isMagicAcquired && !gSaveContext.save.saveInfo.playerData.isDoubleMagicAcquired) {
+                    gSaveContext.save.saveInfo.playerData.magic = 0;
+                }
+            }
+
 
             gSaveContext.save.saveInfo.playerData.healthCapacity = 0x10;
             gSaveContext.save.saveInfo.playerData.health = 0x10;
@@ -427,6 +437,17 @@ void update_rando(PlayState* play) {
 
             old_items_size = new_items_size;
             initItems = true;
+        }
+
+        if (gMagicFix) { // REPLACE WITH YAML CHECK
+            if (gSaveContext.save.saveInfo.playerData.magic == 0 && gSaveContext.save.saveInfo.playerData.isMagicAcquired && has_unlocked_magic < 2) {
+                if (gSaveContext.save.saveInfo.playerData.magicLevel == 1) {
+                    gSaveContext.save.saveInfo.playerData.magic = MAGIC_NORMAL_METER;
+                } else if (gSaveContext.save.saveInfo.playerData.magicLevel == 2) {
+                    gSaveContext.save.saveInfo.playerData.magic = MAGIC_DOUBLE_METER;
+                }
+                has_unlocked_magic++;
+            }
         }
 
         if (new_items_size > old_items_size) {
