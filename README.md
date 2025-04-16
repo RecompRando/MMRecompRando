@@ -18,7 +18,7 @@
 4. Place the mods within the zip into the Zelda64Recomp mods folder, as well as any texture packs you've downloaded.
     1. If on Windows, this is located at `%LOCALAPPDATA%\Zelda64Recompiled\mods`.
     2. If on Linux, this is located at `~/.config/Zelda64Recompiled/mods`.
-5. You can also download [poptracker](https://github.com/black-sliver/PopTracker/releases/latest) along with Seto's [pack](https://github.com/seto10987/Majoras-Mask-AP-PopTracker-Pack/releases/latest)
+5. You can also download [poptracker](https://github.com/black-sliver/PopTracker/releases/latest) along with [G4M3RL1F3's fork of Seto's pack](https://github.com/G4M3RL1F3/Majoras-Mask-AP-PopTracker-Pack/releases/latest)
 6. Place `apconnect.txt` next to `Zelda64Recompiled.exe`, and fill it out with your server connection information.
     - MAKE SURE it is NOT named `apconnect.txt.txt`.
 7. Open `Zelda64Recompiled.exe`, select your ROM, and hit Start Game.
