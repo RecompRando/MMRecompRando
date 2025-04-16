@@ -27,7 +27,7 @@ extern s32 sCharTexSize;
 extern s32 sCharTexScale;
 extern s32 D_801F6B08;
 
-static unsigned char ap_msg[128] = "You got an\x01 AP item\x00!\xbf";
+static unsigned char ap_msg[128];
 static unsigned char ctsf_msg[128] = "You found\x08 Clock Town's\x06 Stray Fairy\x00!\xbf";
 static unsigned char wfsf_msg[128] = "You found a\x02 Woodfall\x06 Stray Fairy\x00!\xbf";
 static unsigned char shsf_msg[128] = "You found a\x05 Snowhead\x06 Stray Fairy\x00!\xbf";
@@ -587,6 +587,58 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
             i += 1;
         }
         font->msgBuf.schar[new_end_i + i] = 0xBF;
+    } else if (msg == ap_msg) {
+        recomp_printf("ap_msg\n");
+        char was_sent_str[128] = "was sent to ";
+        char item_str[67];
+        char player_str[17];
+
+        rando_get_location_item_name(rando_get_last_location_sent(), item_str);
+        rando_get_location_item_player(rando_get_last_location_sent(), player_str);
+
+        char c = item_str[0];
+        u32 msg_i = 11;
+        font->msgBuf.schar[msg_i] = 0x05;
+        msg_i += 1;
+
+        while (c != 0) {
+            font->msgBuf.schar[msg_i] = c;
+            msg_i += 1;
+            c = item_str[msg_i - 12];
+        }
+
+        font->msgBuf.schar[msg_i] = 0x11;
+        font->msgBuf.schar[msg_i + 1] = 0x00;
+        msg_i += 2;
+
+        u32 i = 0;
+        c = was_sent_str[0];
+
+        while (c != 0) {
+            font->msgBuf.schar[msg_i + i] = c;
+            i += 1;
+            c = was_sent_str[i];
+        }
+
+        msg_i += i;
+        font->msgBuf.schar[msg_i] = 0x01;
+        msg_i += 1;
+        i = 0;
+        c = player_str[0];
+
+        while (c != 0) {
+            font->msgBuf.schar[msg_i + i] = c;
+            i += 1;
+            c = player_str[i];
+        }
+
+        msg_i += i;
+        font->msgBuf.schar[msg_i] = 0x00;
+        font->msgBuf.schar[msg_i + 1] = '!';
+        font->msgBuf.schar[msg_i + 2] = 0xBF;
+
+        recomp_printf("item: `%s'\n", item_str);
+        recomp_printf("player: `%s'\n", player_str);
     }
 
     // for reverse-engineering text
