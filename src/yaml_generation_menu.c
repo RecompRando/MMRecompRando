@@ -66,11 +66,18 @@ RecompuiResource randoYAMLCreateMenuEntryArea (RecompuiContext context, Recompui
     recompui_set_display(retVal, DISPLAY_BLOCK);
     recompui_set_justify_content(retVal, JUSTIFY_CONTENT_SPACE_EVENLY);
     recompui_set_flex_direction(retVal, FLEX_DIRECTION_ROW);
-    recompui_set_padding(retVal, 20.0f, UNIT_DP);
+    recompui_set_padding(retVal, 12.0f, UNIT_DP);
     recompui_set_gap(retVal, 20.0f, UNIT_DP);
     recompui_set_align_items(retVal, ALIGN_ITEMS_BASELINE);
 
     return retVal;
+}
+
+RecompuiResource randoYAMLCreateSettingLabel(RecompuiContext context, RecompuiResource parent, const char* display_name) {
+    RecompuiResource label = recompui_create_label(context, parent, display_name, LABELSTYLE_NORMAL);
+    recompui_set_display(label, DISPLAY_BLOCK);
+    recompui_set_margin_bottom(label, 12.0f, UNIT_DP);
+    return label;
 }
 
 // Toggle Button Helpers:
@@ -97,9 +104,7 @@ void randoYAMLToggleButtonCallback(RecompuiResource button, const RecompuiEventD
 RecompuiResource randoCreateToggleButtonOption(RecompuiContext context, RecompuiResource parent, char* display_name, u32* config_option) {
     RecompuiResource button_area = randoYAMLCreateMenuEntryArea(context, parent);
 
-    RecompuiResource label = recompui_create_label(context, button_area, display_name, LABELSTYLE_NORMAL);
-    recompui_set_display(label, DISPLAY_BLOCK);
-    recompui_set_padding(label, 16.0f, UNIT_DP);
+    randoYAMLCreateSettingLabel(context, button_area, display_name);
 
     RecompuiResource button = recompui_create_button(context, button_area, display_name, BUTTONSTYLE_SECONDARY);
     recompui_set_display(button, DISPLAY_BLOCK);
@@ -125,21 +130,32 @@ RecompuiResource randoCreateRadioOption(RecompuiContext context, RecompuiResourc
     char** options, unsigned long num_options, u32* config_option) {
     RecompuiResource radio_area = randoYAMLCreateMenuEntryArea(context, parent);
 
-    RecompuiResource label = recompui_create_label(context, radio_area, display_name, LABELSTYLE_NORMAL);
-    recompui_set_display(label, DISPLAY_BLOCK);
-    recompui_set_padding_top(label, 16.0f, UNIT_DP);
-    recompui_set_padding_bottom(label, 8.0f, UNIT_DP);
+    randoYAMLCreateSettingLabel(context, radio_area, display_name);
 
     RecompuiResource radio = recompui_create_labelradio(context, radio_area, options, num_options);
-    recompui_set_display(radio, DISPLAY_BLOCK);
+    // recompui_set_display(radio, DISPLAY_BLOCK);
     // recompui_set_text_align(radio, TEXT_ALIGN_CENTER);
     recompui_register_callback(radio, randoYAMLRadioCallback, config_option);
-    recompui_set_padding_left(radio, 60.0f, UNIT_DP);
-    recompui_set_padding_bottom(radio, 16.0f, UNIT_DP);
-    recompui_set_max_width(radio, 600.0f, UNIT_DP);
+    // recompui_set_padding_left(radio, 60.0f, UNIT_DP);
+    // recompui_set_padding_bottom(radio, 16.0f, UNIT_DP);
+    // recompui_set_max_width(radio, 600.0f, UNIT_DP);
     recompui_set_input_value_u32(radio, *config_option);
 
     recomp_printf("%s radio created.\n", display_name);
+    return 0;
+}
+
+static char* rando_bool_prop_names[] = {"Off", "On"};
+RecompuiResource randoCreateBoolPropOption(RecompuiContext context, RecompuiResource parent, char* display_name, u32* config_option) {
+    RecompuiResource radio_area = randoYAMLCreateMenuEntryArea(context, parent);
+
+    randoYAMLCreateSettingLabel(context, radio_area, display_name);
+
+    RecompuiResource radio = recompui_create_labelradio(context, radio_area, rando_bool_prop_names, 2);
+    recompui_register_callback(radio, randoYAMLRadioCallback, config_option);
+    recompui_set_input_value_u32(radio, *config_option);
+
+    recomp_printf("%s bool prop created.\n", display_name);
     return 0;
 }
 
@@ -155,24 +171,22 @@ RecompuiResource randoCreateSliderOption(RecompuiContext context, RecompuiResour
     float min, float max, float step, u32* config_option) {
     RecompuiResource slider_area = randoYAMLCreateMenuEntryArea(context, parent);
 
-    RecompuiResource label = recompui_create_label(context, slider_area, display_name, LABELSTYLE_NORMAL);
-    recompui_set_display(label, DISPLAY_BLOCK);
-    recompui_set_padding_top(label, 16.0f, UNIT_DP);
-    recompui_set_padding_bottom(label, 8.0f, UNIT_DP);
+    randoYAMLCreateSettingLabel(context, slider_area, display_name);
 
     RecompuiResource slider = recompui_create_slider(context, slider_area, SLIDERTYPE_NUMBER, min, max, step, (float)*config_option);
 
     recompui_set_display(slider, DISPLAY_BLOCK);
     // recompui_set_text_align(radio, TEXT_ALIGN_CENTER);
     recompui_register_callback(slider, randoYAMLSliderCallback, config_option);
-    recompui_set_padding_left(slider, 60.0f, UNIT_DP);
-    recompui_set_padding_bottom(slider, 16.0f, UNIT_DP);
+    // recompui_set_padding_left(slider, 60.0f, UNIT_DP);
+    // recompui_set_padding_bottom(slider, 16.0f, UNIT_DP);
     recompui_set_max_width(slider, 600.0f, UNIT_DP);
 
 
     recomp_printf("%s slider created.\n", display_name);
     return 0;
 }
+
 
 
 static char* rando_accessability_names[] = {"Full", "Minimal"};
@@ -257,37 +271,42 @@ void randoCreateYamlConfigMenu() {
     recompui_set_height(submit_button, 80.0f, UNIT_DP);
     recompui_set_gap(submit_button, 40.0f, UNIT_DP);
     recompui_set_align_items(submit_button, ALIGN_ITEMS_BASELINE);
+    recompui_set_margin_left(submit_button, 12.0f, UNIT_DP);
+    recompui_set_margin_right(submit_button, 12.0f, UNIT_DP);
+    recompui_set_margin_bottom(submit_button, 12.0f, UNIT_DP);
+    recompui_set_width_auto(submit_button);
     recompui_register_callback(submit_button, randoYAMLGenerateCallback, NULL);
 
     // Set up the container to be the modal's background.
+    recompui_set_padding(yaml_config_menu.body, 12.0f, UNIT_DP);
     recompui_set_border_width(yaml_config_menu.frame, modal_border_width, UNIT_DP);
     recompui_set_border_radius(yaml_config_menu.frame, modal_border_radius, UNIT_DP);
     recompui_set_border_color(yaml_config_menu.frame, &border_color);
     recompui_set_background_color(yaml_config_menu.frame, &modal_color);
-    randoCreateRadioOption(yaml_config_menu.context, yaml_config_menu.body, "Accessability:", rando_accessability_names, 2, &yaml_config.accessability);
+    randoCreateRadioOption(yaml_config_menu.context, yaml_config_menu.body, "Accessibility:", rando_accessability_names, 2, &yaml_config.accessability);
     randoCreateRadioOption(yaml_config_menu.context, yaml_config_menu.body, "Logic Difficulty:", rando_logic_difficulty_names, 3, &yaml_config.logicDifficulty);
-    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.body, "Chests Match Contents:", &(yaml_config.chestsMatchContents));
-    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.body, "Start Swordless:", &(yaml_config.startSwordless));
-    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.body, "Start Shieldless:", &(yaml_config.startShieldless));
-    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.body, "Start with Song of Soaring:", &(yaml_config.startWithSoaring));
-    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.body, "Starting Hearts are Random:", &(yaml_config.startingHeartsAreRandom));
+    randoCreateBoolPropOption(yaml_config_menu.context, yaml_config_menu.body, "Chests Match Contents:", &(yaml_config.chestsMatchContents));
+    randoCreateBoolPropOption(yaml_config_menu.context, yaml_config_menu.body, "Start Swordless:", &(yaml_config.startSwordless));
+    randoCreateBoolPropOption(yaml_config_menu.context, yaml_config_menu.body, "Start Shieldless:", &(yaml_config.startShieldless));
+    randoCreateBoolPropOption(yaml_config_menu.context, yaml_config_menu.body, "Start with Song of Soaring:", &(yaml_config.startWithSoaring));
+    randoCreateBoolPropOption(yaml_config_menu.context, yaml_config_menu.body, "Starting Hearts are Random:", &(yaml_config.startingHeartsAreRandom));
     randoCreateSliderOption(yaml_config_menu.context, yaml_config_menu.body, "Random Starting Hearts Segments - Minimum:", 1, 12, 1, &(yaml_config.startingHeartsMin));
     randoCreateSliderOption(yaml_config_menu.context, yaml_config_menu.body, "Random Starting Hearts Segments - Maximum:", 1, 12, 1, &(yaml_config.startingHeartsMax));
     randoCreateSliderOption(yaml_config_menu.context, yaml_config_menu.body, "Non-Random Starting Heart Segments:", 1, 12, 1, &(yaml_config.startingHearts));
     randoCreateRadioOption(yaml_config_menu.context, yaml_config_menu.body, "Unused Starting Hearts are Distributed as:", rando_starting_hearts_type_names, 2, &yaml_config.startingHeartsAreContainersOrPieces);
     randoCreateRadioOption(yaml_config_menu.context, yaml_config_menu.body, "Shuffle Regional Maps:", rando_shuffle_regional_maps_names, 3, &yaml_config.shuffleRegionalMaps);
     randoCreateRadioOption(yaml_config_menu.context, yaml_config_menu.body, "Shuffle Boss Maps:", rando_shuffle_boss_remains_names, 3, &yaml_config.shuffleBossRemains);
-    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.body, "Shuffle Spiderhouse Rewards:", &(yaml_config.shuffleSpiderHouseRewards));
+    randoCreateBoolPropOption(yaml_config_menu.context, yaml_config_menu.body, "Shuffle Spiderhouse Rewards:", &(yaml_config.shuffleSpiderHouseRewards));
     randoCreateRadioOption(yaml_config_menu.context, yaml_config_menu.body, "Skull-Sanity Mode:", rando_skullsanity_names, 3, &yaml_config.skullSanity);
     randoCreateRadioOption(yaml_config_menu.context, yaml_config_menu.body, "Shop-Sanity Mode:", rando_shopsanity_names, 3, &yaml_config.shopSanity);
-    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.body, "Scrub-Sanity:", &(yaml_config.scrubSanity));
-    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.body, "Cow-Sanity:", &(yaml_config.cowSanity));
-    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.body, "Shuffle Great Fairy Rewards:", &(yaml_config.shuffleCreatFairyRewards));
-    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.body, "FairySanity:", &(yaml_config.fairySanity));
-    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.body, "startWithConsumables:", &(yaml_config.startWithConsumables));
-    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.body, "Permanent Chateau Romani:", &(yaml_config.permanentChateauRomani));
-    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.body, "Start With Inverted Time:", &(yaml_config.startWithInvertedTime));
-    randoCreateToggleButtonOption(yaml_config_menu.context, yaml_config_menu.body, "Recieve Filled Wallets:", &(yaml_config.recieveFilledWallets));
+    randoCreateBoolPropOption(yaml_config_menu.context, yaml_config_menu.body, "Scrub-Sanity:", &(yaml_config.scrubSanity));
+    randoCreateBoolPropOption(yaml_config_menu.context, yaml_config_menu.body, "Cow-Sanity:", &(yaml_config.cowSanity));
+    randoCreateBoolPropOption(yaml_config_menu.context, yaml_config_menu.body, "Shuffle Great Fairy Rewards:", &(yaml_config.shuffleCreatFairyRewards));
+    randoCreateBoolPropOption(yaml_config_menu.context, yaml_config_menu.body, "FairySanity:", &(yaml_config.fairySanity));
+    randoCreateBoolPropOption(yaml_config_menu.context, yaml_config_menu.body, "startWithConsumables:", &(yaml_config.startWithConsumables));
+    randoCreateBoolPropOption(yaml_config_menu.context, yaml_config_menu.body, "Permanent Chateau Romani:", &(yaml_config.permanentChateauRomani));
+    randoCreateBoolPropOption(yaml_config_menu.context, yaml_config_menu.body, "Start With Inverted Time:", &(yaml_config.startWithInvertedTime));
+    randoCreateBoolPropOption(yaml_config_menu.context, yaml_config_menu.body, "Recieve Filled Wallets:", &(yaml_config.recieveFilledWallets));
     randoCreateRadioOption(yaml_config_menu.context, yaml_config_menu.body, "Damage Multiplier:", rando_damage_multiplier_names, 5, &yaml_config.damageMultiplier);
     randoCreateRadioOption(yaml_config_menu.context, yaml_config_menu.body, "Death Behavior:", rando_death_behavior_names, 3, &yaml_config.deathBehavior);
     
