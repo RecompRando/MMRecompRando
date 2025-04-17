@@ -113,6 +113,8 @@ RECOMP_IMPORT(".", bool rando_get_death_link_enabled());
 RECOMP_IMPORT(".", void rando_send_death_link());
 RECOMP_IMPORT(".", u32 rando_damage_multiplier());
 RECOMP_IMPORT(".", u32 rando_death_behavior());
+RECOMP_IMPORT(".", u32 rando_get_moon_remains_required());
+RECOMP_IMPORT(".", u32 rando_get_majora_remains_required());
 RECOMP_IMPORT(".", bool rando_is_magic_trap());
 RECOMP_IMPORT(".", bool rando_skulltulas_enabled());
 RECOMP_IMPORT(".", bool rando_shopsanity_enabled());

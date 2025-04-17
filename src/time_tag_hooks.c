@@ -85,6 +85,13 @@ void EnTimeTag_KickOut_Transition(EnTimeTag* this, PlayState* play);
 void EnTimeTag_KickOut_WaitForTrigger(EnTimeTag* this, PlayState* play);
 void EnTimeTag_KickOut_WaitForTime(EnTimeTag* this, PlayState* play);
 
+bool rando_met_moon_condition() {
+    return ((CHECK_QUEST_ITEM(QUEST_REMAINS_ODOLWA) > 0) +
+            (CHECK_QUEST_ITEM(QUEST_REMAINS_GOHT) > 0) +
+            (CHECK_QUEST_ITEM(QUEST_REMAINS_GYORG) > 0) +
+            (CHECK_QUEST_ITEM(QUEST_REMAINS_TWINMOLD) > 0)) >= rando_get_moon_remains_required();
+}
+
 RECOMP_PATCH void EnTimeTag_RooftopOath_Wait(EnTimeTag* this, PlayState* play) {
     Actor* thisx = &this->actor;
 
@@ -113,8 +120,9 @@ RECOMP_PATCH void EnTimeTag_RooftopOath_Cutscene(EnTimeTag* this, PlayState* pla
     if (play->msgCtx.ocarinaMode == OCARINA_MODE_END) {
         this->actionFunc = EnTimeTag_RooftopOath_Wait;
     }
-    if (CHECK_QUEST_ITEM(QUEST_REMAINS_ODOLWA) && CHECK_QUEST_ITEM(QUEST_REMAINS_GOHT) &&
-        CHECK_QUEST_ITEM(QUEST_REMAINS_GYORG) && CHECK_QUEST_ITEM(QUEST_REMAINS_TWINMOLD)) {
+    // if (CHECK_QUEST_ITEM(QUEST_REMAINS_ODOLWA) && CHECK_QUEST_ITEM(QUEST_REMAINS_GOHT) &&
+    //     CHECK_QUEST_ITEM(QUEST_REMAINS_GYORG) && CHECK_QUEST_ITEM(QUEST_REMAINS_TWINMOLD)) {
+    if (rando_met_moon_condition()) {
         gSaveContext.timerStates[TIMER_ID_MOON_CRASH] = TIMER_STATE_OFF;
         play->msgCtx.ocarinaMode = OCARINA_MODE_END;
         play->nextEntrance = ENTRANCE(THE_MOON, 0);

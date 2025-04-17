@@ -73,6 +73,8 @@ static unsigned char shop_desc_msg[128] = "\x01Some Item: \xbf";
 static unsigned char shop_buy_msg[128] = "Some Item: \xbf";
 static unsigned char shop_oos_msg[128] = "\x01You've already purchased this item!\x1a\xbf";
 
+static unsigned char moon_weak_msg[128] = "You are not strong enough...\x11\x13\x13\x12Shall...I send you back?\x02\x11\x11\xc2Yes\x11No\xbf";
+
 void Message_FindMessage(PlayState* play, u16 textId);
 
 RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
@@ -285,6 +287,9 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
             break;
         case 0x3545:
             msg = slow_dog_msg;
+            break;
+        case 0x3550:
+            msg = moon_weak_msg;
             break;
         case 0x3C:
             msg = sk_msg;
