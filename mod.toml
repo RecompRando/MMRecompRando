@@ -61,6 +61,7 @@ native_libraries = [
                                     "rando_shopsanity_enabled",
                                     "rando_scrubs_enabled",
                                     "rando_cows_enabled",
+                                    "rando_is_magic_trap",
                                     "rando_damage_multiplier",
                                     "rando_death_behavior",
                                     "rando_get_location_type",

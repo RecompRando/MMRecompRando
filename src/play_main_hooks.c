@@ -288,8 +288,6 @@ void update_rando(PlayState* play) {
     u8 has_unlocked_magic;
     u8* save_ptr;
 
-    u8 gMagicFix = 1; // REPLACE WITH YAML CHECK
-
     gPlay = play;
 
     if (saveOpened) {
@@ -307,7 +305,7 @@ void update_rando(PlayState* play) {
 
             s16 old_health = gSaveContext.save.saveInfo.playerData.health;
 
-            if (gMagicFix) { // REPLACE WITH YAML CHECK
+            if (!rando_is_magic_trap()) {
                 if (!gSaveContext.save.saveInfo.playerData.isMagicAcquired && !gSaveContext.save.saveInfo.playerData.isDoubleMagicAcquired) {
                     gSaveContext.save.saveInfo.playerData.magic = 0;
                 }
@@ -439,7 +437,7 @@ void update_rando(PlayState* play) {
             initItems = true;
         }
 
-        if (gMagicFix) { // REPLACE WITH YAML CHECK
+        if (!rando_is_magic_trap()) {
             if (gSaveContext.save.saveInfo.playerData.magic == 0 && gSaveContext.save.saveInfo.playerData.isMagicAcquired && has_unlocked_magic < 2) {
                 if (gSaveContext.save.saveInfo.playerData.magicLevel == 1) {
                     gSaveContext.save.saveInfo.playerData.magic = MAGIC_NORMAL_METER;
