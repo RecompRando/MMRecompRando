@@ -275,6 +275,7 @@ RECOMP_IMPORT("*", void recompui_set_input_text(RecompuiResource id, const char*
 
 // Images
 RECOMP_IMPORT("*", RecompuiTextureHandle recompui_create_texture_rgba32(void* data, unsigned long width, unsigned long height));
+RECOMP_IMPORT("*", RecompuiTextureHandle recompui_create_texture_image_bytes(void* data, u32 size_bytes));
 RECOMP_IMPORT("*", void recompui_destroy_texture(RecompuiTextureHandle texture));
 RECOMP_IMPORT("*", void recompui_set_imageview_texture(RecompuiResource id, RecompuiTextureHandle texture));
 

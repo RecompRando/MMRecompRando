@@ -1,5 +1,6 @@
 #include "apcommon.h"
 #include "recompui.h"
+#include "incbin.h"
 
 // used ProxySaw's notification mod as a base https://github.com/garrettjoecox/ProxyMM_RecompMods/blob/main/packages/Notifications/src/notifications.c
 
@@ -31,6 +32,11 @@ RecompuiColor progTextColor = { 175, 153, 239, 255 };
 RecompuiColor usefulTextColor = { 109, 139, 232, 255 };
 RecompuiColor junkTextColor = { 0, 238, 238, 255 };
 RecompuiColor trapTextColor = { 255, 119, 0, 255 };
+
+// load logo images
+INCBIN(ap_logo_png, "textures/apLogoNormal.dds")
+INCBIN(ap_logo_prog_png, "textures/apLogoProg.dds")
+INCBIN(ap_logo_junk_png, "textures/apLogoFiller.dds")
 
 typedef struct {
     RecompuiResource notification;
@@ -143,8 +149,16 @@ RecompuiResource create_basic_notification_element() {
     return notification;
 }
 
-// TODO: ap images
-RecompuiTextureHandle notification_get_item_image(const ItemId item) {
+RecompuiTextureHandle notification_get_item_image(const u8 item) {
+    switch (item) {
+        case ITEM_AP_PROG:
+            return recompui_create_texture_image_bytes(ap_logo_prog_png, ap_logo_prog_png_end - ap_logo_prog_png);
+        case ITEM_AP_USEFUL:
+            return recompui_create_texture_image_bytes(ap_logo_png, ap_logo_png_end - ap_logo_png);
+        case ITEM_AP_FILLER:
+            return recompui_create_texture_image_bytes(ap_logo_junk_png, ap_logo_junk_png_end - ap_logo_junk_png);
+    }
+
     u8 item_texture_data[ICON_ITEM_TEX_SIZE];
 
     CmpDma_LoadFile((uintptr_t)SEGMENT_ROM_START(icon_item_static_yar), item, item_texture_data, sizeof(item_texture_data));
