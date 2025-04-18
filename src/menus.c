@@ -191,7 +191,7 @@ void RandoMenu_Main(GameState* thisx) {
     // Show an error if connection failed.
     if (failed_to_connect) {
         recomp_printf("Failed to connect\n");
-        // TODO show an error.
+        randoEmitErrorNotification("Failed to connect");
         failed_to_connect = false;
     }
 
