@@ -4,6 +4,7 @@
 #include "apcommon.h"
 
 #define LOCATION_REMAINS(i) (GI_REMAINS_ODOLWA + i)
+#define LOCATION_SONG_OATH 0x040065
 
 #define FLAGS (ACTOR_FLAG_10 | ACTOR_FLAG_20)
 #define THIS ((DmHina*)thisx)
@@ -128,5 +129,30 @@ RECOMP_PATCH void DmHina_Draw(Actor* thisx, PlayState* play) {
         }
 
         func_80A1F9AC(this, play);
+    }
+}
+
+void func_80A1F56C(DmHina* this, PlayState* play);
+void func_80A1F5AC(DmHina* this, PlayState* play);
+
+void DmHina_OfferOath(DmHina* this, PlayState* play) {
+    if (Actor_HasParent(&this->actor, play)) {
+        this->actor.parent = NULL;
+        this->actionFunc = func_80A1F56C;
+    } else {
+        Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_SONG_OATH), LOCATION_SONG_OATH, 30.0f, 80.0f, true, true);
+    }
+}
+
+RECOMP_PATCH void func_80A1F56C(DmHina* this, PlayState* play) {
+    if (Message_GetState(&play->msgCtx) == TEXT_STATE_CLOSING) {
+        // @rando override warp animation
+        if (!rando_location_is_checked(LOCATION_SONG_OATH)) {
+            this->actor.parent = NULL;
+            this->actionFunc = DmHina_OfferOath;
+            return;
+        }
+        this->unk17C = 2;
+        this->actionFunc = func_80A1F5AC;
     }
 }

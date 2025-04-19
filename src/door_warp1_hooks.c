@@ -22,6 +22,7 @@ typedef void (*DoorWarp1ActionFunc)(struct DoorWarp1*, PlayState*);
 #define LOCATION_REMAINS_GOHT GI_REMAINS_GOHT
 #define LOCATION_REMAINS_GYORG GI_REMAINS_GYORG
 #define LOCATION_REMAINS_TWINMOLD GI_REMAINS_TWINMOLD
+#define LOCATION_SONG_OATH 0x040065
 
 typedef enum {
     /* 0 */ ENDOORWARP1_FF_0,
@@ -193,6 +194,45 @@ RECOMP_PATCH void DoorWarp1_Init(Actor* thisx, PlayState* play) {
         Environment_StopTime();
         play->interfaceCtx.restrictions.songOfTime = 1;
         play->interfaceCtx.restrictions.songOfSoaring = 1;
+    }
+}
+
+void func_808B9E94(DoorWarp1* this, PlayState* play);
+void func_808B9ED8(DoorWarp1* this, PlayState* play);
+
+RECOMP_PATCH void func_808B9E94(DoorWarp1* this, PlayState* play) {
+    // @rando don't count down warp unless oath is checked in DmHina (remains)
+    if (!rando_location_is_checked(LOCATION_SONG_OATH)) {
+        return;
+    }
+
+    if (Message_GetState(&play->msgCtx) == TEXT_STATE_CLOSING) {
+        this->unk_1CE = 110;
+        DoorWarp1_SetupAction(this, func_808B9ED8);
+    }
+}
+
+void func_808B9FD0(DoorWarp1* this, PlayState* play);
+s32 func_808B866C(DoorWarp1* this, PlayState* play);
+
+// already collected remains
+RECOMP_PATCH void func_808B9F10(DoorWarp1* this, PlayState* play) {
+    // @rando backup offer in case remains location was checked without oath location (i.e. from a release)
+    if (!Actor_HasParent(&this->dyna.actor, play) && !rando_location_is_checked(LOCATION_SONG_OATH)) {
+        Actor_OfferGetItemHook(&this->dyna.actor, play, rando_get_item_id(LOCATION_SONG_OATH), LOCATION_SONG_OATH, 30.0f, 80.0f, true, true);
+        return;
+    }
+    
+    Actor_PlaySfx(&this->dyna.actor, NA_SE_EV_WARP_HOLE - SFX_FLAG);
+    if ((this->unk_203 == 0) && func_808B866C(this, play) && !Play_InCsMode(play) && (this->unk_203 == 0)) {
+        Player* player = GET_PLAYER(play);
+
+        Interface_SetHudVisibility(HUD_VISIBILITY_NONE);
+        func_800B7298(play, &this->dyna.actor, PLAYER_CSACTION_9);
+        player->unk_3A0.x = this->dyna.actor.world.pos.x;
+        player->unk_3A0.z = this->dyna.actor.world.pos.z;
+        this->unk_1CA = 20;
+        DoorWarp1_SetupAction(this, func_808B9FD0);
     }
 }
 
