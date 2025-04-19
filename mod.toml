@@ -56,6 +56,7 @@ native_libraries = [
                                     "rando_get_permanent_chateau_romani_enabled",
                                     "rando_get_start_with_inverted_time_enabled",
                                     "rando_get_receive_filled_wallets_enabled",
+                                    "rando_get_remains_allow_boss_warps_enabled",
                                     "rando_get_starting_heart_locations",
                                     "rando_get_moon_remains_required",
                                     "rando_get_majora_remains_required",

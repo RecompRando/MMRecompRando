@@ -3,6 +3,8 @@
 
 #include "apcommon.h"
 
+RECOMP_IMPORT(".", bool rando_get_remains_allow_boss_warps_enabled());
+
 struct DoorWarp1;
 
 #define FLAGS 0x00000000
@@ -191,5 +193,40 @@ RECOMP_PATCH void DoorWarp1_Init(Actor* thisx, PlayState* play) {
         Environment_StopTime();
         play->interfaceCtx.restrictions.songOfTime = 1;
         play->interfaceCtx.restrictions.songOfSoaring = 1;
+    }
+}
+
+void func_808BAAF4(DoorWarp1* this, PlayState* play);
+void func_808BABF4(DoorWarp1* this, PlayState* play);
+
+RECOMP_PATCH void func_808B8C48(DoorWarp1* this, PlayState* play) {
+    this->dyna.actor.shape.yOffset = 0.0f;
+    Actor_SetScale(&this->dyna.actor, 0.1f);
+    Lights_PointNoGlowSetInfo(&this->unk_1E0, this->dyna.actor.world.pos.x, this->dyna.actor.world.pos.y,
+                              this->dyna.actor.world.pos.z, 200, 255, 255, 255);
+    Lights_PointNoGlowSetInfo(&this->unk_1F4, this->dyna.actor.world.pos.x, this->dyna.actor.world.pos.y,
+                              this->dyna.actor.world.pos.z, 200, 255, 255, 255);
+    if (((DOORWARP1_GET_FF(&this->dyna.actor) == ENDOORWARP1_FF_2)
+            && ((CHECK_QUEST_ITEM(QUEST_REMAINS_ODOLWA) && rando_get_remains_allow_boss_warps_enabled())
+                || rando_location_is_checked(LOCATION_REMAINS_ODOLWA))) ||
+        ((DOORWARP1_GET_FF(&this->dyna.actor) == ENDOORWARP1_FF_3)
+            && ((CHECK_QUEST_ITEM(QUEST_REMAINS_GOHT) && rando_get_remains_allow_boss_warps_enabled())
+                || rando_location_is_checked(LOCATION_REMAINS_GOHT))) ||
+        ((DOORWARP1_GET_FF(&this->dyna.actor) == ENDOORWARP1_FF_4)
+            && ((CHECK_QUEST_ITEM(QUEST_REMAINS_GYORG) && rando_get_remains_allow_boss_warps_enabled())
+                || rando_location_is_checked(LOCATION_REMAINS_GYORG))) ||
+        ((DOORWARP1_GET_FF(&this->dyna.actor) == ENDOORWARP1_FF_5)
+            && ((CHECK_QUEST_ITEM(QUEST_REMAINS_TWINMOLD) && rando_get_remains_allow_boss_warps_enabled())
+                || rando_location_is_checked(LOCATION_REMAINS_TWINMOLD)))) {
+        s16 params = DOORWARP1_GET_FF00_2(&this->dyna.actor);
+
+        params |= 6;
+        Actor_SpawnAsChild(&play->actorCtx, &this->dyna.actor, play, ACTOR_DOOR_WARP1, this->dyna.actor.world.pos.x,
+                           this->dyna.actor.world.pos.y + 10.0f, this->dyna.actor.world.pos.z,
+                           this->dyna.actor.world.rot.x, this->dyna.actor.world.rot.y, this->dyna.actor.world.rot.z,
+                           params);
+        DoorWarp1_SetupAction(this, func_808BAAF4);
+    } else {
+        DoorWarp1_SetupAction(this, func_808BABF4);
     }
 }
