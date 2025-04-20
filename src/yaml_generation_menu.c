@@ -15,7 +15,7 @@ RandoOptionData* randoAllocateOption(RandoYamlConfigMenu* menu, const char* opti
 
     // Check if the max number of options has been reached and error out if so.
     if (menu->num_options >= MAX_OPTIONS) {
-        recomp_printf("Max rando options reached, increase the MAX_OPTIONS field in " __FILE__ " to use more options\n");
+        recomp_printf("Max rando options reached, increase the MAX_OPTIONS field in \"yaml_generation.h\" to use more options\n");
         *(volatile int*)0 = 0;
         return NULL;
     }
@@ -79,7 +79,7 @@ void randoYAMLGenerateCallback(RecompuiResource button, const RecompuiEventData*
         }
 
         unsigned char* save_path = recomp_get_save_file_path();
-        rando_yaml_finalize(save_path, 1);
+        rando_yaml_finalize(save_path);
         recomp_free(save_path);
     }
 }

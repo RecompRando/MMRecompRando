@@ -7,7 +7,7 @@
 #include "modding.h"
 RECOMP_IMPORT(".", void rando_yaml_init());
 RECOMP_IMPORT(".", void rando_yaml_puts(const char* text, u32 size));
-RECOMP_IMPORT(".", void rando_yaml_finalize(const unsigned char* save_path, u32 slot));
+RECOMP_IMPORT(".", void rando_yaml_finalize(const unsigned char* save_path));
 
 #define MAX_OPTIONS 64
 
