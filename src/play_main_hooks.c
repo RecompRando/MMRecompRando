@@ -35,8 +35,10 @@ void init_rando()
 
     dsot_set_skip_dsot_cutscene(true);
 
+    // randoCreateStartMenu();
+    // randoCreateSoloMenu();
     randoCreateYamlConfigMenu();
-    // randoCreateAPConnectMenu();
+    randoCreateAPConnectMenu();
 }
 
 s8 giToItemId[GI_MAX] = {

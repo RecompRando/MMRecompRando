@@ -170,6 +170,14 @@ u8 getTextId(s16 gi);
 
 extern s8 giToItemId[];
 
+// void randoCreateStartMenu();
+// void randoShowStartMenu();
+// void randoCreateSoloMenu();
+// void randoShowSoloMenu();
+void randoCreateYamlConfigMenu();
+void randoShowYamlConfigMenu();
 void randoCreateAPConnectMenu();
+void randoShowAPConnectMenu();
+void randoStart();
 
 #endif

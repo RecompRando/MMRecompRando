@@ -106,6 +106,4 @@ typedef struct {
 
 extern RandoYamlConfigMenu yaml_config_menu;
 
-void randoCreateYamlConfigMenu();
-
 #endif

@@ -451,3 +451,7 @@ void randoCreateYamlConfigMenu() {
 
     recompui_close_context(yaml_config_menu.context);
 }
+
+void randoShowYamlConfigMenu() {
+    recompui_show_context(yaml_config_menu.context);
+}
