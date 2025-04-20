@@ -5,8 +5,31 @@
 #include "recompui.h"
 
 #include "modding.h"
-RECOMP_IMPORT(".", void rando_save_run_yaml(char* save_path, u32 slot, char* yaml));
-RECOMP_IMPORT(".", void rando_append_run_yaml(char* save_path, u32 slot, char* yaml));
+RECOMP_IMPORT(".", void rando_yaml_init());
+RECOMP_IMPORT(".", void rando_yaml_puts(const char* text, u32 size));
+RECOMP_IMPORT(".", void rando_yaml_finalize(const unsigned char* save_path, u32 slot));
+
+#define MAX_OPTIONS 64
+
+typedef enum {
+    OPTION_BOOL,
+    OPTION_RADIO,
+    OPTION_INT_SLIDER,
+    OPTION_FLOAT_SLIDER
+} RandoOptionType;
+
+typedef struct {
+    RandoOptionType type;
+    RecompuiResource root_element;
+    RecompuiResource input_element;
+    void* data;
+    char* option_id;
+} RandoOptionData;
+
+typedef struct {
+    const char* id;
+    const char* name;
+} EnumOptionValue;
 
 typedef enum {
     RANDO_ACCESSABILITY_FULL = 0,
@@ -72,59 +95,17 @@ typedef enum {
 } RandoDeathBehavior;
 
 typedef struct {
-    /* RandoAccessability */ 
-    u32 accessability;
-    /* RandoLogicDifficulty */ 
-    u32 logicDifficulty;
-    bool chestsMatchContents;
-    bool startSwordless;
-    bool startShieldless;
-    bool startWithSoaring;
-    bool startingHeartsAreRandom;
-    u32 startingHeartsMin;
-    u32 startingHeartsMax;
-    u32 startingHearts;
-    /* RandoStartingHeartsAreContainersOrPieces */ 
-    u32 startingHeartsAreContainersOrPieces;
-    /*RandoShuffleRegionalMaps */ 
-    u32 shuffleRegionalMaps;
-    /* RandoShuffleBossRemains */ 
-    u32 shuffleBossRemains;
-    bool shuffleSpiderHouseRewards;
-    /* RandoSkullSanity */ 
-    u32 skullSanity;
-    /* RandoShopSanity */
-    u32 shopSanity;
-    bool scrubSanity;
-    bool cowSanity;
-    bool shuffleCreatFairyRewards;
-    bool fairySanity;
-    bool startWithConsumables;
-    bool permanentChateauRomani;
-    bool startWithInvertedTime;
-    bool recieveFilledWallets;
-    /* RandoDamageMultiplier */ 
-    u32 damageMultiplier;
-    /* RandoDeathBehavior */ 
-    u32 deathBehavior;
-
-} RandoYamlConfig;
-
-typedef struct {
     RecompuiContext context;
     RecompuiResource root;
     RecompuiResource frame;
     RecompuiResource header;
     RecompuiResource body;
+    RandoOptionData all_options[MAX_OPTIONS];
+    u32 num_options;
 } RandoYamlConfigMenu;
 
-extern RandoYamlConfig yaml_config;
 extern RandoYamlConfigMenu yaml_config_menu;
 
-
-void RandoYamlConfig_Init(RandoYamlConfig* config);
-RandoYamlConfig* RandoYamlConfig_Create();
-void RandoYamlConfig_Destroy(RandoYamlConfig* config);
 void randoCreateYamlConfigMenu();
 
 #endif
