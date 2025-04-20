@@ -6,6 +6,26 @@ RandoStartMenu start_menu;
 
 #define RANDO_TITLE "Majora's Mask Recompiled Randomizer"
 
+static void soloButtonClicked(RecompuiResource resource, const RecompuiEventData* event, void* userdata) {
+    (void)resource;
+    (void)userdata;
+
+    if (event->type == UI_EVENT_CLICK) {
+        recompui_hide_context(start_menu.context);
+        // randoShowSoloMenu();
+    }
+}
+
+static void multiworldButtonClicked(RecompuiResource resource, const RecompuiEventData* event, void* userdata) {
+    (void)resource;
+    (void)userdata;
+
+    if (event->type == UI_EVENT_CLICK) {
+        recompui_hide_context(start_menu.context);
+        randoShowAPConnectMenu();
+    }
+}
+
 void randoCreateStartMenu() {
     start_menu.context = recompui_create_context();
     recompui_open_context(start_menu.context);
@@ -46,10 +66,13 @@ void randoCreateStartMenu() {
     recompui_set_flex_grow(start_menu.solo_button, 0.0f);
     recompui_set_flex_shrink(start_menu.solo_button, 0.0f);
     recompui_set_flex_basis(start_menu.solo_button, button_width, UNIT_DP);
+    recompui_register_callback(start_menu.solo_button, soloButtonClicked, NULL);
+
     start_menu.multiworld_button = recompui_create_button(start_menu.context, start_menu.button_container, "Multiworld", BUTTONSTYLE_SECONDARY);
     recompui_set_flex_grow(start_menu.multiworld_button, 0.0f);
     recompui_set_flex_shrink(start_menu.multiworld_button, 0.0f);
     recompui_set_flex_basis(start_menu.multiworld_button, button_width, UNIT_DP);
+    recompui_register_callback(start_menu.multiworld_button, multiworldButtonClicked, NULL);
 
     recompui_close_context(start_menu.context);
 }

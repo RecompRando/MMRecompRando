@@ -125,25 +125,26 @@ void randoYAMLToggleButtonCallback(RecompuiResource button, const RecompuiEventD
     }
 }
 
-// Untested
-RecompuiResource randoCreateToggleButtonOption(RandoYamlConfigMenu* menu, const char* option_id, const char* display_name, u32* config_option) {
-    RecompuiResource button_area = randoYAMLCreateMenuEntryArea(menu->context, menu->body);
+// Not currently implemented
+// RandoOptionData* randoCreateToggleButtonOption(RandoYamlConfigMenu* menu, const char* option_id, const char* display_name, u32* config_option) {
+//     RecompuiResource button_area = randoYAMLCreateMenuEntryArea(menu->context, menu->body);
 
-    randoYAMLCreateSettingLabel(menu->context, button_area, display_name);
+//     randoYAMLCreateSettingLabel(menu->context, button_area, display_name);
 
-    RandoOptionData* option_data = randoAllocateOption(menu, option_id);
+//     RandoOptionData* option_data = randoAllocateOption(menu, option_id);
 
-    RecompuiResource button = recompui_create_button(menu->context, button_area, display_name, BUTTONSTYLE_SECONDARY);
-    recompui_set_display(button, DISPLAY_BLOCK);
-    // recompui_set_text_align(button, TEXT_ALIGN_CENTER);
-    recompui_register_callback(button, randoYAMLToggleButtonCallback, option_data);
-    recompui_set_padding(button, 8.0f, UNIT_DP);
-    recompui_set_max_width(button, 600.0f, UNIT_DP);
-    randoSetToggleButton(button, *config_option);
+//     RecompuiResource button = recompui_create_button(menu->context, button_area, display_name, BUTTONSTYLE_SECONDARY);
+//     recompui_set_display(button, DISPLAY_BLOCK);
+//     // recompui_set_text_align(button, TEXT_ALIGN_CENTER);
+//     recompui_register_callback(button, randoYAMLToggleButtonCallback, option_data);
+//     recompui_set_padding(button, 8.0f, UNIT_DP);
+//     recompui_set_max_width(button, 600.0f, UNIT_DP);
+//     randoSetToggleButton(button, *config_option);
 
-    recomp_printf("%s button created.\n", display_name);
-    return button;
-}
+//     recomp_printf("%s button created.\n", display_name);
+    
+//     return option_data;
+// }
 
 static int toupper(int ch) {
     if (ch >= 'a' && ch <= 'z') {
@@ -184,7 +185,7 @@ char* randoFormatOptionName(EnumOptionValue* option) {
     }
 }
 
-RecompuiResource randoCreateRadioOption(RandoYamlConfigMenu* menu, const char* option_id, const char* display_name,
+RandoOptionData* randoCreateRadioOption(RandoYamlConfigMenu* menu, const char* option_id, const char* display_name,
     EnumOptionValue* options, unsigned long num_options, u32 default_value) {
     RecompuiResource radio_area = randoYAMLCreateMenuEntryArea(menu->context, menu->body);
 
@@ -212,13 +213,11 @@ RecompuiResource randoCreateRadioOption(RandoYamlConfigMenu* menu, const char* o
     option_data->root_element = radio_area;
     option_data->input_element = radio;
     option_data->data = options;
-
-    recomp_printf("%s radio created. (%08X %d)\n", display_name, (u32)option_data, option_data->type);
-    return 0;
+    return option_data;
 }
 
 static char* rando_bool_prop_names[] = {"Off", "On"};
-RecompuiResource randoCreateBoolPropOption(RandoYamlConfigMenu* menu, const char* option_id, const char* display_name, bool default_value) {
+RandoOptionData* randoCreateBoolPropOption(RandoYamlConfigMenu* menu, const char* option_id, const char* display_name, bool default_value) {
     RecompuiResource radio_area = randoYAMLCreateMenuEntryArea(menu->context, menu->body);
 
     randoYAMLCreateSettingLabel(menu->context, radio_area, display_name);
@@ -231,9 +230,7 @@ RecompuiResource randoCreateBoolPropOption(RandoYamlConfigMenu* menu, const char
     option_data->type = OPTION_BOOL;
     option_data->root_element = radio_area;
     option_data->input_element = radio;
-
-    recomp_printf("%s bool prop created.\n", display_name);
-    return 0;
+    return option_data;
 }
 
 // Slider
@@ -244,7 +241,7 @@ void randoYAMLSliderCallback(RecompuiResource labelenum, const RecompuiEventData
     }
 }
 
-RecompuiResource randoCreateIntSliderOption(RandoYamlConfigMenu* menu, const char* option_id, const char* display_name,
+RandoOptionData* randoCreateIntSliderOption(RandoYamlConfigMenu* menu, const char* option_id, const char* display_name,
     s32 min, s32 max, s32 step, s32 default_value) {
     RecompuiResource slider_area = randoYAMLCreateMenuEntryArea(menu->context, menu->body);
 
@@ -260,12 +257,10 @@ RecompuiResource randoCreateIntSliderOption(RandoYamlConfigMenu* menu, const cha
     option_data->type = OPTION_INT_SLIDER;
     option_data->root_element = slider_area;
     option_data->input_element = slider;
-
-    recomp_printf("%s int slider created.\n", display_name);
-    return 0;
+    return option_data;
 }
 
-RecompuiResource randoCreateFloatSliderOption(RandoYamlConfigMenu* menu, const char* option_id, const char* display_name,
+RandoOptionData* randoCreateFloatSliderOption(RandoYamlConfigMenu* menu, const char* option_id, const char* display_name,
     float min, float max, float step, float default_value) {
     RecompuiResource slider_area = randoYAMLCreateMenuEntryArea(menu->context, menu->body);
 
@@ -281,9 +276,7 @@ RecompuiResource randoCreateFloatSliderOption(RandoYamlConfigMenu* menu, const c
     option_data->type = OPTION_FLOAT_SLIDER;
     option_data->root_element = slider_area;
     option_data->input_element = slider;
-
-    recomp_printf("%s float slider created.\n", display_name);
-    return 0;
+    return option_data;
 }
 
 static EnumOptionValue rando_accessibility_options[] = {
