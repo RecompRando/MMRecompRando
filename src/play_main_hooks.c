@@ -35,7 +35,7 @@ void init_rando()
 
     dsot_set_skip_dsot_cutscene(true);
 
-    // randoCreateStartMenu();
+    randoCreateStartMenu();
     // randoCreateSoloMenu();
     randoCreateYamlConfigMenu();
     randoCreateAPConnectMenu();
