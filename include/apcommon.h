@@ -172,8 +172,8 @@ extern s8 giToItemId[];
 
 void randoCreateStartMenu();
 void randoShowStartMenu();
-// void randoCreateSoloMenu();
-// void randoShowSoloMenu();
+void randoCreateSoloMenu();
+void randoShowSoloMenu();
 void randoCreateYamlConfigMenu();
 void randoShowYamlConfigMenu();
 void randoCreateAPConnectMenu();

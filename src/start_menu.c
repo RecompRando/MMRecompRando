@@ -12,7 +12,7 @@ static void soloButtonClicked(RecompuiResource resource, const RecompuiEventData
 
     if (event->type == UI_EVENT_CLICK) {
         recompui_hide_context(start_menu.context);
-        // randoShowSoloMenu();
+        randoShowSoloMenu();
     }
 }
 
