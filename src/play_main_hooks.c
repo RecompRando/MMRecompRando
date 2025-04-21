@@ -301,7 +301,7 @@ void update_rando(PlayState* play) {
             u8 new_sword_level = rando_has_item(GI_SWORD_KOKIRI);
             u8 new_shield_level = rando_has_item(GI_SHIELD_HERO);
 
-            u8 bottle_count_new = rando_has_item(GI_BOTTLE) + rando_has_item(GI_POTION_RED_BOTTLE) + rando_has_item(GI_CHATEAU_BOTTLE);
+            u8 bottle_count_new = rando_has_item(GI_BOTTLE) + rando_has_item(GI_POTION_RED_BOTTLE) + rando_has_item(GI_CHATEAU_BOTTLE) + rando_has_item(GI_MILK_BOTTLE);
             u8 bottle_count = 0;
 
             s16 old_health = gSaveContext.save.saveInfo.playerData.health;
