@@ -95,6 +95,8 @@ void func_80AED544(EnTk* this, PlayState* play);
 void EnTk_Day2BatsOffer(EnTk* this, PlayState* play) {
     if (Actor_HasParent(&this->actor, play)) {
         this->actor.parent = NULL;
+        SubS_ChangeAnimationBySpeedInfo(&this->skelAnime, D_80AEF868, 0, &this->animIndex);
+        this->actionFunc = func_80AECB6C;
     } else {
         Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_DAY2BATS), LOCATION_DAY2BATS, 300.0f, 300.0f, true, true);
     }
