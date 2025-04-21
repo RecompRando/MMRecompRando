@@ -1897,6 +1897,7 @@ u8 randoItemGive(u32 gi) {
                     if (!gSaveContext.save.saveInfo.playerData.isMagicAcquired) {
                         gSaveContext.save.saveInfo.playerData.isMagicAcquired = true;
                         gSaveContext.magicFillTarget = MAGIC_NORMAL_METER;
+                        gSaveContext.save.saveInfo.playerData.magic = MAGIC_NORMAL_METER;
                     } else {
                         gSaveContext.save.saveInfo.playerData.isDoubleMagicAcquired = true;
                         gSaveContext.magicFillTarget = MAGIC_DOUBLE_METER;
