@@ -281,11 +281,12 @@ RECOMP_PATCH s32 Health_ChangeBy(PlayState* play, s16 healthChange) {
     }
 }
 
+u8 has_unlocked_magic = 0;
+
 RECOMP_CALLBACK("*", recomp_on_play_main)
 void update_rando(PlayState* play) {
     u32 new_items_size;
     u32 i;
-    u8 has_unlocked_magic;
     u8* save_ptr;
 
     gPlay = play;
@@ -309,8 +310,12 @@ void update_rando(PlayState* play) {
                 if (!gSaveContext.save.saveInfo.playerData.isMagicAcquired && !gSaveContext.save.saveInfo.playerData.isDoubleMagicAcquired) {
                     gSaveContext.save.saveInfo.playerData.magic = 0;
                 }
+                if (gSaveContext.save.saveInfo.playerData.isMagicAcquired) {
+                    has_unlocked_magic += 1;
+                } else if (gSaveContext.save.saveInfo.playerData.isDoubleMagicAcquired) {
+                    has_unlocked_magic += 1;
+                }
             }
-
 
             gSaveContext.save.saveInfo.playerData.healthCapacity = 0x10;
             gSaveContext.save.saveInfo.playerData.health = 0x10;
