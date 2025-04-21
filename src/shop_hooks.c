@@ -273,8 +273,11 @@ RECOMP_PATCH void EnFsn_GiveItem(EnFsn* this, PlayState* play) {
         Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
     } else {
         // note: this gets hit 4 times so i don't think vanilla rewards can work here
-        // Actor_OfferGetItem(&this->actor, play, this->getItemId, 300.0f, 300.0f);
-        Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_FSN_RUPEE), LOCATION_FSN_RUPEE, 300.0f, 300.0f, true, true);
+        if (play->sceneId == SCENE_AYASHIISHOP) {
+            Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_FSN_RUPEE), LOCATION_FSN_RUPEE, 300.0f, 300.0f, true, true);
+        } else {
+            Actor_OfferGetItem(&this->actor, play, this->getItemId, 300.0f, 300.0f);
+        }
     }
 }
 
