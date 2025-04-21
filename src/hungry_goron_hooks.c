@@ -56,33 +56,26 @@ RECOMP_PATCH void func_80BB31B8(EnGeg* this, PlayState* play) {
     s32 getItemId = GI_MASK_DON_GERO;
 
     // if (INV_CONTENT(ITEM_MASK_DON_GERO) == ITEM_MASK_DON_GERO) {
-    if (rando_location_is_checked(GI_MASK_DON_GERO)) {
-        // if (Player_GetMask(play) == PLAYER_MASK_DON_GERO) {
-        //     this->unk_496 = 0xD8B;
-        //     getItemId = GI_RUPEE_PURPLE;
-        // } else {
-        //     this->unk_496 = 0xD73;
-        //     getItemId = GI_RUPEE_PURPLE;
-        // }
-        this->unk_496 = 0xD73;
-    } else {
-        this->unk_496 = 0xD70;
-    }
+    //     if (Player_GetMask(play) == PLAYER_MASK_DON_GERO) {
+    //         this->unk_496 = 0xD8B;
+    //         getItemId = GI_RUPEE_PURPLE;
+    //     } else {
+    //         this->unk_496 = 0xD73;
+    //         getItemId = GI_RUPEE_PURPLE;
+    //     }
+    // } else {
+    //     this->unk_496 = 0xD70;
+    // }
+    this->unk_496 = 0xD70;
 
     if (Actor_HasParent(&this->actor, play)) {
         this->actor.parent = NULL;
         SET_WEEKEVENTREG(WEEKEVENTREG_61_01);
-        // if (getItemId == GI_MASK_DON_GERO) {
-        if (!rando_location_is_checked(GI_MASK_DON_GERO)) {
+        if (getItemId == GI_MASK_DON_GERO) {
             this->unk_230 |= 0x40;
         }
         this->actionFunc = func_80BB32AC;
     } else {
-        // Actor_OfferGetItem(&this->actor, play, getItemId, 300.0f, 300.0f);
-        if (rando_location_is_checked(GI_MASK_DON_GERO)) {
-			Actor_OfferGetItem(&this->actor, play, GI_RUPEE_PURPLE, 300.0f, 300.0f);
-		} else {
-        	Actor_OfferGetItem(&this->actor, play, GI_MASK_DON_GERO, 300.0f, 300.0f);
-		}
+        Actor_OfferGetItem(&this->actor, play, getItemId, 300.0f, 300.0f);
     }
 }
