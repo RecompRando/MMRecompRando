@@ -425,6 +425,7 @@ RECOMP_PATCH void EnBox_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList
                     return;
                 case GI_HEART_PIECE:
                 case GI_HEART_CONTAINER:
+                case GI_DEFENSE_DOUBLE:
                     gSPDisplayList((*gfx)++, &heartChestBaseDL);
                     return;
                 case GI_TRUE_SKULL_TOKEN:
@@ -466,6 +467,7 @@ RECOMP_PATCH void EnBox_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList
                     return;
                 case GI_HEART_PIECE:
                 case GI_HEART_CONTAINER:
+                case GI_DEFENSE_DOUBLE:
                     gSPDisplayList((*gfx)++, &heartChestLidDL);
                     return;
                 case GI_TRUE_SKULL_TOKEN:
