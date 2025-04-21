@@ -1,6 +1,10 @@
 #include "modding.h"
 #include "global.h"
 
+#include "apcommon.h"
+
+#define LOCATION_DAY2BATS ((play->sceneId << 8) | this->actor.id)
+
 struct EnTk;
 
 typedef void (*EnTkActionFunc)(struct EnTk*, PlayState*);
@@ -63,9 +67,116 @@ typedef struct EnTk {
     /* 0x3F0 */ s32 timePathElapsedTime;
 } EnTk; // size = 0x3F4
 
+extern AnimationHeader object_tk_Anim_001FA8;
+extern AnimationHeader object_tk_Anim_0030A4;
+extern AnimationHeader object_tk_Anim_001144;
+extern AnimationHeader object_tk_Anim_003724;
+extern AnimationHeader object_tk_Anim_003FB8;
+extern AnimationHeader object_tk_Anim_0020C8;
+extern AnimationHeader object_tk_Anim_003B10;
+
+static AnimationSpeedInfo D_80AEF868[] = {
+    { &object_tk_Anim_001FA8, 1.0f, ANIMMODE_LOOP, -10.0f }, { &object_tk_Anim_001FA8, 2.0f, ANIMMODE_LOOP, -10.0f },
+    { &object_tk_Anim_0030A4, 1.0f, ANIMMODE_LOOP, -10.0f }, { &object_tk_Anim_001144, 1.0f, ANIMMODE_ONCE, -10.0f },
+    { &object_tk_Anim_003724, 1.0f, ANIMMODE_ONCE, -10.0f }, { &object_tk_Anim_003FB8, 1.0f, ANIMMODE_LOOP, -10.0f },
+    { &object_tk_Anim_0020C8, 1.0f, ANIMMODE_LOOP, -10.0f }, { &object_tk_Anim_003B10, 1.0f, ANIMMODE_LOOP, -10.0f },
+};
+
 u8 dampeSpeedMultiplier = 2;
 
 // turning isn't sped up, so it may be hard to control dampé
 RECOMP_HOOK_RETURN("func_80AEC658") void speedup_dampe_walk(SkelAnime* skelAnime, f32 arg1, f32 arg2, f32* arg3, f32* arg4) {
     *arg3 *= dampeSpeedMultiplier;
+}
+
+void func_80AECB6C(EnTk* this, PlayState* play);
+void func_80AED544(EnTk* this, PlayState* play);
+
+void EnTk_Day2BatsOffer(EnTk* this, PlayState* play) {
+    if (Actor_HasParent(&this->actor, play)) {
+        this->actor.parent = NULL;
+    } else {
+        Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_DAY2BATS), LOCATION_DAY2BATS, 300.0f, 300.0f, true, true);
+    }
+}
+
+RECOMP_PATCH void func_80AED610(EnTk* this, PlayState* play) {
+    if ((this->animIndex == 4) && Animation_OnFrame(&this->skelAnime, this->skelAnime.endFrame)) {
+        SubS_ChangeAnimationBySpeedInfo(&this->skelAnime, D_80AEF868, 7, &this->animIndex);
+    }
+
+    switch (Message_GetState(&play->msgCtx)) {
+        case TEXT_STATE_NONE:
+            if (Math_ScaledStepToS(&this->actor.shape.rot.y, this->actor.yawTowardsPlayer - 0x1555, 0x71C)) {
+                if (Player_GetMask(play) == PLAYER_MASK_CAPTAIN) {
+                    SubS_ChangeAnimationBySpeedInfo(&this->skelAnime, D_80AEF868, 4, &this->animIndex);
+                    Message_StartTextbox(play, 0x13FD, &this->actor);
+                } else if (CURRENT_DAY != 2) {
+                    func_80AED544(this, play);
+                } else if (!Flags_GetSwitch(play, ENTK_GET_SWITCH_FLAG(&this->actor))) {
+                    Message_StartTextbox(play, 0x1403, &this->actor);
+                } else if (CHECK_WEEKEVENTREG(WEEKEVENTREG_60_02)) {
+                    func_80AED544(this, play);
+                } else {
+                    Message_StartTextbox(play, 0x1413, &this->actor);
+                }
+                break;
+            }
+
+        case TEXT_STATE_1:
+        case TEXT_STATE_CLOSING:
+        case TEXT_STATE_3:
+            break;
+
+        case TEXT_STATE_CHOICE:
+        case TEXT_STATE_5:
+        case TEXT_STATE_DONE:
+            if (Message_ShouldAdvance(play)) {
+                switch (play->msgCtx.currentTextId) {
+                    case 0x13FD:
+                        this->unk_2CA |= 0x10;
+                        SubS_ChangeAnimationBySpeedInfo(&this->skelAnime, D_80AEF868, 0, &this->animIndex);
+                        this->skelAnime.playSpeed = 10.0f;
+                        this->actionFunc = func_80AECB6C;
+                        break;
+
+                    case 0x13FE:
+                        Message_ContinueTextbox(play, 0x13FF);
+                        break;
+
+                    case 0x1413:
+                        // Rupees_ChangeBy(30);
+                        SET_WEEKEVENTREG(WEEKEVENTREG_60_02);
+                        Message_ContinueTextbox(play, 0x13FF);
+                        this->actionFunc = EnTk_Day2BatsOffer; // this does give the item late, but it works
+                        break;
+
+                    case 0x13FF:
+                    case 0x1400:
+                    case 0x1401:
+                    case 0x1402:
+                    case 0x1403:
+                    case 0x1404:
+                    case 0x1405:
+                    case 0x1406:
+                    case 0x1407:
+                    case 0x1408:
+                    case 0x1409:
+                    case 0x140A:
+                    case 0x140B:
+                    case 0x140C:
+                    case 0x140D:
+                    case 0x140E:
+                    case 0x140F:
+                    case 0x1410:
+                    case 0x1411:
+                    case 0x1412:
+                    default:
+                        SubS_ChangeAnimationBySpeedInfo(&this->skelAnime, D_80AEF868, 0, &this->animIndex);
+                        this->actionFunc = func_80AECB6C;
+                        break;
+                }
+            }
+            break;
+    }
 }
