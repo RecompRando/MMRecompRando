@@ -281,8 +281,6 @@ RECOMP_PATCH s32 Health_ChangeBy(PlayState* play, s16 healthChange) {
     }
 }
 
-u8 has_unlocked_magic = 0;
-
 RECOMP_CALLBACK("*", recomp_on_play_main)
 void update_rando(PlayState* play) {
     u32 new_items_size;
@@ -306,14 +304,19 @@ void update_rando(PlayState* play) {
 
             s16 old_health = gSaveContext.save.saveInfo.playerData.health;
 
+            u8 new_magic_level = rando_has_item_async(AP_ITEM_ID_MAGIC);
+
+            if (new_magic_level >= 1 && !gSaveContext.save.saveInfo.playerData.isMagicAcquired) {
+                randoItemGive(AP_ITEM_ID_MAGIC);
+            }
+
+            if (new_magic_level >= 2 && !gSaveContext.save.saveInfo.playerData.isDoubleMagicAcquired) {
+                randoItemGive(AP_ITEM_ID_MAGIC);
+            }
+
             if (!rando_is_magic_trap()) {
-                if (!gSaveContext.save.saveInfo.playerData.isMagicAcquired && !gSaveContext.save.saveInfo.playerData.isDoubleMagicAcquired) {
+                if (new_magic_level < 1) {
                     gSaveContext.save.saveInfo.playerData.magic = 0;
-                }
-                if (gSaveContext.save.saveInfo.playerData.isMagicAcquired) {
-                    has_unlocked_magic += 1;
-                } else if (gSaveContext.save.saveInfo.playerData.isDoubleMagicAcquired) {
-                    has_unlocked_magic += 1;
                 }
             }
 
@@ -409,6 +412,7 @@ void update_rando(PlayState* play) {
                     }
                 } else {
                     switch (item_id) {
+                        case AP_ITEM_ID_MAGIC:
                         case AP_ITEM_ID_STRAY_FAIRY_WOODFALL:
                         case AP_ITEM_ID_STRAY_FAIRY_SNOWHEAD:
                         case AP_ITEM_ID_STRAY_FAIRY_GREATBAY:
@@ -440,17 +444,6 @@ void update_rando(PlayState* play) {
 
             old_items_size = new_items_size;
             initItems = true;
-        }
-
-        if (!rando_is_magic_trap()) {
-            if (gSaveContext.save.saveInfo.playerData.magic == 0 && gSaveContext.save.saveInfo.playerData.isMagicAcquired && has_unlocked_magic < 2) {
-                if (gSaveContext.save.saveInfo.playerData.magicLevel == 1) {
-                    gSaveContext.save.saveInfo.playerData.magic = MAGIC_NORMAL_METER;
-                } else if (gSaveContext.save.saveInfo.playerData.magicLevel == 2) {
-                    gSaveContext.save.saveInfo.playerData.magic = MAGIC_DOUBLE_METER;
-                }
-                has_unlocked_magic++;
-            }
         }
 
         if (new_items_size > old_items_size) {
