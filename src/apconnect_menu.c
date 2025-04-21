@@ -95,7 +95,7 @@ void randoCreateAPConnectMenu() {
     connect_menu.back_button = recompui_create_button(connect_menu.context, connect_menu.frame.root, "Back", BUTTONSTYLE_SECONDARY);
     recompui_set_position(connect_menu.back_button, POSITION_ABSOLUTE);
     recompui_set_left(connect_menu.back_button, 64.0f, UNIT_DP);
-    recompui_set_top(connect_menu.back_button, 64.0f, UNIT_DP);
+    recompui_set_top(connect_menu.back_button, 32.0f, UNIT_DP);
     recompui_register_callback(connect_menu.back_button, backPressed, NULL);
     
     recompui_close_context(connect_menu.context);

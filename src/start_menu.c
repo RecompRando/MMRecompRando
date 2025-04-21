@@ -12,7 +12,11 @@ static void soloButtonClicked(RecompuiResource resource, const RecompuiEventData
 
     if (event->type == UI_EVENT_CLICK) {
         recompui_hide_context(start_menu.context);
+        // Close the start menu context temporarily so that the solo context can be opened.
+        recompui_close_context(start_menu.context);
         randoShowSoloMenu();
+        // Reopen the start menu context.
+        recompui_open_context(start_menu.context);
     }
 }
 
