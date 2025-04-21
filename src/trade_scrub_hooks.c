@@ -4,6 +4,7 @@
 #include "apcommon.h"
 
 #define LOCATION_SCRUB_SHOP (0x090100 | func_80BED034(this))
+#define LOCATION_SCRUB_IKANA ((SCENE_IKANA << 8) | GI_RUPEE_HUGE)
 
 struct EnAkindonuts;
 
@@ -104,7 +105,12 @@ RECOMP_PATCH void func_80BEF360(EnAkindonuts* this, PlayState* play) {
         this->actor.parent = NULL;
         this->actionFunc = func_80BEF450;
     } else {
-        Actor_OfferGetItem(&this->actor, play, func_80BECFBC(this), 300.0f, 300.0f);
+        s32 tradeGI = func_80BECFBC(this);
+        if (tradeGI == GI_RUPEE_HUGE) {
+            Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_SCRUB_IKANA), LOCATION_SCRUB_IKANA, 300.0f, 300.0f, true, true);
+        } else {
+            Actor_OfferGetItem(&this->actor, play, tradeGI, 300.0f, 300.0f);
+        }
     }
 }
 
