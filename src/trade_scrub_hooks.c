@@ -81,25 +81,34 @@ RECOMP_PATCH void EnAkindonuts_Update(Actor* thisx, PlayState* play) {
     func_80BECC7C(this, play);
 }
 
+void EnAkindonuts_OfferNormalShopItem(EnAkindonuts* this, PlayState* play) {
+    if (Actor_HasParent(&this->actor, play)) {
+        this->actor.parent = NULL;
+        Rupees_ChangeBy(this->unk_364);
+        this->unk_32C &= ~0x40;
+        this->actionFunc = func_80BEF450;
+    } else {
+        Actor_OfferGetItem(&this->actor, play, func_80BED034(this), 300.0f, 300.0f);
+    }
+}
+
+void EnAkindonuts_OfferRandoShopItem(EnAkindonuts* this, PlayState* play) {
+    if (Actor_HasParent(&this->actor, play)) {
+        this->actor.parent = NULL;
+        Rupees_ChangeBy(this->unk_364);
+        this->unk_32C &= ~0x40;
+        this->actionFunc = func_80BEF450;
+    } else {
+        Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_SCRUB_SHOP), LOCATION_SCRUB_SHOP, 300.0f, 300.0f, true, true);
+    }
+}
+
 RECOMP_PATCH void func_80BEF360(EnAkindonuts* this, PlayState* play) {
     if (this->unk_32C & 0x40) {
-        if (Actor_HasParent(&this->actor, play)) {
-            this->actor.parent = NULL;
-            Rupees_ChangeBy(this->unk_364);
-            this->unk_32C &= ~0x40;
-            this->actionFunc = func_80BEF450;
+        if (rando_location_is_checked(LOCATION_SCRUB_SHOP)) {
+            this->actionFunc = EnAkindonuts_OfferNormalShopItem;
         } else {
-            if (rando_scrubs_enabled()) {
-                Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_SCRUB_SHOP), LOCATION_SCRUB_SHOP, 300.0f, 300.0f, true, true);
-            } else {
-                Actor_OfferGetItem(&this->actor, play, func_80BED034(this), 300.0f, 300.0f);
-            }
-            // @bug: this function is called multiple times for some reason so the below doesn't work
-            // if (rando_location_is_checked(LOCATION_SCRUB_SHOP)) {
-            //     Actor_OfferGetItem(&this->actor, play, func_80BED034(this), 300.0f, 300.0f);
-            // } else {
-            //     Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_SCRUB_SHOP), LOCATION_SCRUB_SHOP, 300.0f, 300.0f, true, true);
-            // }
+            this->actionFunc = EnAkindonuts_OfferRandoShopItem;
         }
     } else if (Actor_HasParent(&this->actor, play)) {
         this->actor.parent = NULL;
