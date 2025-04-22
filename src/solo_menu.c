@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////////////
 
 u32 rando_num_solo_seeds() {
-    return 100;
+    return 5;
 }
 
 // returns the actual string length

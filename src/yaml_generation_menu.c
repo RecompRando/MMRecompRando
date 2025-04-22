@@ -9,6 +9,17 @@
 
 RandoYamlConfigMenu yaml_config_menu;
 
+static void backPressed(RecompuiResource resource, const RecompuiEventData* data, void* userdata) {
+    if (data->type == UI_EVENT_CLICK) {
+        recompui_hide_context(yaml_config_menu.context);
+        // Close the start menu context temporarily so that the solo context can be opened.
+        recompui_close_context(yaml_config_menu.context);
+        randoShowSoloMenu();
+        // Reopen the start menu context.
+        recompui_open_context(yaml_config_menu.context);
+    }
+}
+
 RandoOptionData* randoAllocateOption(RandoYamlConfigMenu* menu, const char* option_id) {
     // Get a new option data element and increate the option count.
     RandoOptionData* ret = &menu->all_options[menu->num_options++];
@@ -249,9 +260,7 @@ RandoOptionData* randoCreateIntSliderOption(RandoYamlConfigMenu* menu, const cha
 
     RandoOptionData* option_data = randoAllocateOption(menu, option_id);
 
-    RecompuiResource slider = recompui_create_slider(menu->context, slider_area, SLIDERTYPE_NUMBER, (float)min, (float)max, (float)step, (float)default_value);
-
-    recompui_set_display(slider, DISPLAY_BLOCK);
+    RecompuiResource slider = recompui_create_slider(menu->context, slider_area, SLIDERTYPE_INTEGER, (float)min, (float)max, (float)step, (float)default_value);
     recompui_set_max_width(slider, 600.0f, UNIT_DP);
 
     option_data->type = OPTION_INT_SLIDER;
@@ -269,8 +278,6 @@ RandoOptionData* randoCreateFloatSliderOption(RandoYamlConfigMenu* menu, const c
     RandoOptionData* option_data = randoAllocateOption(menu, option_id);
 
     RecompuiResource slider = recompui_create_slider(menu->context, slider_area, SLIDERTYPE_NUMBER, min, max, step, default_value);
-
-    recompui_set_display(slider, DISPLAY_BLOCK);
     recompui_set_max_width(slider, 600.0f, UNIT_DP);
 
     option_data->type = OPTION_FLOAT_SLIDER;
@@ -363,56 +370,49 @@ void randoCreateYamlConfigMenu() {
     yaml_config_menu.context = recompui_create_context();
     recompui_open_context(yaml_config_menu.context);
 
-    yaml_config_menu.root = recompui_context_root(yaml_config_menu.context);
-    yaml_config_menu.frame = recompui_create_element(yaml_config_menu.context, yaml_config_menu.root);
-    recompui_set_display(yaml_config_menu.frame, DISPLAY_BLOCK);
-    recompui_set_height(yaml_config_menu.frame, 100.0f, UNIT_PERCENT);
-    recompui_set_width(yaml_config_menu.frame, 100.0f, UNIT_PERCENT);
+    createUiFrame(yaml_config_menu.context, &yaml_config_menu.frame);
 
-#ifdef STATIC_MENU_HEADER
-    yaml_config_menu.header = recompui_create_element(yaml_config_menu.context, yaml_config_menu.frame);
-    recompui_set_display(yaml_config_menu.header, DISPLAY_BLOCK);
-    recompui_set_overflow(yaml_config_menu.header, OVERFLOW_VISIBLE);
-    recompui_set_height(yaml_config_menu.header, 10.0f, UNIT_PERCENT);
-    recompui_set_width(yaml_config_menu.header, 100.0f, UNIT_PERCENT);
-#endif
+    // Adjust the container's properties.
+    recompui_set_width(yaml_config_menu.frame.container, 1200.0f, UNIT_DP);
+    recompui_set_height(yaml_config_menu.frame.container, 800.0f, UNIT_DP);
+    recompui_set_display(yaml_config_menu.frame.container, DISPLAY_FLEX);
+    recompui_set_flex_direction(yaml_config_menu.frame.container, FLEX_DIRECTION_COLUMN);
+    recompui_set_align_items(yaml_config_menu.frame.container, ALIGN_ITEMS_STRETCH);
+    recompui_set_justify_content(yaml_config_menu.frame.container, JUSTIFY_CONTENT_FLEX_START);
 
-    yaml_config_menu.body = recompui_create_element(yaml_config_menu.context, yaml_config_menu.frame);
+    // Remove the padding on the frame's container so that the divider line has the full width of the container.
+    recompui_set_padding(yaml_config_menu.frame.container, 0.0f, UNIT_DP);
+
+    // Create the header.
+    yaml_config_menu.header = recompui_create_element(yaml_config_menu.context, yaml_config_menu.frame.container);
+    recompui_set_flex_grow(yaml_config_menu.header, 0.0f);
+    recompui_set_flex_shrink(yaml_config_menu.header, 0.0f);
+    recompui_set_display(yaml_config_menu.header, DISPLAY_FLEX);
+    recompui_set_flex_direction(yaml_config_menu.header, FLEX_DIRECTION_ROW);
+    recompui_set_justify_content(yaml_config_menu.header, JUSTIFY_CONTENT_SPACE_BETWEEN);
+    recompui_set_border_bottom_width(yaml_config_menu.header, 1.1f, UNIT_DP);
+    recompui_set_height_auto(yaml_config_menu.header);
+    recompui_set_padding(yaml_config_menu.header, 16.0f, UNIT_DP);
+    recompui_set_align_items(yaml_config_menu.header, ALIGN_ITEMS_CENTER);
+
+    RecompuiColor divider_color;
+    divider_color.r = 255;
+    divider_color.g = 255;
+    divider_color.b = 255;
+    divider_color.a = 25;
+    recompui_set_border_bottom_color(yaml_config_menu.header, &divider_color);
+
+    yaml_config_menu.header_label = recompui_create_label(yaml_config_menu.context, yaml_config_menu.header, "Randomizer Settings", LABELSTYLE_LARGE);
+    recompui_set_text_align(yaml_config_menu.header_label, TEXT_ALIGN_CENTER);
+    recompui_set_margin_left(yaml_config_menu.header_label, 32.0f, UNIT_DP);
+
+    yaml_config_menu.generate_button = recompui_create_button(yaml_config_menu.context, yaml_config_menu.header, "Generate", BUTTONSTYLE_PRIMARY);
+    recompui_register_callback(yaml_config_menu.generate_button, randoYAMLGenerateCallback, &yaml_config_menu);
+
+    // Create the body.
+    yaml_config_menu.body = recompui_create_element(yaml_config_menu.context, yaml_config_menu.frame.container);
     recompui_set_display(yaml_config_menu.body, DISPLAY_BLOCK);
     recompui_set_overflow_y(yaml_config_menu.body, OVERFLOW_SCROLL);
-    // Take up the full height and full width, up to a maximum width.
-    recompui_set_width(yaml_config_menu.body, 100.0f, UNIT_PERCENT);
-
-#ifdef STATIC_MENU_HEADER
-    recompui_set_height(yaml_config_menu.body, 90.0f, UNIT_PERCENT);
-    RecompuiResource header_label = recompui_create_label(yaml_config_menu.context, yaml_config_menu.header, "Randomizer: Configure", LABELSTYLE_LARGE);
-#else
-    recompui_set_height(yaml_config_menu.body, 100.0f, UNIT_PERCENT);
-    RecompuiResource header_label = recompui_create_label(yaml_config_menu.context, yaml_config_menu.body, "Randomizer: Configure", LABELSTYLE_LARGE);
-#endif
-
-    recompui_set_display(header_label, DISPLAY_BLOCK);
-    recompui_set_padding(header_label, 40.0f, UNIT_DP);
-    recompui_set_gap(header_label, 40.0f, UNIT_DP);
-    recompui_set_align_items(header_label, ALIGN_ITEMS_BASELINE);
-
-    RecompuiResource submit_button = recompui_create_button(yaml_config_menu.context, yaml_config_menu.body, "Generate", BUTTONSTYLE_PRIMARY);
-    recompui_set_display(submit_button, DISPLAY_BLOCK);
-    recompui_set_height(submit_button, 80.0f, UNIT_DP);
-    recompui_set_gap(submit_button, 40.0f, UNIT_DP);
-    recompui_set_align_items(submit_button, ALIGN_ITEMS_BASELINE);
-    recompui_set_margin_left(submit_button, 12.0f, UNIT_DP);
-    recompui_set_margin_right(submit_button, 12.0f, UNIT_DP);
-    recompui_set_margin_bottom(submit_button, 12.0f, UNIT_DP);
-    recompui_set_width_auto(submit_button);
-    recompui_register_callback(submit_button, randoYAMLGenerateCallback, &yaml_config_menu);
-
-    // Set up the container to be the modal's background.
-    recompui_set_padding(yaml_config_menu.body, 12.0f, UNIT_DP);
-    recompui_set_border_width(yaml_config_menu.frame, modal_border_width, UNIT_DP);
-    recompui_set_border_radius(yaml_config_menu.frame, modal_border_radius, UNIT_DP);
-    recompui_set_border_color(yaml_config_menu.frame, &border_color);
-    recompui_set_background_color(yaml_config_menu.frame, &modal_color);
 
     yaml_config_menu.num_options = 0;
     randoCreateRadioOption(&yaml_config_menu, "accessibility", "Accessibility:", rando_accessibility_options, ARRAY_COUNT(rando_accessibility_options), RANDO_ACCESSABILITY_FULL);
@@ -424,7 +424,7 @@ void randoCreateYamlConfigMenu() {
     // randoCreateBoolPropOption(&yaml_config_menu, "", "Starting Hearts are Random:", false);
     // randoCreateIntSliderOption(&yaml_config_menu, "", "Random Starting Hearts Segments - Minimum:", 1, 12, 1, 4);
     // randoCreateIntSliderOption(&yaml_config_menu, "", "Random Starting Hearts Segments - Maximum:", 1, 12, 1, 12);
-    randoCreateIntSliderOption(&yaml_config_menu, "starting_hearts", "Non-Random Starting Heart Segments:", 1, 12, 1, 12);
+    randoCreateIntSliderOption(&yaml_config_menu, "starting_hearts", "Starting Heart Segments:", 1, 12, 1, 12);
     randoCreateRadioOption(&yaml_config_menu, "starting_hearts_are_containers_or_pieces", "Unused Starting Hearts are Distributed as:", rando_starting_hearts_type_options, ARRAY_COUNT(rando_starting_hearts_type_options), RANDO_STARTING_HEARTS_ARE_CONTAINERS);
     randoCreateRadioOption(&yaml_config_menu, "shuffle_regional_maps", "Shuffle Regional Maps:", rando_shuffle_regional_maps_options, ARRAY_COUNT(rando_shuffle_regional_maps_options), RANDO_SHUFFLE_REGIONAL_MAPS_VANILLA);
     randoCreateRadioOption(&yaml_config_menu, "shuffle_boss_remains", "Shuffle Boss Maps:", rando_shuffle_boss_remains_options, ARRAY_COUNT(rando_shuffle_boss_remains_options), RANDO_SHUFFLE_BOSS_REMAINS_VANILLA);
@@ -441,6 +441,13 @@ void randoCreateYamlConfigMenu() {
     randoCreateBoolPropOption(&yaml_config_menu, "receive_filled_wallets", "Recieve Filled Wallets:", true);
     randoCreateRadioOption(&yaml_config_menu, "damage_multiplier", "Damage Multiplier:", rando_damage_multiplier_options, ARRAY_COUNT(rando_damage_multiplier_options), RANDO_DAMAGE_MULITPLIER_NORMAL);
     randoCreateRadioOption(&yaml_config_menu, "death_behavior", "Death Behavior:", rando_death_behavior_options, ARRAY_COUNT(rando_death_behavior_options), RANDO_DEATH_BEHAVIOR_VANILLA);
+
+    // Create the back button, parenting it to the root with absolute positioning.
+    yaml_config_menu.back_button = recompui_create_button(yaml_config_menu.context, yaml_config_menu.frame.root, "Back", BUTTONSTYLE_SECONDARY);
+    recompui_set_position(yaml_config_menu.back_button, POSITION_ABSOLUTE);
+    recompui_set_left(yaml_config_menu.back_button, 64.0f, UNIT_DP);
+    recompui_set_top(yaml_config_menu.back_button, 32.0f, UNIT_DP);
+    recompui_register_callback(yaml_config_menu.back_button, backPressed, NULL);
 
     recompui_close_context(yaml_config_menu.context);
 }

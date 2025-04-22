@@ -3,6 +3,7 @@
 
 #include "apcommon.h"
 #include "recompui.h"
+#include "menu_helpers.h"
 
 #include "modding.h"
 RECOMP_IMPORT(".", void rando_yaml_init());
@@ -96,12 +97,14 @@ typedef enum {
 
 typedef struct {
     RecompuiContext context;
-    RecompuiResource root;
-    RecompuiResource frame;
+    UiFrame frame;
     RecompuiResource header;
+    RecompuiResource header_label;
+    RecompuiResource generate_button;
     RecompuiResource body;
     RandoOptionData all_options[MAX_OPTIONS];
     u32 num_options;
+    RecompuiResource back_button;
 } RandoYamlConfigMenu;
 
 extern RandoYamlConfigMenu yaml_config_menu;
