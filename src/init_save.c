@@ -169,6 +169,10 @@ RECOMP_PATCH void Sram_InitNewSave(void) {
     Sram_GenerateRandomSaveFields();
 
     gSaveContext.save.saveInfo.playerData.threeDayResetCount = 1;
+}
+
+RECOMP_CALLBACK("*", recomp_after_init_save)
+void after_init_save(FileSelectState* fileSelect2, SramContext* sramCtx) {
     gSaveContext.save.cutsceneIndex = 0;
 }
 
