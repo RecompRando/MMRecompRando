@@ -268,8 +268,6 @@ void Sram_ResetSaveCycle(PlayState* play) {
         randoItemGive(0x01007F);
     }
 
-    //recomp_save_items_index(gSaveContext.fileNum, old_items_size);
-
     DUNGEON_KEY_COUNT(0) = rando_has_item(0x090078);
     DUNGEON_KEY_COUNT(1) = rando_has_item(0x090178);
     DUNGEON_KEY_COUNT(2) = rando_has_item(0x090278);
