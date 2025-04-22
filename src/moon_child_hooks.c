@@ -107,7 +107,7 @@ RECOMP_PATCH void func_8096A38C(EnJs* this, PlayState* play) {
                         switch (play->msgCtx.choiceIndex) {
                             case 0:
                                 // @rando send player back to first day if they don't meet the victory condition
-                                if (!rando_met_majora_condition()) {
+                                if (rando_location_is_checked(GI_MASK_FIERCE_DEITY) && !rando_met_majora_condition()) {
                                     Message_ContinueTextbox(play, 0x3550);
                                     Animation_MorphToPlayOnce(&this->skelAnime, &gMoonChildGettingUpAnim, -5.0f);
                                     this->unk_2B8 |= 0x10;
@@ -125,6 +125,7 @@ RECOMP_PATCH void func_8096A38C(EnJs* this, PlayState* play) {
                             default:
                                 break;
                         }
+                        break;
 
                     // @rando send player back to first day if they don't meet the victory condition
                     case 0x3550:
@@ -148,6 +149,7 @@ RECOMP_PATCH void func_8096A38C(EnJs* this, PlayState* play) {
                             default:
                                 break;
                         }
+                        break;
 
                     default:
                         break;
@@ -172,14 +174,14 @@ RECOMP_PATCH void func_8096A38C(EnJs* this, PlayState* play) {
                         break;
 
                     case 0x2207:
-                        if (INV_CONTENT(ITEM_MASK_FIERCE_DEITY) == ITEM_MASK_FIERCE_DEITY) {
-                            Message_ContinueTextbox(play, 0x2208);
-                            func_809696EC(this, 0);
-                        } else {
-                            Message_CloseTextbox(play);
-                            this->actionFunc = func_8096A2C0;
-                            func_8096A2C0(this, play);
-                        }
+                        // if (INV_CONTENT(ITEM_MASK_FIERCE_DEITY) == ITEM_MASK_FIERCE_DEITY) {
+                        //     Message_ContinueTextbox(play, 0x2208);
+                        //     func_809696EC(this, 0);
+                        // } else {
+                        Message_CloseTextbox(play);
+                        this->actionFunc = func_8096A2C0;
+                        func_8096A2C0(this, play);
+                        // }
                         break;
 
                     case 0x2201:
@@ -198,5 +200,38 @@ RECOMP_PATCH void func_8096A38C(EnJs* this, PlayState* play) {
 
         default:
             break;
+    }
+}
+
+void func_8096A1E8(EnJs* this, PlayState* play);
+
+void EnJs_PreventFightAfterFDOffer(EnJs* this, PlayState* play) {
+    if (SkelAnime_Update(&this->skelAnime)) {
+        Animation_MorphToLoop(&this->skelAnime, &gMoonChildStandingAnim, 0.0f);
+    }
+    if (Actor_ProcessTalkRequest(&this->actor, &play->state)) {
+        this->actor.flags &= ~ACTOR_FLAG_10000;
+        this->actionFunc = func_8096A38C;
+        Message_StartTextbox(play, 0x3550, &this->actor);
+    } else {
+        Actor_OfferTalkExchange(&this->actor, play, 1000.0f, 1000.0f, PLAYER_IA_MINUS1);
+    }
+}
+
+RECOMP_PATCH void func_8096A2C0(EnJs* this, PlayState* play) {
+    if (SkelAnime_Update(&this->skelAnime)) {
+        Animation_MorphToLoop(&this->skelAnime, &gMoonChildStandingAnim, 0.0f);
+    }
+    if (Actor_HasParent(&this->actor, play)) {
+        this->actor.parent = NULL;
+        this->actor.flags |= ACTOR_FLAG_10000;
+        if (rando_met_majora_condition()) {
+            this->actionFunc = func_8096A1E8;
+        } else {
+            this->actionFunc = EnJs_PreventFightAfterFDOffer;
+        }
+        Actor_OfferTalkExchange(&this->actor, play, 1000.0f, 1000.0f, PLAYER_IA_MINUS1);
+    } else {
+        Actor_OfferGetItem(&this->actor, play, GI_MASK_FIERCE_DEITY, 10000.0f, 1000.0f);
     }
 }
