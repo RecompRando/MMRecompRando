@@ -105,7 +105,7 @@ void EnAkindonuts_OfferRandoShopItem(EnAkindonuts* this, PlayState* play) {
 
 RECOMP_PATCH void func_80BEF360(EnAkindonuts* this, PlayState* play) {
     if (this->unk_32C & 0x40) {
-        if (rando_location_is_checked(LOCATION_SCRUB_SHOP)) {
+        if (!rando_scrubs_enabled() || rando_location_is_checked(LOCATION_SCRUB_SHOP)) {
             this->actionFunc = EnAkindonuts_OfferNormalShopItem;
         } else {
             this->actionFunc = EnAkindonuts_OfferRandoShopItem;
