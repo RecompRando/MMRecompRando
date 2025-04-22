@@ -36,10 +36,7 @@ RECOMP_PATCH void func_800F4A10(PlayState* play) {
         }
     } else {
         // skip other warps if hidden owl is hit
-        if ((gSaveContext.save.saveInfo.playerData.owlActivationFlags >> OWL_WARP_HIDDEN_OWL) & 1) {
-            pauseCtx->worldMapPoints[OWL_WARP_HIDDEN_OWL] = true;
-            pauseCtx->cursorPoint[PAUSE_WORLD_MAP] = OWL_WARP_HIDDEN_OWL;
-        } else {
+        if (!((gSaveContext.save.saveInfo.playerData.owlActivationFlags >> OWL_WARP_HIDDEN_OWL) & 1)) {
             for (i = OWL_WARP_STONE_TOWER; i >= OWL_WARP_GREAT_BAY_COAST; i--) {
                 if ((gSaveContext.save.saveInfo.playerData.owlActivationFlags >> i) & 1) {
                     pauseCtx->worldMapPoints[i] = true;
