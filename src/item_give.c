@@ -1447,9 +1447,13 @@ RECOMP_PATCH s32 Actor_OfferGetItem(Actor* actor, PlayState* play, GetItemId get
                             (item == ITEM_MILK) || (item == ITEM_GOLD_DUST_2) || (item == ITEM_HYLIAN_LOACH_2) ||
                             (item == ITEM_SEAHORSE_CAUGHT))) {
                     } else {
-                        itemWorkaround = true;
-                        itemShuffled = true;
-                        trueGI = rando_get_item_id(getItemId);
+                        if (rando_location_is_checked_async(getItemId)) {
+                            trueGI = getItemId = GI_RUPEE_BLUE;
+                        } else {
+                            itemWorkaround = true;
+                            itemShuffled = true;
+                            trueGI = rando_get_item_id(getItemId);
+                        }
                     }
                     if (getItemId == GI_HEART_PIECE) {
                         recomp_printf("Actor HP: 0x%06X\n", LOCATION_QUEST_HEART_PIECE);
@@ -1457,52 +1461,96 @@ RECOMP_PATCH s32 Actor_OfferGetItem(Actor* actor, PlayState* play, GetItemId get
                         itemShuffled = true;
                         trueGI = rando_get_item_id(LOCATION_QUEST_HEART_PIECE);
                         if (LOCATION_QUEST_HEART_PIECE == LOCATION_GRANNY_STORY_1 && rando_location_is_checked(LOCATION_GRANNY_STORY_1)) {
-                            // stupid gramma double heart piece
-                            rando_send_location(LOCATION_GRANNY_STORY_2);
-                            trueGI = rando_get_item_id(LOCATION_GRANNY_STORY_2);
+                            if (rando_location_is_checked_async(LOCATION_GRANNY_STORY_2)) {
+                                trueGI = getItemId = GI_RUPEE_BLUE;
+                                itemWorkaround = false;
+                                itemShuffled = false;
+                            } else {
+                                // stupid gramma double heart piece
+                                rando_send_location(LOCATION_GRANNY_STORY_2);
+                                trueGI = rando_get_item_id(LOCATION_GRANNY_STORY_2);
+                            }
                         } else {
-                            rando_send_location(LOCATION_QUEST_HEART_PIECE);
+                            if (rando_location_is_checked_async(LOCATION_QUEST_HEART_PIECE)) {
+                                trueGI = getItemId = GI_RUPEE_BLUE;
+                                itemWorkaround = false;
+                                itemShuffled = false;
+                            } else {
+                                rando_send_location(LOCATION_QUEST_HEART_PIECE);
+                            }
                         }
                     } else if (getItemId >= GI_REMAINS_ODOLWA && getItemId <= GI_REMAINS_TWINMOLD) {
-                        itemWorkaround = true;
-                        itemShuffled = true;
-                        trueGI = rando_get_item_id(getItemId);
-                        rando_send_location(getItemId);
-                        rChecked[getItemId - GI_REMAINS_ODOLWA] = true;
+                        if (rando_location_is_checked_async(getItemId)) {
+                            trueGI = getItemId = GI_RUPEE_BLUE;
+                        } else {
+                            itemWorkaround = true;
+                            itemShuffled = true;
+                            trueGI = rando_get_item_id(getItemId);
+                            rando_send_location(getItemId);
+                            rChecked[getItemId - GI_REMAINS_ODOLWA] = true;
+                        }
                     } else if (getItemId == GI_BOTTLE) {
                         recomp_printf("Actor bottle: 0x%06X\n", LOCATION_QUEST_BOTTLE);
-                        itemWorkaround = true;
-                        itemShuffled = true;
-                        trueGI = rando_get_item_id(LOCATION_QUEST_BOTTLE);
-                        rando_send_location(LOCATION_QUEST_BOTTLE);
+                        if (rando_location_is_checked_async(LOCATION_QUEST_BOTTLE)) {
+                            trueGI = getItemId = GI_RUPEE_BLUE;
+                        } else {
+                            itemWorkaround = true;
+                            itemShuffled = true;
+                            trueGI = rando_get_item_id(LOCATION_QUEST_BOTTLE);
+                            rando_send_location(LOCATION_QUEST_BOTTLE);
+                        }
                     } else if (getItemId == GI_MILK && actor->id != ACTOR_ID_COW && !rando_location_is_checked(LOCATION_MILK) && rando_shopsanity_enabled()) {
                         // Milk Purchases
                         recomp_printf("Milkman Location: 0x%06X\n", LOCATION_MILK);
-                        itemWorkaround = true;
-                        itemShuffled = true;
-                        rando_send_location(LOCATION_MILK);
-                        trueGI = rando_get_item_id(LOCATION_MILK);
+                        if (rando_location_is_checked_async(LOCATION_MILK)) {
+                            trueGI = getItemId = GI_RUPEE_BLUE;
+                        } else {
+                            itemWorkaround = true;
+                            itemShuffled = true;
+                            rando_send_location(LOCATION_MILK);
+                            trueGI = rando_get_item_id(LOCATION_MILK);
+                        }
                     } else if (getItemId == GI_MAGIC_BEANS && actor->id == ACTOR_ID_BEAN_DADDY) {
-                        itemWorkaround = true;
-                        itemShuffled = true;
-                        trueGI = rando_get_item_id(LOCATION_BEAN_DADDY);
-                        rando_send_location(LOCATION_BEAN_DADDY);
+                        if (rando_location_is_checked_async(LOCATION_BEAN_DADDY)) {
+                            trueGI = getItemId = GI_RUPEE_BLUE;
+                        } else {
+                            itemWorkaround = true;
+                            itemShuffled = true;
+                            trueGI = rando_get_item_id(LOCATION_BEAN_DADDY);
+                            rando_send_location(LOCATION_BEAN_DADDY);
+                        }
                     } else if (getItemId == GI_RUPEE_PURPLE && actor->id == ACTOR_ID_DEKU_PLAYGROUND_WORKER && !rando_location_is_checked(LOCATION_PLAYGROUND_ANY_DAY)) {
                         // Deku Playground Any Day
-                        rando_send_location(LOCATION_PLAYGROUND_ANY_DAY);
-                        trueGI = rando_get_item_id(LOCATION_PLAYGROUND_ANY_DAY);
+                        if (rando_location_is_checked_async(LOCATION_PLAYGROUND_ANY_DAY)) {
+                            trueGI = getItemId = GI_RUPEE_BLUE;
+                        } else {
+                            rando_send_location(LOCATION_PLAYGROUND_ANY_DAY);
+                            trueGI = rando_get_item_id(LOCATION_PLAYGROUND_ANY_DAY);
+                        }
                     } else if (getItemId == GI_RUPEE_PURPLE && actor->id == ACTOR_ID_HONEY_AND_DARLING && !rando_location_is_checked(LOCATION_HONEY_AND_DARLING_ANY_DAY)) {
                         // Honey and Darling Any Day
-                        rando_send_location(LOCATION_HONEY_AND_DARLING_ANY_DAY);
-                        trueGI = rando_get_item_id(LOCATION_HONEY_AND_DARLING_ANY_DAY);
+                        if (rando_location_is_checked_async(LOCATION_HONEY_AND_DARLING_ANY_DAY)) {
+                            trueGI = getItemId = GI_RUPEE_BLUE;
+                        } else {
+                            rando_send_location(LOCATION_HONEY_AND_DARLING_ANY_DAY);
+                            trueGI = rando_get_item_id(LOCATION_HONEY_AND_DARLING_ANY_DAY);
+                        }
                     } else if (getItemId == GI_RUPEE_RED && actor->id == ACTOR_ID_SWAMP_GUIDE) { // && !rando_location_is_checked(LOCATION_SWAMP_GUIDE_GOOD)) {
                         // Swamp Pictograph Contest Good Picture
-                        rando_send_location(LOCATION_SWAMP_GUIDE_GOOD);
-                        trueGI = rando_get_item_id(LOCATION_SWAMP_GUIDE_GOOD);
+                        if (rando_location_is_checked_async(LOCATION_SWAMP_GUIDE_GOOD)) {
+                            trueGI = getItemId = GI_RUPEE_BLUE;
+                        } else {
+                            rando_send_location(LOCATION_SWAMP_GUIDE_GOOD);
+                            trueGI = rando_get_item_id(LOCATION_SWAMP_GUIDE_GOOD);
+                        }
                     } else if (getItemId == GI_RUPEE_BLUE && actor->id == ACTOR_ID_SWAMP_GUIDE) { // && !rando_location_is_checked(LOCATION_SWAMP_GUIDE_OKAY)) {
                         // Swamp Pictograph Contest Okay Picture
-                        rando_send_location(LOCATION_SWAMP_GUIDE_OKAY);
-                        trueGI = rando_get_item_id(LOCATION_SWAMP_GUIDE_OKAY);
+                        if (rando_location_is_checked_async(LOCATION_SWAMP_GUIDE_OKAY)) {
+                            trueGI = getItemId = GI_RUPEE_BLUE;
+                        } else {
+                            rando_send_location(LOCATION_SWAMP_GUIDE_OKAY);
+                            trueGI = rando_get_item_id(LOCATION_SWAMP_GUIDE_OKAY);
+                        }
                     } else if (getItemId == GI_POWDER_KEG && ((actor->id == ACTOR_ID_MEDIGORON && rando_location_is_checked(GI_POWDER_KEG)) || actor->id == ACTOR_ID_BOMBGORON)) {
                         // Goron Village Medigoron Sale + Bomb Shop Goron Rebuy
                         itemWorkaround = false;
@@ -1551,6 +1599,9 @@ s32 Actor_OfferGetItemHook(Actor* actor, PlayState* play, GetItemId getItemId, u
                 s32 absYawDiff = ABS_ALT(yawDiff);
 
                 if ((getItemId != GI_NONE) || (player->getItemDirection < absYawDiff)) {
+                    if (rando_location_is_checked_async(location)) {
+                        getItemId = GI_RUPEE_BLUE;
+                    }
                     trueGI = getItemId;
                     itemWorkaround = use_workaround;
                     itemShuffled = item_is_shuffled;
