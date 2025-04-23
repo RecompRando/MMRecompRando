@@ -1,4 +1,3 @@
-
 #ifndef __UI_FUNCS_H__
 #define __UI_FUNCS_H__
 
@@ -31,15 +30,15 @@ typedef struct {
         } click;
 
         struct {
-            bool active;
+            int active;
         } focus;
 
         struct {
-            bool active;
+            int active;
         } hover;
 
         struct {
-            bool active;
+            int active;
         } enable;
 
         struct {

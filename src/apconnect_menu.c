@@ -21,8 +21,7 @@ static void connectPressed(RecompuiResource resource, const RecompuiEventData* d
             recompui_hide_context(connect_menu.context);
         }
         else {
-            recomp_printf("Failed to connect\n");
-            // TODO show UI context for connection error
+            randoEmitErrorNotification("Failed to connect");
         }
     }
 }

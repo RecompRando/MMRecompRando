@@ -43,6 +43,8 @@ void init_rando()
     randoCreateSoloMenu();
     randoCreateYamlConfigMenu();
     randoCreateAPConnectMenu();
+
+    randoCreateNotificationContainer();
 }
 
 s8 giToItemId[GI_MAX] = {
@@ -469,5 +471,7 @@ void update_rando(PlayState* play) {
             }
             rando_reset_death_link_pending();
         }
+
+        notificationUpdateCycle();
     }
 }
