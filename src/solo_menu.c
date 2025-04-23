@@ -289,10 +289,13 @@ void randoCreateSoloMenu() {
     recompui_close_context(solo_menu.context);
 }
 
+bool soloContext = false;
+
 void randoShowSoloMenu() {
     recompui_open_context(solo_menu.context);
     createSoloList();
     recompui_close_context(solo_menu.context);
 
     recompui_show_context(solo_menu.context);
+    soloContext = true;
 }
