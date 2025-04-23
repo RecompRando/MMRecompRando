@@ -1,7 +1,9 @@
 #include "modding.h"
 #include "global.h"
+#include "recompconfig.h"
 
 #include "apcommon.h"
+#include "yaml_generation.h"
 
 #define LOCATION_INVENTORY_SWORD 0x000037
 #define LOCATION_INVENTORY_SHIELD 0x000032
@@ -26,6 +28,9 @@ PlayState* gPlay;
 RECOMP_CALLBACK("*", recomp_on_init)
 void init_rando()
 {
+    // Set a dummy save file on init just to make recomp change the save folder. The real save
+    // file will be determined when starting solo or multiworld.
+    recomp_change_save_file("save.bin");
     recomp_set_moon_crash_resets_save(false);
     recomp_set_fd_anywhere(true);
     recomp_set_no_bow_epona_fix(true);
@@ -34,7 +39,10 @@ void init_rando()
 
     dsot_set_skip_dsot_cutscene(true);
 
-    randoCreateMenus();
+    randoCreateStartMenu();
+    randoCreateSoloMenu();
+    randoCreateYamlConfigMenu();
+    randoCreateAPConnectMenu();
 }
 
 s8 giToItemId[GI_MAX] = {

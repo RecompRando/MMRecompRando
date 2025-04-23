@@ -16,7 +16,8 @@
             ],
             "compilerPath": "clang",
             "cStandard": "c99",
-            "intelliSenseMode": "clang-x86"
+            "intelliSenseMode": "clang-x86",
+            "configurationProvider": "ms-vscode.makefile-tools"
         }
     ],
     "version": 4
