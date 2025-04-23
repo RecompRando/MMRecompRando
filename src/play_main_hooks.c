@@ -291,6 +291,30 @@ RECOMP_PATCH s32 Health_ChangeBy(PlayState* play, s16 healthChange) {
     }
 }
 
+ItemId randoConvertItemId(u32 ap_item_id) {
+    ap_item_id &= 0xFFFFFF;
+
+    switch (ap_item_id & 0xFF0000) {
+        case 0x010000:
+            return ITEM_FAIRY;
+        case 0x020000:
+            switch (ap_item_id & 0xFF) {
+                case 0x00:
+                    if (!gSaveContext.save.saveInfo.playerData.isMagicAcquired) {
+                        return ITEM_MAGIC_JAR_SMALL;
+                    }
+                    return ITEM_MAGIC_JAR_BIG;
+                case 0x01:
+                    return ITEM_SWORD_KOKIRI;
+                case 0x03:
+                default:
+                    return ITEM_HEART_CONTAINER;
+            }
+        default:
+            return (ItemId) giToItemId[ap_item_id & 0xFF];
+    }
+}
+
 RECOMP_CALLBACK("*", recomp_on_play_main)
 void update_rando(PlayState* play) {
     u32 new_items_size;
@@ -458,7 +482,15 @@ void update_rando(PlayState* play) {
 
         if (new_items_size > old_items_size) {
             for (u32 i = old_items_size; i < new_items_size; ++i) {
-                randoItemGive(rando_get_item(i));
+                u32 item_id = rando_get_item(i);
+                if (rando_get_sending_player(i) != rando_get_own_slot_id()) {
+                    char item_name[33];
+                    char player_name[17];
+                    rando_get_item_name_from_id(item_id, item_name);
+                    rando_get_sending_player_name(i, player_name);
+                    randoEmitRecieveNotification(item_name, player_name, randoConvertItemId(item_id), RANDO_ITEM_CLASS_PROGRESSION);
+                }
+                randoItemGive(item_id);
             }
 
             old_items_size = new_items_size;

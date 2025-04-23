@@ -169,7 +169,7 @@ RecompuiTextureHandle notification_get_item_image(const u8 item) {
 
 RecompuiColor* notification_get_item_classification_color(RandoItemClassification item_class) {
     switch (item_class) {
-        case RANDO_ITEM_CLASS_PROGRESSIVE:
+        case RANDO_ITEM_CLASS_PROGRESSION:
             return &progTextColor;
         case RANDO_ITEM_CLASS_USEFUL:
             return &usefulTextColor;
