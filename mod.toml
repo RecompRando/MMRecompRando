@@ -25,7 +25,7 @@ https://github.com/RecompRando/MMRecompRando"""
 short_description = "hey game different now"
 
 # Authors of this mod.
-authors = [ "ThatHypedPerson", "PixelShake92", "Muervo_", "dcvz", "CelestialKitsune", "VincentsSin", "LittleCube" ]
+authors = [ "LittleCube", "ThatHypedPerson", "PixelShake92", "Muervo_", "dcvz", "CelestialKitsune", "VincentsSin" ]
 
 # ID of the target recomp game.
 game_id = "mm"
