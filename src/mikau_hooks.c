@@ -337,8 +337,8 @@ RECOMP_PATCH void func_80B93BA8(EnZog* this, s16 csIdIndex) {
     if (csIdIndex == 2) {
         PlayState* play = gPlay;
         play->nextEntrance = ENTRANCE(GREAT_BAY_COAST, 9);
-        play->transitionType = TRANS_TYPE_FADE_WHITE_FAST;
-        gSaveContext.nextTransitionType = TRANS_TYPE_FADE_WHITE_FAST;
+        play->transitionType = TRANS_TYPE_FADE_BLACK_FAST;
+        gSaveContext.nextTransitionType = TRANS_TYPE_FADE_BLACK_FAST;
         play->transitionTrigger = TRANS_TRIGGER_START;
         return;
     }
