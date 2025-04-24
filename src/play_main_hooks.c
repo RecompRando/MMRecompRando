@@ -310,6 +310,47 @@ ItemId randoConvertItemId(u32 ap_item_id) {
                 default:
                     return ITEM_HEART_CONTAINER;
             }
+        case 0x040000:
+            return ITEM_OCARINA_FAIRY; // could use music notes instead, but this is funnier
+        case 0x090000:
+            return ap_item_id & 0xFF;
+        case 0x000000:
+            switch (ap_item_id & 0xFF) {
+                case GI_TRUE_SKULL_TOKEN:
+                case GI_OCEAN_SKULL_TOKEN:
+                    return ITEM_SKULL_TOKEN;
+                case GI_BOMBCHUS_1:
+                case GI_BOMBCHUS_5:
+                case GI_BOMBCHUS_10:
+                case GI_BOMBCHUS_20: // tbh this feels like bait without chu bag
+                case GI_BAG_BOMBCHU:
+                    return ITEM_BOMBCHU;
+                case GI_POTION_RED_BOTTLE:
+                    return ITEM_POTION_RED;
+                case GI_HEART_PIECE:
+                    return ITEM_HEART_PIECE;
+                case GI_SWORD_KOKIRI:
+                    return MIN(ITEM_SWORD_KOKIRI + rando_has_item(GI_SWORD_KOKIRI) - 1, ITEM_SWORD_GILDED);
+                case GI_SHIELD_HERO:
+                    return MIN(ITEM_SHIELD_HERO + rando_has_item(GI_SHIELD_HERO) - 1, ITEM_SHIELD_MIRROR);
+                case GI_BOMB_BAG_20:
+                    return MIN(ITEM_BOMB_BAG_20 + rando_has_item(GI_BOMB_BAG_20) - 1, ITEM_BOMB_BAG_40);
+                case GI_QUIVER_30:
+                    if (rando_has_item(GI_QUIVER_30) == 1) {
+                        return ITEM_BOW;
+                    }
+                    return MIN(ITEM_QUIVER_30 + rando_has_item(GI_QUIVER_30) - 1, ITEM_QUIVER_50);
+                case GI_ARROWS_30:
+                    return ITEM_BOW; // might be confusing when you don't have bow
+                case GI_RUPEE_GREEN:
+                case GI_RUPEE_BLUE:
+                case GI_RUPEE_10:
+                case GI_RUPEE_RED:
+                case GI_RUPEE_PURPLE:
+                case GI_RUPEE_SILVER:
+                case GI_RUPEE_HUGE:
+                    return ITEM_WALLET_DEFAULT; // temp
+            }
         default:
             return (ItemId) giToItemId[ap_item_id & 0xFF];
     }

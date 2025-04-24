@@ -11,10 +11,6 @@
 #define NOTIFICATION_DURATION NOTIFICATION_TRUE_DURATION(10)
 #define NOTIFICATION_FADE_START NOTIFICATION_TRUE_DURATION(2)
 
-#define ICON_ITEM_TEX_WIDTH  32
-#define ICON_ITEM_TEX_HEIGHT 32
-#define ICON_ITEM_TEX_SIZE ((ICON_ITEM_TEX_WIDTH * ICON_ITEM_TEX_HEIGHT) * 4)
-
 #define NOTIFICATION_WIDTH 400.0f
 #define NOTIFICATION_PADDING 12.0f
 #define IMG_SIZE 75.0f
@@ -33,11 +29,6 @@ RecompuiColor usefulTextColor = { 109, 139, 232, 255 };
 RecompuiColor junkTextColor = { 0, 238, 238, 255 };
 RecompuiColor trapTextColor = { 255, 119, 0, 255 };
 
-// load logo images
-INCBIN(ap_logo_png, "textures/apLogoNormal.dds")
-INCBIN(ap_logo_prog_png, "textures/apLogoProg.dds")
-INCBIN(ap_logo_junk_png, "textures/apLogoFiller.dds")
-
 typedef struct {
     RecompuiResource notification;
     int duration;
@@ -46,6 +37,18 @@ typedef struct {
 static int notif_head = 0;
 static int notif_count = 0;
 Notification notifications[MAX_NOTIFICATIONS];
+
+// cache icons (thanks wiseguy)
+static RecompuiTextureHandle cached_texture_handles[256];
+
+// load logo images
+INCBIN(ap_logo_png, "textures/apLogoNormal.dds")
+INCBIN(ap_logo_prog_png, "textures/apLogoProg.dds")
+INCBIN(ap_logo_junk_png, "textures/apLogoFiller.dds")
+
+#define ICON_ITEM_TEX_WIDTH  32
+#define ICON_ITEM_TEX_HEIGHT 32
+#define ICON_ITEM_TEX_SIZE ((ICON_ITEM_TEX_WIDTH * ICON_ITEM_TEX_HEIGHT) * 4)
 
 void notificationUpdateCycle() {
     int start_index = notif_head;
@@ -150,20 +153,40 @@ RecompuiResource create_basic_notification_element() {
 }
 
 RecompuiTextureHandle notification_get_item_image(const u8 item) {
-    switch (item) {
-        case ITEM_AP_PROG:
-            return recompui_create_texture_image_bytes(ap_logo_prog_png, ap_logo_prog_png_end - ap_logo_prog_png);
-        case ITEM_AP_USEFUL:
-            return recompui_create_texture_image_bytes(ap_logo_png, ap_logo_png_end - ap_logo_png);
-        case ITEM_AP_FILLER:
-            return recompui_create_texture_image_bytes(ap_logo_junk_png, ap_logo_junk_png_end - ap_logo_junk_png);
+    if (cached_texture_handles[item] != 0) {
+        return cached_texture_handles[item];
     }
 
     u8 item_texture_data[ICON_ITEM_TEX_SIZE];
+    RecompuiTextureHandle item_texture_handle;
 
-    CmpDma_LoadFile((uintptr_t)SEGMENT_ROM_START(icon_item_static_yar), item, item_texture_data, sizeof(item_texture_data));
-    RecompuiTextureHandle item_texture_handle = recompui_create_texture_rgba32(item_texture_data, ICON_ITEM_TEX_WIDTH, ICON_ITEM_TEX_HEIGHT);
+    switch (item) {
+        // use custom image
+        case ITEM_AP_PROG:
+            item_texture_handle = recompui_create_texture_image_bytes(ap_logo_prog_png, ap_logo_prog_png_end - ap_logo_prog_png);
+        case ITEM_AP_USEFUL:
+            item_texture_handle = recompui_create_texture_image_bytes(ap_logo_png, ap_logo_png_end - ap_logo_png);
+        case ITEM_AP_FILLER:
+            item_texture_handle = recompui_create_texture_image_bytes(ap_logo_junk_png, ap_logo_junk_png_end - ap_logo_junk_png);
+        // use rom textures
+        default:
+            // icon_item_24 items
+            if (item >= ITEM_SKULL_TOKEN && item <= ITEM_HEART_PIECE_2) {
+                CmpDma_LoadFile((uintptr_t)SEGMENT_ROM_START(icon_item_24_static_yar), item - ITEM_SKULL_TOKEN, item_texture_data, 0x900);
+                item_texture_handle = recompui_create_texture_rgba32(item_texture_data, 24, 24);
+            // bomber's notebook (why is it so different)
+            } else if (item == ITEM_BOMBERS_NOTEBOOK) {
+                CmpDma_LoadFile((uintptr_t)SEGMENT_ROM_START(icon_item_static_yar), ITEM_SONG_SONATA, item_texture_data, 0x1000);
+                item_texture_handle = recompui_create_texture_rgba32(item_texture_data, ICON_ITEM_TEX_WIDTH, ICON_ITEM_TEX_HEIGHT);
+            // TODO: rupees/arrows
+            // normal items
+            } else {
+                CmpDma_LoadFile((uintptr_t)SEGMENT_ROM_START(icon_item_static_yar), item, item_texture_data, sizeof(item_texture_data));
+                item_texture_handle = recompui_create_texture_rgba32(item_texture_data, ICON_ITEM_TEX_WIDTH, ICON_ITEM_TEX_HEIGHT);
+            }
+    }
 
+    cached_texture_handles[item] = item_texture_handle;
     return item_texture_handle;
 }
 
