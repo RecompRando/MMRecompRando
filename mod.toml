@@ -102,3 +102,11 @@ data_reference_syms_files = [ "Zelda64RecompSyms/mm.us.rev1.datasyms.toml", "Zel
 
 # Additional files to include in the mod.
 additional_files = [ ]
+
+[[manifest.config_options]]
+id = "notification_position"
+name = "Notification Position"
+description = "Sets where incoming item notifications appear on your screen"
+type = "Enum"
+options = [ "Top Left", "Top Right", "Bottom Left", "Bottom Right" ]
+default = "Top Left"

@@ -20,12 +20,12 @@ static void connectPressed(RecompuiResource resource, const RecompuiEventData* d
             randoStart();
             recompui_hide_context(connect_menu.context);
             recompui_close_context(connect_menu.context);
-            randoEmitNormalNotification("Connection success");
+            randoEmitNormalNotification("Successfully connected");
             recompui_open_context(connect_menu.context);
         }
         else {
             recompui_close_context(connect_menu.context);
-            randoEmitErrorNotification("Connection failure");
+            randoEmitErrorNotification("Failed to connect");
             recompui_open_context(connect_menu.context);
         }
     }

@@ -364,6 +364,8 @@ void update_rando(PlayState* play) {
 
     gPlay = play;
 
+    notificationUpdateCycle();
+
     if (saveOpened) {
         new_items_size = rando_get_items_size();
 
@@ -544,7 +546,5 @@ void update_rando(PlayState* play) {
             }
             rando_reset_death_link_pending();
         }
-
-        notificationUpdateCycle();
     }
 }

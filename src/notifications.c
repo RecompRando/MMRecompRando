@@ -1,5 +1,6 @@
 #include "apcommon.h"
 #include "recompui.h"
+#include "recompconfig.h"
 #include "incbin.h"
 
 // used ProxySaw's notification mod as a base https://github.com/garrettjoecox/ProxyMM_RecompMods/blob/main/packages/Notifications/src/notifications.c
@@ -50,7 +51,29 @@ INCBIN(ap_logo_junk_png, "textures/apLogoFiller.dds")
 #define ICON_ITEM_TEX_HEIGHT 32
 #define ICON_ITEM_TEX_SIZE ((ICON_ITEM_TEX_WIDTH * ICON_ITEM_TEX_HEIGHT) * 4)
 
+void setNotificationPosition() {
+    switch (recomp_get_config_u32("notification_position")) {
+        case 0: // top left
+            recompui_set_flex_direction(notif_container, FLEX_DIRECTION_COLUMN_REVERSE);
+            recompui_set_align_items(notif_container, ALIGN_ITEMS_FLEX_START);
+            break;
+        case 1: // top right
+            recompui_set_flex_direction(notif_container, FLEX_DIRECTION_COLUMN_REVERSE);
+            recompui_set_align_items(notif_container, ALIGN_ITEMS_FLEX_END);
+            break;
+        case 2: // bottom left
+            recompui_set_flex_direction(notif_container, FLEX_DIRECTION_COLUMN);
+            recompui_set_align_items(notif_container, ALIGN_ITEMS_FLEX_START);
+            break;
+        case 3: // bottom right
+            recompui_set_flex_direction(notif_container, FLEX_DIRECTION_COLUMN);
+            recompui_set_align_items(notif_container, ALIGN_ITEMS_FLEX_END);
+            break;
+    }
+}
+
 void notificationUpdateCycle() {
+    // fade out + remove notifications
     int start_index = notif_head;
     for (int i = 0; i < notif_count; i++) {
         int index = (start_index + i) % MAX_NOTIFICATIONS;
@@ -76,17 +99,24 @@ void notificationUpdateCycle() {
             }
         }
     }
+
+    // change notification position
+    recompui_open_context(notif_context);
+    setNotificationPosition();
+    recompui_close_context(notif_context);
 }
 
 void randoCreateNotificationContainer() {
     const float body_padding = 32.0f;
 
+    // create notification context
     notif_context = recompui_create_context();
     recompui_set_context_captures_input(notif_context, 0);
     recompui_set_context_captures_mouse(notif_context, 0);
 
     recompui_open_context(notif_context);
 
+    // create root covering the whole screen
     notif_root = recompui_context_root(notif_context);
     recompui_set_position(notif_root, POSITION_ABSOLUTE);
     recompui_set_top(notif_root, 0, UNIT_DP);
@@ -99,22 +129,16 @@ void randoCreateNotificationContainer() {
     recompui_set_flex_direction(notif_root, FLEX_DIRECTION_COLUMN);
     recompui_set_justify_content(notif_root, JUSTIFY_CONTENT_CENTER);
 
+    // create main notification container
     notif_container = recompui_create_element(notif_context, notif_root);
     recompui_set_height(notif_container, 100.0f, UNIT_PERCENT);
     recompui_set_flex_grow(notif_container, 1.0f);
     recompui_set_display(notif_container, DISPLAY_FLEX);
     recompui_set_gap(notif_container, 16.0f, UNIT_DP);
 
-    // new notifications appear at the top
-    // recompui_set_flex_direction(notif_container, FLEX_DIRECTION_COLUMN_REVERSE);
-    // recompui_set_justify_content(notif_container, JUSTIFY_CONTENT_FLEX_START); // maybe not?
-
-    // new notifications appear at the bottom
-    recompui_set_flex_direction(notif_container, FLEX_DIRECTION_COLUMN);
+    // set notification order + position
     recompui_set_justify_content(notif_container, JUSTIFY_CONTENT_FLEX_END);
-
-    recompui_set_align_items(notif_container, ALIGN_ITEMS_FLEX_START); // left
-    // recompui_set_align_items(notif_container, ALIGN_ITEMS_FLEX_END); // right
+    setNotificationPosition();
 
     recompui_close_context(notif_context);
     recompui_show_context(notif_context);
@@ -277,7 +301,7 @@ void randoEmitNormalNotification(const char* notif_text) {
     recompui_open_context(notif_context);
 
     RecompuiResource notification = create_basic_notification_element();
-    recompui_set_width_auto(notification);
+    recompui_set_width(notification, NOTIFICATION_WIDTH, UNIT_DP);
 
     RecompuiResource text_got = recompui_create_label(notif_context, notification, notif_text, LABELSTYLE_SMALL);
     recompui_set_color(text_got, &msgTextColor);
@@ -290,7 +314,7 @@ void randoEmitErrorNotification(const char* error_text) {
 
     RecompuiResource notification = create_basic_notification_element();
     recompui_set_background_color(notification, &notifBgError);
-    recompui_set_width_auto(notification);
+    recompui_set_width(notification, NOTIFICATION_WIDTH, UNIT_DP);
 
     RecompuiResource text_got = recompui_create_label(notif_context, notification, error_text, LABELSTYLE_SMALL);
     recompui_set_color(text_got, &msgTextColor);
