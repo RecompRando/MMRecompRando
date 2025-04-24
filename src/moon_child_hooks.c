@@ -7,6 +7,8 @@ struct EnJs;
 
 typedef void (*EnJsActionFunc)(struct EnJs*, PlayState*);
 
+#define ENJS_GET_TYPE(thisx) ((thisx)->params & 0xF)
+
 #define MOONCHILD_LIMB_MAX 0x12
 
 typedef struct EnJs {
@@ -233,5 +235,47 @@ RECOMP_PATCH void func_8096A2C0(EnJs* this, PlayState* play) {
         Actor_OfferTalkExchange(&this->actor, play, 1000.0f, 1000.0f, PLAYER_IA_MINUS1);
     } else {
         Actor_OfferGetItem(&this->actor, play, GI_MASK_FIERCE_DEITY, 10000.0f, 1000.0f);
+    }
+}
+
+PlayerItemAction func_80123810(PlayState* play);
+void func_80969898(EnJs* this, PlayState* play);
+s32 func_809692A8(s32 arg0);
+void EnJs_TakeMask(s32 itemActions, s32 childType);
+
+RECOMP_PATCH void func_80969748(EnJs* this, PlayState* play) {
+    PlayerItemAction itemAction;
+    Player* player = GET_PLAYER(play);
+
+    SkelAnime_Update(&this->skelAnime);
+    Math_SmoothStepToS(&this->actor.world.rot.y, this->actor.yawTowardsPlayer, 6, 0x1838, 0x64);
+    this->actor.shape.rot.y = this->actor.world.rot.y;
+    if (Message_GetState(&play->msgCtx) == TEXT_STATE_16) {
+        itemAction = func_80123810(play);
+
+        if (itemAction != PLAYER_IA_NONE) {
+            this->actionFunc = func_80969898;
+        }
+        if (itemAction > PLAYER_IA_NONE) {
+            Message_CloseTextbox(play);
+            if ((itemAction >= PLAYER_IA_MASK_MIN) && (itemAction < PLAYER_IA_MASK_TRANSFORMATION_MIN)) {
+                EnJs_TakeMask(itemAction, ENJS_GET_TYPE(&this->actor));
+                Inventory_UnequipItem(itemAction - 4);
+                if (!func_809692A8(ENJS_GET_TYPE(&this->actor))) {
+                    player->actor.textId = 0x2212;
+                } else {
+                    player->actor.textId = 0x2213;
+                }
+            } else if ((itemAction >= PLAYER_IA_MASK_TRANSFORMATION_MIN) && (itemAction <= PLAYER_IA_MASK_MAX)) {
+                player->actor.textId = 0x2211;
+            } else {
+                player->actor.textId = 0x2210;
+            }
+        }
+
+        if (itemAction <= PLAYER_IA_MINUS1) {
+            // Message_ContinueTextbox(play, 0x2216);
+            Message_ContinueTextbox(play, 0x2214);
+        }
     }
 }
