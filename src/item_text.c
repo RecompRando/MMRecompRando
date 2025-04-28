@@ -593,7 +593,6 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         }
         font->msgBuf.schar[new_end_i + i] = 0xBF;
     } else if (msg == ap_msg) {
-        recomp_printf("ap_msg\n");
         char was_sent_str[128] = "was sent to ";
         char item_str[67];
         char player_str[17];
@@ -641,9 +640,6 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         font->msgBuf.schar[msg_i] = 0x00;
         font->msgBuf.schar[msg_i + 1] = '!';
         font->msgBuf.schar[msg_i + 2] = 0xBF;
-
-        recomp_printf("item: `%s'\n", item_str);
-        recomp_printf("player: `%s'\n", player_str);
     }
 
     // for reverse-engineering text
