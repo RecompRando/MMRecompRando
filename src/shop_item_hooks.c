@@ -4,6 +4,8 @@
 #include "apcommon.h"
 
 #define LOCATION_SHOP_ITEM (0x090000 | this->actor.params)
+#define SHOP_ITEM_TEXT (0x3600 | this->actor.params)
+#define SHOP_ITEM_BUY_TEXT (0x3700 | this->actor.params)
 
 RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
 
@@ -77,6 +79,18 @@ RECOMP_PATCH void EnGirlA_Draw(Actor* thisx, PlayState* play) {
     if (rando_shopsanity_enabled() && !rando_location_is_checked(LOCATION_SHOP_ITEM)) {
         s16 getItemId = rando_get_item_id(LOCATION_SHOP_ITEM);
         if (shopObjectLoaded[this->actor.params]) {
+            // fix rotation of some items
+            switch(getItemId) {
+                case GI_AP_PROG:
+                case GI_AP_USEFUL:
+                case GI_AP_FILLER:
+                case GI_ROOM_KEY:
+                    Matrix_RotateYS(DEG_TO_BINANG(90), MTXMODE_APPLY);
+                    break;
+                default:
+                    break;
+            }
+
             if (shopObjectStatic[this->actor.params]) {
                 GetItem_Draw(play, getGid(getItemId));
             } else {
@@ -165,7 +179,7 @@ RECOMP_PATCH void EnGirlA_InitItem(PlayState* play, EnGirlA* this) {
     shopObjectLoading[this->actor.params] = false;
     shopObjectLoaded[this->actor.params] = false;
 
-    this->actor.textId = 0x083F;
+    this->actor.textId = SHOP_ITEM_TEXT;
     this->isOutOfStock = false;
     this->actor.draw = EnGirlA_Draw;
 }
@@ -180,7 +194,7 @@ RECOMP_PATCH void EnGirlA_InitalUpdate(EnGirlA* this, PlayState* play) {
             this->actor.params == SI_SWORD_GILDED
             )) {
         s16 trueGI = rando_get_item_id(LOCATION_SHOP_ITEM);
-        ShopItemEntry item = { getObjectId(trueGI), getGid(trueGI), NULL, 1, 0x083F, 0x0840, trueGI, EnGirlA_RandoCanBuyFunc,
+        ShopItemEntry item = { getObjectId(trueGI), getGid(trueGI), NULL, 1, SHOP_ITEM_TEXT, SHOP_ITEM_BUY_TEXT, trueGI, EnGirlA_RandoCanBuyFunc,
             EnGirlA_RandoBuyFunc, EnGirlA_RandoBuyFanfare };
         ShopItemEntry* shopItem = &item;
 
@@ -218,12 +232,6 @@ RECOMP_PATCH void EnGirlA_InitalUpdate(EnGirlA* this, PlayState* play) {
             this->isSelected = false;
             this->rotY = 0;
             this->initialRotY = this->actor.shape.rot.y;
-
-            if (rando_location_is_checked(LOCATION_SHOP_ITEM)) {
-                this->actor.textId = 0x0841;
-                this->isOutOfStock = true;
-                this->drawFunc = NULL;
-            }
         }
     } else {
         ShopItemEntry* shopItem = &sShopItemEntries[params];

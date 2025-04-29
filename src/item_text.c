@@ -69,9 +69,7 @@ static unsigned char fast_dog_msg[128] = "\x0a\x0a\x0a\x0a\x0a\x0a.\x0a.\x0a.\x0
 
 static unsigned char fool_msg[128] = "You are a\x01 FOOL!\xbf";
 
-static unsigned char shop_desc_msg[128] = "\x01Some Item: \xbf";
-static unsigned char shop_buy_msg[128] = "Some Item: \xbf";
-static unsigned char shop_oos_msg[128] = "\x01You've already purchased this item!\x1a\xbf";
+static unsigned char shop_msg[128];
 
 static unsigned char moon_weak_msg[128] = "...But you are not strong enough...\x11\x13\x13\x12Shall...I send you back?\x02\x11\x11\xc2Yes\x11No\xbf";
 
@@ -309,20 +307,7 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         case 0x74:
             msg = fool_msg;
             break;
-        case 0x83F:
-            if (rando_shopsanity_enabled()) {
-                msg = shop_desc_msg;
-            }
-            break;
-        case 0x840:
-            if (rando_shopsanity_enabled()) {
-                msg = shop_buy_msg;
-            }
-            break;
-        case 0x841:
-            if (rando_shopsanity_enabled()) {
-                msg = shop_oos_msg;
-            }
+        default:
             break;
     }
 
@@ -342,17 +327,13 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         font->msgBuf.schar[0] = 0x06;
         font->msgBuf.schar[1] = 0x71;
     }
-    if (textId == 0x83F) {
+    if ((textId & 0xFF00) == 0x3600 || (textId & 0xFF00) == 0x3700 || textId == 0x0880) {
+        msg = shop_msg;
         font->msgBuf.schar[0] = 0x06;
         font->msgBuf.schar[1] = 0x30;
-    }
-    if (textId == 0x840) {
-        font->msgBuf.schar[0] = 0x06;
-        font->msgBuf.schar[1] = 0x31;
-    }
-    if (textId == 0x841) {
-        font->msgBuf.schar[0] = 0x06;
-        font->msgBuf.schar[1] = 0x30;
+        s16 price = 20; // temp
+        font->msgBuf.schar[5] = (price & 0xFF00) >> 8;
+        font->msgBuf.schar[6] = price & 0xFF;
     }
 
     // if (msg == sk_msg || msg == bk_msg || msg == map_msg || msg == compass_msg) {
@@ -549,49 +530,166 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
                 break;
             }
         }
-    } else if (msg == shop_desc_msg || msg == shop_buy_msg) {
-        u8 desc_str[128] = "\x11\x00Maybe you'll want this.\xbf";
-        u8 buy_str[128] = "\x11\x11\x02\xc2I'll buy it\x11No thanks\xbf";
-        u8 rupees_str[128] = " Rupees\xbf";
-        u8* rupees_msg = rupees_str;
-        u8* shop_msg = desc_str;
-        if (msg == shop_buy_msg) {
-            shop_msg = buy_str;
-        }
-        u8 end_i = i + 11;
+    } else if (msg == shop_msg) {      
+        char item_str[67];
+        char player_str[17];
 
-        s16 price = 20; // temp
+        u32 shop_location = (0x090000 | (textId & 0xFF));
+        bool buying = false;
+        // witch blue potion | SI_POTION_BLUE
+        if (textId == 0x0880) {
+            shop_location = 0x090002;
+        }
+
+        rando_get_location_item_name(shop_location, item_str);
+        rando_get_location_item_player(shop_location, player_str);
+
+        u8 rupees_str[128] = " Rupees\x11";
+        u8 buy_str[128] = "\x11\x02\xc2I'll buy it\x11No thanks\x1A";
+        u8 mushroom_str[128] = "\x11\x05Requires a Magic Mushroom";
+        
+        // these colors could change
+        u8 desc_str[128] = "This is a";
+        u8 prog_str[128] = "\x03 Progressive Item ";
+        u8 useful_str[128] = "\x05 Useful Item ";
+        u8 junk_str[128] = "\x07 Filler Item ";
+        u8 trap_str[128] = "\x01 Trap ";
+        u8* type_msg;
+
+        switch (rando_get_location_type(shop_location)) {
+            case 1:
+                type_msg = prog_str;
+                break;
+            case 2:
+                type_msg = useful_str;
+                break;
+            case 3:
+                type_msg = trap_str;
+                break;
+            case 0:
+            default:
+                type_msg = junk_str;
+                break;
+        }
+
+        u8 msg_i = 11;
+
+        if ((textId & 0xFF00) == 0x3700) {
+            font->msgBuf.schar[1] = 0x31;
+            buying = true;
+        } else {
+            font->msgBuf.schar[msg_i] = 0x01;
+            msg_i += 1;
+        }
+
+        char c = item_str[0];
+        i = 0;
+
+        while (c != 0) {
+            font->msgBuf.schar[msg_i + i] = c;
+            i += 1;
+            c = item_str[i];
+        }
+        msg_i += i;
+
+        font->msgBuf.schar[msg_i] = ':';
+        font->msgBuf.schar[msg_i + 1] = ' ';
+        msg_i += 2;
+
+        s16 price = 20; // temp (need to change above too)
         if (price >= 100) {
-            font->msgBuf.schar[end_i] = (price / 100) + 0x30;
-            end_i += 1;
+            font->msgBuf.schar[msg_i] = (price / 100) + 0x30;
+            msg_i += 1;
         }
         if (price >= 10) {
-            font->msgBuf.schar[end_i] = ((price % 100) / 10) + 0x30;
-            end_i += 1;
+            font->msgBuf.schar[msg_i] = ((price % 100) / 10) + 0x30;
+            msg_i += 1;
         }
-        font->msgBuf.schar[end_i] = (price % 10) + 0x30;
-        end_i += 1;
+        font->msgBuf.schar[msg_i] = (price % 10) + 0x30;
+        msg_i += 1;
 
-        for (i = 0; i < 128; ++i) {
-            if (rupees_msg[i] == 0xBF) {
-                break;
-            }
-            font->msgBuf.schar[end_i + i] = rupees_msg[i];
-        }
+        i = 0;
+        c = rupees_str[0];
 
-        u8 new_end_i = end_i + i;
-        for (i = 0; i < 128; ++i) {
-            if (shop_msg[i] == 0xBF) {
-                break;
-            }
-            font->msgBuf.schar[new_end_i + i] = shop_msg[i];
-        }
-
-        if (msg == shop_desc_msg) {
-            font->msgBuf.schar[new_end_i + i] = 0x1A;
+        while (c != 0) {
+            font->msgBuf.schar[msg_i + i] = c;
             i += 1;
+            c = rupees_str[i];
         }
-        font->msgBuf.schar[new_end_i + i] = 0xBF;
+        msg_i += i;
+
+        if (!buying) {
+            font->msgBuf.schar[msg_i] = 0x00;
+            msg_i += 1;
+            
+            i = 0;
+            c = desc_str[0];
+
+            while (c != 0) {
+                font->msgBuf.schar[msg_i + i] = c;
+                i += 1;
+                c = desc_str[i];
+            }
+            msg_i += i;
+
+            i = 0;
+            c = type_msg[0];
+
+            while (c != 0) {
+                font->msgBuf.schar[msg_i + i] = c;
+                i += 1;
+                c = type_msg[i];
+            }
+            msg_i += i;
+
+            s16 shopGI = rando_get_item_id(shop_location);
+            if (shopGI == GI_AP_PROG || shopGI == GI_AP_USEFUL || shopGI == GI_AP_FILLER) {
+                font->msgBuf.schar[msg_i] = 0x00;
+                font->msgBuf.schar[msg_i + 1] = 'f';
+                font->msgBuf.schar[msg_i + 2] = 'o';
+                font->msgBuf.schar[msg_i + 3] = 'r';
+                font->msgBuf.schar[msg_i + 4] = 0x02;
+                font->msgBuf.schar[msg_i + 5] = 0x11;
+                msg_i += 6;
+
+                i = 0;
+                c = player_str[0];
+
+                while (c != 0) {
+                    font->msgBuf.schar[msg_i + i] = c;
+                    i += 1;
+                    c = player_str[i];
+                }
+                msg_i += i;
+            }
+
+            // witch blue potion | SI_POTION_BLUE
+            if (textId == 0x0880) {
+                i = 0;
+                c = mushroom_str[0];
+
+                while (c != 0) {
+                    font->msgBuf.schar[msg_i + i] = c;
+                    i += 1;
+                    c = mushroom_str[i];
+                }
+                msg_i += i;
+            }
+
+            font->msgBuf.schar[msg_i] = 0x1A;
+            msg_i += 1;
+        } else {
+            for (i = 0; i < 128; ++i) {
+                if (buy_str[i] == 0xBF) {
+                    break;
+                }
+                font->msgBuf.schar[msg_i + i] = buy_str[i];
+            }
+
+            msg_i += i;
+        }
+
+        font->msgBuf.schar[msg_i] = 0xBF;
     } else if (msg == ap_msg) {
         char was_sent_str[128] = "was sent to ";
         char item_str[67];
