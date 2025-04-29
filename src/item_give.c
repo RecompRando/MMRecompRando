@@ -701,6 +701,8 @@ RECOMP_PATCH void Player_DrawGetItemImpl(PlayState* play, Player* player, Vec3f*
 
 extern Vec3f sPlayerGetItemRefPos;
 
+u32 location_to_send;
+
 RECOMP_PATCH void Player_DrawGetItem(PlayState* play, Player* player) {
     if (!player->giObjectLoading || (osRecvMesg(&player->giObjectLoadQueue, NULL, OS_MESG_NOBLOCK) == 0)) {
         Vec3f refPos;
@@ -732,6 +734,10 @@ RECOMP_PATCH void Player_DrawGetItem(PlayState* play, Player* player) {
             drawIdPlusOne = ABS_ALT(player->getItemDrawIdPlusOne);
         }
         Player_DrawGetItemImpl(play, player, &refPos, drawIdPlusOne);
+        if (itemShuffled && location_to_send != 0) {
+            rando_send_location(location_to_send);
+            location_to_send = 0;
+        }
     }
 }
 
@@ -1458,50 +1464,50 @@ RECOMP_PATCH s32 Actor_OfferGetItem(Actor* actor, PlayState* play, GetItemId get
                         trueGI = rando_get_item_id(LOCATION_QUEST_HEART_PIECE);
                         if (LOCATION_QUEST_HEART_PIECE == LOCATION_GRANNY_STORY_1 && rando_location_is_checked(LOCATION_GRANNY_STORY_1)) {
                             // stupid gramma double heart piece
-                            rando_send_location(LOCATION_GRANNY_STORY_2);
+                            location_to_send = LOCATION_GRANNY_STORY_2;
                             trueGI = rando_get_item_id(LOCATION_GRANNY_STORY_2);
                         } else {
-                            rando_send_location(LOCATION_QUEST_HEART_PIECE);
+                            location_to_send = LOCATION_QUEST_HEART_PIECE;
                         }
                     } else if (getItemId >= GI_REMAINS_ODOLWA && getItemId <= GI_REMAINS_TWINMOLD) {
                         itemWorkaround = true;
                         itemShuffled = true;
                         trueGI = rando_get_item_id(getItemId);
-                        rando_send_location(getItemId);
+                        location_to_send = getItemId;
                         rChecked[getItemId - GI_REMAINS_ODOLWA] = true;
                     } else if (getItemId == GI_BOTTLE) {
                         recomp_printf("Actor bottle: 0x%06X\n", LOCATION_QUEST_BOTTLE);
                         itemWorkaround = true;
                         itemShuffled = true;
                         trueGI = rando_get_item_id(LOCATION_QUEST_BOTTLE);
-                        rando_send_location(LOCATION_QUEST_BOTTLE);
+                        location_to_send = LOCATION_QUEST_BOTTLE;
                     } else if (getItemId == GI_MILK && actor->id != ACTOR_ID_COW && !rando_location_is_checked(LOCATION_MILK) && rando_shopsanity_enabled()) {
                         // Milk Purchases
                         recomp_printf("Milkman Location: 0x%06X\n", LOCATION_MILK);
                         itemWorkaround = true;
                         itemShuffled = true;
-                        rando_send_location(LOCATION_MILK);
+                        location_to_send = LOCATION_MILK;
                         trueGI = rando_get_item_id(LOCATION_MILK);
                     } else if (getItemId == GI_MAGIC_BEANS && actor->id == ACTOR_ID_BEAN_DADDY) {
                         itemWorkaround = true;
                         itemShuffled = true;
                         trueGI = rando_get_item_id(LOCATION_BEAN_DADDY);
-                        rando_send_location(LOCATION_BEAN_DADDY);
+                        location_to_send = LOCATION_BEAN_DADDY;
                     } else if (getItemId == GI_RUPEE_PURPLE && actor->id == ACTOR_ID_DEKU_PLAYGROUND_WORKER && !rando_location_is_checked(LOCATION_PLAYGROUND_ANY_DAY)) {
                         // Deku Playground Any Day
-                        rando_send_location(LOCATION_PLAYGROUND_ANY_DAY);
+                        location_to_send = LOCATION_PLAYGROUND_ANY_DAY;
                         trueGI = rando_get_item_id(LOCATION_PLAYGROUND_ANY_DAY);
                     } else if (getItemId == GI_RUPEE_PURPLE && actor->id == ACTOR_ID_HONEY_AND_DARLING && !rando_location_is_checked(LOCATION_HONEY_AND_DARLING_ANY_DAY)) {
                         // Honey and Darling Any Day
-                        rando_send_location(LOCATION_HONEY_AND_DARLING_ANY_DAY);
+                        location_to_send = LOCATION_HONEY_AND_DARLING_ANY_DAY;
                         trueGI = rando_get_item_id(LOCATION_HONEY_AND_DARLING_ANY_DAY);
                     } else if (getItemId == GI_RUPEE_RED && actor->id == ACTOR_ID_SWAMP_GUIDE) { // && !rando_location_is_checked(LOCATION_SWAMP_GUIDE_GOOD)) {
                         // Swamp Pictograph Contest Good Picture
-                        rando_send_location(LOCATION_SWAMP_GUIDE_GOOD);
+                        location_to_send = LOCATION_SWAMP_GUIDE_GOOD;
                         trueGI = rando_get_item_id(LOCATION_SWAMP_GUIDE_GOOD);
                     } else if (getItemId == GI_RUPEE_BLUE && actor->id == ACTOR_ID_SWAMP_GUIDE) { // && !rando_location_is_checked(LOCATION_SWAMP_GUIDE_OKAY)) {
                         // Swamp Pictograph Contest Okay Picture
-                        rando_send_location(LOCATION_SWAMP_GUIDE_OKAY);
+                        location_to_send = LOCATION_SWAMP_GUIDE_OKAY;
                         trueGI = rando_get_item_id(LOCATION_SWAMP_GUIDE_OKAY);
                     } else if (getItemId == GI_POWDER_KEG && ((actor->id == ACTOR_ID_MEDIGORON && rando_location_is_checked(GI_POWDER_KEG)) || actor->id == ACTOR_ID_BOMBGORON)) {
                         // Goron Village Medigoron Sale + Bomb Shop Goron Rebuy
@@ -1511,7 +1517,7 @@ RECOMP_PATCH s32 Actor_OfferGetItem(Actor* actor, PlayState* play, GetItemId get
                         item = GI_POWDER_KEG;
                         AMMO(ITEM_POWDER_KEG) = 1;
                     } else if (itemShuffled) {
-                        rando_send_location(getItemId);
+                        location_to_send = getItemId;
                     }
                     if (itemShuffled) {
                         player->getItemId = GI_DEED_LAND;
@@ -1555,11 +1561,10 @@ s32 Actor_OfferGetItemHook(Actor* actor, PlayState* play, GetItemId getItemId, u
                     itemWorkaround = use_workaround;
                     itemShuffled = item_is_shuffled;
                     drawIdChosen = false;
+                    if (itemShuffled) {
+                        location_to_send = location;
+                    }
                     if (itemWorkaround) {
-                        if (location != 0)
-                        {
-                            rando_send_location(location);
-                        }
                         player->getItemId = GI_DEED_LAND;
                     } else {
                         player->getItemId = getItemId;
