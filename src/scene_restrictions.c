@@ -72,11 +72,10 @@ RECOMP_PATCH void Interface_SetSceneRestrictions(PlayState* play) {
 
     do {
         currentScene = (u8)play->sceneId;
-        if (currentScene == SCENE_OKUJOU) {
-            return;
-        }
-        if (currentScene == SCENE_TOUGITES) {
-            return;
+        switch (currentScene) {
+            case SCENE_OKUJOU:
+            case SCENE_TOUGITES:
+                return;
         }
         if (currentScene == sRestrictionFlags[i].scene) {
             interfaceCtx->restrictions.hGauge = RESTRICTIONS_GET_HGAUGE(&sRestrictionFlags[i]);
