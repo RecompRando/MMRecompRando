@@ -268,6 +268,7 @@ RECOMP_PATCH void EnFsn_GiveItem(EnFsn* this, PlayState* play) {
             Player_UpdateBottleHeld(play, GET_PLAYER(play), ITEM_BOTTLE, PLAYER_IA_BOTTLE_EMPTY);
         }
         this->actionFunc = EnFsn_SetupResumeInteraction;
+        this->getItemId = 0;
     } else if (this->isSelling == true) {
         // Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
         Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
@@ -279,7 +280,6 @@ RECOMP_PATCH void EnFsn_GiveItem(EnFsn* this, PlayState* play) {
             Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_FSN_RUPEE), LOCATION_FSN_RUPEE, 300.0f, 300.0f, true, true);
         }
     }
-    this->getItemId = 0;
 }
 
 RECOMP_PATCH void EnFsn_HandleCanPlayerBuyItem(EnFsn* this, PlayState* play) {
