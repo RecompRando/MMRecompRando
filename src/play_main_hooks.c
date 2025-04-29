@@ -548,3 +548,8 @@ void update_rando(PlayState* play) {
         }
     }
 }
+
+RECOMP_HOOK("FileSelect_Main")
+void fileselect_update() {
+    notificationUpdateCycle();
+}
