@@ -75,6 +75,9 @@ RECOMP_PATCH void Interface_SetSceneRestrictions(PlayState* play) {
         if (currentScene == SCENE_OKUJOU) {
             return;
         }
+        if (currentScene == SCENE_TOUGITES) {
+            return;
+        }
         if (currentScene == sRestrictionFlags[i].scene) {
             interfaceCtx->restrictions.hGauge = RESTRICTIONS_GET_HGAUGE(&sRestrictionFlags[i]);
             interfaceCtx->restrictions.all = RESTRICTIONS_GET_ALL(&sRestrictionFlags[i]);
