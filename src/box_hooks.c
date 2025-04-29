@@ -108,6 +108,7 @@ when set, gets cleared next EnBox_Update call and clip to the floor
 #define ENBOX_MOVE_0x80 (1 << 7)
 
 #define LOCATION_ENBOX ((0x060000) | (play->sceneId << 8) | ENBOX_GET_CHEST_FLAG(&this->dyna.actor))
+#define LOCATION_ENBOX_CHEST_GAME ((0x061700) | ENBOX_GET_ITEM(&this->dyna.actor))
 
 #define THIS ((EnBox*)thisx)
 
@@ -156,7 +157,11 @@ RECOMP_PATCH void EnBox_Init(Actor* thisx, PlayState* play) {
     this->movementFlags = 0;
 
     if (rando_get_camc_enabled()) {
-        switch (rando_get_location_type(LOCATION_ENBOX)) {
+        u32 chestType = rando_get_location_type(LOCATION_ENBOX);
+        if (LOCATION_ENBOX == 0x061700) {
+            chestType = rando_get_location_type(LOCATION_ENBOX_CHEST_GAME);
+        }
+        switch (chestType) {
             case 0:
             case 2:
                 this->type = ENBOX_TYPE_SMALL;
@@ -187,15 +192,24 @@ RECOMP_PATCH void EnBox_Init(Actor* thisx, PlayState* play) {
     thisx->shape.rot.x = this->dyna.actor.world.rot.x;
 
     if (LOCATION_ENBOX == 0x061700) {
-        if (ENBOX_GET_ITEM(&this->dyna.actor) == 0x0C) {
-            if (rando_location_is_checked(LOCATION_ENBOX)) {
+        if (rando_location_is_checked(LOCATION_ENBOX_CHEST_GAME)) {
+            if (ENBOX_GET_ITEM(&this->dyna.actor) == 0x0C) {
                 this->getItemId = GI_RUPEE_HUGE;
             } else {
-                this->getItemId = rando_get_item_id(LOCATION_ENBOX);
+                this->getItemId = ENBOX_GET_ITEM(thisx);
             }
         } else {
-            this->getItemId = ENBOX_GET_ITEM(thisx);
+            this->getItemId = rando_get_item_id(LOCATION_ENBOX_CHEST_GAME);
         }
+        // if (ENBOX_GET_ITEM(&this->dyna.actor) == 0x0C) {
+        //     if (rando_location_is_checked(LOCATION_ENBOX)) {
+        //         this->getItemId = GI_RUPEE_HUGE;
+        //     } else {
+        //         this->getItemId = rando_get_item_id(LOCATION_ENBOX);
+        //     }
+        // } else {
+        //     this->getItemId = ENBOX_GET_ITEM(thisx);
+        // }
     } else if (rando_location_is_checked(LOCATION_ENBOX)) {
         Flags_SetTreasure(play, ENBOX_GET_CHEST_FLAG(&this->dyna.actor));
     } else {
@@ -333,8 +347,13 @@ RECOMP_PATCH void EnBox_WaitOpen(EnBox* this, PlayState* play) {
         Animation_Change(&this->skelAnime, anim, playSpeed, 0.0f, endFrame, ANIMMODE_ONCE, 0.0f);
 
         // Account for Treasure Game chest (always same location)
-        if (LOCATION_ENBOX != 0x061700 || ENBOX_GET_ITEM(&this->dyna.actor) == 0x0C) {
-            rando_send_location(LOCATION_ENBOX);
+        // if (LOCATION_ENBOX != 0x061700 || ENBOX_GET_ITEM(&this->dyna.actor) == 0x0C) {
+        //     recomp_printf("box location: 0x%06X, box item: 0x%06X\n", LOCATION_ENBOX, ENBOX_GET_ITEM((Actor*) this));
+        // }
+        if (LOCATION_ENBOX == 0x061700) {
+            // recomp_printf("box location: 0x%06X, box item: 0x%06X\n", LOCATION_ENBOX, ENBOX_GET_ITEM((Actor*) this));
+            recomp_printf("box location: 0x%06X, box item: 0x%06X\n", LOCATION_ENBOX_CHEST_GAME, ENBOX_GET_ITEM((Actor*) this));
+        } else {
             recomp_printf("box location: 0x%06X, box item: 0x%06X\n", LOCATION_ENBOX, ENBOX_GET_ITEM((Actor*) this));
         }
         EnBox_SetupAction(this, EnBox_Open);
@@ -373,8 +392,9 @@ RECOMP_PATCH void EnBox_WaitOpen(EnBox* this, PlayState* play) {
             }
 
             if (LOCATION_ENBOX == 0x061700) {
-                if (ENBOX_GET_ITEM(&this->dyna.actor) == 0x0C && !rando_location_is_checked(LOCATION_ENBOX)) {
-                    Actor_OfferGetItemHook(&this->dyna.actor, play, -this->getItemId, 0, 50.0f, 10.0f, false, true);
+                // if (ENBOX_GET_ITEM(&this->dyna.actor) == 0x0C && !rando_location_is_checked(LOCATION_ENBOX)) {
+                if (!rando_location_is_checked(LOCATION_ENBOX_CHEST_GAME)) {
+                    Actor_OfferGetItemHook(&this->dyna.actor, play, -this->getItemId, LOCATION_ENBOX_CHEST_GAME, 50.0f, 10.0f, false, true);
                 } else {
                     Actor_OfferGetItemHook(&this->dyna.actor, play, -this->getItemId, 0, 50.0f, 10.0f, false, false);
                 }
@@ -399,11 +419,18 @@ extern Gfx gBoxChestLidDL[];
 RECOMP_PATCH void EnBox_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3s* rot, Actor* thisx, Gfx** gfx) {
     s32 pad;
     EnBox* this = THIS;
+    s16 trueGI;
+
+    if (LOCATION_ENBOX == 0x061700) {
+        trueGI = rando_get_item_id(LOCATION_ENBOX_CHEST_GAME);
+    } else {
+        trueGI = rando_get_item_id(LOCATION_ENBOX);
+    }
 
     if (limbIndex == OBJECT_BOX_CHEST_LIMB_01) {
         gSPMatrix((*gfx)++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
         if (rando_get_camc_enabled()) {
-            switch (rando_get_item_id(LOCATION_ENBOX)) {
+            switch (trueGI) {
                 case GI_AP_FILLER:
                     gSPDisplayList((*gfx)++, &apJunkChestBaseDL);
                     return;
@@ -445,7 +472,7 @@ RECOMP_PATCH void EnBox_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList
     } else if (limbIndex == OBJECT_BOX_CHEST_LIMB_03) {
         gSPMatrix((*gfx)++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
         if (rando_get_camc_enabled()) {
-            switch (rando_get_item_id(LOCATION_ENBOX)) {
+            switch (trueGI) {
                 case GI_AP_FILLER:
                     gSPDisplayList((*gfx)++, &apJunkChestLidDL);
                     return;
