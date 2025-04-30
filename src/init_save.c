@@ -254,8 +254,9 @@ void Sram_ResetSaveCycle(PlayState* play) {
     SET_STOLEN_ITEM_2(STOLEN_ITEM_NONE);
 
     for (i = SLOT_BOTTLE_1; i <= SLOT_BOTTLE_6; i++) {
-        // Check for Deku Princess
-        if (gSaveContext.save.saveInfo.inventory.items[i] == ITEM_DEKU_PRINCESS) {
+        // Check for Deku Princess and Gold Dust
+        if (gSaveContext.save.saveInfo.inventory.items[i] == ITEM_DEKU_PRINCESS ||
+            gSaveContext.save.saveInfo.inventory.items[i] == ITEM_GOLD_DUST) {
             for (j = EQUIP_SLOT_C_LEFT; j <= EQUIP_SLOT_C_RIGHT; j++) {
                 if (GET_CUR_FORM_BTN_ITEM(j) == gSaveContext.save.saveInfo.inventory.items[i]) {
                     SET_CUR_FORM_BTN_ITEM(j, ITEM_BOTTLE);

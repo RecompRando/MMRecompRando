@@ -16,7 +16,6 @@ typedef void (*EnGkActionFunc)(struct EnGk*, PlayState*);
 #define ENGK_PATH_INDEX_NONE 0xF
 
 #define OBJECT_GK_LIMB_MAX 0x14
-#define ENGK_ANIM_3 0x3
 
 typedef enum {
     /* 0 */ ENGK_F_0,
@@ -26,6 +25,24 @@ typedef enum {
     /* 4 */ ENGK_F_4,
     /* 5 */ ENGK_F_5
 } EnGkParam;
+
+typedef enum {
+    /*  -1 */ ENGK_ANIM_NONE = -1,
+    /* 0x0 */ ENGK_ANIM_0,
+    /* 0x1 */ ENGK_ANIM_1,
+    /* 0x2 */ ENGK_ANIM_2,
+    /* 0x3 */ ENGK_ANIM_3,
+    /* 0x4 */ ENGK_ANIM_4,
+    /* 0x5 */ ENGK_ANIM_5,
+    /* 0x6 */ ENGK_ANIM_6,
+    /* 0x7 */ ENGK_ANIM_7,
+    /* 0x8 */ ENGK_ANIM_8,
+    /* 0x9 */ ENGK_ANIM_9,
+    /* 0xA */ ENGK_ANIM_10,
+    /* 0xB */ ENGK_ANIM_11,
+    /* 0xC */ ENGK_ANIM_12,
+    /* 0xD */ ENGK_ANIM_MAX
+} EnGkAnimation;
 
 typedef struct EnGk {
     /* 0x000 */ Actor actor;
@@ -62,8 +79,6 @@ typedef struct EnGk {
     /* 0x350 */ s16 unk_350;
     /* 0x354 */ f32 unk_354;
 } EnGk; // size = 0x358
-
-#define ENGK_ANIM_MAX 0xD
 
 extern AnimationHeader object_gk_Anim_00787C;
 extern AnimationHeader object_gk_Anim_007DC4;
@@ -143,4 +158,226 @@ RECOMP_PATCH s32 func_80B50854(EnGk* this, PlayState* play) {
         return true;
     }
     return false;
+}
+
+void func_80B51D9C(EnGk* this, PlayState* play);
+void func_80B51970(EnGk* this, PlayState* play);
+void func_80B51B40(EnGk* this, PlayState* play);
+void func_80B51760(EnGk* this, PlayState* play);
+void func_80B525E0(EnGk* this, PlayState* play);
+u16 func_80B50410(EnGk* this, PlayState* play);
+
+void EnGk_GiveGoldDust(EnGk* this, PlayState* play) {
+    if (Actor_HasParent(&this->actor, play)) {
+        this->actor.parent = NULL;
+        this->actionFunc = func_80B51760;
+    } else {
+        Actor_OfferGetItemHook(&this->actor, play, GI_GOLD_DUST_2, 0, 300.0f, 300.0f, true, false);
+    }
+}
+
+RECOMP_PATCH void func_80B5253C(EnGk* this, PlayState* play) {
+    if (Actor_HasParent(&this->actor, play)) {
+        this->actor.parent = NULL;
+        this->actionFunc = func_80B525E0;
+    } else {
+        Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(GI_GOLD_DUST), GI_GOLD_DUST, 300.0f, 300.0f, true, true);
+    }
+}
+
+RECOMP_PATCH void func_80B51760(EnGk* this, PlayState* play) {
+    s16 curFrame = this->skelAnime.curFrame;
+    s16 endFrame;
+
+    if (this->animIndex == ENGK_ANIM_11) {
+        endFrame = Animation_GetLastFrame(sAnimationInfo[this->animIndex].animation);
+        if (curFrame == endFrame) {
+            this->animIndex = ENGK_ANIM_5;
+            Actor_ChangeAnimationByInfo(&this->skelAnime, sAnimationInfo, this->animIndex);
+        }
+    } else if (this->animIndex == ENGK_ANIM_10) {
+        endFrame = Animation_GetLastFrame(sAnimationInfo[this->animIndex].animation);
+        if (curFrame == endFrame) {
+            this->animIndex = ENGK_ANIM_11;
+            Actor_ChangeAnimationByInfo(&this->skelAnime, sAnimationInfo, this->animIndex);
+        }
+    } else {
+        if (Flags_GetSwitch(play, ENGK_GET_SWITCH_FLAG(&this->actor))) {
+            SET_WEEKEVENTREG(WEEKEVENTREG_40_40);
+            this->actionFunc = func_80B51D9C;
+            return;
+        }
+
+        if (Actor_ProcessTalkRequest(&this->actor, &play->state)) {
+            this->unk_1E4 |= 4;
+            this->unk_31C = func_80B50410(this, play);
+            Message_StartTextbox(play, this->unk_31C, &this->actor);
+            this->actionFunc = func_80B51970;
+            if (this->unk_31C == 0xE81) {
+                this->animIndex = ENGK_ANIM_0;
+                this->unk_1E4 |= 2;
+            } else if (this->unk_31C == 0xE92) {
+                this->actionFunc = EnGk_GiveGoldDust;
+            }
+        } else if (((this->actor.xzDistToPlayer < 100.0f) || this->actor.isLockedOn) &&
+                   (gSaveContext.save.entrance != ENTRANCE(GORON_RACETRACK, 1))) {
+            Actor_OfferTalkNearColChkInfoCylinder(&this->actor, play);
+        }
+
+        if (this->unk_1E4 & 4) {
+            Math_SmoothStepToS(&this->actor.shape.rot.y, this->actor.yawTowardsPlayer, 5, 0x1000, 0x100);
+            this->actor.world.rot.y = this->actor.shape.rot.y;
+        }
+    }
+}
+
+RECOMP_PATCH u16 func_80B50410(EnGk* this, PlayState* play) {
+    Player* player = GET_PLAYER(play);
+
+    if (play->sceneId == SCENE_17SETUGEN2) {
+        if (player->transformation == PLAYER_FORM_GORON) {
+            if (!CHECK_WEEKEVENTREG(WEEKEVENTREG_40_80)) {
+                switch (this->unk_31C) {
+                    case 0xE7A:
+                        return 0xE7B;
+
+                    case 0xE7B:
+                        return 0xE7C;
+
+                    case 0xE7C:
+                        return 0xE7D;
+
+                    case 0xE7D:
+                        return 0xE7E;
+
+                    case 0xE7E:
+                        return 0xE7F;
+
+                    case 0xE7F:
+                        SET_WEEKEVENTREG(WEEKEVENTREG_40_80);
+                        this->unk_1E4 |= 1;
+                        return 0xE80;
+
+                    default:
+                        return 0xE7A;
+                }
+            } else {
+                this->unk_1E4 |= 1;
+                return 0xE81;
+            }
+        } else if (!CHECK_WEEKEVENTREG(WEEKEVENTREG_41_01)) {
+            switch (this->unk_31C) {
+                case 0xE82:
+                    return 0xE83;
+
+                case 0xE83:
+                    return 0xE7D;
+
+                case 0xE7D:
+                    return 0xE7E;
+
+                case 0xE7E:
+                    return 0xE7F;
+
+                case 0xE7F:
+                    SET_WEEKEVENTREG(WEEKEVENTREG_41_01);
+                    this->unk_1E4 |= 1;
+                    return 0xE80;
+
+                default:
+                    return 0xE82;
+            }
+        } else {
+            this->unk_1E4 |= 1;
+            return 0xE81;
+        }
+    } else if (play->sceneId == SCENE_GORONRACE) {
+        if (player->transformation == PLAYER_FORM_GORON) {
+            if (rando_location_is_checked(GI_GOLD_DUST)) {
+                this->unk_1E4 |= 1;
+                return 0xE92;
+            }
+
+            if (!CHECK_WEEKEVENTREG(WEEKEVENTREG_41_04)) {
+                if (this->unk_31C == 0xE88) {
+                    // if (!CHECK_WEEKEVENTREG(WEEKEVENTREG_41_08) || Inventory_HasEmptyBottle()) {
+                    if (!rando_location_is_checked(GI_GOLD_DUST)) {
+                        return 0xE89;
+                    }
+                    SET_WEEKEVENTREG(WEEKEVENTREG_41_04);
+                    this->unk_1E4 |= 1;
+                    return 0xE94;
+                }
+                return 0xE88;
+            }
+
+            if ((this->unk_31C == 0xE8D) || (this->unk_31C == 0xE98)) {
+                // if (!CHECK_WEEKEVENTREG(WEEKEVENTREG_41_08) || Inventory_HasEmptyBottle()) {
+                if (!rando_location_is_checked(GI_GOLD_DUST)) {
+                    return 0xE89;
+                }
+                SET_WEEKEVENTREG(WEEKEVENTREG_41_04);
+                this->unk_1E4 |= 1;
+                return 0xE94;
+            }
+
+            if (this->unk_1E4 & 0x10) {
+                return 0xE8D;
+            }
+            return 0xE98;
+        }
+
+        if (!CHECK_WEEKEVENTREG(WEEKEVENTREG_41_02)) {
+            switch (this->unk_31C) {
+                case 0xE85:
+                    return 0xE86;
+
+                case 0xE86:
+                    SET_WEEKEVENTREG(WEEKEVENTREG_41_02);
+                    this->unk_1E4 |= 1;
+                    return 0xE87;
+
+                default:
+                    return 0xE85;
+            }
+        } else {
+            this->unk_1E4 |= 1;
+            return 0xE87;
+        }
+    }
+
+    return 0;
+}
+
+RECOMP_PATCH void func_80B52430(EnGk* this, PlayState* play) {
+    if ((Message_GetState(&play->msgCtx) == TEXT_STATE_DONE) && Message_ShouldAdvance(play)) {
+        switch (this->unk_31C) {
+            case 0xE93:
+                this->unk_31C = 0xE89;
+                Message_StartTextbox(play, this->unk_31C, &this->actor);
+                this->actionFunc = func_80B51B40;
+                return;
+
+            case 0xE90:
+                this->unk_31C = 0xE91;
+                Message_StartTextbox(play, this->unk_31C, &this->actor);
+                return;
+
+            case 0xE91:
+                this->actionFunc = func_80B5253C;
+                return;
+
+            case 0xE92:
+                this->unk_1E4 &= ~4;
+                // this->actionFunc = func_80B51760;
+                this->actionFunc = EnGk_GiveGoldDust;
+                return;
+
+            default:
+                break;
+        }
+    }
+
+    Math_SmoothStepToS(&this->actor.shape.rot.y, this->actor.yawTowardsPlayer, 5, 0x1000, 0x100);
+    this->actor.world.rot.y = this->actor.shape.rot.y;
 }
