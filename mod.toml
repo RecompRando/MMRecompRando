@@ -61,6 +61,7 @@ native_libraries = [
                                     "rando_get_moon_remains_required",
                                     "rando_get_majora_remains_required",
                                     "rando_get_tunic_color",
+                                    "rando_get_shop_price",
                                     "rando_skulltulas_enabled",
                                     "rando_shopsanity_enabled",
                                     "rando_scrubs_enabled",

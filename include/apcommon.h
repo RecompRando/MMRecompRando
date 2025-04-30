@@ -133,6 +133,7 @@ RECOMP_IMPORT(".", void rando_complete_goal());
 RECOMP_IMPORT(".", u32 rando_has_item(u32 item_id));
 RECOMP_IMPORT(".", u32 rando_has_item_async(u32 item_id));
 RECOMP_IMPORT(".", u32 rando_get_own_slot_id());
+RECOMP_IMPORT(".", s16 rando_get_shop_price(u32 shop_item_id));
 RECOMP_IMPORT(".", u32 rando_get_items_size());
 RECOMP_IMPORT(".", u32 rando_get_item(u32 items_i));
 RECOMP_IMPORT(".", u32 rando_get_sending_player(u32 items_i));
