@@ -83,6 +83,7 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
     uintptr_t i;
     u32 ffcount = 0;
     unsigned char* msg = NULL;
+    s16 price;
 
     // recomp_printf("text id: 0x%04X\n", textId);
 
@@ -331,9 +332,15 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         msg = shop_msg;
         font->msgBuf.schar[0] = 0x06;
         font->msgBuf.schar[1] = 0x30;
-        s16 price = 20; // temp
+        if (textId == 0x0880) {
+            price = rando_get_shop_price(0x02); // SI_POTION_BLUE
+        } else {
+            price = rando_get_shop_price(textId & 0xFF);
+        }
+        // recomp_printf("shop price: %d 0x%02X%02X\n", price, ((price & 0xFF00) >> 8), (price & 0xFF));
         font->msgBuf.schar[5] = (price & 0xFF00) >> 8;
         font->msgBuf.schar[6] = price & 0xFF;
+        msgCtx->unk1206C = price;
     }
 
     // if (msg == sk_msg || msg == bk_msg || msg == map_msg || msg == compass_msg) {
@@ -596,7 +603,6 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         font->msgBuf.schar[msg_i + 1] = ' ';
         msg_i += 2;
 
-        s16 price = 20; // temp (need to change above too)
         if (price >= 100) {
             font->msgBuf.schar[msg_i] = (price / 100) + 0x30;
             msg_i += 1;
