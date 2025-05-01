@@ -174,7 +174,9 @@ RECOMP_PATCH void EnGirlA_InitItem(PlayState* play, EnGirlA* this) {
         this->actor.draw = EnGirlA_Draw;
         return;
     }
-    
+
+    rando_broadcast_location_hint(LOCATION_SHOP_ITEM);
+
     shopObjectStatic[this->actor.params] = false;
     shopObjectLoading[this->actor.params] = false;
     shopObjectLoaded[this->actor.params] = false;
