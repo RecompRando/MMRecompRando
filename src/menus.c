@@ -88,6 +88,8 @@ void Setup_InitImpl(SetupState* this);
 
 void RandoMenu_Main(GameState* thisx) {
     SetupState* this = (SetupState*)thisx;
+    
+    notificationUpdateCycle();
 
     // Perform the original setup init after connection.
     if (rando_started) {
@@ -102,7 +104,7 @@ void RandoMenu_Main(GameState* thisx) {
             sprintf(file_name, "solo_%s", seed_name);
         }
         recomp_change_save_file(file_name);
-        
+
         colors_set_human_tunic(C_TO_PARAMS(rando_get_tunic_color()));
         Setup_InitImpl(this);
     }

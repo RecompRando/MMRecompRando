@@ -7,11 +7,18 @@
 #include "recompconfig.h"
 #include "libc/string.h"
 
+bool is_generate_menu_shown = false;
+
+bool randoGenerateMenuOpen() {
+    return is_generate_menu_shown;
+}
+
 RandoYamlConfigMenu yaml_config_menu;
 
 static void backPressed(RecompuiResource resource, const RecompuiEventData* data, void* userdata) {
     if (data->type == UI_EVENT_CLICK) {
         recompui_hide_context(yaml_config_menu.context);
+        is_generate_menu_shown = false;
         // Close the start menu context temporarily so that the solo context can be opened.
         recompui_close_context(yaml_config_menu.context);
         randoShowSoloMenu();
@@ -91,8 +98,22 @@ void randoYAMLGenerateCallback(RecompuiResource button, const RecompuiEventData*
 
         unsigned char* save_path = recomp_get_save_file_path();
         rando_yaml_finalize(save_path);
-        rando_solo_generate();
         recomp_free(save_path);
+
+        if (rando_solo_generate()) {
+            recompui_hide_context(yaml_config_menu.context);
+            is_generate_menu_shown = false;
+            // Close the start menu context temporarily so that the solo context can be opened.
+            recompui_close_context(yaml_config_menu.context);
+            randoShowSoloMenu();
+            // Reopen the start menu context.
+            recompui_open_context(yaml_config_menu.context);
+        }
+        else {
+            recompui_close_context(yaml_config_menu.context);
+            randoEmitErrorNotification("Failed to generate. Please report the settings you used to the developers.");
+            recompui_open_context(yaml_config_menu.context);
+        }
     }
 }
 
@@ -455,4 +476,5 @@ void randoCreateYamlConfigMenu() {
 
 void randoShowYamlConfigMenu() {
     recompui_show_context(yaml_config_menu.context);
+    is_generate_menu_shown = true;
 }

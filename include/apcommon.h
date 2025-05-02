@@ -204,5 +204,6 @@ void randoEmitRecieveNotification(const char* item_name, const char* from_name, 
 void randoEmitSendNotification(const char* item_name, const char* to_name, const ItemId item, RandoItemClassification item_class);
 void randoEmitNormalNotification(const char* notif_text);
 void randoEmitErrorNotification(const char* error_text);
+bool randoGenerateMenuOpen();
 
 #endif
