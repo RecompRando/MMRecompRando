@@ -84,6 +84,8 @@ RECOMP_PATCH void EnGirlA_Draw(Actor* thisx, PlayState* play) {
                 case GI_AP_PROG:
                 case GI_AP_USEFUL:
                 case GI_AP_FILLER:
+                    Matrix_RotateYS(DEG_TO_BINANG(-90), MTXMODE_APPLY);
+                    break;
                 case GI_ROOM_KEY:
                     Matrix_RotateYS(DEG_TO_BINANG(90), MTXMODE_APPLY);
                     break;
