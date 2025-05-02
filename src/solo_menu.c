@@ -183,12 +183,14 @@ void createSoloList() {
         u32 last_entry_index = solo_menu.entry_list_size - 1;
         recompui_set_nav(solo_menu.new_seed_button, NAVDIRECTION_UP, solo_menu.entry_list[last_entry_index].entry_button);
         recompui_set_nav(solo_menu.entry_list[last_entry_index].entry_button, NAVDIRECTION_DOWN, solo_menu.new_seed_button);
+        recompui_set_display(solo_menu.start_button, DISPLAY_BLOCK);
 
         selectEntry(0);
     }
     else {
         recompui_set_nav(solo_menu.new_seed_button, NAVDIRECTION_UP, solo_menu.back_button);
         recompui_set_nav(solo_menu.back_button, NAVDIRECTION_DOWN, solo_menu.new_seed_button);
+        recompui_set_display(solo_menu.start_button, DISPLAY_NONE);
     }
 }
 
