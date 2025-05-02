@@ -75,6 +75,7 @@ native_libraries = [
                                     "rando_complete_goal",
                                     "rando_has_item",
                                     "rando_has_item_async",
+                                    "rando_get_seed_name",
                                     "rando_get_own_slot_id",
                                     "rando_get_items_size",
                                     "rando_get_item",

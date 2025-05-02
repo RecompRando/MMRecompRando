@@ -7,6 +7,7 @@
 #include "yaml_generation.h"
 #include "menu_helpers.h"
 #include "recomputils.h"
+#include "recompconfig.h"
 
 void createUiFrame(RecompuiContext context, UiFrame* frame) {
     RecompuiColor bg_color;
@@ -75,9 +76,11 @@ RECOMP_IMPORT(".", int rando_get_tunic_color());
 RECOMP_IMPORT("mm_recomp_colors", void colors_set_human_tunic(u8 r, u8 g, u8 b));
 
 bool rando_started = false;
+bool is_multiworld = false;
 
-void randoStart() {
+void randoStart(bool multiworld) {
     rando_started = true;
+    is_multiworld = multiworld;
 }
 
 // Startup Menu
@@ -88,6 +91,18 @@ void RandoMenu_Main(GameState* thisx) {
 
     // Perform the original setup init after connection.
     if (rando_started) {
+        // Set the filename based on the seed and session type.
+        char seed_name[64];
+        char file_name[72];
+        rando_get_seed_name(seed_name, sizeof(seed_name));
+        if (is_multiworld) {
+            sprintf(file_name, "multi_%s", seed_name);
+        }
+        else {
+            sprintf(file_name, "solo_%s", seed_name);
+        }
+        recomp_change_save_file(file_name);
+        
         colors_set_human_tunic(C_TO_PARAMS(rando_get_tunic_color()));
         Setup_InitImpl(this);
     }

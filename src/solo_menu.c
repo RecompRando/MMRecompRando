@@ -170,7 +170,7 @@ static void startPressed(RecompuiResource resource, const RecompuiEventData* dat
         if (rando_init_solo(solo_menu.selected_entry)) {
             recomp_printf("Started successfully\n");
             recompui_hide_context(solo_menu.context);
-            randoStart();
+            randoStart(false);
         }
         else {
             recomp_printf("Failed to start solo\n");
