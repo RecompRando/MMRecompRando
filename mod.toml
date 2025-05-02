@@ -84,6 +84,12 @@ native_libraries = [
                                     "rando_yaml_init",
                                     "rando_yaml_puts",
                                     "rando_yaml_finalize",
+                                    "rando_init_solo",
+                                    "rando_scan_solo_seeds",
+                                    "rando_solo_count",
+                                    "rando_solo_get_name",
+                                    "rando_solo_get_generation_date",
+                                    "rando_solo_generate",
                                     "rando_get_location_item_player",
                                     "rando_get_location_item_name",
                                     "rando_get_last_location_sent"] }

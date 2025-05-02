@@ -105,9 +105,6 @@ void randoCreateAPConnectMenu() {
     recompui_close_context(connect_menu.context);
 }
 
-extern bool soloContext;
-
 void randoShowAPConnectMenu() {
     recompui_show_context(connect_menu.context);
-    soloContext = false;
 }

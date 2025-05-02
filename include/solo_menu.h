@@ -23,6 +23,8 @@ typedef struct {
     RecompuiResource list_container;
     // The details of the currently selected seed on the right side.
     RecompuiResource details_container;
+    // The button to start.
+    RecompuiResource start_button;
     // Bottom row that contains the new seed button. 
     RecompuiResource footer;
     // Button to return to the start menu.

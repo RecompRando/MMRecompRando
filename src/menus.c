@@ -83,19 +83,12 @@ void randoStart() {
 // Startup Menu
 void Setup_InitImpl(SetupState* this);
 
-extern bool soloContext;
-
 void RandoMenu_Main(GameState* thisx) {
     SetupState* this = (SetupState*)thisx;
 
     // Perform the original setup init after connection.
     if (rando_started) {
         colors_set_human_tunic(C_TO_PARAMS(rando_get_tunic_color()));
-
-        if (soloContext) {
-            recompui_hide_context(yaml_config_menu.context);
-        }
-
         Setup_InitImpl(this);
     }
 

@@ -1,37 +1,17 @@
 #include "recomputils.h"
+#include "recompconfig.h"
 
 #include "apcommon.h"
 #include "solo_menu.h"
 
-/////////////////////////////////////////////////////////
-// Dummy functions to be implemented in the glue layer //
-/////////////////////////////////////////////////////////
+RECOMP_IMPORT(".", void rando_scan_solo_seeds(const unsigned char* save_filename));
+RECOMP_IMPORT(".", u32 rando_solo_count());
+// Returns the actual string length
+RECOMP_IMPORT(".", u32 rando_solo_get_name(u32 seed_index, char* out, u32 max_length));
+// Returns the actual string length
+RECOMP_IMPORT(".", u32 rando_solo_get_generation_date(u32 seed_index, char* out, u32 max_length));
 
-u32 rando_num_solo_seeds() {
-    return 5;
-}
-
-// returns the actual string length
-u32 rando_solo_get_generation_date(u32 seed_index, char* out, u32 max_length) {
-    Lib_MemCpy(out, "March 18 2025", 14);
-    return 14;
-}
-
-// returns the actual string length
-u32 rando_solo_get_seed(u32 seed_index, char* out, u32 max_length) {
-    Lib_MemCpy(out, "123456789", 10);
-    return 10;
-}
-
-// returns the actual string length
-u32 rando_solo_get_slot_name(u32 seed_index, char* out, u32 max_length) {
-    Lib_MemCpy(out, "TestPlayer", 11);
-    return 11;
-}
-
-/////////////////////////
-// End dummy functions //
-/////////////////////////
+RECOMP_IMPORT(".", u32 rando_init_solo(u32 seed_index));
 
 RandoSoloMenu solo_menu;
 
@@ -114,7 +94,7 @@ void entrySelectedHandler(RecompuiResource resource, const RecompuiEventData* ev
     updateEntryStyle(entry, index);
 }
 
-void clearSoloListEntry(SeedEntry* entry, u32 index) {
+void createSoloListEntry(SeedEntry* entry, u32 index) {
     static const RecompuiColor SoloEntryBgColor = { 26, 24, 32, 255 };
     // static const RecompuiColor SoloEntryBorderColorDefault = { 242, 242, 242, 12 };
     static const RecompuiColor SoloEntryColorTextDefault = { 242, 242, 242, 255 };
@@ -144,7 +124,7 @@ void clearSoloListEntry(SeedEntry* entry, u32 index) {
     recompui_set_opacity(cur_button, 0.0f);
     recompui_register_callback(cur_button, entrySelectedHandler, (void*)index);
 
-    char datestr[32];
+    char datestr[64];
     rando_solo_get_generation_date(index, datestr, sizeof(datestr));
     RecompuiResource cur_label = recompui_create_label(solo_menu.context, cur_container, datestr, LABELSTYLE_NORMAL);
     recompui_set_font_size(cur_label, 20.0f, UNIT_DP);
@@ -157,12 +137,17 @@ void createSoloList() {
         clearSoloList();
     }
 
-    solo_menu.entry_list_size = rando_num_solo_seeds();
-    solo_menu.entry_list = (SeedEntry*)recomp_alloc(sizeof(solo_menu.entry_list[0]) * solo_menu.entry_list_size);
+    u8* save_path = recomp_get_save_file_path();
+    rando_scan_solo_seeds(save_path);
+    recomp_free(save_path);
+    solo_menu.entry_list_size = rando_solo_count();
+    if (solo_menu.entry_list_size != 0) {
+        solo_menu.entry_list = (SeedEntry*)recomp_alloc(sizeof(solo_menu.entry_list[0]) * solo_menu.entry_list_size);
 
-    for (u32 i = 0; i < solo_menu.entry_list_size; i++) {
-        SeedEntry* cur_entry = &solo_menu.entry_list[i];
-        clearSoloListEntry(cur_entry, i);
+        for (u32 i = 0; i < solo_menu.entry_list_size; i++) {
+            SeedEntry* cur_entry = &solo_menu.entry_list[i];
+            createSoloListEntry(cur_entry, i);
+        }
     }
 }
 
@@ -177,6 +162,22 @@ static void backPressed(RecompuiResource resource, const RecompuiEventData* data
     if (data->type == UI_EVENT_CLICK) {
         recompui_hide_context(solo_menu.context);
         randoShowStartMenu();
+    }
+}
+
+static void startPressed(RecompuiResource resource, const RecompuiEventData* data, void* userdata) {
+    if (data->type == UI_EVENT_CLICK) {
+        if (rando_init_solo(solo_menu.selected_entry)) {
+            recomp_printf("Started successfully\n");
+            recompui_hide_context(solo_menu.context);
+            randoStart();
+        }
+        else {
+            recomp_printf("Failed to start solo\n");
+            recompui_close_context(solo_menu.context);
+            randoEmitErrorNotification("Failed to load seed, file may be corrupted");
+            recompui_open_context(solo_menu.context);
+        }
     }
 }
 
@@ -256,6 +257,10 @@ void randoCreateSoloMenu() {
     recompui_set_display(solo_menu.details_container, DISPLAY_BLOCK);
     recompui_set_height(solo_menu.details_container, 300.0f, UNIT_PERCENT);
     recompui_set_max_height(solo_menu.details_container, 100.0f, UNIT_PERCENT);
+
+    // Create the start button
+    solo_menu.start_button = recompui_create_button(solo_menu.context, solo_menu.details_container, "Start", BUTTONSTYLE_SECONDARY);
+    recompui_register_callback(solo_menu.start_button, startPressed, NULL);
     
     // Create the footer.
     solo_menu.footer = recompui_create_element(solo_menu.context, solo_menu.frame.container);
@@ -289,13 +294,10 @@ void randoCreateSoloMenu() {
     recompui_close_context(solo_menu.context);
 }
 
-bool soloContext = false;
-
 void randoShowSoloMenu() {
     recompui_open_context(solo_menu.context);
     createSoloList();
     recompui_close_context(solo_menu.context);
 
     recompui_show_context(solo_menu.context);
-    soloContext = true;
 }

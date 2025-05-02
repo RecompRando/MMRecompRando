@@ -63,7 +63,7 @@ void randoYAMLGenerateCallback(RecompuiResource button, const RecompuiEventData*
         rando_yaml_init();
         rando_yaml_printf("name: Player\n");
         rando_yaml_printf("game: Majora's Mask Recompiled\n");
-        rando_yaml_printf("requires:\n  version: %s\n", "0.5.1"); // TODO hook this up to the mod version?
+        rando_yaml_printf("requires:\n  version: %s\n", "0.4.5"); // TODO hook this up to the mod version?
         rando_yaml_printf("Majora's Mask Recompiled:\n");
 
         // Iterate over the options and write their values into the yaml.
@@ -91,6 +91,7 @@ void randoYAMLGenerateCallback(RecompuiResource button, const RecompuiEventData*
 
         unsigned char* save_path = recomp_get_save_file_path();
         rando_yaml_finalize(save_path);
+        rando_solo_generate();
         recomp_free(save_path);
     }
 }
@@ -287,7 +288,7 @@ RandoOptionData* randoCreateFloatSliderOption(RandoYamlConfigMenu* menu, const c
 }
 
 static EnumOptionValue rando_accessibility_options[] = {
-    { "full", NULL },
+    { "locations", "Full" },
     { "minimal", NULL }
 };
 
