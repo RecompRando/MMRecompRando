@@ -130,6 +130,13 @@ typedef enum {
     SLIDERTYPE_INTEGER
 } RecompuiSliderType;
 
+typedef enum {
+    NAVDIRECTION_UP,
+    NAVDIRECTION_RIGHT,
+    NAVDIRECTION_DOWN,
+    NAVDIRECTION_LEFT,
+} RecompuiNavDirection;
+
 typedef struct {
     unsigned long type;
     float duration;
@@ -164,7 +171,7 @@ RECOMP_IMPORT("*", RecompuiResource recompui_create_label(RecompuiContext contex
 RECOMP_IMPORT("*", RecompuiResource recompui_create_textinput(RecompuiContext context, RecompuiResource parent));
 RECOMP_IMPORT("*", RecompuiResource recompui_create_passwordinput(RecompuiContext context, RecompuiResource parent));
 RECOMP_IMPORT("*", RecompuiResource recompui_create_labelradio(RecompuiContext context, RecompuiResource parent,
-    char** options, unsigned long num_options));
+    const char** options, unsigned long num_options));
 RECOMP_IMPORT("*", RecompuiResource recompui_create_slider(RecompuiContext context, RecompuiResource parent,
     RecompuiSliderType type, float min_value, float max_value, float step, float initial_value));
 RECOMP_IMPORT("*", RecompuiResource recompui_create_imageview(RecompuiContext context, RecompuiResource parent, RecompuiTextureHandle texture));
@@ -272,6 +279,11 @@ RECOMP_IMPORT("*", char* recompui_get_input_text(RecompuiResource id));
 RECOMP_IMPORT("*", void recompui_set_input_value_u32(RecompuiResource id, unsigned long val));
 RECOMP_IMPORT("*", void recompui_set_input_value_float(RecompuiResource id, float val));
 RECOMP_IMPORT("*", void recompui_set_input_text(RecompuiResource id, const char* text));
+
+// Navigation
+RECOMP_IMPORT("*", void recompui_set_nav_auto(RecompuiResource id, RecompuiNavDirection direction));
+RECOMP_IMPORT("*", void recompui_set_nav_none(RecompuiResource id, RecompuiNavDirection direction));
+RECOMP_IMPORT("*", void recompui_set_nav(RecompuiResource id, RecompuiNavDirection direction, RecompuiResource target_id));
 
 // Images
 RECOMP_IMPORT("*", RecompuiTextureHandle recompui_create_texture_rgba32(void* data, unsigned long width, unsigned long height));

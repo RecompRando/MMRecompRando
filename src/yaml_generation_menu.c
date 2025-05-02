@@ -471,6 +471,9 @@ void randoCreateYamlConfigMenu() {
     recompui_set_top(yaml_config_menu.back_button, 32.0f, UNIT_DP);
     recompui_register_callback(yaml_config_menu.back_button, backPressed, NULL);
 
+    recompui_set_nav(yaml_config_menu.generate_button, NAVDIRECTION_DOWN, yaml_config_menu.all_options[0].input_element);
+    recompui_set_nav(yaml_config_menu.all_options[0].input_element, NAVDIRECTION_UP, yaml_config_menu.generate_button);
+
     recompui_close_context(yaml_config_menu.context);
 }
 

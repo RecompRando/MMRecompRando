@@ -67,7 +67,9 @@ void selectEntry(u32 index) {
 
     if (old_index < solo_menu.entry_list_size) {
         updateEntryStyle(&solo_menu.entry_list[old_index], old_index);
-        
+    }
+
+    if (index < solo_menu.entry_list_size) {
         char label_buffer[128];
         char text_buffer[64];
         
@@ -78,6 +80,11 @@ void selectEntry(u32 index) {
         rando_solo_get_seed_name(index, text_buffer, sizeof(text_buffer));
         sprintf(label_buffer, "Seed: %s\n", text_buffer);
         recompui_set_text(solo_menu.details_seedname, label_buffer);
+        
+        recompui_set_nav(solo_menu.start_button, NAVDIRECTION_LEFT, solo_menu.entry_list[index].entry_button);
+    }
+    else {
+        recompui_set_nav(solo_menu.start_button, NAVDIRECTION_LEFT, solo_menu.back_button);
     }
 }
 
@@ -127,6 +134,7 @@ void createSoloListEntry(SeedEntry* entry, u32 index) {
     // Create an invisible button on top of the container.
     // Use absolute positioning and make it take up the entire size of the container.
     RecompuiResource cur_button = recompui_create_button(solo_menu.context, cur_container, "", BUTTONSTYLE_PRIMARY);
+    entry->entry_button = cur_button;
     recompui_set_position(cur_button, POSITION_ABSOLUTE);
     recompui_set_left(cur_button, 0.0f, UNIT_DP);
     recompui_set_right(cur_button, 0.0f, UNIT_DP);
@@ -138,7 +146,10 @@ void createSoloListEntry(SeedEntry* entry, u32 index) {
     char datestr[64];
     rando_solo_get_generation_date(index, datestr, sizeof(datestr));
     RecompuiResource cur_label = recompui_create_label(solo_menu.context, cur_container, datestr, LABELSTYLE_NORMAL);
+    entry->entry_label = cur_label;
     recompui_set_font_size(cur_label, 20.0f, UNIT_DP);
+
+    recompui_set_nav(cur_button, NAVDIRECTION_RIGHT, solo_menu.start_button);
 
     updateEntryStyle(entry, index);
 }
@@ -158,9 +169,26 @@ void createSoloList() {
         for (u32 i = 0; i < solo_menu.entry_list_size; i++) {
             SeedEntry* cur_entry = &solo_menu.entry_list[i];
             createSoloListEntry(cur_entry, i);
+            
+            if (i == 0) {
+                recompui_set_nav(cur_entry->entry_button, NAVDIRECTION_UP, solo_menu.back_button);
+                recompui_set_nav(solo_menu.back_button, NAVDIRECTION_DOWN, cur_entry->entry_button);
+            }
+            else {
+                recompui_set_nav(cur_entry->entry_button, NAVDIRECTION_UP, solo_menu.entry_list[i - 1].entry_button);
+                recompui_set_nav(solo_menu.entry_list[i - 1].entry_button, NAVDIRECTION_DOWN, cur_entry->entry_button);
+            }
         }
 
+        u32 last_entry_index = solo_menu.entry_list_size - 1;
+        recompui_set_nav(solo_menu.new_seed_button, NAVDIRECTION_UP, solo_menu.entry_list[last_entry_index].entry_button);
+        recompui_set_nav(solo_menu.entry_list[last_entry_index].entry_button, NAVDIRECTION_DOWN, solo_menu.new_seed_button);
+
         selectEntry(0);
+    }
+    else {
+        recompui_set_nav(solo_menu.new_seed_button, NAVDIRECTION_UP, solo_menu.back_button);
+        recompui_set_nav(solo_menu.back_button, NAVDIRECTION_DOWN, solo_menu.new_seed_button);
     }
 }
 
