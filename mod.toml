@@ -88,7 +88,7 @@ native_libraries = [
                                     "rando_init_solo",
                                     "rando_scan_solo_seeds",
                                     "rando_solo_count",
-                                    "rando_solo_get_name",
+                                    "rando_solo_get_seed_name",
                                     "rando_solo_get_generation_date",
                                     "rando_solo_generate",
                                     "rando_get_location_item_player",

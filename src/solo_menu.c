@@ -7,7 +7,7 @@
 RECOMP_IMPORT(".", void rando_scan_solo_seeds(const unsigned char* save_filename));
 RECOMP_IMPORT(".", u32 rando_solo_count());
 // Returns the actual string length
-RECOMP_IMPORT(".", u32 rando_solo_get_name(u32 seed_index, char* out, u32 max_length));
+RECOMP_IMPORT(".", u32 rando_solo_get_seed_name(u32 seed_index, char* out, u32 max_length));
 // Returns the actual string length
 RECOMP_IMPORT(".", u32 rando_solo_get_generation_date(u32 seed_index, char* out, u32 max_length));
 
@@ -67,6 +67,17 @@ void selectEntry(u32 index) {
 
     if (old_index < solo_menu.entry_list_size) {
         updateEntryStyle(&solo_menu.entry_list[old_index], old_index);
+        
+        char label_buffer[128];
+        char text_buffer[64];
+        
+        rando_solo_get_generation_date(index, text_buffer, sizeof(text_buffer));
+        sprintf(label_buffer, "Generated: %s\n", text_buffer);
+        recompui_set_text(solo_menu.details_time, label_buffer);
+
+        rando_solo_get_seed_name(index, text_buffer, sizeof(text_buffer));
+        sprintf(label_buffer, "Seed: %s\n", text_buffer);
+        recompui_set_text(solo_menu.details_seedname, label_buffer);
     }
 }
 
@@ -148,6 +159,8 @@ void createSoloList() {
             SeedEntry* cur_entry = &solo_menu.entry_list[i];
             createSoloListEntry(cur_entry, i);
         }
+
+        selectEntry(0);
     }
 }
 
@@ -254,13 +267,40 @@ void randoCreateSoloMenu() {
     recompui_set_flex_basis(solo_menu.details_container, 200.0f, UNIT_PERCENT);
     
     // Set the details container's properties.
-    recompui_set_display(solo_menu.details_container, DISPLAY_BLOCK);
+    recompui_set_display(solo_menu.details_container, DISPLAY_FLEX);
+    recompui_set_flex_direction(solo_menu.details_container, FLEX_DIRECTION_COLUMN);
     recompui_set_height(solo_menu.details_container, 300.0f, UNIT_PERCENT);
     recompui_set_max_height(solo_menu.details_container, 100.0f, UNIT_PERCENT);
+    
+    // Create the divisions of the details container.
+    solo_menu.details_header = recompui_create_element(solo_menu.context, solo_menu.details_container);
+    recompui_set_flex_grow(solo_menu.details_header, 0.0f);
+    recompui_set_flex_shrink(solo_menu.details_header, 0.0f);
+    recompui_set_padding(solo_menu.details_header, 8.0f, UNIT_DP);
 
-    // Create the start button
-    solo_menu.start_button = recompui_create_button(solo_menu.context, solo_menu.details_container, "Start", BUTTONSTYLE_SECONDARY);
+    solo_menu.details_body = recompui_create_element(solo_menu.context, solo_menu.details_container);
+    recompui_set_flex_grow(solo_menu.details_body, 1.0f);
+    recompui_set_flex_shrink(solo_menu.details_body, 0.0f);
+
+    solo_menu.details_footer = recompui_create_element(solo_menu.context, solo_menu.details_container);
+    recompui_set_flex_grow(solo_menu.details_footer, 0.0f);
+    recompui_set_flex_shrink(solo_menu.details_footer, 0.0f);
+
+    recompui_set_display(solo_menu.details_footer, DISPLAY_FLEX);
+    recompui_set_flex_direction(solo_menu.details_footer, FLEX_DIRECTION_ROW);
+    recompui_set_justify_content(solo_menu.details_footer, JUSTIFY_CONTENT_CENTER);
+    recompui_set_padding(solo_menu.details_footer, 8.0f, UNIT_DP);
+
+    // Create the labels in the details header.
+    solo_menu.details_time = recompui_create_label(solo_menu.context, solo_menu.details_header, "", LABELSTYLE_NORMAL);
+    recompui_set_margin_bottom(solo_menu.details_time, 8.0f, UNIT_DP);
+    solo_menu.details_seedname = recompui_create_label(solo_menu.context, solo_menu.details_header, "", LABELSTYLE_NORMAL);
+
+    // Create the start button.
+    solo_menu.start_button = recompui_create_button(solo_menu.context, solo_menu.details_footer, "Start", BUTTONSTYLE_SECONDARY);
     recompui_register_callback(solo_menu.start_button, startPressed, NULL);
+    recompui_set_width(solo_menu.start_button, 300.0f, UNIT_DP);
+    recompui_set_text_align(solo_menu.start_button, TEXT_ALIGN_CENTER);
     
     // Create the footer.
     solo_menu.footer = recompui_create_element(solo_menu.context, solo_menu.frame.container);
