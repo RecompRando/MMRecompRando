@@ -9,6 +9,7 @@
 RECOMP_IMPORT(".", void rando_yaml_init());
 RECOMP_IMPORT(".", void rando_yaml_puts(const char* text, u32 size));
 RECOMP_IMPORT(".", void rando_yaml_finalize(const unsigned char* save_path));
+RECOMP_IMPORT(".", bool rando_solo_generate());
 
 #define MAX_OPTIONS 64
 

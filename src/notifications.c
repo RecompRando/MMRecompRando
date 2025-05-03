@@ -52,23 +52,30 @@ INCBIN(ap_logo_junk_png, "textures/apLogoFiller.dds")
 #define ICON_ITEM_TEX_SIZE ((ICON_ITEM_TEX_WIDTH * ICON_ITEM_TEX_HEIGHT) * 4)
 
 void setNotificationPosition() {
-    switch (recomp_get_config_u32("notification_position")) {
-        case 0: // top left
-            recompui_set_flex_direction(notif_container, FLEX_DIRECTION_COLUMN_REVERSE);
-            recompui_set_align_items(notif_container, ALIGN_ITEMS_FLEX_START);
-            break;
-        case 1: // top right
-            recompui_set_flex_direction(notif_container, FLEX_DIRECTION_COLUMN_REVERSE);
-            recompui_set_align_items(notif_container, ALIGN_ITEMS_FLEX_END);
-            break;
-        case 2: // bottom left
-            recompui_set_flex_direction(notif_container, FLEX_DIRECTION_COLUMN);
-            recompui_set_align_items(notif_container, ALIGN_ITEMS_FLEX_START);
-            break;
-        case 3: // bottom right
-            recompui_set_flex_direction(notif_container, FLEX_DIRECTION_COLUMN);
-            recompui_set_align_items(notif_container, ALIGN_ITEMS_FLEX_END);
-            break;
+    // Force notifications to the top right corner in the generate menu so they don't overlap the back button.
+    if (randoGenerateMenuOpen()) {
+        recompui_set_flex_direction(notif_container, FLEX_DIRECTION_COLUMN_REVERSE);
+        recompui_set_align_items(notif_container, ALIGN_ITEMS_FLEX_END);
+    }
+    else {
+        switch (recomp_get_config_u32("notification_position")) {
+            case 0: // top left
+                recompui_set_flex_direction(notif_container, FLEX_DIRECTION_COLUMN_REVERSE);
+                recompui_set_align_items(notif_container, ALIGN_ITEMS_FLEX_START);
+                break;
+            case 1: // top right
+                recompui_set_flex_direction(notif_container, FLEX_DIRECTION_COLUMN_REVERSE);
+                recompui_set_align_items(notif_container, ALIGN_ITEMS_FLEX_END);
+                break;
+            case 2: // bottom left
+                recompui_set_flex_direction(notif_container, FLEX_DIRECTION_COLUMN);
+                recompui_set_align_items(notif_container, ALIGN_ITEMS_FLEX_START);
+                break;
+            case 3: // bottom right
+                recompui_set_flex_direction(notif_container, FLEX_DIRECTION_COLUMN);
+                recompui_set_align_items(notif_container, ALIGN_ITEMS_FLEX_END);
+                break;
+        }
     }
 }
 

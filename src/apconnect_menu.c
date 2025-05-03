@@ -17,7 +17,7 @@ static void connectPressed(RecompuiResource resource, const RecompuiEventData* d
         recomp_free(password_text);
 
         if (success) {
-            randoStart();
+            randoStart(true);
             recompui_hide_context(connect_menu.context);
             recompui_close_context(connect_menu.context);
             randoEmitNormalNotification("Successfully connected");
@@ -105,9 +105,6 @@ void randoCreateAPConnectMenu() {
     recompui_close_context(connect_menu.context);
 }
 
-extern bool soloContext;
-
 void randoShowAPConnectMenu() {
     recompui_show_context(connect_menu.context);
-    soloContext = false;
 }

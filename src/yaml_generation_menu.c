@@ -7,11 +7,18 @@
 #include "recompconfig.h"
 #include "libc/string.h"
 
+bool is_generate_menu_shown = false;
+
+bool randoGenerateMenuOpen() {
+    return is_generate_menu_shown;
+}
+
 RandoYamlConfigMenu yaml_config_menu;
 
 static void backPressed(RecompuiResource resource, const RecompuiEventData* data, void* userdata) {
     if (data->type == UI_EVENT_CLICK) {
         recompui_hide_context(yaml_config_menu.context);
+        is_generate_menu_shown = false;
         // Close the start menu context temporarily so that the solo context can be opened.
         recompui_close_context(yaml_config_menu.context);
         randoShowSoloMenu();
@@ -63,7 +70,7 @@ void randoYAMLGenerateCallback(RecompuiResource button, const RecompuiEventData*
         rando_yaml_init();
         rando_yaml_printf("name: Player\n");
         rando_yaml_printf("game: Majora's Mask Recompiled\n");
-        rando_yaml_printf("requires:\n  version: %s\n", "0.5.1"); // TODO hook this up to the mod version?
+        rando_yaml_printf("requires:\n  version: %s\n", "0.4.5"); // TODO hook this up to the mod version?
         rando_yaml_printf("Majora's Mask Recompiled:\n");
 
         // Iterate over the options and write their values into the yaml.
@@ -92,6 +99,21 @@ void randoYAMLGenerateCallback(RecompuiResource button, const RecompuiEventData*
         unsigned char* save_path = recomp_get_save_file_path();
         rando_yaml_finalize(save_path);
         recomp_free(save_path);
+
+        if (rando_solo_generate()) {
+            recompui_hide_context(yaml_config_menu.context);
+            is_generate_menu_shown = false;
+            // Close the start menu context temporarily so that the solo context can be opened.
+            recompui_close_context(yaml_config_menu.context);
+            randoShowSoloMenu();
+            // Reopen the start menu context.
+            recompui_open_context(yaml_config_menu.context);
+        }
+        else {
+            recompui_close_context(yaml_config_menu.context);
+            randoEmitErrorNotification("Failed to generate. Please report the settings you used to the developers.");
+            recompui_open_context(yaml_config_menu.context);
+        }
     }
 }
 
@@ -287,7 +309,7 @@ RandoOptionData* randoCreateFloatSliderOption(RandoYamlConfigMenu* menu, const c
 }
 
 static EnumOptionValue rando_accessibility_options[] = {
-    { "full", NULL },
+    { "locations", "Full" },
     { "minimal", NULL }
 };
 
@@ -449,9 +471,13 @@ void randoCreateYamlConfigMenu() {
     recompui_set_top(yaml_config_menu.back_button, 32.0f, UNIT_DP);
     recompui_register_callback(yaml_config_menu.back_button, backPressed, NULL);
 
+    recompui_set_nav(yaml_config_menu.generate_button, NAVDIRECTION_DOWN, yaml_config_menu.all_options[0].input_element);
+    recompui_set_nav(yaml_config_menu.all_options[0].input_element, NAVDIRECTION_UP, yaml_config_menu.generate_button);
+
     recompui_close_context(yaml_config_menu.context);
 }
 
 void randoShowYamlConfigMenu() {
     recompui_show_context(yaml_config_menu.context);
+    is_generate_menu_shown = true;
 }
