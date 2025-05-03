@@ -183,6 +183,9 @@ RecompuiResource create_basic_notification_element() {
     return notification;
 }
 
+extern u64 gArrowTex[];
+extern u64 gRupeeCounterIconTex[];
+
 RecompuiTextureHandle notification_get_item_image(const u8 item) {
     if (cached_texture_handles[item] != 0) {
         return cached_texture_handles[item];
@@ -209,7 +212,90 @@ RecompuiTextureHandle notification_get_item_image(const u8 item) {
             } else if (item == ITEM_BOMBERS_NOTEBOOK) {
                 CmpDma_LoadFile((uintptr_t)SEGMENT_ROM_START(icon_item_static_yar), ITEM_SONG_SONATA, item_texture_data, 0x1000);
                 item_texture_handle = recompui_create_texture_rgba32(item_texture_data, ICON_ITEM_TEX_WIDTH, ICON_ITEM_TEX_HEIGHT);
-            // TODO: rupees/arrows
+            // arrows
+            } else if (item == ITEM_ARROWS_30) {
+                // u16 array to make each index a single 2 byte pixel
+                u16* arrow_data = Lib_SegmentedToVirtual(gArrowTex);
+                for (int i = 0; i < 32 * 32; i++) {
+                    item_texture_data[i * 4 + 0] = (((arrow_data[i] >> 11) & 0x1F) * 255 + 15) / 31; 
+                    item_texture_data[i * 4 + 1] = (((arrow_data[i] >> 6) & 0x1F) * 255 + 15) / 31;
+                    item_texture_data[i * 4 + 2] = (((arrow_data[i] >> 1) & 0x1F) * 255 + 15) / 31;
+                    item_texture_data[i * 4 + 3] = (arrow_data[i] & 0x0001) * 255;
+                }
+                item_texture_handle = recompui_create_texture_rgba32(item_texture_data, ICON_ITEM_TEX_WIDTH, ICON_ITEM_TEX_HEIGHT);
+            // rupees
+            } else if (item == ITEM_RUPEE_GREEN ||
+                       item == ITEM_RUPEE_BLUE ||
+                       item == ITEM_RUPEE_10 ||
+                       item == ITEM_RUPEE_RED ||
+                       item == ITEM_RUPEE_PURPLE ||
+                       item == ITEM_RUPEE_SILVER ||
+                       item == ITEM_RUPEE_HUGE
+                       ) {
+                u32 color_r;
+                u32 color_g;
+                u32 color_b;
+
+                switch (item) {
+                    case ITEM_RUPEE_GREEN:
+                        color_r = 200;
+                        color_g = 0;
+                        color_b = 255;
+                        break;
+                    case ITEM_RUPEE_BLUE:
+                        color_r = 0;
+                        color_g = 200;
+                        color_b = 255;
+                        break;
+                    case ITEM_RUPEE_10:
+                        color_r = 255;
+                        color_g = 0;
+                        color_b = 80;
+                        break;
+                    case ITEM_RUPEE_RED:
+                        color_r = 255;
+                        color_g = 100;
+                        color_b = 100;
+                        break;
+                    case ITEM_RUPEE_PURPLE:
+                        color_r = 255;
+                        color_g = 80;
+                        color_b = 255;
+                        break;
+                    case ITEM_RUPEE_SILVER:
+                        color_r = 240;
+                        color_g = 250;
+                        color_b = 250;
+                        break;
+                    case ITEM_RUPEE_HUGE:
+                        color_r = 255;
+                        color_g = 240;
+                        color_b = 0;
+                        break;
+                }
+
+                // thanks to wiseguy for help with this
+
+                // Make sure gSegments[2] is set to the pointer where parameter_static is loaded, since parameter_static is in RSP segment 2
+                gSegments[2] = OS_K0_TO_PHYSICAL(gPlay->interfaceCtx.parameterSegment);
+                u8* rupee_data = Lib_SegmentedToVirtual(gRupeeCounterIconTex);
+
+                for (int i = 0; i < 16 * 16; i++) {
+                    // Every pixel of an ia8 is 2 bytes (1 pixel per i)
+                    // The first byte is the amount of color (intensity)
+                    u8 rupee_intensity = (rupee_data[i] >> 4) * 0xF;
+                    // The second byte is the alpha
+                    u8 rupee_alpha = (rupee_data[i] & 0xF) * 0xF;
+                    // RGBA32 is 4 bytes per pixel (so i * 4), in order of RGBA 
+                    // Mix the rupee intensity with the target rupee color and divide by 255 to scale back down to the right magnitude.
+                    item_texture_data[i * 4 + 0] = (rupee_intensity * color_r) / 255;
+                    item_texture_data[i * 4 + 1] = (rupee_intensity * color_g) / 255;
+                    item_texture_data[i * 4 + 2] = (rupee_intensity * color_b) / 255;
+                    // Copy the input alpha to the output alpha directly
+                    item_texture_data[i * 4 + 3] = rupee_alpha;
+                }
+
+                item_texture_handle = recompui_create_texture_rgba32(item_texture_data, 16, 16);
             // normal items
             } else {
                 CmpDma_LoadFile((uintptr_t)SEGMENT_ROM_START(icon_item_static_yar), item, item_texture_data, sizeof(item_texture_data));

@@ -341,15 +341,7 @@ ItemId randoConvertItemId(u32 ap_item_id) {
                     }
                     return MIN(ITEM_QUIVER_30 + rando_has_item(GI_QUIVER_30) - 1, ITEM_QUIVER_50);
                 case GI_ARROWS_30:
-                    return ITEM_BOW; // might be confusing when you don't have bow
-                case GI_RUPEE_GREEN:
-                case GI_RUPEE_BLUE:
-                case GI_RUPEE_10:
-                case GI_RUPEE_RED:
-                case GI_RUPEE_PURPLE:
-                case GI_RUPEE_SILVER:
-                case GI_RUPEE_HUGE:
-                    return ITEM_WALLET_DEFAULT; // temp
+                    return ITEM_ARROWS_30;
             }
         default:
             return (ItemId) giToItemId[ap_item_id & 0xFF];
