@@ -138,9 +138,6 @@ RECOMP_PATCH void Sram_InitNewSave(void) {
         gSaveContext.save.timeSpeedOffset = -2;
     }
 
-    // TODO: hide song on quest screen + add playback text
-    SET_QUEST_ITEM(QUEST_SONG_SUN);
-
     gSaveContext.save.saveInfo.horseData.sceneId = SCENE_F01;
     gSaveContext.save.saveInfo.horseData.pos.x = -1420;
     gSaveContext.save.saveInfo.horseData.pos.y = 257;
