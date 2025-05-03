@@ -107,7 +107,7 @@ when set, gets cleared next EnBox_Update call and clip to the floor
 #define ENBOX_MOVE_0x40 (1 << 6)
 #define ENBOX_MOVE_0x80 (1 << 7)
 
-#define LOCATION_ENBOX ((0x060000) | (play->sceneId << 8) | ENBOX_GET_CHEST_FLAG(&this->dyna.actor))
+#define LOCATION_ENBOX ((0x060000) | (sceneId << 8) | ENBOX_GET_CHEST_FLAG(&this->dyna.actor))
 #define LOCATION_ENBOX_CHEST_GAME ((0x061700) | ENBOX_GET_ITEM(&this->dyna.actor))
 
 #define THIS ((EnBox*)thisx)
@@ -125,6 +125,59 @@ s32 EnBox_IsSmallChest(u8 type)
         return true;
     }
     return false;
+}
+
+// change the scene of shared chests to show/give the correct item
+s16 EnBox_UpdateSceneID(s16 sceneId, s16 flag) {
+    switch (sceneId) {
+        case SCENE_17SETUGEN: // winter twin islands
+            return SCENE_17SETUGEN2; // always switch to spring (can't get glitched)
+        case SCENE_INISIE_N: // stt
+            switch (flag) {
+                case 0x10:
+                case 0x0E:
+                case 0x13:
+                case 0x04:
+                case 0x05:
+                case 0x1A:
+                    // add case for "glitched" chests here
+                    // if (rando_glitched_locations_enabled()) break;
+                case 0x11: // can't get glitched
+                case 0x1E: // can't get glitched
+                    return SCENE_INISIE_R;
+                default:
+                    break;
+            }
+            break;
+        case SCENE_INISIE_R: // istt
+            switch (flag) {
+                case 0x16:
+                case 0x12:
+                case 0x02:
+                case 0x1D:
+                case 0x18:
+                case 0x1C:
+                case 0x01:
+                case 0x0C:
+                    // add case for "glitched" chests here
+                    // if (rando_glitched_locations_enabled()) break;
+                case 0x15: // can't get glitched
+                case 0x17: // can't get glitched
+                case 0x0B: // can't get glitched
+                case 0x0F: // can't get glitched
+                case 0x19: // can't get glitched
+                case 0x0D: // can't get glitched
+                case 0x1B: // can't get glitched
+                case 0x14: // can't get glitched
+                    return SCENE_INISIE_N;
+                default:
+                    break;
+            }
+            break;
+        default:
+            break;
+    }
+    return sceneId;
 }
 
 void EnBox_SetupAction(EnBox* this, EnBoxActionFunc func);
@@ -145,6 +198,7 @@ RECOMP_PATCH void EnBox_Init(Actor* thisx, PlayState* play) {
     f32 startFrame;
     f32 endFrame;
     u8 vanillaType = ENBOX_GET_TYPE(&this->dyna.actor);
+    s16 sceneId = EnBox_UpdateSceneID(play->sceneId, ENBOX_GET_CHEST_FLAG(&this->dyna.actor));
 
     colHeader = NULL;
     startFrame = 0.0f;
@@ -322,6 +376,7 @@ RECOMP_PATCH void EnBox_WaitOpen(EnBox* this, PlayState* play) {
     AnimationHeader* anim;
     f32 endFrame;
     f32 playSpeed;
+    s16 sceneId = EnBox_UpdateSceneID(play->sceneId, ENBOX_GET_CHEST_FLAG(&this->dyna.actor));
 
     this->alpha = 255;
     this->movementFlags |= ENBOX_MOVE_IMMOBILE;
@@ -420,6 +475,7 @@ RECOMP_PATCH void EnBox_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList
     s32 pad;
     EnBox* this = THIS;
     s16 trueGI;
+    s16 sceneId = EnBox_UpdateSceneID(play->sceneId, ENBOX_GET_CHEST_FLAG(&this->dyna.actor));
 
     if (LOCATION_ENBOX == 0x061700) {
         trueGI = rando_get_item_id(LOCATION_ENBOX_CHEST_GAME);
