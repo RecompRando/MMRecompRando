@@ -1516,6 +1516,10 @@ RECOMP_PATCH s32 Actor_OfferGetItem(Actor* actor, PlayState* play, GetItemId get
                         trueGI = GI_POWDER_KEG;
                         item = GI_POWDER_KEG;
                         AMMO(ITEM_POWDER_KEG) = 1;
+                    } else if (getItem(rando_get_item_id(getItemId)) <= ITEM_BOMBCHUS_20 && getItem(rando_get_item_id(getItemId)) >= ITEM_BOMBCHUS_5 && rando_has_item_async(GI_BAG_BOMBCHU) == 0) {
+                        itemWorkaround = true;
+                        itemShuffled = false;
+                        trueGI = GI_RUPEE_BLUE;
                     } else if (itemShuffled) {
                         location_to_send = getItemId;
                     }
@@ -1561,6 +1565,11 @@ s32 Actor_OfferGetItemHook(Actor* actor, PlayState* play, GetItemId getItemId, u
                     itemWorkaround = use_workaround;
                     itemShuffled = item_is_shuffled;
                     drawIdChosen = false;
+                    if (getItem(getItemId) <= ITEM_BOMBCHUS_20 && getItem(getItemId) >= ITEM_BOMBCHUS_5 && rando_has_item_async(GI_BAG_BOMBCHU) == 0) {
+                        itemWorkaround = true;
+                        itemShuffled = false;
+                        trueGI = GI_RUPEE_BLUE;
+                    }
                     if (itemShuffled) {
                         location_to_send = location;
                     }
