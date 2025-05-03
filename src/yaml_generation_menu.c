@@ -232,7 +232,7 @@ RandoOptionData* randoCreateRadioOption(RandoYamlConfigMenu* menu, const char* o
         option_names[i] = randoFormatOptionName(&options[i]);
     }
 
-    RecompuiResource radio = recompui_create_labelradio(menu->context, radio_area, option_names, num_options);
+    RecompuiResource radio = recompui_create_labelradio(menu->context, radio_area, (const char**) option_names, num_options);
 
     // Free the option list.
     for (u32 i = 0; i < num_options; i++) {
@@ -257,7 +257,7 @@ RandoOptionData* randoCreateBoolPropOption(RandoYamlConfigMenu* menu, const char
 
     RandoOptionData* option_data = randoAllocateOption(menu, option_id);
 
-    RecompuiResource radio = recompui_create_labelradio(menu->context, radio_area, rando_bool_prop_names, 2);
+    RecompuiResource radio = recompui_create_labelradio(menu->context, radio_area, (const char**) rando_bool_prop_names, 2);
     recompui_set_input_value_u32(radio, (u32)default_value);
 
     option_data->type = OPTION_BOOL;
