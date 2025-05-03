@@ -343,76 +343,6 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         msgCtx->unk1206C = price;
     }
 
-    // if (msg == sk_msg || msg == bk_msg || msg == map_msg || msg == compass_msg) {
-    //     u8* dungeon_msg;
-    //     u8 wf_str[128] = "\x02(Woodfall)\x00\xbf";
-    //     u8 sh_str[128] = "\x05(Snowhead)\x00\xbf";
-    //     u8 gb_str[128] = "\x03(Great Bay)\x00\xbf";
-    //     u8 st_str[128] = "\x04(Stone Tower)\x00\xbf";
-
-    //     // TODO: figure out dungeon from text
-    //     s16 dungeonId = (textId - GI_MAX) / 4;
-    //     switch (dungeonId) {
-    //         case 0:
-    //             dungeon_msg = wf_str;
-    //             break;
-    //         case 1:
-    //             dungeon_msg = sh_str;
-    //             break;
-    //         case 2:
-    //             dungeon_msg = gb_str;
-    //             break;
-    //         case 3:
-    //             dungeon_msg = st_str;
-    //             break;
-    //     }
-    //     u8 end_i = i + 11;
-    //     for (i = 0; i < 128; ++i) {
-    //         font->msgBuf.schar[end_i + i] = dungeon_msg[i];
-    //         if (dungeon_msg[i] == 0xBF) {
-    //             break;
-    //         }
-    //     }
-
-    //     // small key count
-    //     if (msg == sk_msg) {
-    //         u8 count_str[128] = "\x11This is your \xbf";
-    //         u8* count_msg = count_str;
-    //         u8 new_end_i = end_i + i;
-    //         for (i = 0; i < 128; ++i) {
-    //             font->msgBuf.schar[new_end_i + i] = count_msg[i];
-    //             if (count_msg[i] == 0xBF) {
-    //                 u8 key_count = DUNGEON_KEY_COUNT(dungeonId / 0x100);
-    //                 u8 count_suffix[2] = "th";
-    //                 if ((key_count % 10) == 1 && key_count != 11) {
-    //                     count_suffix[0] = 's';
-    //                     count_suffix[1] = 't';
-    //                 } else if ((key_count % 10) == 2 && key_count != 12) {
-    //                     count_suffix[0] = 'n';
-    //                     count_suffix[1] = 'd';
-    //                 } else if ((key_count % 10) == 3 && key_count != 13) {
-    //                     count_suffix[0] = 'r';
-    //                     count_suffix[1] = 'd';
-    //                 }
-    //                 font->msgBuf.schar[new_end_i + i] = 0x01;
-    //                 i += 1;
-    //                 if (key_count >= 10) {
-    //                     font->msgBuf.schar[new_end_i + i] = (key_count / 10) + 0x30;
-    //                     i += 1;
-    //                 }
-    //                 font->msgBuf.schar[new_end_i + i] = (key_count % 10) + 0x30;
-    //                 font->msgBuf.schar[new_end_i + i + 1] = count_suffix[0];
-    //                 font->msgBuf.schar[new_end_i + i + 2] = count_suffix[1];
-    //                 font->msgBuf.schar[new_end_i + i + 3] = 0x00;
-    //                 font->msgBuf.schar[new_end_i + i + 4] = '.';
-    //                 font->msgBuf.schar[new_end_i + i + 5] = 0xBF;
-    //                 break;
-    //             }
-    //         }
-    //     }
-    // }
-    
-
     if (msg == ssht_msg) {
         u8 count_str[128] = "\x11This is your \xbf";
         u8 count_done_str[128] = "\x11You've found all of them!\xbf";
@@ -537,7 +467,73 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
                 break;
             }
         }
-    } else if (msg == shop_msg) {      
+    } else if (msg == sk_msg || msg == bk_msg || msg == map_msg || msg == compass_msg) {
+        u8* dungeon_msg;
+        u8 wf_str[128] = "\x02(Woodfall)\x00\xbf";
+        u8 sh_str[128] = "\x05(Snowhead)\x00\xbf";
+        u8 gb_str[128] = "\x03(Great Bay)\x00\xbf";
+        u8 st_str[128] = "\x04(Stone Tower)\x00\xbf";
+
+        u8 dungeonId = (rando_get_item_id(rando_get_last_location_sent()) - GI_MAX - 1) / 4;
+        switch (dungeonId) {
+            case 0:
+                dungeon_msg = wf_str;
+                break;
+            case 1:
+                dungeon_msg = sh_str;
+                break;
+            case 2:
+                dungeon_msg = gb_str;
+                break;
+            case 3:
+                dungeon_msg = st_str;
+                break;
+        }
+        u8 end_i = i + 11;
+        for (i = 0; i < 128; ++i) {
+            font->msgBuf.schar[end_i + i] = dungeon_msg[i];
+            if (dungeon_msg[i] == 0xBF) {
+                break;
+            }
+        }
+
+        // small key count
+        if (msg == sk_msg) {
+            u8 count_str[128] = "\x11This is your \xbf";
+            u8* count_msg = count_str;
+            u8 new_end_i = end_i + i;
+            for (i = 0; i < 128; ++i) {
+                font->msgBuf.schar[new_end_i + i] = count_msg[i];
+                if (count_msg[i] == 0xBF) {
+                    u8 key_count = rando_has_item(0x090078 + (dungeonId * 0x100));
+                    u8 count_suffix[2] = "th";
+                    if ((key_count % 10) == 1 && key_count != 11) {
+                        count_suffix[0] = 's';
+                        count_suffix[1] = 't';
+                    } else if ((key_count % 10) == 2 && key_count != 12) {
+                        count_suffix[0] = 'n';
+                        count_suffix[1] = 'd';
+                    } else if ((key_count % 10) == 3 && key_count != 13) {
+                        count_suffix[0] = 'r';
+                        count_suffix[1] = 'd';
+                    }
+                    font->msgBuf.schar[new_end_i + i] = 0x01;
+                    i += 1;
+                    if (key_count >= 10) {
+                        font->msgBuf.schar[new_end_i + i] = (key_count / 10) + 0x30;
+                        i += 1;
+                    }
+                    font->msgBuf.schar[new_end_i + i] = (key_count % 10) + 0x30;
+                    font->msgBuf.schar[new_end_i + i + 1] = count_suffix[0];
+                    font->msgBuf.schar[new_end_i + i + 2] = count_suffix[1];
+                    font->msgBuf.schar[new_end_i + i + 3] = 0x00;
+                    font->msgBuf.schar[new_end_i + i + 4] = '.';
+                    font->msgBuf.schar[new_end_i + i + 5] = 0xBF;
+                    break;
+                }
+            }
+        }
+    } else if (msg == shop_msg) {
         char item_str[67];
         char player_str[17];
 
