@@ -1962,6 +1962,7 @@ u8 randoItemGive(u32 gi) {
                 if (!INV_HAS(ITEM_BOMBCHU)) {
                     INV_CONTENT(ITEM_BOMBCHU) = ITEM_BOMBCHU;
                 }
+                AMMO(ITEM_BOMBCHU) = 10*rando_has_item_async(GI_BAG_BOMBCHU);
                 return ITEM_NONE;
             }
             item = giToItemId[gi & 0xFF];
