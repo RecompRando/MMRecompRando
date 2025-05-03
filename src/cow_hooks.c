@@ -142,7 +142,7 @@ RECOMP_PATCH void EnCow_GiveMilkWait(EnCow* this, PlayState* play) {
         this->actor.parent = NULL;
         this->actionFunc = EnCow_GiveMilkEnd;
     } else {
-        if (rando_location_is_checked(LOCATION_COW) && rando_cows_enabled()) {
+        if (rando_location_is_checked(LOCATION_COW) || !rando_cows_enabled()) {
             Actor_OfferGetItem(&this->actor, play, GI_MILK, 10000.0f, 100.0f);
         } else {
             Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_COW), LOCATION_COW, 300.0f, 300.0f, true, true);
@@ -155,7 +155,7 @@ RECOMP_PATCH void EnCow_GiveMilk(EnCow* this, PlayState* play) {
         this->actor.flags &= ~ACTOR_FLAG_10000;
         Message_CloseTextbox(play);
         this->actionFunc = EnCow_GiveMilkWait;
-        if (rando_location_is_checked(LOCATION_COW) && rando_cows_enabled()) {
+        if (rando_location_is_checked(LOCATION_COW) || !rando_cows_enabled()) {
             Actor_OfferGetItem(&this->actor, play, GI_MILK, 10000.0f, 100.0f);
         } else {
             Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_COW), LOCATION_COW, 300.0f, 300.0f, true, true);
