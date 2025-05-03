@@ -6,6 +6,8 @@
 
 #include "apcommon.h"
 
+#define MAX_BOMBCHUS ((s8) (10*rando_has_item_async(GI_BAG_BOMBCHU) + 10))
+
 RECOMP_IMPORT(".", bool rando_get_receive_filled_wallets_enabled());
 
 extern s16 sExtraItemBases[];
@@ -1702,31 +1704,29 @@ RECOMP_PATCH u8 Item_Give(PlayState* play, u8 item) {
         return ITEM_NONE;
 
     } else if (item == ITEM_BOMBCHU) {
-        u8 max_bombchus = 10*rando_has_item_async(GI_BAG_BOMBCHU);
         if (INV_CONTENT(ITEM_BOMBCHU) != ITEM_BOMBCHU) {
             //~ INV_CONTENT(ITEM_BOMBCHU) = ITEM_BOMBCHU;
             AMMO(ITEM_BOMBCHU) = 10;
             return ITEM_NONE;
         }
-        if ((AMMO(ITEM_BOMBCHU) += 10) > max_bombchus) {
-            AMMO(ITEM_BOMBCHU) = max_bombchus;
+        if ((AMMO(ITEM_BOMBCHU) += 10) > MAX_BOMBCHUS) {
+            AMMO(ITEM_BOMBCHU) = MAX_BOMBCHUS;
         }
         return ITEM_NONE;
 
     } else if ((item >= ITEM_BOMBCHUS_20) && (item <= ITEM_BOMBCHUS_5)) {
-        u8 max_bombchus = 10*rando_has_item_async(GI_BAG_BOMBCHU);
         if (gSaveContext.save.saveInfo.inventory.items[SLOT_BOMBCHU] != ITEM_BOMBCHU) {
             //~ INV_CONTENT(ITEM_BOMBCHU) = ITEM_BOMBCHU;
             AMMO(ITEM_BOMBCHU) += sBombchuRefillCounts[item - ITEM_BOMBCHUS_20];
 
-            if (AMMO(ITEM_BOMBCHU) > max_bombchus) {
-                AMMO(ITEM_BOMBCHU) = max_bombchus;
+            if (AMMO(ITEM_BOMBCHU) > MAX_BOMBCHUS) {
+                AMMO(ITEM_BOMBCHU) = MAX_BOMBCHUS;
             }
             return ITEM_NONE;
         }
 
-        if ((AMMO(ITEM_BOMBCHU) += sBombchuRefillCounts[item - ITEM_BOMBCHUS_20]) > max_bombchus) {
-            AMMO(ITEM_BOMBCHU) = max_bombchus;
+        if ((AMMO(ITEM_BOMBCHU) += sBombchuRefillCounts[item - ITEM_BOMBCHUS_20]) > MAX_BOMBCHUS) {
+            AMMO(ITEM_BOMBCHU) = MAX_BOMBCHUS;
         }
         return ITEM_NONE;
 
@@ -1962,7 +1962,7 @@ u8 randoItemGive(u32 gi) {
                 if (!INV_HAS(ITEM_BOMBCHU)) {
                     INV_CONTENT(ITEM_BOMBCHU) = ITEM_BOMBCHU;
                 }
-                AMMO(ITEM_BOMBCHU) = 10*rando_has_item_async(GI_BAG_BOMBCHU);
+                AMMO(ITEM_BOMBCHU) = MAX_BOMBCHUS;
                 return ITEM_NONE;
             }
             item = giToItemId[gi & 0xFF];
@@ -2254,31 +2254,29 @@ u8 randoItemGive(u32 gi) {
         return ITEM_NONE;
 
     } else if (item == ITEM_BOMBCHU) {
-        u8 max_bombchus = 10*rando_has_item_async(GI_BAG_BOMBCHU);
         if (INV_CONTENT(ITEM_BOMBCHU) != ITEM_BOMBCHU) {
             //~ INV_CONTENT(ITEM_BOMBCHU) = ITEM_BOMBCHU;
             AMMO(ITEM_BOMBCHU) = 10;
             return ITEM_NONE;
         }
-        if ((AMMO(ITEM_BOMBCHU) += 10) > max_bombchus) {
-            AMMO(ITEM_BOMBCHU) = max_bombchus;
+        if ((AMMO(ITEM_BOMBCHU) += 10) > MAX_BOMBCHUS) {
+            AMMO(ITEM_BOMBCHU) = MAX_BOMBCHUS;
         }
         return ITEM_NONE;
 
     } else if ((item >= ITEM_BOMBCHUS_20) && (item <= ITEM_BOMBCHUS_5)) {
-        u8 max_bombchus = 10*rando_has_item_async(GI_BAG_BOMBCHU);
         if (gSaveContext.save.saveInfo.inventory.items[SLOT_BOMBCHU] != ITEM_BOMBCHU) {
             //~ INV_CONTENT(ITEM_BOMBCHU) = ITEM_BOMBCHU;
             AMMO(ITEM_BOMBCHU) += sBombchuRefillCounts[item - ITEM_BOMBCHUS_20];
 
-            if (AMMO(ITEM_BOMBCHU) > max_bombchus) {
-                AMMO(ITEM_BOMBCHU) = max_bombchus;
+            if (AMMO(ITEM_BOMBCHU) > MAX_BOMBCHUS) {
+                AMMO(ITEM_BOMBCHU) = MAX_BOMBCHUS;
             }
             return ITEM_NONE;
         }
 
-        if ((AMMO(ITEM_BOMBCHU) += sBombchuRefillCounts[item - ITEM_BOMBCHUS_20]) > max_bombchus) {
-            AMMO(ITEM_BOMBCHU) = max_bombchus;
+        if ((AMMO(ITEM_BOMBCHU) += sBombchuRefillCounts[item - ITEM_BOMBCHUS_20]) > MAX_BOMBCHUS) {
+            AMMO(ITEM_BOMBCHU) = MAX_BOMBCHUS;
         }
         return ITEM_NONE;
 
@@ -2473,11 +2471,10 @@ RECOMP_PATCH void Inventory_ChangeAmmo(s16 item, s16 ammoChange) {
         }
 
     } else if (item == ITEM_BOMBCHU) {
-        u8 max_bombchus = 10*rando_has_item_async(GI_BAG_BOMBCHU);
         AMMO(ITEM_BOMBCHU) += ammoChange;
 
-        if (AMMO(ITEM_BOMBCHU) >= max_bombchus) {
-            AMMO(ITEM_BOMBCHU) = max_bombchus;
+        if (AMMO(ITEM_BOMBCHU) >= MAX_BOMBCHUS) {
+            AMMO(ITEM_BOMBCHU) = MAX_BOMBCHUS;
         } else if (AMMO(ITEM_BOMBCHU) < 0) {
             AMMO(ITEM_BOMBCHU) = 0;
         }
