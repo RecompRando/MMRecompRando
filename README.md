@@ -11,10 +11,11 @@ This randomizer is still under development in the beta phase but is considered s
 ### Archipelago Setup
 1. Know [Archipelago](https://archipelago.gg/tutorial/Archipelago/setup/en).
 2. Download the [apworld](https://github.com/RecompRando/MMRecompRando/releases/latest).
-3. Place the apworld into `Archipelago/custom_worlds/`.
-4. Generate a multiworld, and host the game either locally or on the website.
+3. **MAKE SURE** to clear out _any_ apworlds named `mm-recomp.apworld` or `mm_recomp.apworld` from your `Archipelago/lib/worlds` folder or your `Archipelago/custom_worlds` folder.
+4. Place the apworld into `Archipelago/custom_worlds/`.
+5. Generate a multiworld, and host the game either locally or on the website.
 
-### Mod Setup
+### Mod Installation
 1. Download the latest [Visual Studio C++ Redist](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-microsoft-visual-c-redistributable-version).
 2. Download [Zelda64Recomp](https://github.com/Zelda64Recomp/Zelda64Recomp/releases/latest).
 3. Optionally download any additional mods or texture packs you'd like from [Thunderstore](https://thunderstore.io/c/zelda-64-recompiled/).
