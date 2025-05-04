@@ -418,34 +418,40 @@ void EnTrt_SetupItemGiven(EnTrt* this, PlayState* play);
 #define ENTRT_CUTSCENESTATE_STOPPED 0x0
 #define ENTRT_CUTSCENESTATE_PLAYING 0x3
 
-RECOMP_PATCH void EnTrt_BuyItemWithFanfare(EnTrt* this, PlayState* play) {
+u32 location_to_buy;
+
+void EnTrt_ShopsanityBuyItemWithFanfare(EnTrt* this, PlayState* play) {
     if (Actor_HasParent(&this->actor, play)) {
         this->actor.parent = NULL;
         this->actionFunc = EnTrt_SetupItemGiven;
-        //~ location_to_buy_locked = false;
     } else {
-        if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled()) {
-            Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
-        } else {
-            Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
-        }
+        Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(location_to_buy), location_to_buy, 300.0f, 300.0f, true, true);
     }
 }
 
-RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
+void EnTrt_VanillaBuyItemWithFanfare(EnTrt* this, PlayState* play) {
+    if (Actor_HasParent(&this->actor, play)) {
+        this->actor.parent = NULL;
+        this->actionFunc = EnTrt_SetupItemGiven;
+    } else {
+        Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
+    }
+}
 
-u32 location_to_buy;
+RECOMP_PATCH void EnTrt_BuyItemWithFanfare(EnTrt* this, PlayState* play) {
+    if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled()) {
+        EnTrt_ShopsanityBuyItemWithFanfare(this, play);
+    } else {
+        EnTrt_VanillaBuyItemWithFanfare(this, play);
+    }
+}
 
 RECOMP_PATCH void EnTrt_SetupBuyItemWithFanfare(PlayState* play, EnTrt* this) {
     Player* player = GET_PLAYER(play);
 
-    recomp_printf("shop location: 0x%06X\n", location_to_buy);
-
     if (rando_location_is_checked(location_to_buy) || !rando_shopsanity_enabled()) {
-        recomp_printf("vanilla\n");
         Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
     } else {
-        recomp_printf("shuffled\n");
         Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(location_to_buy), location_to_buy, 300.0f, 300.0f, true, true);
     }
     Rupees_ChangeBy(-play->msgCtx.unk1206C);
@@ -569,24 +575,19 @@ bool shopItemIsChecked(EnGirlA* item, PlayState* play) {
 
 extern bool kotake_is_weird;
 
-bool location_to_buy_locked = false;
-
 RECOMP_PATCH void EnTrt_SelectItem(EnTrt* this, PlayState* play) {
     EnGirlA* item = this->items[this->cursorIndex];
     u8 talkState = Message_GetState(&play->msgCtx);
-    recomp_printf("selected shop item location: 0x%06X\n", (0x090000 | item->actor.params) & 0xFFFFFF);
-    if (!location_to_buy_locked) {
-        location_to_buy = LOCATION_SHOP_ITEM;
-    }
+
+    location_to_buy = (0x090000 | item->actor.params) & 0xFFFFFF;
+
     if (EnTrt_TakeItemOffShelf(this)) {
         if (talkState == TEXT_STATE_CHOICE) {
             func_8011552C(play, DO_ACTION_DECIDE);
             if (!EnTrt_TestCancelOption(this, play, CONTROLLER1(&play->state)) && Message_ShouldAdvance(play)) {
                 switch (play->msgCtx.choiceIndex) {
                     case 0:
-                        location_to_buy_locked = true;
                         kotake_is_weird = !shopItemIsChecked(item, play);
-                        recomp_printf("location to buy: 0x%06X\n", location_to_buy);
                         EnTrt_HandleCanBuyItem(play, this);
                         break;
 
