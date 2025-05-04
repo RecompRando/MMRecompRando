@@ -37,7 +37,7 @@ minimum_recomp_version = "1.2.0"
 dependencies = [
     "owls_never_quit:1.0.0",
     "mm_recomp_better_double_sot:0.0.1",
-    "mm_recomp_colors:1.0.0"
+    "mm_recomp_colors:0.5.0"
 ]
 
 # Native libraries (e.g. DLLs) and the functions they export.
