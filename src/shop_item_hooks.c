@@ -298,7 +298,7 @@ RECOMP_PATCH s32 EnGirlA_CanBuyBombchus(PlayState* play, EnGirlA* this) {
         return CANBUY_RESULT_CANNOT_GET_NOW;
     }
     // if (AMMO(ITEM_BOMBCHU) >= CUR_CAPACITY(UPG_BOMB_BAG)) {
-    if (AMMO(ITEM_BOMBCHU) >= (s8)(10 * rando_has_item_async(GI_BAG_BOMBCHU) + 10)) {
+    if (AMMO(ITEM_BOMBCHU) >= MAX_BOMBCHUS) {
         return CANBUY_RESULT_NO_ROOM;
     }
     if (gSaveContext.save.saveInfo.playerData.rupees < play->msgCtx.unk1206C) {
