@@ -18,7 +18,7 @@ This randomizer is still under development in the beta phase but is considered s
 1. Download the latest [Visual Studio C++ Redist](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-microsoft-visual-c-redistributable-version).
 2. Optionally download any additional mods or texture packs you'd like from [Thunderstore](https://thunderstore.io/c/zelda-64-recompiled/).
     1. You only need to drag and drop mod zips from Thunderstore onto the game window to install them.
-3. Download the [mods](https://github.com/RecompRando/MMRecompRando/releases/latest).
+3. Download [MMRecompRando.zip](https://github.com/RecompRando/MMRecompRando/releases/latest).
 4. Place the mods within the zip into the Zelda64Recomp mods folder, as well as any texture packs you've downloaded.
     1. If on Windows, this is located at `%LOCALAPPDATA%\Zelda64Recompiled\mods`.
     2. If on Linux, this is located at `~/.config/Zelda64Recompiled/mods`.
