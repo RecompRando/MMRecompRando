@@ -41,6 +41,7 @@ RandoOptionData* randoAllocateOption(RandoYamlConfigMenu* menu, const char* opti
     // Copy the option_id into the returned option.
     size_t option_id_len = strlen(option_id);
     ret->option_id = recomp_alloc(option_id_len + 1);
+    ret->is_callback = false;
     Lib_MemCpy(ret->option_id, (void*)option_id, option_id_len + 1);
 
     return ret;
@@ -76,23 +77,42 @@ void randoYAMLGenerateCallback(RecompuiResource button, const RecompuiEventData*
         // Iterate over the options and write their values into the yaml.
         for (u32 i = 0; i < menu->num_options; i++) {
             RandoOptionData* option = &menu->all_options[i];
-            switch (option->type) {
-                case OPTION_BOOL:
-                    rando_yaml_printf("  %s:\n    '%s': 1\n", option->option_id, recompui_get_input_value_u32(option->input_element) ? "true" : "false");
-                    break;
-                case OPTION_RADIO:
-                    {
-                        EnumOptionValue* enum_options = (EnumOptionValue*)option->data;
-                        rando_yaml_printf("  %s:\n    %s: 1\n", option->option_id, enum_options[recompui_get_input_value_u32(option->input_element)].id);
-                    }
-                    break;
-                case OPTION_INT_SLIDER:
-                    // TODO replace this with recompui_get_input_value_s32 when it gets added
-                    rando_yaml_printf("  %s:\n    %d: 1\n", option->option_id, (s32)recompui_get_input_value_float(option->input_element));
-                    break;
-                case OPTION_FLOAT_SLIDER:
-                    rando_yaml_printf("  %s:\n    %f: 1\n", option->option_id, recompui_get_input_value_float(option->input_element));
-                    break;
+            if (!option->is_callback) {
+                switch (option->type) {
+                    case OPTION_BOOL:
+                        rando_yaml_printf("  %s:\n    '%s': 1\n", option->option_id, recompui_get_input_value_u32(option->input_element) ? "true" : "false");
+                        break;
+                    case OPTION_RADIO:
+                        {
+                            EnumOptionValue* enum_options = (EnumOptionValue*)option->data;
+                            rando_yaml_printf("  %s:\n    %s: 1\n", option->option_id, enum_options[recompui_get_input_value_u32(option->input_element)].id);
+                        }
+                        break;
+                    case OPTION_INT_SLIDER:
+                        // TODO replace this with recompui_get_input_value_s32 when it gets added
+                        rando_yaml_printf("  %s:\n    %d: 1\n", option->option_id, (s32)recompui_get_input_value_float(option->input_element));
+                        break;
+                    case OPTION_FLOAT_SLIDER:
+                        rando_yaml_printf("  %s:\n    %f: 1\n", option->option_id, recompui_get_input_value_float(option->input_element));
+                        break;
+                }
+            }
+            else {
+                switch (option->type) {
+                    case OPTION_BOOL:
+                        option->bool_callback((bool)recompui_get_input_value_u32(option->input_element));
+                        break;
+                    case OPTION_RADIO:
+                        option->bool_callback(recompui_get_input_value_u32(option->input_element));
+                        break;
+                    case OPTION_INT_SLIDER:
+                        // TODO replace this with recompui_get_input_value_s32 when it gets added
+                        option->int_callback((s32)recompui_get_input_value_float(option->input_element));
+                        break;
+                    case OPTION_FLOAT_SLIDER:
+                        option->float_callback(recompui_get_input_value_float(option->input_element));
+                        break;
+                }
             }
         }
 
@@ -266,6 +286,13 @@ RandoOptionData* randoCreateBoolPropOption(RandoYamlConfigMenu* menu, const char
     return option_data;
 }
 
+RandoOptionData* randoCreateCallbackBoolPropOption(RandoYamlConfigMenu* menu, const char* display_name, bool default_value, bool_callback_t* callback) {
+    RandoOptionData* option = randoCreateBoolPropOption(menu, "", display_name, default_value);
+    option->is_callback = true;
+    option->bool_callback = callback;
+    return option;
+}
+
 // Slider
 void randoYAMLSliderCallback(RecompuiResource labelenum, const RecompuiEventData* data, void* userdata) {
     u32* config_option = userdata;
@@ -308,6 +335,16 @@ RandoOptionData* randoCreateFloatSliderOption(RandoYamlConfigMenu* menu, const c
     return option_data;
 }
 
+void tunicColorCallback(bool enabled) {
+    if (enabled) {
+        u32 link_color = Rand_Next();
+        u32 link_red = (link_color >> 24) & 0xFF;
+        u32 link_green = (link_color >> 16) & 0xFF;
+        u32 link_blue = (link_color >> 8) & 0xFF;
+        rando_yaml_printf("  link_tunic_color:\n    [%d, %d, %d]\n", link_red, link_green, link_blue);
+    }
+}
+
 static EnumOptionValue rando_accessibility_options[] = {
     { "locations", "Full" },
     { "minimal", NULL }
@@ -336,6 +373,14 @@ static EnumOptionValue rando_shuffle_boss_remains_options[] = {
     { "vanilla", NULL },
     { "anywhere", NULL },
     { "bosses", NULL },
+};
+
+static EnumOptionValue shop_prices_options[] = {
+    { "vanilla", NULL },
+    { "free", NULL },
+    { "cheap", NULL },
+    { "expensive", NULL },
+    { "offensive", NULL },
 };
 
 static EnumOptionValue rando_skullsanity_options[] = {
@@ -449,20 +494,24 @@ void randoCreateYamlConfigMenu() {
     randoCreateIntSliderOption(&yaml_config_menu, "starting_hearts", "Starting Heart Segments:", 1, 12, 1, 12);
     randoCreateRadioOption(&yaml_config_menu, "starting_hearts_are_containers_or_pieces", "Unused Starting Hearts are Distributed as:", rando_starting_hearts_type_options, ARRAY_COUNT(rando_starting_hearts_type_options), RANDO_STARTING_HEARTS_ARE_CONTAINERS);
     randoCreateRadioOption(&yaml_config_menu, "shuffle_regional_maps", "Shuffle Regional Maps:", rando_shuffle_regional_maps_options, ARRAY_COUNT(rando_shuffle_regional_maps_options), RANDO_SHUFFLE_REGIONAL_MAPS_VANILLA);
-    randoCreateRadioOption(&yaml_config_menu, "shuffle_boss_remains", "Shuffle Boss Maps:", rando_shuffle_boss_remains_options, ARRAY_COUNT(rando_shuffle_boss_remains_options), RANDO_SHUFFLE_BOSS_REMAINS_VANILLA);
+    randoCreateRadioOption(&yaml_config_menu, "shuffle_boss_remains", "Shuffle Boss Remains:", rando_shuffle_boss_remains_options, ARRAY_COUNT(rando_shuffle_boss_remains_options), RANDO_SHUFFLE_BOSS_REMAINS_VANILLA);
     randoCreateBoolPropOption(&yaml_config_menu, "shuffle_spiderhouse_reward", "Shuffle Spiderhouse Rewards:", false);
+    randoCreateBoolPropOption(&yaml_config_menu, "shuffle_great_fairy_rewards", "Shuffle Great Fairy Rewards:", false);
+    randoCreateRadioOption(&yaml_config_menu, "shop_prices", "Shop Prices:", shop_prices_options, ARRAY_COUNT(shop_prices_options), RANDO_SHOP_PRICES_VANILLA);
     randoCreateRadioOption(&yaml_config_menu, "skullsanity", "Skull-Sanity Mode:", rando_skullsanity_options, ARRAY_COUNT(rando_skullsanity_options), RANDO_SKULLSANITY_VANILLA);
     randoCreateRadioOption(&yaml_config_menu, "shopsanity", "Shop-Sanity Mode:", rando_shopsanity_options, ARRAY_COUNT(rando_shopsanity_options), RANDO_SHOPSANITY_VANILLA);
     randoCreateBoolPropOption(&yaml_config_menu, "scrubsanity", "Scrub-Sanity:", false);
     randoCreateBoolPropOption(&yaml_config_menu, "cowsanity", "Cow-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "shuffle_great_fairy_rewards", "Shuffle Great Fairy Rewards:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "fairysanity", "FairySanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "start_with_consumables", "Start With Consumables:", false);
+    randoCreateBoolPropOption(&yaml_config_menu, "keysanity", "Key-Sanity:", false);
+    randoCreateBoolPropOption(&yaml_config_menu, "fairysanity", "Fairy Sanity:", false);
+    randoCreateBoolPropOption(&yaml_config_menu, "start_with_consumables", "Start With Consumables:", true);
     randoCreateBoolPropOption(&yaml_config_menu, "permanent_chateau_romani", "Permanent Chateau Romani:", true);
     randoCreateBoolPropOption(&yaml_config_menu, "start_with_inverted_time", "Start With Inverted Time:", true);
-    randoCreateBoolPropOption(&yaml_config_menu, "receive_filled_wallets", "Recieve Filled Wallets:", true);
+    randoCreateBoolPropOption(&yaml_config_menu, "receive_filled_wallets", "Receive Filled Wallets:", true);
     randoCreateRadioOption(&yaml_config_menu, "damage_multiplier", "Damage Multiplier:", rando_damage_multiplier_options, ARRAY_COUNT(rando_damage_multiplier_options), RANDO_DAMAGE_MULITPLIER_NORMAL);
     randoCreateRadioOption(&yaml_config_menu, "death_behavior", "Death Behavior:", rando_death_behavior_options, ARRAY_COUNT(rando_death_behavior_options), RANDO_DEATH_BEHAVIOR_VANILLA);
+    randoCreateBoolPropOption(&yaml_config_menu, "magic_is_a_trap", "Magic is a Trap:", false);
+    randoCreateCallbackBoolPropOption(&yaml_config_menu, "Randomize Tunic Color:", true, tunicColorCallback);
 
     // Create the back button, parenting it to the root with absolute positioning.
     yaml_config_menu.back_button = recompui_create_button(yaml_config_menu.context, yaml_config_menu.frame.root, "Back", BUTTONSTYLE_SECONDARY);
