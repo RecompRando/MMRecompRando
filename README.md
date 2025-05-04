@@ -11,7 +11,7 @@ This randomizer is still under development in the beta phase but is considered s
 ### Archipelago Setup
 1. Know [Archipelago](https://archipelago.gg/tutorial/Archipelago/setup/en).
 2. Download the [apworld](https://github.com/RecompRando/MMRecompRando/releases/latest).
-3. **MAKE SURE** to clear out _any_ apworlds named `mm-recomp.apworld` or `mm_recomp.apworld` from your `Archipelago/lib/worlds` folder or your `Archipelago/custom_worlds` folder.
+3. **MAKE SURE** to clear out _any_ apworlds named `mm-recomp.apworld` or `mm_recomp.apworld` from your `Archipelago/lib/worlds` folder and your `Archipelago/custom_worlds` folder.
 4. Place the apworld into `Archipelago/custom_worlds/`.
 5. Generate a multiworld, and host the game either locally or on the website.
 
