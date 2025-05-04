@@ -1401,6 +1401,7 @@ RECOMP_PATCH s32 Player_ActionChange_2(Player* this, PlayState* play) {
 #define ACTOR_ID_HONEY_AND_DARLING 0x0B5
 #define ACTOR_ID_BEAN_DADDY 0x0A5
 #define ACTOR_ID_COW 0x0F3
+#define ACTOR_ID_BARTEN 0x263
 #define ACTOR_ID_SWAMP_GUIDE 0x1C5
 #define ACTOR_ID_MEDIGORON 0x138
 #define ACTOR_ID_BOMBGORON 0x242
@@ -1449,8 +1450,8 @@ RECOMP_PATCH s32 Actor_OfferGetItem(Actor* actor, PlayState* play, GetItemId get
                         ((item >= ITEM_RUPEE_GREEN) && (item <= ITEM_RUPEE_HUGE) && (actor->id != ACTOR_ID_DEKU_PLAYGROUND_WORKER) && (actor->id != ACTOR_ID_HONEY_AND_DARLING) && (actor->id != ACTOR_ID_SWAMP_GUIDE)) ||
                         ((item == ITEM_POE) || (item == ITEM_GOLD_DUST) ||
                             (item == ITEM_HYLIAN_LOACH)) ||
-                        (((item >= ITEM_POTION_RED) && (item <= ITEM_OBABA_DRINK) && (item != ITEM_CHATEAU) && (item != ITEM_CHATEAU_2)) ||
-                            (item == ITEM_MILK) || (item == ITEM_GOLD_DUST_2) || (item == ITEM_HYLIAN_LOACH_2) ||
+                        (((item >= ITEM_POTION_RED) && (item <= ITEM_OBABA_DRINK) && (item != ITEM_CHATEAU)) ||
+                            (item == ITEM_MILK) || (item == ITEM_CHATEAU_2) || (item == ITEM_GOLD_DUST_2) || (item == ITEM_HYLIAN_LOACH_2) ||
                             (item == ITEM_SEAHORSE_CAUGHT))) {
                     } else {
                         itemWorkaround = true;
@@ -1481,13 +1482,18 @@ RECOMP_PATCH s32 Actor_OfferGetItem(Actor* actor, PlayState* play, GetItemId get
                         itemShuffled = true;
                         trueGI = rando_get_item_id(LOCATION_QUEST_BOTTLE);
                         location_to_send = LOCATION_QUEST_BOTTLE;
-                    } else if (getItemId == GI_MILK && actor->id != ACTOR_ID_COW && !rando_location_is_checked(LOCATION_MILK) && rando_shopsanity_enabled()) {
-                        // Milk Purchases
-                        recomp_printf("Milkman Location: 0x%06X\n", LOCATION_MILK);
+                    } else if (getItemId == GI_MILK && actor->id == ACTOR_ID_BARTEN && !rando_location_is_checked(LOCATION_MILK) && rando_shopsanity_enabled()) {
+                        // Milk Bar Milk Purchase
                         itemWorkaround = true;
                         itemShuffled = true;
                         location_to_send = LOCATION_MILK;
                         trueGI = rando_get_item_id(LOCATION_MILK);
+                    } else if (getItemId == GI_CHATEAU && actor->id == ACTOR_ID_BARTEN && !rando_location_is_checked(GI_CHATEAU) && rando_shopsanity_enabled()) {
+                        // Milk Bar Chateau Purchase
+                        itemWorkaround = true;
+                        itemShuffled = true;
+                        location_to_send = GI_CHATEAU;
+                        trueGI = rando_get_item_id(GI_CHATEAU);
                     } else if (getItemId == GI_MAGIC_BEANS && actor->id == ACTOR_ID_BEAN_DADDY) {
                         itemWorkaround = true;
                         itemShuffled = true;
