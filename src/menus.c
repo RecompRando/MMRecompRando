@@ -111,10 +111,16 @@ void RandoMenu_Main(GameState* thisx) {
 
     // Setup drawing just so that the renderer sees new frames coming in.
     func_8012CF0C(thisx->gfxCtx, true, false, 0, 0, 0);
+
+    // Advance RNG (used for some solo menu options).
+    Rand_Next();
 }
 
 RECOMP_PATCH void Setup_Init(GameState* thisx) {
     SetupState* this = (SetupState*)thisx;
+
+    // Seed the game's RNG.
+    Rand_Seed(osGetTime());
 
     randoShowStartMenu();
     recomp_printf("Context Shown\n");

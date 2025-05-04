@@ -20,12 +20,24 @@ typedef enum {
     OPTION_FLOAT_SLIDER
 } RandoOptionType;
 
+typedef void (bool_callback_t)(bool value);
+typedef void (radio_callback_t)(u32 value);
+typedef void (int_callback_t)(int value);
+typedef void (float_callback_t)(float value);
+
 typedef struct {
     RandoOptionType type;
     RecompuiResource root_element;
     RecompuiResource input_element;
     void* data;
     char* option_id;
+    bool is_callback;
+    union {
+        bool_callback_t* bool_callback;
+        radio_callback_t* radio_callback;
+        int_callback_t* int_callback;
+        float_callback_t* float_callback;
+    };
 } RandoOptionData;
 
 typedef struct {
@@ -72,6 +84,15 @@ typedef enum {
     RANDO_SKULLSANITY_IGNORE = 2,
     RANDO_SKULLSANITY_MAX = 0xFFFFFFFF
 } RandoSkullSanity;
+
+typedef enum {
+    RANDO_SHOP_PRICES_VANILLA = 0,
+    RANDO_SHOP_PRICES_FREE = 1,
+    RANDO_SHOP_PRICES_CHEAP = 2,
+    RANDO_SHOP_PRICES_EXPENSIVE = 3,
+    RANDO_SHOP_PRICES_OFFENSIVE = 4,
+    RANDO_SHOP_PRICES_MAX = 0xFFFFFFFF
+} RandoShopPrices;
 
 typedef enum {
     RANDO_SHOPSANITY_VANILLA = 0,
