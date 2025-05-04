@@ -418,26 +418,41 @@ void EnTrt_SetupItemGiven(EnTrt* this, PlayState* play);
 #define ENTRT_CUTSCENESTATE_STOPPED 0x0
 #define ENTRT_CUTSCENESTATE_PLAYING 0x3
 
-RECOMP_PATCH void EnTrt_BuyItemWithFanfare(EnTrt* this, PlayState* play) {
+u32 location_to_buy;
+
+void EnTrt_ShopsanityBuyItemWithFanfare(EnTrt* this, PlayState* play) {
     if (Actor_HasParent(&this->actor, play)) {
         this->actor.parent = NULL;
         this->actionFunc = EnTrt_SetupItemGiven;
     } else {
-        if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled()) {
-            Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
-        } else {
-            Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
-        }
+        Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(location_to_buy), location_to_buy, 300.0f, 300.0f, true, true);
+    }
+}
+
+void EnTrt_VanillaBuyItemWithFanfare(EnTrt* this, PlayState* play) {
+    if (Actor_HasParent(&this->actor, play)) {
+        this->actor.parent = NULL;
+        this->actionFunc = EnTrt_SetupItemGiven;
+    } else {
+        Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
+    }
+}
+
+RECOMP_PATCH void EnTrt_BuyItemWithFanfare(EnTrt* this, PlayState* play) {
+    if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled()) {
+        EnTrt_ShopsanityBuyItemWithFanfare(this, play);
+    } else {
+        EnTrt_VanillaBuyItemWithFanfare(this, play);
     }
 }
 
 RECOMP_PATCH void EnTrt_SetupBuyItemWithFanfare(PlayState* play, EnTrt* this) {
     Player* player = GET_PLAYER(play);
 
-    if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled()) {
+    if (rando_location_is_checked(location_to_buy) || !rando_shopsanity_enabled()) {
         Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
     } else {
-        Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
+        Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(location_to_buy), location_to_buy, 300.0f, 300.0f, true, true);
     }
     Rupees_ChangeBy(-play->msgCtx.unk1206C);
     play->msgCtx.msgMode = MSGMODE_TEXT_CLOSING;
@@ -451,12 +466,120 @@ RECOMP_PATCH void EnTrt_SetupBuyItemWithFanfare(PlayState* play, EnTrt* this) {
 s32 EnTrt_TakeItemOffShelf(EnTrt *this);
 u16 EnTrt_GetItemTextId(EnTrt *this);
 s32 EnTrt_TestCancelOption(EnTrt *this, PlayState *play, Input *input);
+void EnTrt_SetupCanBuy(PlayState* play, EnTrt* this, u16 textId);
 void EnTrt_SetupCannotBuy(PlayState *play, EnTrt *this, u16 textId);
-void EnTrt_HandleCanBuyItem(PlayState *play, EnTrt *this);
+
+void EnTrt_ShopsanityHandleCanBuyItem(PlayState* play, EnTrt* this) {
+    EnGirlA* item = this->items[this->cursorIndex];
+    EnGirlA* item2;
+
+    switch (item->canBuyFunc(play, item)) {
+        case CANBUY_RESULT_SUCCESS_2:
+        case CANBUY_RESULT_NO_ROOM:
+        case CANBUY_RESULT_NEED_EMPTY_BOTTLE:
+        case CANBUY_RESULT_SUCCESS_1:
+            if (this->cutsceneState == ENTRT_CUTSCENESTATE_PLAYING) {
+                CutsceneManager_Stop(this->csId);
+                this->cutsceneState = ENTRT_CUTSCENESTATE_STOPPED;
+            }
+            Audio_PlaySfx_MessageDecide();
+            item2 = this->items[this->cursorIndex];
+            item2->buyFanfareFunc(play, item2);
+            EnTrt_SetupBuyItemWithFanfare(play, this);
+            this->drawCursor = 0;
+            this->shopItemSelectedTween = 0.0f;
+            item->boughtFunc(play, item);
+            break;
+
+        case CANBUY_RESULT_NEED_RUPEES:
+            Audio_PlaySfx(NA_SE_SY_ERROR);
+            EnTrt_SetupCannotBuy(play, this, 0x847);
+            break;
+
+        case CANBUY_RESULT_CANNOT_GET_NOW:
+            Audio_PlaySfx(NA_SE_SY_ERROR);
+            EnTrt_SetupCannotBuy(play, this, 0x643);
+            break;
+
+        default:
+            break;
+    }
+}
+
+void EnTrt_VanillaHandleCanBuyItem(PlayState* play, EnTrt* this) {
+    EnGirlA* item = this->items[this->cursorIndex];
+    EnGirlA* item2;
+
+    switch (item->canBuyFunc(play, item)) {
+        case CANBUY_RESULT_SUCCESS_1:
+            if (this->cutsceneState == ENTRT_CUTSCENESTATE_PLAYING) {
+                CutsceneManager_Stop(this->csId);
+                this->cutsceneState = ENTRT_CUTSCENESTATE_STOPPED;
+            }
+            Audio_PlaySfx_MessageDecide();
+            item2 = this->items[this->cursorIndex];
+            item2->buyFanfareFunc(play, item2);
+            EnTrt_SetupBuyItemWithFanfare(play, this);
+            this->drawCursor = 0;
+            this->shopItemSelectedTween = 0.0f;
+            item->boughtFunc(play, item);
+            break;
+
+        case CANBUY_RESULT_SUCCESS_2:
+            Audio_PlaySfx_MessageDecide();
+            item->buyFunc(play, item);
+            EnTrt_SetupCanBuy(play, this, 0x848);
+            this->drawCursor = 0;
+            this->shopItemSelectedTween = 0.0f;
+            item->boughtFunc(play, item);
+            break;
+
+        case CANBUY_RESULT_NO_ROOM:
+            Audio_PlaySfx(NA_SE_SY_ERROR);
+            EnTrt_SetupCannotBuy(play, this, 0x641);
+            break;
+
+        case CANBUY_RESULT_NEED_EMPTY_BOTTLE:
+            Audio_PlaySfx(NA_SE_SY_ERROR);
+            EnTrt_SetupCannotBuy(play, this, 0x846);
+            break;
+
+        case CANBUY_RESULT_NEED_RUPEES:
+            Audio_PlaySfx(NA_SE_SY_ERROR);
+            EnTrt_SetupCannotBuy(play, this, 0x847);
+            break;
+
+        case CANBUY_RESULT_CANNOT_GET_NOW:
+            Audio_PlaySfx(NA_SE_SY_ERROR);
+            EnTrt_SetupCannotBuy(play, this, 0x643);
+            break;
+
+        default:
+            break;
+    }
+}
+
+bool kotake_is_weird = false;
+
+RECOMP_PATCH void EnTrt_HandleCanBuyItem(PlayState* play, EnTrt* this) {
+    if (kotake_is_weird) {
+        EnTrt_ShopsanityHandleCanBuyItem(play, this);
+    } else {
+        EnTrt_VanillaHandleCanBuyItem(play, this);
+    }
+}
+
+bool shopItemIsChecked(EnGirlA* item, PlayState* play) {
+    return rando_location_is_checked_async(0x090000 | item->actor.params);
+}
+
+extern bool kotake_is_weird;
 
 RECOMP_PATCH void EnTrt_SelectItem(EnTrt* this, PlayState* play) {
     EnGirlA* item = this->items[this->cursorIndex];
     u8 talkState = Message_GetState(&play->msgCtx);
+
+    location_to_buy = (0x090000 | item->actor.params) & 0xFFFFFF;
 
     if (EnTrt_TakeItemOffShelf(this)) {
         if (talkState == TEXT_STATE_CHOICE) {
@@ -464,6 +587,7 @@ RECOMP_PATCH void EnTrt_SelectItem(EnTrt* this, PlayState* play) {
             if (!EnTrt_TestCancelOption(this, play, CONTROLLER1(&play->state)) && Message_ShouldAdvance(play)) {
                 switch (play->msgCtx.choiceIndex) {
                     case 0:
+                        kotake_is_weird = !shopItemIsChecked(item, play);
                         EnTrt_HandleCanBuyItem(play, this);
                         break;
 
