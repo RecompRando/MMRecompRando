@@ -111,6 +111,8 @@
 #define LOCATION_SWAMP_GUIDE_GOOD 0x071C54
 #define LOCATION_SWAMP_GUIDE_OKAY 0x071C52
 
+#define MAX_BOMBCHUS ((s8) (10*rando_has_item_async(GI_BAG_BOMBCHU) + 10))
+
 RECOMP_IMPORT(".", bool rando_location_is_checked(u32 location_id));
 RECOMP_IMPORT(".", bool rando_location_is_checked_async(u32 location_id));
 RECOMP_IMPORT(".", bool rando_get_death_link_pending());

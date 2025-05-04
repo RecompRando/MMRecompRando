@@ -6,8 +6,6 @@
 
 #include "apcommon.h"
 
-#define MAX_BOMBCHUS ((s8) (10*rando_has_item_async(GI_BAG_BOMBCHU) + 10))
-
 RECOMP_IMPORT(".", bool rando_get_receive_filled_wallets_enabled());
 
 extern s16 sExtraItemBases[];
