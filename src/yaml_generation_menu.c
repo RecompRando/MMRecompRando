@@ -351,7 +351,7 @@ static EnumOptionValue rando_accessibility_options[] = {
 };
 
 static EnumOptionValue rando_logic_difficulty_options[] = {
-    { "easy", NULL },
+    // { "easy", NULL },
     { "normal", NULL },
     // { "obscure_glitchless", NULL },
     // { "glitched", NULL },
@@ -406,6 +406,7 @@ static EnumOptionValue rando_damage_multiplier_options[] = {
 static EnumOptionValue rando_death_behavior_options[] = {
     { "vanilla", NULL }, 
     { "fast", NULL },
+    { "instant", NULL },
     { "moon_crash", NULL },
 };
 
@@ -491,7 +492,7 @@ void randoCreateYamlConfigMenu() {
     // randoCreateBoolPropOption(&yaml_config_menu, "", "Starting Hearts are Random:", false);
     // randoCreateIntSliderOption(&yaml_config_menu, "", "Random Starting Hearts Segments - Minimum:", 1, 12, 1, 4);
     // randoCreateIntSliderOption(&yaml_config_menu, "", "Random Starting Hearts Segments - Maximum:", 1, 12, 1, 12);
-    randoCreateIntSliderOption(&yaml_config_menu, "starting_hearts", "Starting Heart Segments:", 1, 12, 1, 12);
+    randoCreateIntSliderOption(&yaml_config_menu, "starting_hearts", "Starting Heart Segments:", 4, 12, 1, 12);
     randoCreateRadioOption(&yaml_config_menu, "starting_hearts_are_containers_or_pieces", "Unused Starting Hearts are Distributed as:", rando_starting_hearts_type_options, ARRAY_COUNT(rando_starting_hearts_type_options), RANDO_STARTING_HEARTS_ARE_CONTAINERS);
     randoCreateRadioOption(&yaml_config_menu, "shuffle_regional_maps", "Shuffle Regional Maps:", rando_shuffle_regional_maps_options, ARRAY_COUNT(rando_shuffle_regional_maps_options), RANDO_SHUFFLE_REGIONAL_MAPS_VANILLA);
     randoCreateRadioOption(&yaml_config_menu, "shuffle_boss_remains", "Shuffle Boss Remains:", rando_shuffle_boss_remains_options, ARRAY_COUNT(rando_shuffle_boss_remains_options), RANDO_SHUFFLE_BOSS_REMAINS_VANILLA);
