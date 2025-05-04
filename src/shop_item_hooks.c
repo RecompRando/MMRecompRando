@@ -290,3 +290,35 @@ RECOMP_PATCH s32 EnGirlA_CanBuyShieldHero(PlayState* play, EnGirlA* this) {
     }
     return CANBUY_RESULT_SUCCESS_1;
 }
+
+// @rando adjust bombchu purchases to bombchu bag
+RECOMP_PATCH s32 EnGirlA_CanBuyBombchus(PlayState* play, EnGirlA* this) {
+    // if (GET_CUR_UPG_VALUE(UPG_BOMB_BAG) == 0) {
+    if (!rando_has_item_async(GI_BAG_BOMBCHU)) {
+        return CANBUY_RESULT_CANNOT_GET_NOW;
+    }
+    // if (AMMO(ITEM_BOMBCHU) >= CUR_CAPACITY(UPG_BOMB_BAG)) {
+    if (AMMO(ITEM_BOMBCHU) >= (s8)(10 * rando_has_item_async(GI_BAG_BOMBCHU) + 10)) {
+        return CANBUY_RESULT_NO_ROOM;
+    }
+    if (gSaveContext.save.saveInfo.playerData.rupees < play->msgCtx.unk1206C) {
+        return CANBUY_RESULT_NEED_RUPEES;
+    }
+    if (Item_CheckObtainability(ITEM_BOMBCHU) == ITEM_NONE) {
+        return CANBUY_RESULT_SUCCESS_1;
+    }
+    return CANBUY_RESULT_SUCCESS_2;
+}
+
+// @rando disable bomb bag purchases
+RECOMP_PATCH s32 EnGirlA_CanBuyBombBagCuriosityShop(PlayState* play, EnGirlA* this) {
+    return CANBUY_RESULT_CANNOT_GET_NOW;
+}
+
+RECOMP_PATCH s32 EnGirlA_CanBuyBombBag20BombShop(PlayState* play, EnGirlA* this) {
+    return CANBUY_RESULT_HAVE_BETTER;
+}
+
+RECOMP_PATCH s32 EnGirlA_CanBuyBombBag30BombShop(PlayState* play, EnGirlA* this) {
+    return CANBUY_RESULT_HAVE_BETTER;
+}

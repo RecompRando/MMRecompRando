@@ -270,14 +270,20 @@ RECOMP_PATCH void EnFsn_GiveItem(EnFsn* this, PlayState* play) {
         this->actionFunc = EnFsn_SetupResumeInteraction;
         this->getItemId = 0;
     } else if (this->isSelling == true) {
-        // Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
-        Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
+        if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled()) {
+            Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
+        } else {
+            Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
+        }
     } else {
-        // note: this gets hit 4 times so i don't think vanilla rewards can work here
         if (this->getItemId == GI_MASK_KEATON || this->getItemId == GI_LETTER_TO_MAMA) {
             Actor_OfferGetItem(&this->actor, play, this->getItemId, 300.0f, 300.0f);
         } else {
-            Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_FSN_RUPEE), LOCATION_FSN_RUPEE, 300.0f, 300.0f, true, true);
+            if (rando_location_is_checked(LOCATION_FSN_RUPEE)) {
+                Actor_OfferGetItem(&this->actor, play, this->getItemId, 300.0f, 300.0f);
+            } else {
+                Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_FSN_RUPEE), LOCATION_FSN_RUPEE, 300.0f, 300.0f, true, true);
+            }
         }
     }
 }
@@ -298,8 +304,11 @@ RECOMP_PATCH void EnFsn_HandleCanPlayerBuyItem(EnFsn* this, PlayState* play) {
             Audio_PlaySfx_MessageDecide();
             item = this->items[this->cursorIndex];
             item->buyFanfareFunc(play, item);
-            // Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
-            Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
+            if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled()) {
+                Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
+            } else {
+                Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
+            }
             Rupees_ChangeBy(-play->msgCtx.unk1206C);
             play->msgCtx.msgMode = MSGMODE_TEXT_CLOSING;
             play->msgCtx.stateTimer = 4;
@@ -344,16 +353,22 @@ RECOMP_PATCH void EnOssan_BuyItemWithFanfare(EnOssan* this, PlayState* play) {
         this->actor.parent = NULL;
         EnOssan_SetupAction(this, EnOssan_SetupItemPurchased);
     } else {
-        // Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
-        Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
+        if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled()) {
+            Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
+        } else {
+            Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
+        }
     }
 }
 
 RECOMP_PATCH void EnOssan_SetupBuyItemWithFanfare(PlayState* play, EnOssan* this) {
     Player* player = GET_PLAYER(play);
 
-    // Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
-    Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
+    if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled()) {
+        Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
+    } else {
+        Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
+    }
     Rupees_ChangeBy(-play->msgCtx.unk1206C);
     play->msgCtx.msgMode = MSGMODE_TEXT_CLOSING;
     play->msgCtx.stateTimer = 4;
@@ -372,16 +387,22 @@ RECOMP_PATCH void EnSob1_BuyItemWithFanfare(EnSob1* this, PlayState* play) {
         this->actor.parent = NULL;
         EnSob1_SetupAction(this, EnSob1_SetupItemPurchased);
     } else {
-        // Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
-        Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
+        if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled()) {
+            Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
+        } else {
+            Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
+        }
     }
 }
 
 RECOMP_PATCH void EnSob1_SetupBuyItemWithFanfare(PlayState* play, EnSob1* this) {
     Player* player = GET_PLAYER(play);
 
-    // Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
-    Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
+    if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled()) {
+        Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
+    } else {
+        Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
+    }
     Rupees_ChangeBy(-play->msgCtx.unk1206C);
     play->msgCtx.msgMode = MSGMODE_TEXT_CLOSING;
     play->msgCtx.stateTimer = 4;
@@ -402,16 +423,22 @@ RECOMP_PATCH void EnTrt_BuyItemWithFanfare(EnTrt* this, PlayState* play) {
         this->actor.parent = NULL;
         this->actionFunc = EnTrt_SetupItemGiven;
     } else {
-        // Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
-        Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
+        if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled()) {
+            Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
+        } else {
+            Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
+        }
     }
 }
 
 RECOMP_PATCH void EnTrt_SetupBuyItemWithFanfare(PlayState* play, EnTrt* this) {
     Player* player = GET_PLAYER(play);
 
-    // Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
-    Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
+    if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled()) {
+        Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
+    } else {
+        Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
+    }
     Rupees_ChangeBy(-play->msgCtx.unk1206C);
     play->msgCtx.msgMode = MSGMODE_TEXT_CLOSING;
     play->msgCtx.stateTimer = 4;
@@ -452,7 +479,7 @@ RECOMP_PATCH void EnTrt_SelectItem(EnTrt* this, PlayState* play) {
             }
         } else if ((talkState == TEXT_STATE_5) && Message_ShouldAdvance(play)) {
             // if (!Inventory_HasEmptyBottle()) {
-            if (!Inventory_HasEmptyBottle() && !rando_shopsanity_enabled()) {
+            if (!Inventory_HasEmptyBottle() && (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled())) {
                 Audio_PlaySfx(NA_SE_SY_ERROR);
                 EnTrt_SetupCannotBuy(play, this, 0x846);
             } else {

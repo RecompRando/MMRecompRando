@@ -328,7 +328,7 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         font->msgBuf.schar[0] = 0x06;
         font->msgBuf.schar[1] = 0x71;
     }
-    if ((textId & 0xFF00) == 0x3600 || (textId & 0xFF00) == 0x3700 || textId == 0x0880) {
+    if ((textId & 0xFF00) == 0x3600 || (textId & 0xFF00) == 0x3700 || (textId == 0x0880 && rando_shopsanity_enabled() && !rando_location_is_checked_async(0x090002))) {
         msg = shop_msg;
         font->msgBuf.schar[0] = 0x06;
         font->msgBuf.schar[1] = 0x30;
