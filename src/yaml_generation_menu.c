@@ -503,7 +503,7 @@ void randoCreateYamlConfigMenu() {
     randoCreateBoolPropOption(&yaml_config_menu, "scrubsanity", "Scrub-Sanity:", false);
     randoCreateBoolPropOption(&yaml_config_menu, "cowsanity", "Cow-Sanity:", false);
     randoCreateBoolPropOption(&yaml_config_menu, "keysanity", "Key-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "fairysanity", "Fairy Sanity:", false);
+    randoCreateBoolPropOption(&yaml_config_menu, "fairysanity", "Fairy-Sanity:", false);
     randoCreateBoolPropOption(&yaml_config_menu, "start_with_consumables", "Start With Consumables:", true);
     randoCreateBoolPropOption(&yaml_config_menu, "permanent_chateau_romani", "Permanent Chateau Romani:", true);
     randoCreateBoolPropOption(&yaml_config_menu, "start_with_inverted_time", "Start With Inverted Time:", true);
