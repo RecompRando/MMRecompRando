@@ -368,7 +368,6 @@ void update_rando(PlayState* play) {
             u8 new_sword_level = rando_has_item(GI_SWORD_KOKIRI);
             u8 new_shield_level = rando_has_item(GI_SHIELD_HERO);
 
-            u8 bottle_count_new = rando_has_item(GI_BOTTLE) + rando_has_item(GI_POTION_RED_BOTTLE) + rando_has_item(GI_CHATEAU_BOTTLE) + rando_has_item(GI_MILK_BOTTLE);
             u8 bottle_count = 0;
 
             s16 old_health = gSaveContext.save.saveInfo.playerData.health;
@@ -434,9 +433,6 @@ void update_rando(PlayState* play) {
                     bottle_count += 1;
                 }
             }
-            for (i = bottle_count; i < bottle_count_new; ++i) {
-                randoItemGive(GI_BOTTLE);
-            }
 
             if (rando_has_item(GI_BOMBCHUS_1) || rando_has_item(GI_BOMBCHUS_5) || rando_has_item(GI_BOMBCHUS_10) || rando_has_item(GI_BOMBCHUS_20)) {
                 randoItemGive(GI_BOMBCHUS_20);
@@ -465,13 +461,20 @@ void update_rando(PlayState* play) {
                         continue;
                     }
                     switch (gi) {
+                        case GI_POTION_RED_BOTTLE:
+                        case GI_CHATEAU_BOTTLE:
+                        case GI_BOTTLE:
+                        case GI_MILK_BOTTLE:
+                            if (bottle_count > 0) {
+                                bottle_count -= 1;
+                                continue;
+                            }
+                            break;
                         case GI_QUIVER_30:
                         case GI_BOMB_BAG_20:
                         case GI_WALLET_ADULT:
                         case GI_SWORD_KOKIRI:
                         case GI_SHIELD_HERO:
-                        case GI_POTION_RED_BOTTLE:
-                        case GI_CHATEAU_BOTTLE:
                         case GI_TRUE_SKULL_TOKEN:
                         case GI_OCEAN_SKULL_TOKEN:
                             continue;
