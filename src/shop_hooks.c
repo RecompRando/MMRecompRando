@@ -439,21 +439,16 @@ void EnTrt_VanillaBuyItemWithFanfare(EnTrt* this, PlayState* play) {
 }
 
 RECOMP_PATCH void EnTrt_BuyItemWithFanfare(EnTrt* this, PlayState* play) {
-    if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled()) {
-        EnTrt_ShopsanityBuyItemWithFanfare(this, play);
-    } else {
+    if (!rando_shopsanity_enabled() || rando_location_is_checked(location_to_buy)) {
         EnTrt_VanillaBuyItemWithFanfare(this, play);
+    } else {
+        EnTrt_ShopsanityBuyItemWithFanfare(this, play);
     }
 }
 
 RECOMP_PATCH void EnTrt_SetupBuyItemWithFanfare(PlayState* play, EnTrt* this) {
     Player* player = GET_PLAYER(play);
 
-    if (rando_location_is_checked(location_to_buy) || !rando_shopsanity_enabled()) {
-        Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
-    } else {
-        Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(location_to_buy), location_to_buy, 300.0f, 300.0f, true, true);
-    }
     Rupees_ChangeBy(-play->msgCtx.unk1206C);
     play->msgCtx.msgMode = MSGMODE_TEXT_CLOSING;
     play->msgCtx.stateTimer = 4;
@@ -587,7 +582,7 @@ RECOMP_PATCH void EnTrt_SelectItem(EnTrt* this, PlayState* play) {
             if (!EnTrt_TestCancelOption(this, play, CONTROLLER1(&play->state)) && Message_ShouldAdvance(play)) {
                 switch (play->msgCtx.choiceIndex) {
                     case 0:
-                        kotake_is_weird = !shopItemIsChecked(item, play);
+                        kotake_is_weird = rando_shopsanity_enabled() && !shopItemIsChecked(item, play);
                         EnTrt_HandleCanBuyItem(play, this);
                         break;
 
@@ -603,7 +598,7 @@ RECOMP_PATCH void EnTrt_SelectItem(EnTrt* this, PlayState* play) {
             }
         } else if ((talkState == TEXT_STATE_5) && Message_ShouldAdvance(play)) {
             // if (!Inventory_HasEmptyBottle()) {
-            if (!Inventory_HasEmptyBottle() && (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled())) {
+            if (!Inventory_HasEmptyBottle() && (rando_location_is_checked(location_to_buy) || !rando_shopsanity_enabled())) {
                 Audio_PlaySfx(NA_SE_SY_ERROR);
                 EnTrt_SetupCannotBuy(play, this, 0x846);
             } else {
