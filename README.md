@@ -18,15 +18,12 @@ This randomizer is still under development in the beta phase but is considered s
 ### Mod Installation
 1. Download the latest [Visual Studio C++ Redist](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-microsoft-visual-c-redistributable-version).
 2. Download [Zelda64Recomp](https://github.com/Zelda64Recomp/Zelda64Recomp/releases/latest).
-3. Optionally download any additional mods or texture packs you'd like from [Thunderstore](https://thunderstore.io/c/zelda-64-recompiled/).
-    1. You only need to drag and drop mod zips from Thunderstore onto the game window to install them.
-4. Download [MMRecompRando.zip](https://github.com/RecompRando/MMRecompRando/releases/latest).
-5. Place the mods within the zip into the Zelda64Recomp mods folder, as well as any texture packs you've downloaded.
-    1. If on Windows, this is located at `%LOCALAPPDATA%\Zelda64Recompiled\mods`.
-    2. If on Linux, this is located at `~/.config/Zelda64Recompiled/mods`.
-6. You can also download [poptracker](https://github.com/black-sliver/PopTracker/releases/latest) along with [G4M3RL1F3's fork of Seto's pack](https://github.com/G4M3RL1F3/Majoras-Mask-AP-PopTracker-Pack/releases/latest)
-7. Open `Zelda64Recompiled`, select your ROM, and hit Start Game.
-8. Go nuts.
+3. Download [MMRecompRando.zip](https://github.com/RecompRando/MMRecompRando/releases/latest).
+4. Optionally download any additional mods or texture packs you'd like from [Thunderstore](https://thunderstore.io/c/zelda-64-recompiled/).
+    - You only need to drag and drop mod zips from GitHub or Thunderstore onto the game window to install them.
+5. You can also download [poptracker](https://github.com/black-sliver/PopTracker/releases/latest) along with [G4M3RL1F3's fork of Seto's pack](https://github.com/G4M3RL1F3/Majoras-Mask-AP-PopTracker-Pack/releases/latest)
+6. Open `Zelda64Recompiled`, select your ROM, and hit Start Game.
+7. Go nuts.
 
 ## FAQ
 
