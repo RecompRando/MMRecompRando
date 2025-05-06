@@ -1885,6 +1885,10 @@ u8 randoItemGive(u32 gi) {
     u8 dungeonIndex;
     s16 old_health;
 
+    if (rando_has_item(GI_OCARINA_OF_TIME)) {
+        INV_CONTENT(ITEM_OCARINA_OF_TIME) = ITEM_OCARINA_OF_TIME;
+    }
+
     gi &= 0xFFFFFF;
 
     switch (gi & 0xFF0000) {
