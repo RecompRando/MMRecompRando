@@ -279,16 +279,24 @@ RECOMP_PATCH void EnGirlA_InitalUpdate(EnGirlA* this, PlayState* play) {
 
 // @rando prevent vanilla shield from being bought without already having a progressive shield
 RECOMP_PATCH s32 EnGirlA_CanBuyShieldHero(PlayState* play, EnGirlA* this) {
-    if (!rando_has_item(GI_SHIELD_HERO)) {
-        return CANBUY_RESULT_CANNOT_GET_NOW;
-    }
-    if (GET_CUR_EQUIP_VALUE(EQUIP_TYPE_SHIELD) != EQUIP_VALUE_SHIELD_NONE) {
+    if (!rando_has_item_async(GI_SHIELD_HERO) || GET_CUR_EQUIP_VALUE(EQUIP_TYPE_SHIELD) != EQUIP_VALUE_SHIELD_NONE) {
         return CANBUY_RESULT_NO_ROOM;
     }
     if (gSaveContext.save.saveInfo.playerData.rupees < play->msgCtx.unk1206C) {
         return CANBUY_RESULT_NEED_RUPEES;
     }
     return CANBUY_RESULT_SUCCESS_1;
+}
+
+// @rando prevent arrows from being bought without having a progressive bow
+RECOMP_PATCH s32 EnGirlA_CanBuyArrows(PlayState* play, EnGirlA* this) {
+    if (!rando_has_item_async(GI_QUIVER_30) || AMMO(ITEM_BOW) >= CUR_CAPACITY(UPG_QUIVER)) {
+        return CANBUY_RESULT_NO_ROOM_2;
+    }
+    if (gSaveContext.save.saveInfo.playerData.rupees < play->msgCtx.unk1206C) {
+        return CANBUY_RESULT_NEED_RUPEES;
+    }
+    return CANBUY_RESULT_SUCCESS_2;
 }
 
 // @rando adjust bombchu purchases to bombchu bag
