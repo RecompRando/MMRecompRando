@@ -8,7 +8,7 @@
 id = "mm_recomp_rando"
 
 # Version of this mod.
-version = "0.9.0"
+version = "0.9.2-a"
 
 # The name that will show up for this mod in the mod menu. This should be human readable.
 display_name = "MMRecompRando"
