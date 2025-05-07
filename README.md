@@ -44,15 +44,14 @@ If you picked up a phantom on a check that should be implemented, you can open a
 ## Known Issues
 
 - Kotake sometimes does not show the price of her shopsanity item in the second dialogue.
-- Buying the vanilla Shield (far-left item) in the Zora Hall shop will softlock the game.
-- Trying to buy a progression item normally sold in a shop (such as the Bomb Bag) will not work, but will take your Rupees anyway.
+- Trying to buy the Powder Keg from the Bomb Shop Goron will crash.
 
 ## Credit for additional mods included
 
 Thank you to the original authors of some of the other recomp mods used!
 
-- danielryb (Better SoDT, Z-Target Fix, Song Utils)
 - ThatHypedPerson (Color Mods)
+- danielryb (Better SoDT, Z-Target Fix, Song Utils)
 
 ## Writing mods
 See [this document](https://hackmd.io/fMDiGEJ9TBSjomuZZOgzNg) for an explanation of the modding framework, including how to write function patches and perform interop between different mods.
