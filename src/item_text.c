@@ -553,7 +553,7 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         
         // these colors could change
         u8 desc_str[128] = "This is a";
-        u8 prog_str[128] = "\x03 Progressive Item ";
+        u8 prog_str[128] = "\x03 Progression Item ";
         u8 useful_str[128] = "\x05 Useful Item ";
         u8 junk_str[128] = "\x07 Filler Item ";
         u8 trap_str[128] = "\x01 Trap ";
