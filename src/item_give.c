@@ -1639,6 +1639,11 @@ RECOMP_PATCH u8 Item_Give(PlayState* play, u8 item) {
         }
         give = true;
 
+    } else if (item == ITEM_SHIELD_HERO) {
+        SET_EQUIP_VALUE(EQUIP_TYPE_SHIELD, MIN(rando_has_item(GI_SHIELD_HERO), EQUIP_VALUE_SHIELD_MIRROR));
+        Player_SetEquipmentData(play, player);
+        return ITEM_NONE;
+
     } else if (item == ITEM_MAGIC_BEANS) {
         if (INV_CONTENT(ITEM_MAGIC_BEANS) == ITEM_NONE) {
             INV_CONTENT(item) = item;
@@ -2059,6 +2064,7 @@ u8 randoItemGive(u32 gi) {
         if (item == ITEM_SWORD_RAZOR) {
             gSaveContext.save.saveInfo.playerData.swordHealth = 100;
         }
+        Player_SetEquipmentData(play, player);
         return ITEM_NONE;
 
     } else if (item == ITEM_SHIELD_HERO) {
@@ -2138,18 +2144,20 @@ u8 randoItemGive(u32 gi) {
     } else if (item == ITEM_WALLET_ADULT) {
         if (CUR_UPG_VALUE(UPG_WALLET) == 2) {
             // stop sending yourself wallets you freaks
-            Rupees_ChangeBy(500); // you can get money though
+            if (rando_get_receive_filled_wallets_enabled()) {
+                Rupees_ChangeBy(gUpgradeCapacities[UPG_WALLET][3]); // you can get money though
+            }
             return ITEM_NONE;
         } else if (CUR_UPG_VALUE(UPG_WALLET) == 1) {
             Inventory_ChangeUpgrade(UPG_WALLET, 2);
             if (rando_get_receive_filled_wallets_enabled()) {
-                Rupees_ChangeBy(500);
+                Rupees_ChangeBy(gUpgradeCapacities[UPG_WALLET][2]);
             }
             return ITEM_NONE;
         }
         Inventory_ChangeUpgrade(UPG_WALLET, 1);
         if (rando_get_receive_filled_wallets_enabled()) {
-            Rupees_ChangeBy(200);
+            Rupees_ChangeBy(gUpgradeCapacities[UPG_WALLET][1]);
         }
         return ITEM_NONE;
 

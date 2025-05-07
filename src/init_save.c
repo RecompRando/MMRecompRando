@@ -127,7 +127,7 @@ RECOMP_PATCH void Sram_InitNewSave(void) {
 
     if (rando_get_start_with_consumables_enabled()) {
         // start with basic consumables
-        gSaveContext.save.saveInfo.playerData.rupees = 99;
+        gSaveContext.save.saveInfo.playerData.rupees = gUpgradeCapacities[UPG_WALLET][0];
         gSaveContext.save.saveInfo.inventory.items[SLOT_DEKU_STICK] = ITEM_DEKU_STICK;
         gSaveContext.save.saveInfo.inventory.ammo[SLOT_DEKU_STICK] = 10;
         gSaveContext.save.saveInfo.inventory.items[SLOT_DEKU_NUT] = ITEM_DEKU_NUT;

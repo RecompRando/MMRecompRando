@@ -519,7 +519,7 @@ RECOMP_PATCH void EnItem00_Update(Actor* thisx, PlayState* play) {
     }
 
     if (this->actor.params == ITEM00_SHIELD_HERO) {
-        randoItemGive(GI_SHIELD_HERO);
+        Item_Give(play, ITEM_SHIELD_HERO);
     }
 
     switch (this->actor.params) {
