@@ -44,7 +44,7 @@ If you picked up a phantom on a check that should be implemented, you can open a
 ## Known Issues
 
 - Kotake sometimes does not show the price of her shopsanity item in the second dialogue.
-- Trying to buy the Powder Keg from the Bomb Shop Goron will crash.
+- Healing Darmani and Mikau will show the vanilla item despite being randomized.
 
 ## Credit for additional mods included
 

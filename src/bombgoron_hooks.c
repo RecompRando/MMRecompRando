@@ -240,7 +240,7 @@ RECOMP_PATCH u16 EnSGoro_BombshopGoron_NextTextId(EnSGoro* this, PlayState* play
 
         case 0x670:
             if (this->bombbuyFlags & EN_S_GORO_BOMBBUYFLAG_YESBUY) {
-                if (AMMO(ITEM_POWDER_KEG) != 0 && rando_location_is_checked(LOCATION_BOMBSHOP_KEG)) {
+                if (AMMO(ITEM_POWDER_KEG) != 0 && (rando_location_is_checked(LOCATION_BOMBSHOP_KEG) || !rando_shopsanity_enabled())) {
                     this->actionFlags |= EN_S_GORO_ACTIONFLAG_LASTMESSAGE;
                     Audio_PlaySfx(NA_SE_SY_ERROR);
                     return 0x673;
@@ -323,7 +323,7 @@ RECOMP_PATCH void EnSGoro_ShopGoron_Talk(EnSGoro* this, PlayState* play) {
         if ((this->textId == 0x675) || (this->textId == 0x676)) {
             play->msgCtx.msgMode = MSGMODE_TEXT_CLOSING;
             play->msgCtx.stateTimer = 4;
-            if (rando_location_is_checked(LOCATION_BOMBSHOP_KEG)) {
+            if (rando_location_is_checked(LOCATION_BOMBSHOP_KEG) || !rando_shopsanity_enabled()) {
                 this->actionFunc = EnSGoro_ShopGoron_TakePayment;
             } else {
                 this->actionFunc = EnSGoro_ShopGoron_GiveRandoItem;
