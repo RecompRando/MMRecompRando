@@ -162,6 +162,15 @@ RECOMP_PATCH void EnGg_Init(Actor* thisx, PlayState* play) {
     func_80B35250(this);
 }
 
+void EnGg_GiveMaskAndDie(EnGg* this, PlayState* play) {
+    if (Actor_HasParent(&this->actor, play)) {
+        this->actor.parent = NULL;
+        Actor_Kill(&this->actor);
+    } else {
+        Actor_OfferGetItem(&this->actor, play, GI_MASK_GORON, 300.0f, 300.0f);
+    }
+}
+
 RECOMP_PATCH void func_80B359DC(EnGg* this, PlayState* play) {
     Player* player = GET_PLAYER(play);
 
@@ -193,10 +202,7 @@ RECOMP_PATCH void func_80B359DC(EnGg* this, PlayState* play) {
 
             if (this->unk_307) {
                 // CutsceneManager_Queue(this->csId);
-                play->nextEntrance = ENTRANCE(GORON_GRAVERYARD, 1);
-                play->transitionType = TRANS_TYPE_FADE_BLACK_FAST;
-                gSaveContext.nextTransitionType = TRANS_TYPE_FADE_BLACK_FAST;
-                play->transitionTrigger = TRANS_TRIGGER_START;
+                this->actionFunc = EnGg_GiveMaskAndDie;
             }
         }
     } else {

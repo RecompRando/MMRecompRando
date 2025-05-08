@@ -3,6 +3,8 @@
 
 #include "apcommon.h"
 
+extern bool healedMikau;
+
 #define FLAGS (ACTOR_FLAG_TARGETABLE | ACTOR_FLAG_FRIENDLY)
 
 #define THIS ((EnZog*)thisx)
@@ -120,7 +122,7 @@ RECOMP_PATCH void EnZog_Init(Actor* thisx, PlayState* play) {
     Collider_InitAndSetCylinder(play, &this->collider, &this->actor, &sCylinderInit);
     this->actor.colChkInfo.mass = MASS_IMMOVABLE;
 
-    if ((ENZOG_GET_F(&this->actor) != ENZOG_F_2) && (rando_location_is_checked(GI_MASK_ZORA)) &&
+    if ((ENZOG_GET_F(&this->actor) != ENZOG_F_2) && (rando_location_is_checked(GI_MASK_ZORA) || healedMikau) &&
         ((play->csCtx.scriptIndex != 2) || (gSaveContext.sceneLayer != 0) || (play->sceneId != SCENE_30GYOSON))) {
         Actor_Kill(&this->actor);
         return;
@@ -336,7 +338,8 @@ void func_80B93B44(EnZog* this);
 RECOMP_PATCH void func_80B93BA8(EnZog* this, s16 csIdIndex) {
     if (csIdIndex == 2) {
         PlayState* play = gPlay;
-        play->nextEntrance = ENTRANCE(GREAT_BAY_COAST, 9);
+        healedMikau = true;
+        play->nextEntrance = ENTRANCE(GREAT_BAY_COAST, 10);
         play->transitionType = TRANS_TYPE_FADE_BLACK_FAST;
         gSaveContext.nextTransitionType = TRANS_TYPE_FADE_BLACK_FAST;
         play->transitionTrigger = TRANS_TRIGGER_START;
