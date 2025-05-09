@@ -219,9 +219,11 @@ RECOMP_PATCH void EnMa4_StartDialogue(EnMa4* this, PlayState* play) {
     }
 }
 
-void EnMa4_OfferMilkItem(EnMa4* this, PlayState* play) {
+void EnMa4_OfferEponaSong(EnMa4* this, PlayState* play) {
     if (Actor_HasParent(&this->actor, play)) {
         this->actor.parent = NULL;
+        Message_BombersNotebookQueueEvent(play, BOMBERS_NOTEBOOK_EVENT_MET_ROMANI);
+        Message_BombersNotebookQueueEvent(play, BOMBERS_NOTEBOOK_EVENT_PROMISED_TO_HELP_WITH_THEM);
         this->actionFunc = EnMa4_Wait;
     } else {
         Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(GI_EPONAS_SONG), GI_EPONAS_SONG, 300.0f, 300.0f, true, true);
@@ -337,12 +339,12 @@ RECOMP_PATCH void EnMa4_ChooseNextDialogue(EnMa4* this, PlayState* play) {
 
                 // Check if player has Epona's song
                 //~ if (CHECK_QUEST_ITEM(QUEST_SONG_EPONA)) {
-                if (rando_location_is_checked(GI_MILK_BOTTLE)) {
+                if (rando_location_is_checked(GI_EPONAS_SONG)) {
                     Message_StartTextbox(play, 0x334C, &this->actor);
                     this->textId = 0x334C;
                 } else {
                     Message_CloseTextbox(play);
-                    this->actionFunc = EnMa4_OfferMilkItem;
+                    this->actionFunc = EnMa4_OfferEponaSong;
                     //~ player->stateFlags1 |= PLAYER_STATE1_20;
                     //~ EnMa4_SetupBeginEponasSongCs(this);
                     //~ EnMa4_BeginEponasSongCs(this, play);
@@ -350,7 +352,8 @@ RECOMP_PATCH void EnMa4_ChooseNextDialogue(EnMa4* this, PlayState* play) {
                 break;
 
             case 0x3358:
-                if ((GET_PLAYER_FORM != PLAYER_FORM_HUMAN) || !CHECK_QUEST_ITEM(QUEST_SONG_EPONA)) {
+                // if ((GET_PLAYER_FORM != PLAYER_FORM_HUMAN) || !CHECK_QUEST_ITEM(QUEST_SONG_EPONA)) {
+                if ((GET_PLAYER_FORM != PLAYER_FORM_HUMAN) || !rando_location_is_checked(GI_EPONAS_SONG)) {
                     Message_StartTextbox(play, 0x335C, &this->actor);
                     this->textId = 0x335C;
                     Message_BombersNotebookQueueEvent(play, BOMBERS_NOTEBOOK_EVENT_MET_ROMANI);
@@ -360,6 +363,25 @@ RECOMP_PATCH void EnMa4_ChooseNextDialogue(EnMa4* this, PlayState* play) {
                 }
                 break;
 
+            default:
+                break;
+        }
+    }
+}
+
+RECOMP_HOOK("EnMa4_HandlePlayerChoice")
+void EnMa4_AddRomaniPromiseToNotebook(EnMa4* this, PlayState* play) {
+    if (Message_ShouldAdvance(play)) {
+        switch (this->textId) {
+            case 0x334D:
+                if (play->msgCtx.choiceIndex == 0) {
+                    // if (CHECK_QUEST_ITEM(QUEST_SONG_EPONA)) {
+                    if (rando_location_is_checked(GI_EPONAS_SONG)) {
+                        // this doesn't trigger with current skips, but here for consistency
+                        Message_BombersNotebookQueueEvent(play, BOMBERS_NOTEBOOK_EVENT_PROMISED_TO_HELP_WITH_THEM);
+                    }
+                }
+                break;
             default:
                 break;
         }
