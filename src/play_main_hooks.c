@@ -291,6 +291,47 @@ RECOMP_PATCH s32 Health_ChangeBy(PlayState* play, s16 healthChange) {
     }
 }
 
+s32 Health_ChangeBy_NoSound(PlayState* play, s16 healthChange) {
+    if (gSaveContext.save.saveInfo.playerData.doubleDefense && (healthChange < 0)) {
+        healthChange >>= 1;
+    }
+
+    if (healthChange < 0) {
+        s16 damageMult = rando_damage_multiplier();
+        if (damageMult == 0xF) {
+            gSaveContext.save.saveInfo.playerData.health = 0;
+        }
+
+        if (damageMult == 0) {
+            healthChange *= 0.5;
+        } else {
+            healthChange *= damageMult;
+        }
+    }
+
+    gSaveContext.save.saveInfo.playerData.health += healthChange;
+
+    if (((void)0, gSaveContext.save.saveInfo.playerData.health) >
+        ((void)0, gSaveContext.save.saveInfo.playerData.healthCapacity)) {
+        gSaveContext.save.saveInfo.playerData.health = gSaveContext.save.saveInfo.playerData.healthCapacity;
+    }
+
+    if (gSaveContext.save.saveInfo.playerData.health <= 0) {
+        gSaveContext.save.saveInfo.playerData.health = 0;
+        if (rando_get_death_link_enabled()) {
+            rando_send_death_link();
+        }
+
+        if (rando_death_behavior() == 3) {
+            Interface_StartMoonCrash(play);
+        }
+
+        return false;
+    } else {
+        return true;
+    }
+}
+
 ItemId randoConvertItemId(u32 ap_item_id) {
     ap_item_id &= 0xFFFFFF;
 

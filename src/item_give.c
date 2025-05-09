@@ -1880,6 +1880,8 @@ RECOMP_PATCH bool func_8083FFEC(PlayState* play, Player* this) {
     return false;
 }
 
+s32 Health_ChangeBy_NoSound(PlayState* play, s16 healthChange);
+
 u8 randoItemGive(u32 gi) {
     PlayState* play = gPlay;
     Player* player = GET_PLAYER(play);
@@ -1898,7 +1900,7 @@ u8 randoItemGive(u32 gi) {
 
     switch (gi & 0xFF0000) {
         case 0x010000:
-            Health_ChangeBy(play, 0x30);
+            Health_ChangeBy_NoSound(play, 0x30);
             switch (gi & 0xFF) {
                 case 0x7F:
                     SET_WEEKEVENTREG(WEEKEVENTREG_08_80);
@@ -2022,7 +2024,7 @@ u8 randoItemGive(u32 gi) {
 
     } else if ((item == ITEM_HEART_PIECE_2) || (item == ITEM_HEART_PIECE)) {
         INCREMENT_QUEST_HEART_PIECE_COUNT;
-        Health_ChangeBy(play, gSaveContext.save.saveInfo.playerData.healthCapacity - gSaveContext.save.saveInfo.playerData.health);
+        Health_ChangeBy_NoSound(play, gSaveContext.save.saveInfo.playerData.healthCapacity - gSaveContext.save.saveInfo.playerData.health);
         if (EQ_MAX_QUEST_HEART_PIECE_COUNT) {
             RESET_HEART_PIECE_COUNT;
             gSaveContext.save.saveInfo.playerData.healthCapacity += 0x10;
@@ -2031,7 +2033,7 @@ u8 randoItemGive(u32 gi) {
         return ITEM_NONE;
 
     } else if (item == ITEM_HEART_CONTAINER) {
-        Health_ChangeBy(play, gSaveContext.save.saveInfo.playerData.healthCapacity - gSaveContext.save.saveInfo.playerData.health);
+        Health_ChangeBy_NoSound(play, gSaveContext.save.saveInfo.playerData.healthCapacity - gSaveContext.save.saveInfo.playerData.health);
         gSaveContext.save.saveInfo.playerData.healthCapacity += 0x10;
         gSaveContext.save.saveInfo.playerData.health += 0x10;
         return ITEM_NONE;
@@ -2324,7 +2326,7 @@ u8 randoItemGive(u32 gi) {
         return ITEM_NONE;
 
     } else if (item == ITEM_RECOVERY_HEART) {
-        Health_ChangeBy(play, 0x10);
+        Health_ChangeBy_NoSound(play, 0x10);
         return item;
 
     } else if (item == ITEM_MAGIC_JAR_SMALL) {
