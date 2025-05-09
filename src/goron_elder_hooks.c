@@ -116,6 +116,8 @@ static AnimationInfoS sAnimationInfo[EN_JG_ANIM_MAX] = {
 
 static Vec3f sSfxPos = { 0.0f, 0.0f, 0.0f };
 
+EnJg* gEnJg;
+
 void EnJg_SetupWalk(EnJg* this, PlayState* play);
 void EnJg_Talk(EnJg* this, PlayState* play);
 void EnJg_AlternateTalkOrWalkInPlace(EnJg* this, PlayState* play);
@@ -140,11 +142,17 @@ void EnJg_OfferLullabyIntro(EnJg* this, PlayState* play) {
 }
 
 RECOMP_PATCH void EnJg_SetupTalk(EnJg* this, PlayState* play) {
+    // @rando prevent lullaby cutscene if location is checked
+    if (rando_location_is_checked(LOCATION_LULLABY_INTRO)) {
+        SET_WEEKEVENTREG(WEEKEVENTREG_24_40);
+    }
+    
     Player* player = GET_PLAYER(play);
     switch (this->textId) {
         case 0xDAC: // What was I doing?
             if (!rando_location_is_checked(LOCATION_LULLABY_INTRO) && player->transformation == PLAYER_FORM_GORON && CHECK_WEEKEVENTREG(WEEKEVENTREG_24_80)) {
                 Message_CloseTextbox(play);
+                SET_WEEKEVENTREG(WEEKEVENTREG_24_40);
                 this->actionFunc = EnJg_OfferLullabyIntro;
                 break;
             }
