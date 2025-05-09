@@ -1,7 +1,11 @@
 #include "modding.h"
 #include "global.h"
 
+#include "apcommon.h"
+
 struct ObjHugebombiwa;
+
+#define THIS ((ObjHugebombiwa*)thisx)
 
 typedef void (*ObjHugebombiwaActionFunc)(struct ObjHugebombiwa*, PlayState*);
 
@@ -26,6 +30,15 @@ typedef struct ObjHugebombiwa {
     /* 0x4B3 */ s8 unk_4B3;
     /* 0x4B4 */ ObjHugebombiwaActionFunc actionFunc;
 } ObjHugebombiwa; // size = 0x4B8
+
+RECOMP_HOOK("ObjHugebombiwa_Init")
+void ObjHugebombiwa_KillIfHasKegPrivileges(Actor* thisx, PlayState* play) {
+    ObjHugebombiwa* this = THIS;
+    if (rando_location_is_checked(GI_POWDER_KEG)) {
+        SET_WEEKEVENTREG(WEEKEVENTREG_19_02);
+        Actor_Kill(&this->actor);
+    }
+}
 
 void func_80A53BE0(PlayState* play, Vec3f* arg1);
 void func_80A54E10(ObjHugebombiwa* this);

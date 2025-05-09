@@ -7,6 +7,8 @@
 
 struct EnGk;
 
+#define THIS ((EnGk*)thisx)
+
 typedef void (*EnGkActionFunc)(struct EnGk*, PlayState*);
 
 #define ENGK_GET_F(thisx) ((thisx)->params & 0xF)
@@ -380,4 +382,18 @@ RECOMP_PATCH void func_80B52430(EnGk* this, PlayState* play) {
 
     Math_SmoothStepToS(&this->actor.shape.rot.y, this->actor.yawTowardsPlayer, 5, 0x1000, 0x100);
     this->actor.world.rot.y = this->actor.shape.rot.y;
+}
+
+RECOMP_HOOK("EnGk_Init")
+void EnGk_KillIfHasKegPrivileges(Actor* thisx, PlayState* play) {
+    EnGk* this = THIS;
+
+    if (ENGK_GET_F(&this->actor) == ENGK_F_1) {
+        if (play->sceneId == SCENE_17SETUGEN2) {
+            if (rando_location_is_checked(GI_POWDER_KEG)) {
+                Actor_Kill(&this->actor);
+                return;
+            }
+        }
+    }
 }
