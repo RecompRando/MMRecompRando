@@ -519,19 +519,17 @@ void update_rando(PlayState* play) {
         }
 
         if (new_items_size > old_items_size) {
-            for (u32 i = old_items_size; i < new_items_size; ++i) {
-                u32 item_id = rando_get_item(i);
-                if (rando_get_sending_player(i) != rando_get_own_slot_id()) {
-                    char item_name[33];
-                    char player_name[17];
-                    rando_get_item_name_from_id(item_id, item_name);
-                    rando_get_sending_player_name(i, player_name);
-                    randoEmitRecieveNotification(item_name, player_name, randoConvertItemId(item_id), RANDO_ITEM_CLASS_PROGRESSION);
-                }
-                randoItemGive(item_id);
+            u32 item_id = rando_get_item(old_items_size);
+            if (rando_get_sending_player(old_items_size) != rando_get_own_slot_id()) {
+                char item_name[33];
+                char player_name[17];
+                rando_get_item_name_from_id(item_id, item_name);
+                rando_get_sending_player_name(old_items_size, player_name);
+                randoEmitRecieveNotification(item_name, player_name, randoConvertItemId(item_id), RANDO_ITEM_CLASS_PROGRESSION);
             }
+            randoItemGive(item_id);
 
-            old_items_size = new_items_size;
+            old_items_size += 1;
         }
 
         if (play->pauseCtx.state == 0 && rando_get_death_link_enabled() && rando_get_death_link_pending()) {
