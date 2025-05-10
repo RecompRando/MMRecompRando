@@ -8,13 +8,6 @@ This randomizer is still under development in the beta phase but is considered s
 
 ## Setup
 
-### Archipelago Setup
-1. Know [Archipelago](https://archipelago.gg/tutorial/Archipelago/setup/en).
-2. Download the [apworld](https://github.com/RecompRando/MMRecompRando/releases/latest).
-3. **MAKE SURE** to clear out _any_ apworlds named `mm-recomp.apworld` or `mm_recomp.apworld` from your `Archipelago/lib/worlds` folder and your `Archipelago/custom_worlds` folder.
-4. Place the apworld into `Archipelago/custom_worlds/`.
-5. Generate a multiworld, and host the game either locally or on the website.
-
 ### Mod Installation
 1. Download the latest [Visual Studio C++ Redist](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-microsoft-visual-c-redistributable-version).
 2. Download [Zelda64Recomp](https://github.com/Zelda64Recomp/Zelda64Recomp/releases/latest).
@@ -24,6 +17,21 @@ This randomizer is still under development in the beta phase but is considered s
 5. You can also download [poptracker](https://github.com/black-sliver/PopTracker/releases/latest) along with [G4M3RL1F3's fork of Seto's pack](https://github.com/G4M3RL1F3/Majoras-Mask-AP-PopTracker-Pack/releases/latest)
 6. Open `Zelda64Recompiled`, select your ROM, and hit Start Game.
 7. Go nuts.
+
+### Solo Setup
+1. Launch the game with the randomizer mod enabled.
+2. Select `Solo` in the randomizer menu.
+3. Create a new session and choose which settings you'd like.
+    - Details about these settings are currently not available through the mod only, you will have to look at the [multiworld's example YAML](https://github.com/RecompRando/Archipelago-MM/blob/master/worlds/mm_recomp/EXAMPLE_YAML.yaml) for more information on what each setting does.
+4. Hit `Generate` and select your seed.
+5. Profit.
+
+### Multiworld Archipelago Setup
+1. Know [Archipelago](https://archipelago.gg/tutorial/Archipelago/setup/en).
+2. Download the [apworld](https://github.com/RecompRando/MMRecompRando/releases/latest).
+3. **MAKE SURE** to clear out _any_ apworlds named `mm-recomp.apworld` or `mm_recomp.apworld` from your `Archipelago/lib/worlds` folder and your `Archipelago/custom_worlds` folder.
+4. Place the apworld into `Archipelago/custom_worlds/`.
+5. Generate a multiworld, and host the game either locally or on the website.
 
 ## FAQ
 
