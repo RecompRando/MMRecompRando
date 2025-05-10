@@ -48,6 +48,8 @@ RECOMP_PATCH void func_80C09648(EnKitan* this, PlayState* play) {
     } else {
         Actor_OfferGetItem(&this->actor, play, GI_HEART_PIECE, 2000.0f, 1000.0f);
     }
+    // Keaton quiz music being a fanfare, it needs to be stopped this way, or it keeps playing until a new sequence starts.
+    SEQCMD_STOP_SEQUENCE(SEQ_PLAYER_FANFARE, 128);
 }
 
 RECOMP_PATCH void EnKitan_Destroy(Actor* thisx, PlayState* play) {
