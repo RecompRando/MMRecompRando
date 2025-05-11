@@ -15,7 +15,10 @@ This randomizer is still under development in the beta phase but is considered s
 4. Optionally download any additional mods or texture packs you'd like from [Thunderstore](https://thunderstore.io/c/zelda-64-recompiled/).
     - You only need to drag and drop mod zips from GitHub or Thunderstore onto the game window to install them.
 5. You can also download [poptracker](https://github.com/black-sliver/PopTracker/releases/latest) along with [G4M3RL1F3's fork of Seto's pack](https://github.com/G4M3RL1F3/Majoras-Mask-AP-PopTracker-Pack/releases/latest)
-6. Open `Zelda64Recompiled`, select your ROM, and hit Start Game.
+6. Open `Zelda64Recompiled`.
+    1. Select your ROM file.
+    2. Install MMRecompRando and any additional mods.
+    3. Select Start Game.
 7. Go nuts.
 
 ### Solo Setup
