@@ -279,7 +279,7 @@ RECOMP_PATCH void EnFsn_GiveItem(EnFsn* this, PlayState* play) {
         if (this->getItemId == GI_MASK_KEATON || this->getItemId == GI_LETTER_TO_MAMA) {
             Actor_OfferGetItem(&this->actor, play, this->getItemId, 300.0f, 300.0f);
         } else {
-            if (rando_location_is_checked(LOCATION_FSN_RUPEE)) {
+            if (!rando_advanced_shops_enabled() || rando_location_is_checked(LOCATION_FSN_RUPEE)) {
                 Actor_OfferGetItem(&this->actor, play, this->getItemId, 300.0f, 300.0f);
             } else {
                 Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_FSN_RUPEE), LOCATION_FSN_RUPEE, 300.0f, 300.0f, true, true);

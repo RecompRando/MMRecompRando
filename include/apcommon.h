@@ -126,6 +126,7 @@ RECOMP_IMPORT(".", u32 rando_get_majora_remains_required());
 RECOMP_IMPORT(".", bool rando_is_magic_trap());
 RECOMP_IMPORT(".", bool rando_skulltulas_enabled());
 RECOMP_IMPORT(".", bool rando_shopsanity_enabled());
+RECOMP_IMPORT(".", bool rando_advanced_shops_enabled());
 RECOMP_IMPORT(".", bool rando_scrubs_enabled());
 RECOMP_IMPORT(".", bool rando_cows_enabled());
 RECOMP_IMPORT(".", u32 rando_get_location_type(u32 location_id));
