@@ -24,3 +24,43 @@ RECOMP_HOOK("func_80A450B0") void On_Guitar_Update(EnSekihi* this, PlayState* pl
         this->actionFunc = EnSekihi_GiveMask;
     }
 }
+
+extern CollisionHeader gSunsSongGraveTriforceCol;
+extern CollisionHeader gSunsSongGraveGoronCol;
+extern CollisionHeader gSunsSongGraveKokiriCol;
+extern CollisionHeader gSongOfSoaringPedestalCol;
+extern CollisionHeader gMikauGraveCol;
+
+void EnSekihi_Draw(Actor* thisx, PlayState* play);
+void EnSekihi_DoNothing(EnSekihi* this, PlayState* play);
+
+RECOMP_PATCH void func_80A44DE8(EnSekihi* this, PlayState* play) {
+    CollisionHeader* colHeader = NULL;
+    s32 type;
+    CollisionHeader* colHeaders[] = {
+        &gSunsSongGraveTriforceCol, &gSunsSongGraveGoronCol, &gSunsSongGraveKokiriCol,
+        &gSongOfSoaringPedestalCol, &gMikauGraveCol,
+    };
+
+    type = ENSIKIHI_GET_TYPE(&this->dyna.actor);
+    if (Object_IsLoaded(&play->objectCtx, this->objectSlot)) {
+        this->dyna.actor.objectSlot = this->objectSlot;
+        this->dyna.actor.draw = EnSekihi_Draw;
+        if (type == SEKIHI_TYPE_4) {
+            this->actionFunc = func_80A450B0;
+        } else {
+            this->actionFunc = EnSekihi_DoNothing;
+        }
+
+        Actor_SetObjectDependency(play, &this->dyna.actor);
+        DynaPolyActor_Init(&this->dyna, 0);
+        if (colHeaders[type] != NULL) {
+            CollisionHeader_GetVirtual(colHeaders[type], &colHeader);
+        }
+
+        this->dyna.bgId = DynaPoly_SetBgActor(play, &play->colCtx.dyna, &this->dyna.actor, colHeader);
+        // if ((type == SEKIHI_TYPE_4) && (INV_CONTENT(ITEM_MASK_ZORA) != ITEM_MASK_ZORA)) {
+        //     Actor_Kill(&this->dyna.actor);
+        // }
+    }
+}
