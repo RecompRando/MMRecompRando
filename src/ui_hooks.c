@@ -689,8 +689,8 @@ RECOMP_PATCH void KaleidoScope_DrawAmmoCount(PauseContext* pauseCtx, GraphicsCon
 #define AMMO_DIGIT_TEX_HEIGHT  8
 #define AMMO_DIGIT_TEX_SIZE  (AMMO_DIGIT_TEX_WIDTH * AMMO_DIGIT_TEX_HEIGHT)
 
-extern s16 D_801BFB04[4];
-extern s16 D_801BFB0C[4];
+extern s16 sAmmoDigitsXPositions[4];
+extern s16 sAmmoDigitsYPositions[4];
 
 // @ap Draw green 10 Bombchu ammo count if no bomb bag.
 RECOMP_PATCH void Interface_DrawAmmoCount(PlayState* play, s16 button, s16 alpha) {
@@ -755,14 +755,14 @@ RECOMP_PATCH void Interface_DrawAmmoCount(PlayState* play, s16 button, s16 alpha
         if ((u32)i != 0) {
             OVERLAY_DISP =
                 Gfx_DrawTexRectIA8(OVERLAY_DISP, (u8*)gAmmoDigit0Tex + i * AMMO_DIGIT_TEX_SIZE, AMMO_DIGIT_TEX_WIDTH,
-                                   AMMO_DIGIT_TEX_HEIGHT, D_801BFB04[button], D_801BFB0C[button],
+                                   AMMO_DIGIT_TEX_HEIGHT, sAmmoDigitsXPositions[button], sAmmoDigitsYPositions[button],
                                    AMMO_DIGIT_TEX_WIDTH, AMMO_DIGIT_TEX_HEIGHT, 1 << 10, 1 << 10);
         }
 
         // Draw lower digit (ones)
         OVERLAY_DISP =
             Gfx_DrawTexRectIA8(OVERLAY_DISP, (u8*)gAmmoDigit0Tex + ammo * AMMO_DIGIT_TEX_SIZE, AMMO_DIGIT_TEX_WIDTH,
-                               AMMO_DIGIT_TEX_HEIGHT, D_801BFB04[button] + 6, D_801BFB0C[button],
+                               AMMO_DIGIT_TEX_HEIGHT, sAmmoDigitsXPositions[button] + 6, sAmmoDigitsYPositions[button],
                                AMMO_DIGIT_TEX_WIDTH, AMMO_DIGIT_TEX_HEIGHT, 1 << 10, 1 << 10);
     }
 
