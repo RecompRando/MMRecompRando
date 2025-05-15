@@ -689,10 +689,11 @@ RECOMP_PATCH void KaleidoScope_DrawAmmoCount(PauseContext* pauseCtx, GraphicsCon
 #define AMMO_DIGIT_TEX_HEIGHT  8
 #define AMMO_DIGIT_TEX_SIZE  (AMMO_DIGIT_TEX_WIDTH * AMMO_DIGIT_TEX_HEIGHT)
 
+extern s16 sAmmoDigitsXPositions[4];
+extern s16 sAmmoDigitsYPositions[4];
+
 // @ap Draw green 10 Bombchu ammo count if no bomb bag.
 RECOMP_PATCH void Interface_DrawAmmoCount(PlayState* play, s16 button, s16 alpha) {
-    static s16 sAmmoDigitsXPositions[] = { 162, 228, 250, 272 };
-    static s16 sAmmoDigitsYPositions[] = { 35, 35, 51, 35 };
     u8 i;
     u16 ammo;
 
