@@ -229,102 +229,10 @@ PlayerItemAction Player_ItemToItemAction(Player* this, ItemId item);
 s32 Player_ItemIsInUse(Player* this, ItemId item);
 EquipSlot func_8082FDC4(void);
 
-/**
- * Handles the high level item usage and changing process based on the B and C buttons.
- */
-RECOMP_PATCH void Player_ProcessItemButtons(Player* this, PlayState* play) {
-    if (this->stateFlags1 & (PLAYER_STATE1_800 | PLAYER_STATE1_20000000)) {
-        return;
-    }
-    if (this->stateFlags2 & PLAYER_STATE2_2000000) {
-        return;
-    }
-    if (this->stateFlags3 & PLAYER_STATE3_20000000) {
-        return;
-    }
-    if (func_801240DC(this)) {
-        return;
-    }
-
-    if (this->transformation == PLAYER_FORM_HUMAN) {
-        if (this->currentMask != PLAYER_MASK_NONE) {
-            PlayerItemAction maskItemAction = GET_IA_FROM_MASK(this->currentMask);
-            EquipSlot btn = func_8082FD0C(this, maskItemAction);
-
-            if (btn <= EQUIP_SLOT_NONE) {
-                s32 maskIdMinusOne =
-                    GET_MASK_FROM_IA(Player_ItemToItemAction(this, GET_CUR_FORM_BTN_ITEM(this->unk_154))) - 1;
-
-                if ((maskIdMinusOne < PLAYER_MASK_TRUTH - 1) || (maskIdMinusOne >= PLAYER_MASK_MAX - 1)) {
-                    maskIdMinusOne = this->currentMask - 1;
-                }
-                Player_UseItem(play, this, Player_MaskIdToItemId(maskIdMinusOne));
-                return;
-            }
-
-            if ((this->currentMask == PLAYER_MASK_GIANT) && (gSaveContext.save.saveInfo.playerData.magic == 0)) {
-                func_80838A20(play, this);
-            }
-
-            this->unk_154 = btn;
-        }
-    }
-
-    if (((this->actor.id == ACTOR_PLAYER) && (this->itemAction >= PLAYER_IA_FISHING_ROD)) &&
-        !(((Player_GetHeldBButtonSword(this) == PLAYER_B_SWORD_NONE) || (gSaveContext.jinxTimer == 0)) &&
-          (Player_ItemIsInUse(this, (IREG(1) != 0) ? ITEM_FISHING_ROD : Inventory_GetBtnBItem(play)) ||
-           Player_ItemIsInUse(this, C_BTN_ITEM(EQUIP_SLOT_C_LEFT)) ||
-           Player_ItemIsInUse(this, C_BTN_ITEM(EQUIP_SLOT_C_DOWN)) ||
-           Player_ItemIsInUse(this, C_BTN_ITEM(EQUIP_SLOT_C_RIGHT))))) {
-        Player_UseItem(play, this, ITEM_NONE);
-    } else {
-        s32 pad;
-        ItemId item;
-        EquipSlot i = func_8082FDC4();
-
-        i = ((i >= EQUIP_SLOT_A) && (this->transformation == PLAYER_FORM_FIERCE_DEITY) &&
-             (this->heldItemAction != PLAYER_IA_SWORD_TWO_HANDED))
-                ? EQUIP_SLOT_B
-                : i;
-
-        item = Player_GetItemOnButton(play, this, i);
-
-        if (item >= ITEM_FD) {
-            for (i = 0; i < ARRAY_COUNT(sPlayerItemButtons); i++) {
-                if (CHECK_BTN_ALL(sPlayerControlInput->cur.button, sPlayerItemButtons[i])) {
-                    break;
-                }
-            }
-
-            item = Player_GetItemOnButton(play, this, i);
-            if ((item < ITEM_FD) && (Player_ItemToItemAction(this, item) == this->heldItemAction)) {
-                sPlayerHeldItemButtonIsHeldDown = true;
-            }
-        } else if (item == ITEM_F0) {
-            if (this->blastMaskTimer == 0) {
-                EnBom* bomb = (EnBom*)Actor_Spawn(&play->actorCtx, play, ACTOR_EN_BOM, this->actor.focus.pos.x,
-                                                  this->actor.focus.pos.y, this->actor.focus.pos.z,
-                                                  BOMB_EXPLOSIVE_TYPE_BOMB, 0, 0, BOMB_TYPE_BODY);
-
-                if (bomb != NULL) {
-                    bomb->timer = 0;
-                    this->blastMaskTimer = 0;
-                }
-            }
-        } else if (item == ITEM_F1) {
-            func_80839978(play, this);
-        } else if (item == ITEM_F2) {
-            func_80839A10(play, this);
-        } else if ((Player_BButtonSwordFromIA(this, Player_ItemToItemAction(this, item)) != PLAYER_B_SWORD_NONE) &&
-                   (gSaveContext.jinxTimer != 0)) {
-            if (Message_GetState(&play->msgCtx) == TEXT_STATE_NONE) {
-                Message_StartTextbox(play, 0xF7, NULL);
-            }
-        } else {
-            this->heldItemButton = i;
-            Player_UseItem(play, this, item);
-        }
-    }
+RECOMP_HOOK_RETURN("Player_ProcessItemButtons")
+void updateBlastMaskTimer() {
+    Player* player = GET_PLAYER(gPlay);
+    player->blastMaskTimer = 0;
 }
 
 s32 func_80847880(PlayState* play, Player* this) {
