@@ -8,6 +8,41 @@ void Message_OpenText(PlayState* play, u16 textId);
 
 RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
 
+void sanitizeRandoText(char* rando_string) {
+    u8 c = rando_string[0];
+    u8 next = 0;
+    u8 i = 0;
+    bool shift_string = false;
+
+    while (c != 0) {
+        if (c <= 0x08 || (c >= 0x0A && c <= 0x1F) || (c >= 0xB0 && c <= 0xBB) || (c >= 0xBF && c <= 0xE8) || (c >= 0xF0 && c <= 0xFF)) {
+            next = rando_string[i+1];
+            if (c == 0xC3 && next == 0xA1) { // á
+                rando_string[i] = 0x98;
+                shift_string = true;
+            } else {
+                rando_string[i] = 0xAE; // replace all invalid bytes with ¿
+            }
+        }
+
+        if (shift_string) {
+            u8 new_i = i + 1;
+            u8 new_c = rando_string[new_i];
+            u8 new_next = rando_string[new_i + 1];
+            while (new_c != 0) {
+                rando_string[new_i] = new_next;
+                new_i++;
+                new_c = rando_string[new_i];
+                new_next = rando_string[new_i + 1];
+            }
+            shift_string = false;
+        }
+
+        i++;
+        c = rando_string[i];
+    }
+}
+
 RECOMP_PATCH void Message_StartTextbox(PlayState* play, u16 textId, Actor* actor) {
     MessageContext* msgCtx = &play->msgCtx;
     msgCtx->ocarinaAction = 0xFFFF;
@@ -546,6 +581,8 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
 
         rando_get_location_item_name(shop_location, item_str);
         rando_get_location_item_player(shop_location, player_str);
+        sanitizeRandoText(item_str);
+        sanitizeRandoText(player_str);
 
         u8 rupees_str[128] = " Rupees\x11";
         u8 buy_str[128] = "\x11\x02\xc2I'll buy it\x11No thanks\x1A";
@@ -699,6 +736,8 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
 
         rando_get_location_item_name(rando_get_last_location_sent(), item_str);
         rando_get_location_item_player(rando_get_last_location_sent(), player_str);
+        sanitizeRandoText(item_str);
+        sanitizeRandoText(player_str);
 
         char c = item_str[0];
         u32 msg_i = 11;
