@@ -34,7 +34,8 @@ typedef struct ObjHugebombiwa {
 RECOMP_HOOK("ObjHugebombiwa_Init")
 void ObjHugebombiwa_KillIfHasKegPrivileges(Actor* thisx, PlayState* play) {
     ObjHugebombiwa* this = THIS;
-    if (rando_location_is_checked(GI_POWDER_KEG)) {
+    if (rando_location_is_checked(GI_POWDER_KEG) &&
+            ((play->sceneId == SCENE_17SETUGEN) || (play->sceneId == SCENE_17SETUGEN2))) {
         SET_WEEKEVENTREG(WEEKEVENTREG_19_02);
         Actor_Kill(&this->actor);
     }
