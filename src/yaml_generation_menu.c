@@ -400,7 +400,7 @@ static EnumOptionValue rando_damage_multiplier_options[] = {
     { "normal", NULL },
     { "double", NULL },
     { "quad", NULL },
-    { "okho", "One-Hit KO" },
+    { "ohko", "One-Hit KO" },
 };
 
 static EnumOptionValue rando_death_behavior_options[] = {
