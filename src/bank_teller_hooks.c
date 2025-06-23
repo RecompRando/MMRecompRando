@@ -76,63 +76,35 @@ static AnimationInfo sAnimationInfo[GINKO_ANIM_MAX] = {
 };
 
 bool awardChecked;
+EnGinkoMan* savedEnGinkoMan;
+u32 savedTextId;
 
-// action func: non-input dialogue
-RECOMP_PATCH void EnGinkoMan_DepositDialogue(EnGinkoMan* this, PlayState* play) {
+RECOMP_HOOK("EnGinkoMan_DepositDialogue")
+void EnGinkoMan_OnDepositDialogue(EnGinkoMan* this, PlayState* play) {
+    savedEnGinkoMan = this;
+    savedTextId = this->curTextId;
+}
+
+// compatibility with Say Less mod
+RECOMP_HOOK_RETURN("EnGinkoMan_DepositDialogue")
+void EnGinkoMan_AfterDepositDialogue() {
+    PlayState* play = gPlay;
+    
     if (!Message_ShouldAdvance(play)) {
         return;
     }
 
-    switch (this->curTextId) {
-        case 0x44C:
-            Actor_ChangeAnimationByInfo(&this->skelAnime, sAnimationInfo, GINKO_ANIM_SITTING);
-            if (CHECK_WEEKEVENTREG(WEEKEVENTREG_10_08)) {
-                Message_StartTextbox(play, 0x44E, &this->actor);
-                this->curTextId = 0x44E;
-            } else {
-                Message_StartTextbox(play, 0x44D, &this->actor);
-                this->curTextId = 0x44D;
-            }
-            break;
+    EnGinkoMan* this = savedEnGinkoMan;
 
-        case 0x44D:
-            Message_StartTextbox(play, 0x44E, &this->actor);
-            this->curTextId = 0x44E;
-            break;
-
-        case 0x44F:
-            Actor_ChangeAnimationByInfo(&this->skelAnime, sAnimationInfo, GINKO_ANIM_LEGSMACKING);
-            Message_StartTextbox(play, 0x450, &this->actor);
-            this->curTextId = 0x450;
-            break;
-
-        case 0x453: // you deposited a tiny amount
-        case 0x454: // you deposited a normal amount
-        case 0x455: // you deposited a lot
-            this->isNewAccount = false;
-            if (this->curTextId == 0x453) {
-                Actor_ChangeAnimationByInfo(&this->skelAnime, sAnimationInfo, GINKO_ANIM_LEGSMACKING);
-            }
-
-            play->msgCtx.bankRupees = HS_GET_BANK_RUPEES();
-            Message_StartTextbox(play, 0x45A, &this->actor);
-            this->curTextId = 0x45A;
-            break;
-
-        case 0x456:
-        case 0x459:
-            Message_StartTextbox(play, 0x44E, &this->actor);
-            this->curTextId = 0x44E;
-            break;
-
+    switch (savedTextId) {
         case 0x45A:
             if ((HS_GET_BANK_RUPEES() >= 200) && (this->previousBankValue < 200) &&
-                !CHECK_WEEKEVENTREG(WEEKEVENTREG_59_40)) {
+                !rando_location_is_checked(LOCATION_BANK_200_REWARD)) {
                 SET_WEEKEVENTREG(WEEKEVENTREG_59_40);
                 Message_StartTextbox(play, 0x45B, &this->actor);
                 this->curTextId = 0x45B;
             } else if ((HS_GET_BANK_RUPEES() >= 500) && (this->previousBankValue < 500) &&
-                       !CHECK_WEEKEVENTREG(WEEKEVENTREG_59_80)) {
+                       !rando_location_is_checked(LOCATION_BANK_500_REWARD)) {
                 SET_WEEKEVENTREG(WEEKEVENTREG_59_80);
                 Message_StartTextbox(play, 0x45C, &this->actor);
                 this->curTextId = 0x45C;
@@ -185,124 +157,6 @@ RECOMP_PATCH void EnGinkoMan_DepositDialogue(EnGinkoMan* this, PlayState* play) 
             }
 
             EnGinkoMan_BankAward(this, play);
-            break;
-
-        case 0x461:
-            Message_StartTextbox(play, 0x462, &this->actor);
-            this->curTextId = 0x462;
-            break;
-
-        case 0x462:
-            Message_StartTextbox(play, 0x463, &this->actor);
-            this->curTextId = 0x463;
-            break;
-
-        case 0x463:
-            Message_StartTextbox(play, 0x464, &this->actor);
-            this->curTextId = 0x464;
-            break;
-
-        case 0x464:
-            play->msgCtx.msgMode = MSGMODE_PAUSED;
-            EnGinkoMan_SetupStamp(this); // stamp player
-            break;
-
-        case 0x465:
-            Actor_ChangeAnimationByInfo(&this->skelAnime, sAnimationInfo, GINKO_ANIM_LEGSMACKING);
-            play->msgCtx.bankRupees = HS_GET_BANK_RUPEES();
-            Message_StartTextbox(play, 0x45A, &this->actor);
-            this->curTextId = 0x45A;
-            break;
-
-        case 0x466:
-        case 0x467:
-            Message_StartTextbox(play, 0x468, &this->actor);
-            this->curTextId = 0x468;
-            break;
-
-        case 0x469:
-            EnGinkoMan_SetupStamp(this); // stamp player
-            break;
-
-        case 0x46A:
-        case 0x46C:
-        case 0x47E:
-            if (this->choiceDepositWithdrawl == GINKOMAN_CHOICE_DEPOSIT) {
-                if (HS_GET_BANK_RUPEES() >= 5000) {
-                    Message_StartTextbox(play, 0x45F, &this->actor);
-                    this->curTextId = 0x45F;
-                } else if (gSaveContext.save.saveInfo.playerData.rupees == 0) {
-                    Message_StartTextbox(play, 0x458, &this->actor);
-                    this->curTextId = 0x458;
-                } else {
-                    Message_StartTextbox(play, 0x479, &this->actor);
-                    this->curTextId = 0x479;
-                }
-            } else if ((CURRENT_DAY == 3) && (gSaveContext.save.isNight == true)) {
-                Message_StartTextbox(play, 0x46D, &this->actor);
-
-                this->curTextId = 0x46D;
-            } else { // GINKOMAN_CHOICE_WITHDRAWL
-                Message_StartTextbox(play, 0x46B, &this->actor);
-                this->curTextId = 0x46B;
-            }
-
-            this->choiceDepositWithdrawl = GINKOMAN_CHOICE_RESET;
-            break;
-
-        case 0x46B:
-            Message_StartTextbox(play, 0x46E, &this->actor);
-            this->curTextId = 0x46E;
-            break;
-
-        case 0x46D:
-            Message_StartTextbox(play, 0x46B, &this->actor);
-            this->curTextId = 0x46B;
-            break;
-
-        case 0x470:
-            if (Message_ShouldAdvance(play)) {
-                Message_CloseTextbox(play);
-                this->isStampChecked = false;
-                EnGinkoMan_SetupIdle(this); // change to waiting for approach
-            }
-            break;
-
-        case 0x476:
-            Actor_ChangeAnimationByInfo(&this->skelAnime, sAnimationInfo, GINKO_ANIM_SITTING);
-            // fallthrough
-        case 0x475:
-        case 0x47C:
-        case 0x47D:
-            Message_StartTextbox(play, 0x468, &this->actor);
-            this->curTextId = 0x468;
-            break;
-
-        case 0x472:
-        case 0x473:
-        case 0x474:
-            if (HS_GET_BANK_RUPEES() == 0) {
-                Message_StartTextbox(play, 0x478, &this->actor);
-                this->curTextId = 0x478;
-            } else {
-                play->msgCtx.bankRupees = HS_GET_BANK_RUPEES();
-                Message_StartTextbox(play, 0x45A, &this->actor);
-                this->curTextId = 0x45A;
-            }
-            break;
-
-        case 0x477:
-            Message_StartTextbox(play, 0x471, &this->actor);
-            this->curTextId = 0x471;
-            this->serviceFee = play->msgCtx.unk1206C;
-            break;
-
-        case 0x479:
-            Message_StartTextbox(play, 0x44F, &this->actor);
-            this->curTextId = 0x44F;
-            break;
-
-        default:
             break;
     }
 }
