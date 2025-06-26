@@ -570,7 +570,7 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         }
     } else if (msg == shop_msg) {
         char item_str[67];
-        char player_str[17];
+        char player_str[36];
 
         u32 shop_location = (0x090000 | (textId & 0xFF));
         bool buying = false;
@@ -732,7 +732,7 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
     } else if (msg == ap_msg) {
         char was_sent_str[128] = "was sent to ";
         char item_str[67];
-        char player_str[17];
+        char player_str[36];
 
         rando_get_location_item_name(rando_get_last_location_sent(), item_str);
         rando_get_location_item_player(rando_get_last_location_sent(), player_str);
