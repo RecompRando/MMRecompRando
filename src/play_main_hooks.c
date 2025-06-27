@@ -23,6 +23,8 @@ RECOMP_IMPORT("mm_recomp_better_double_sot", void dsot_set_skip_dsot_cutscene(bo
 
 RECOMP_IMPORT("mm_recomp_colors", void colors_set_human_tunic(u8 r, u8 g, u8 b));
 
+void registerActorExtensions();
+
 PlayState* gPlay;
 
 RECOMP_CALLBACK("*", recomp_on_init)
@@ -38,6 +40,7 @@ void init_rando()
     recomp_set_h_and_d_no_sword_fix(true);
 
     dsot_set_skip_dsot_cutscene(true);
+    registerActorExtensions();
 
     randoCreateStartMenu();
     randoCreateSoloMenu();
