@@ -111,6 +111,9 @@
 #define LOCATION_SWAMP_GUIDE_GOOD 0x071C54
 #define LOCATION_SWAMP_GUIDE_OKAY 0x071C52
 
+#define ITEM00_BOMBCHU 0x1E
+#define ITEM00_APITEM 0x1F
+
 #define MAX_BOMBCHUS ((s8) (10*rando_has_item_async(GI_BAG_BOMBCHU) + 10))
 
 RECOMP_IMPORT(".", bool rando_location_is_checked(u32 location_id));
@@ -163,6 +166,7 @@ extern bool justDied;
 bool loadObject(PlayState* play, void** objectSegment, OSMesgQueue* objectLoadQueue, s16 objectId);
 void GetItem_DrawDynamic(PlayState* play, void* objectSegment, s16 objectId);
 s32 Actor_OfferGetItemHook(Actor* actor, PlayState* play, GetItemId getItemId, u32 location, f32 xzRange, f32 yRange, bool use_workaround, bool item_is_shuffled);
+Actor* Item_RandoDropCollectible(PlayState* play, Vec3f* spawnPos, u32 params, u32 location);
 
 u8 randoItemGive(u32 gi);
 

@@ -1,6 +1,8 @@
 #include "modding.h"
 #include "global.h"
 
+#include "apcommon.h"
+
 #define FAIRY_PARAMS(type, boolParam, collectibleFlag) (((type) /* & 0xF */) | (((boolParam) & 0x1) << 8) | ((((collectibleFlag) & 0x7F) << 9) & 0xFE00))
 
 typedef enum {
@@ -19,8 +21,6 @@ typedef enum {
 
 void func_800A6780(EnItem00* this, PlayState* play);
 s16 func_800A7650(s16 dropId);
-
-#define ITEM00_BOMBCHU 0x1E
 
 u8 sDropTable[DROP_TABLE_SIZE * DROP_TABLE_NUMBER] = {
     ITEM00_RUPEE_GREEN,

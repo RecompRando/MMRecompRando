@@ -6,12 +6,11 @@
 #include "ultra64.h"
 
 #include "apcommon.h"
+#include "actor_extensions.h"
 
 #define THIS ((EnItem00*)thisx)
 
 #define LOCATION_HEART_PIECE ((0x050000) | (sceneId << 8) | this->collectibleFlag)
-
-#define ITEM00_BOMBCHU 0x1E
 
 #define ENITEM00_GET_8000(thisx) ((thisx)->params & 0x8000)
 #define ENITEM00_GET_7F00(thisx) (((thisx)->params & 0x7F00) >> 8)
@@ -26,6 +25,9 @@ static bool objectLoading;
 static bool objectLoaded;
 static OSMesgQueue objectLoadQueue;
 static void* objectSegment;
+
+ActorExtensionId item00Extension;
+u32* extendedItem00Data;
 
 void func_800A640C(EnItem00* this, PlayState* play);
 void func_800A6A40(EnItem00* this, PlayState* play);
@@ -496,6 +498,11 @@ RECOMP_PATCH void EnItem00_Update(Actor* thisx, PlayState* play) {
             getItemId = GI_COMPASS;
             break;
 
+        case ITEM00_APITEM:
+            extendedItem00Data = z64recomp_get_extended_actor_data(&this->actor, item00Extension);
+            getItemId = rando_get_item_id(*extendedItem00Data);
+            break;
+
         default:
             break;
     }
@@ -509,10 +516,16 @@ RECOMP_PATCH void EnItem00_Update(Actor* thisx, PlayState* play) {
                     location = LOCATION_HEART_PIECE;
                     shuffled = true;
                     break;
+                case ITEM00_APITEM:
+                    extendedItem00Data = z64recomp_get_extended_actor_data(&this->actor, item00Extension);
+                    location = *extendedItem00Data;
+                    shuffled = true;
+                    break;
                 default:
                     break;
             }
             if (this->actor.params != ITEM00_HEART_PIECE || objectLoaded) {
+                // TODO: freeze other actors when grabbing items
                 Actor_OfferGetItemHook(&this->actor, play, getItemId, location, 50.0f, 20.0f, shuffled, shuffled);
             }
         }
@@ -532,6 +545,17 @@ RECOMP_PATCH void EnItem00_Update(Actor* thisx, PlayState* play) {
             if (objectLoaded && Actor_HasParent(&this->actor, play)) {
                 Flags_SetCollectible(play, this->collectibleFlag);
                 recomp_printf("Heart Piece location: 0x%06X\n", LOCATION_HEART_PIECE);
+                objectLoading = false;
+                objectLoaded = false;
+                objectStatic = false;
+                Actor_Kill(thisx);
+            }
+            return;
+        case ITEM00_APITEM:
+            if (Actor_HasParent(&this->actor, play)) {
+                // Flags_SetCollectible(play, this->collectibleFlag);
+                extendedItem00Data = z64recomp_get_extended_actor_data(&this->actor, item00Extension);
+                recomp_printf("Item00 location: 0x%06X\n", *extendedItem00Data);
                 objectLoading = false;
                 objectLoaded = false;
                 objectStatic = false;
@@ -684,6 +708,7 @@ RECOMP_PATCH void EnItem00_Draw(Actor* thisx, PlayState* play) {
     }
 }
 
+// TODO: change to return hook
 RECOMP_PATCH void EnItem00_Destroy(Actor* thisx, PlayState* play) {
     EnItem00* this = THIS;
 
@@ -691,77 +716,6 @@ RECOMP_PATCH void EnItem00_Destroy(Actor* thisx, PlayState* play) {
     if (objectSegment != NULL && this->actor.params == ITEM00_HEART_PIECE) {
         ZeldaArena_Free(objectSegment);
         objectSegment = NULL;
-    }
-}
-
-RECOMP_PATCH void func_800A6650(EnItem00* this, PlayState* play) {
-    s32 pad;
-    Vec3f pos;
-
-    if (this->actor.params <= ITEM00_RUPEE_RED) {
-        this->actor.shape.rot.y = this->actor.shape.rot.y + 960;
-    }
-
-    if ((play->gameplayFrames & 1) != 0) {
-        pos.x = this->actor.world.pos.x + Rand_CenteredFloat(10.0f);
-        pos.y = this->actor.world.pos.y + Rand_CenteredFloat(10.0f);
-        pos.z = this->actor.world.pos.z + Rand_CenteredFloat(10.0f);
-        EffectSsKirakira_SpawnSmall(play, &pos, &sEffectVelocity, &sEffectAccel, &sEffectPrimColor, &sEffectEnvColor);
-    }
-
-    if (this->actor.bgCheckFlags & (BGCHECKFLAG_GROUND | BGCHECKFLAG_GROUND_TOUCH)) {
-        if (this->actor.velocity.y > -2.0f) {
-            this->actionFunc = func_800A640C;
-        } else {
-            this->actor.velocity.y = this->actor.velocity.y * -0.8f;
-            this->actor.bgCheckFlags &= ~BGCHECKFLAG_GROUND;
-        }
-    }
-}
-
-RECOMP_PATCH void func_800A640C(EnItem00* this, PlayState* play) {
-    if ((this->actor.params <= ITEM00_RUPEE_RED) ||
-        ((this->actor.params == ITEM00_RECOVERY_HEART) && (this->unk152 < 0)) ||
-        (this->actor.params == ITEM00_HEART_PIECE) || (this->actor.params == ITEM00_HEART_CONTAINER)) {
-        this->actor.shape.rot.y = this->actor.shape.rot.y + 960;
-    } else if ((this->actor.params >= ITEM00_SHIELD_HERO) && (this->actor.params != ITEM00_DEKU_NUTS_10) &&
-               (this->actor.params < ITEM00_BOMBS_0)) {
-        if (this->unk152 == -1) {
-            if (!Math_SmoothStepToS(&this->actor.shape.rot.x, this->actor.world.rot.x - 0x4000, 2, 3000, 1500)) {
-                this->unk152 = -2;
-            }
-        } else if (!Math_SmoothStepToS(&this->actor.shape.rot.x, -0x4000 - this->actor.world.rot.x, 2, 3000, 1500)) {
-            this->unk152 = -1;
-        }
-
-        Math_SmoothStepToS(&this->actor.world.rot.x, 0, 2, 2500, 500);
-    } else if ((this->actor.params == ITEM00_MAP) || (this->actor.params == ITEM00_COMPASS)) {
-        this->unk152 = -1;
-        this->actor.shape.rot.y = this->actor.shape.rot.y + 960;
-    }
-
-    if ((this->actor.params == ITEM00_HEART_PIECE) || (this->actor.params == ITEM00_HEART_CONTAINER)) {
-        this->actor.shape.yOffset = (Math_SinS(this->actor.shape.rot.y) * 150.0f) + 850.0f;
-    }
-
-    Math_SmoothStepToF(&this->actor.speed, 0.0f, 1.0f, 0.5f, 0.0f);
-
-    if (this->unk14C == 0) {
-        if ((this->actor.params != ITEM00_SMALL_KEY) && (this->actor.params != ITEM00_HEART_PIECE) &&
-            (this->actor.params != ITEM00_HEART_CONTAINER)) {
-            this->unk14C = -1;
-        }
-    }
-
-    if (this->unk152 == 0) {
-        if ((this->actor.params != ITEM00_SMALL_KEY) && (this->actor.params != ITEM00_HEART_PIECE) &&
-            (this->actor.params != ITEM00_HEART_CONTAINER)) {
-            Actor_Kill(&this->actor);
-        }
-    }
-
-    if ((this->actor.gravity != 0.0f) && !(this->actor.bgCheckFlags & BGCHECKFLAG_GROUND)) {
-        this->actionFunc = func_800A6650;
     }
 }
 
@@ -817,4 +771,117 @@ RECOMP_PATCH void func_800A6780(EnItem00* this, PlayState* play) {
         this->actor.shape.rot.z = 0;
         this->actor.speed = 0.0f;
     }
+}
+
+// @ap custom item00 below
+
+void Item_RandoCollectibleGround(EnItem00* this, PlayState* play);
+
+// func_800A6650
+void Item_RandoCollectibleNoLongerGround(EnItem00* this, PlayState* play) {
+    s32 pad;
+    Vec3f pos;
+
+    if ((play->gameplayFrames & 1) != 0) {
+        pos.x = this->actor.world.pos.x + Rand_CenteredFloat(10.0f);
+        pos.y = this->actor.world.pos.y + Rand_CenteredFloat(10.0f);
+        pos.z = this->actor.world.pos.z + Rand_CenteredFloat(10.0f);
+        EffectSsKirakira_SpawnSmall(play, &pos, &sEffectVelocity, &sEffectAccel, &sEffectPrimColor, &sEffectEnvColor);
+    }
+
+    if (this->actor.bgCheckFlags & (BGCHECKFLAG_GROUND | BGCHECKFLAG_GROUND_TOUCH)) {
+        if (this->actor.velocity.y > -2.0f) {
+            // this->actionFunc = func_800A640C;
+            this->actionFunc = Item_RandoCollectibleGround;
+        } else {
+            this->actor.velocity.y = this->actor.velocity.y * -0.8f;
+            this->actor.bgCheckFlags &= ~BGCHECKFLAG_GROUND;
+        }
+    }
+}
+
+// func_800A640C
+void Item_RandoCollectibleGround(EnItem00* this, PlayState* play) {
+    // heart piece/container rotation/pos
+    this->actor.shape.rot.y = this->actor.shape.rot.y + 960;
+    this->actor.shape.yOffset = (Math_SinS(this->actor.shape.rot.y) * 150.0f) + 850.0f;
+
+    Math_SmoothStepToF(&this->actor.speed, 0.0f, 1.0f, 0.5f, 0.0f);
+
+    if ((this->actor.gravity != 0.0f) && !(this->actor.bgCheckFlags & BGCHECKFLAG_GROUND)) {
+        // this->actionFunc = func_800A6650;
+        this->actionFunc = Item_RandoCollectibleNoLongerGround;
+    }
+}
+
+// func_800A6780
+void Item_RandoCollectibleActionFunc(EnItem00* this, PlayState* play) {
+    s32 pad;
+    Vec3f pos;
+    s32 var1;
+
+    this->unk152++;
+
+    if (this->actor.velocity.y <= 2.0f) {
+        var1 = (u16)this->actor.shape.rot.z + 0x2710;
+        if (var1 < 0xFFFF) {
+            this->actor.shape.rot.z += 0x2710;
+        } else {
+            this->actor.shape.rot.z = -1;
+        }
+    }
+
+    if ((play->gameplayFrames & 1) == 0) {
+        pos.x = this->actor.world.pos.x + ((Rand_ZeroOne() - 0.5f) * 10.0f);
+        pos.y = this->actor.world.pos.y + ((Rand_ZeroOne() - 0.5f) * 10.0f);
+        pos.z = this->actor.world.pos.z + ((Rand_ZeroOne() - 0.5f) * 10.0f);
+        EffectSsKirakira_SpawnSmall(play, &pos, &sEffectVelocity, &sEffectAccel, &sEffectPrimColor, &sEffectEnvColor);
+    }
+
+    if (this->actor.bgCheckFlags & (BGCHECKFLAG_GROUND | BGCHECKFLAG_GROUND_TOUCH)) {
+        // this->actionFunc = func_800A640C;
+        this->actionFunc = Item_RandoCollectibleGround;
+        this->actor.shape.rot.z = 0;
+        this->actor.speed = 0.0f;
+    }
+}
+
+Actor* Item_RandoDropCollectible(PlayState* play, Vec3f* spawnPos, u32 params, u32 location) {
+    s32 pad;
+    Actor* spawnedActor = NULL;
+
+    // i'm not sure if these params are useful for us
+    s32 newParamFF;
+    s32 param10000 = params & 0x10000;
+    s16 param8000 = params & 0x8000;
+    s16 param7F00 = params & 0x7F00;
+    s32 param20000 = params & 0x20000;
+    s32 paramFF = params & 0xFF;
+
+    spawnedActor = Actor_Spawn(&play->actorCtx, play, ACTOR_EN_ITEM00, spawnPos->x, spawnPos->y, spawnPos->z, 0,
+                                0, 0, ITEM00_APITEM);
+    extendedItem00Data = z64recomp_get_extended_actor_data(spawnedActor, item00Extension);
+    *extendedItem00Data = location;
+
+    if ((spawnedActor != NULL) && (param8000 == 0)) {
+        if (param10000 == 0) {
+            spawnedActor->velocity.y = 8.0f;
+        } else {
+            spawnedActor->velocity.y = -2.0f;
+        }
+        spawnedActor->speed = 2.0f;
+        spawnedActor->gravity = -0.9f;
+        spawnedActor->world.rot.y = Rand_CenteredFloat(0x10000);
+        Actor_SetScale(spawnedActor, 0.0f);
+        // ((EnItem00*)spawnedActor)->actionFunc = func_800A6780;
+        ((EnItem00*)spawnedActor)->actionFunc = Item_RandoCollectibleActionFunc;
+        ((EnItem00*)spawnedActor)->unk152 = 0xDC;
+        // if ((spawnedActor->params != ITEM00_SMALL_KEY) && (spawnedActor->params != ITEM00_HEART_PIECE) &&
+        //     (spawnedActor->params != ITEM00_HEART_CONTAINER)) {
+        //     spawnedActor->room = -1;
+        // }
+        spawnedActor->flags |= 0x0010;
+    }
+
+    return spawnedActor;
 }

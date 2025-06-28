@@ -48,7 +48,7 @@ void OnObjGrass_Init(Actor* thisx, PlayState* play) {
 RECOMP_HOOK("ObjGrass_DropCollectible")
 void ObjGrass_ReplaceCollectible(ObjGrassElement* grassElem, PlayState* play) {
     if (!rando_location_is_checked(LOCATION_GRASS(grassElem))) {
-        Item_DropCollectible(play, &grassElem->pos, ITEM00_HEART_PIECE);
+        Item_RandoDropCollectible(play, &grassElem->pos, ITEM00_APITEM, LOCATION_GRASS(grassElem));
         grassElem->dropTable = 0x10; // disable further drops
     }
 }
