@@ -7,6 +7,7 @@
 
 #include "overlays/actors/ovl_Obj_Grass/z_obj_grass.h"
 #include "overlays/actors/ovl_Obj_Grass_Unit/z_obj_grass_unit.h"
+#include "overlays/actors/ovl_Obj_Grass_Carry/z_obj_grass_carry.h"
 
 #define LOCATION_GRASS(grassElem) ObjGrass_GetLocation(grassElem)
 
@@ -56,5 +57,24 @@ void ObjGrass_ReplaceCollectible(ObjGrassElement* grassElem, PlayState* play) {
     if (!rando_location_is_checked(LOCATION_GRASS(grassElem))) {
         Item_RandoDropCollectible(play, &grassElem->pos, ITEM00_APITEM, LOCATION_GRASS(grassElem));
         grassElem->dropTable = 0x10; // disable further drops
+    }
+}
+
+ObjGrassCarry* carriedGrass;
+
+RECOMP_HOOK("ObjGrassCarry_Fall")
+void OnObjGrassCarry_Fall(ObjGrassCarry* this, PlayState* play) {
+    carriedGrass = this;
+}
+
+RECOMP_PATCH void ObjGrassCarry_DropCollectible(Vec3f* pos, s16 dropTable, PlayState* play) {
+    ObjGrassElement* grassElem = carriedGrass->grassElem;
+    if (!rando_location_is_checked(LOCATION_GRASS(grassElem))) {
+        Item_RandoDropCollectible(play, &grassElem->pos, ITEM00_APITEM, LOCATION_GRASS(grassElem));
+        return;
+    }
+    
+    if ((dropTable & 0x10) == 0) {
+        Item_DropCollectibleRandom(play, NULL, pos, dropTable * 0x10);
     }
 }
