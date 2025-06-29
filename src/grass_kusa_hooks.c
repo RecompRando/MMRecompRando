@@ -13,9 +13,17 @@ u32* extendedKusaGrassData;
 
 extern s16 D_809366B0; // cur grass
 
+u16 getCurrentGrotto(PlayState* play);
+
 u32 EnKusa_CreateLocation(PlayState* play) {
-    // TODO: format this in a way where grottos actually work
-    return (0x130000 | (play->sceneId << 8) | D_809366B0);
+    s16 sceneId = play->sceneId;
+    
+    // handle grottos
+    if (sceneId == SCENE_KAKUSIANA) {
+        sceneId = getCurrentGrotto(play);
+    }
+
+    return (0x130000 | (sceneId << 8) | D_809366B0);
 }
 
 // TODO: handle the different types of grass correctly (i.e. respawning)

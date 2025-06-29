@@ -13,6 +13,8 @@
 #define THIS ((ObjGrass*)thisx)
 ObjGrass* gObjGrass;
 
+u16 getCurrentGrotto(PlayState* play);
+
 // modified ootmm implementation
 u32 ObjGrass_GetLocation(ObjGrassElement* grass) {
     u32 offset;
@@ -34,7 +36,11 @@ u32 ObjGrass_GetLocation(ObjGrassElement* grass) {
     /* Adjust the current scene */
     PlayState* play = gPlay;
     s16 sceneId = play->sceneId;
-    // do stuff if in grotto
+    
+    // handle grottos
+    if (sceneId == SCENE_KAKUSIANA) {
+        sceneId = getCurrentGrotto(play);
+    }
 
     // recomp_printf("pack: %d, bush: %d\n", groupId, bushId);
     return 0x100000 | (groupId << 12) | (sceneId << 4) | bushId;
