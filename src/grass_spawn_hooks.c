@@ -70,7 +70,7 @@ void OnObjGrassCarry_Fall(ObjGrassCarry* this, PlayState* play) {
 RECOMP_PATCH void ObjGrassCarry_DropCollectible(Vec3f* pos, s16 dropTable, PlayState* play) {
     ObjGrassElement* grassElem = carriedGrass->grassElem;
     if (!rando_location_is_checked(LOCATION_GRASS(grassElem))) {
-        Item_RandoDropCollectible(play, &grassElem->pos, ITEM00_APITEM, LOCATION_GRASS(grassElem));
+        Item_RandoDropCollectible(play, pos, ITEM00_APITEM, LOCATION_GRASS(grassElem));
         return;
     }
     
