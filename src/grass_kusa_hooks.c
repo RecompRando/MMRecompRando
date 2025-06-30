@@ -23,7 +23,7 @@ u32 EnKusa_CreateLocation(PlayState* play) {
         sceneId = getCurrentGrotto(play);
     }
 
-    return (0x130000 | (sceneId << 8) | D_809366B0);
+    return (0x120000 | (sceneId << 8) | D_809366B0);
 }
 
 // TODO: handle the different types of grass correctly (i.e. respawning)
