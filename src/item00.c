@@ -863,7 +863,15 @@ Actor* Item_RandoDropCollectible(PlayState* play, Vec3f* spawnPos, u32 params, u
     extendedItem00Data = z64recomp_get_extended_actor_data(spawnedActor, item00Extension);
     *extendedItem00Data = location;
 
-    if ((spawnedActor != NULL) && (param8000 == 0)) {
+    ((EnItem00*)spawnedActor)->getItemId = rando_get_item_id(location);
+
+    if ((spawnedActor != NULL)) {
+        if (param8000) {
+            // wonder item might fall through the world without this check
+            spawnedActor->world.pos = GET_PLAYER(play)->actor.world.pos;
+            return spawnedActor;
+        }
+        
         if (param10000 == 0) {
             spawnedActor->velocity.y = 8.0f;
         } else {
