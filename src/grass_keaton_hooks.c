@@ -4,7 +4,7 @@
 #include "z64recomp_api.h"
 
 #include "apcommon.h"
-#include "actor_extensions.h"
+#include "actor_helpers.h"
 
 #include "overlays/actors/ovl_En_Kusa2/z_en_kusa2.h"
 

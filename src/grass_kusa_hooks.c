@@ -4,33 +4,33 @@
 #include "z64recomp_api.h"
 
 #include "apcommon.h"
-#include "actor_extensions.h"
+#include "actor_helpers.h"
 
 #include "overlays/actors/ovl_En_Kusa/z_en_kusa.h"
 
 ActorExtensionId kusaGrassExtension;
 u32* extendedKusaGrassData;
 
-extern s16 D_809366B0; // cur grass
-
-u16 getCurrentGrotto(PlayState* play);
-
-u32 EnKusa_CreateLocation(PlayState* play) {
+u32 EnKusa_CreateLocation(PlayState* play, Actor* actor) {
     s16 sceneId = play->sceneId;
-    
+    s8 curRoom = play->roomCtx.curRoom.num;
+    s32 actorIndex = randoGetLoadedActorNumInSameRoom(play, actor);
+
+    // recomp_printf("current actor index %d | room: %d\n", actorIndex, curRoom);
+
     // handle grottos
     if (sceneId == SCENE_KAKUSIANA) {
         sceneId = getCurrentGrotto(play);
     }
 
-    return (0x120000 | (sceneId << 8) | D_809366B0);
+    return (0x120000 | (sceneId << 8) | (curRoom << 4) | actorIndex);
 }
 
 // TODO: handle the different types of grass correctly (i.e. respawning)
 RECOMP_HOOK("EnKusa_Init")
 void OnEnKusa_Init(Actor* thisx, PlayState* play) {
     extendedKusaGrassData = z64recomp_get_extended_actor_data(thisx, kusaGrassExtension);
-    *extendedKusaGrassData = EnKusa_CreateLocation(play);
+    *extendedKusaGrassData = EnKusa_CreateLocation(play, thisx);
     // recomp_printf("single grass: 0x%06X\n", *extendedKusaGrassData);
 }
 

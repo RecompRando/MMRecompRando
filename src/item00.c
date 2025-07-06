@@ -6,7 +6,7 @@
 #include "ultra64.h"
 
 #include "apcommon.h"
-#include "actor_extensions.h"
+#include "actor_helpers.h"
 
 #define THIS ((EnItem00*)thisx)
 

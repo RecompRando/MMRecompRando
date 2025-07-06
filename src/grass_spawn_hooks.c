@@ -4,6 +4,7 @@
 #include "z64recomp_api.h"
 
 #include "apcommon.h"
+#include "actor_helpers.h"
 
 #include "overlays/actors/ovl_Obj_Grass/z_obj_grass.h"
 #include "overlays/actors/ovl_Obj_Grass_Unit/z_obj_grass_unit.h"
@@ -13,8 +14,6 @@
 
 #define THIS ((ObjGrass*)thisx)
 ObjGrass* gObjGrass;
-
-u16 getCurrentGrotto(PlayState* play);
 
 // modified ootmm implementation
 u32 ObjGrass_GetLocation(ObjGrassElement* grass) {
