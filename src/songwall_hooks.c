@@ -8,7 +8,8 @@
 #include "overlays/actors/ovl_En_Gakufu/z_en_gakufu.h"
 
 // these share a location prefix with wonder items, but they won't collide so we're fine
-#define LOCATION_SONGWALL(hour, index) (0x150000 | (hour << 4) | index)
+#define LOCATION_SONGWALL(index, i) (0x150000 | (index << 4) | i)
+#define LOCATION_SONGWALL_HOUR(hour, i) (0x150000 | (hour << 4) | i)
 
 extern Vec3f sRewardDropsSpawnTerminaFieldPos;
 extern u8 sRewardDropsIndex[];
@@ -24,8 +25,13 @@ RECOMP_PATCH void EnGakufu_GiveReward(EnGakufu* this, PlayState* play) {
 
     hour = TIME_TO_HOURS_F(gSaveContext.save.time);
     for (i = 0; i < 3; i++) {
-        if (!rando_location_is_checked(LOCATION_SONGWALL(hour, i))) {
-            Item_RandoDropCollectible(play, &sRewardDropsSpawnTerminaFieldPos, ITEM00_APITEM, LOCATION_SONGWALL(hour, i));
+        u32 location = LOCATION_SONGWALL((i + sRewardDropsIndex[hour]), i);
+        // if (every_hour_option) { // this ends up actually adding more checks than in the game
+        //     location = LOCATION_SONGWALL_HOUR(hour, i);
+        // }
+        
+        if (!rando_location_is_checked(location)) {
+            Item_RandoDropCollectible(play, &sRewardDropsSpawnTerminaFieldPos, ITEM00_APITEM, location);
         } else {
             Item_DropCollectible(play, &sRewardDropsSpawnTerminaFieldPos, sRewardDrops[i + sRewardDropsIndex[hour]]);
         }

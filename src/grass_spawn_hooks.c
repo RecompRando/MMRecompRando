@@ -41,6 +41,9 @@ u32 ObjGrass_GetLocation(ObjGrassElement* grass) {
     // handle grottos
     if (sceneId == SCENE_KAKUSIANA) {
         sceneId = getCurrentGrotto(play);
+    } else if (sceneId == SCENE_20SICHITAI ||   // southern swamp (poison)
+               sceneId == SCENE_20SICHITAI2) {  // southern swamp (clear)
+        groupId += play->roomCtx.curRoom.num;
     }
 
     // recomp_printf("pack: %d, bush: %d\n", groupId, bushId);
