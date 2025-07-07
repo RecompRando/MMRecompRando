@@ -9,6 +9,11 @@ void registerActorExtensions() {
     item00Extension = z64recomp_extend_actor(ACTOR_EN_ITEM00, sizeof(u32));
     kusaGrassExtension = z64recomp_extend_actor(ACTOR_EN_KUSA, sizeof(u32));
     keatonGrassExtension = z64recomp_extend_actor(ACTOR_EN_KUSA2, sizeof(u32));
+    potExtension = z64recomp_extend_actor(ACTOR_OBJ_TSUBO, sizeof(u32));
+    potFlyingExtension = z64recomp_extend_actor(ACTOR_EN_TUBO_TRAP, sizeof(u32));
+    potFlowerExtension = z64recomp_extend_actor(ACTOR_OBJ_FLOWERPOT, sizeof(u32));
+    wonderHitExtension = z64recomp_extend_actor(ACTOR_EN_HIT_TAG, sizeof(u32));
+    wonderRupeeExtension = z64recomp_extend_actor(ACTOR_EN_INVISIBLE_RUPPE, sizeof(u32));
 }
 
 s32 randoGetLoadedActorNumInSameRoom(PlayState* play, Actor* actorIn) {
@@ -21,6 +26,27 @@ s32 randoGetLoadedActorNumInSameRoom(PlayState* play, Actor* actorIn) {
 
     while (actor != NULL) {
         if (actor->id == actorId && actor->room == actorRoom) {
+            if (actor == actorIn) {
+                return actorIndex;
+            }
+            actorIndex++;
+        }
+        actor = actor->next;
+    }
+
+    return -1; // should never return -1 if used correctly
+}
+
+s32 randoGetLoadedActorNumInSameRoomExtra(PlayState* play, Actor* actorIn, s16 extraId) {
+    u8 actorCat = actorIn->category;
+    s8 actorRoom = actorIn->room;
+    s16 actorId = actorIn->id;
+
+    Actor* actor = play->actorCtx.actorLists[actorCat].first;
+    s32 actorIndex = 0;
+
+    while (actor != NULL) {
+        if ((actor->id == actorId || actor->id == extraId) && actor->room == actorRoom) {
             if (actor == actorIn) {
                 return actorIndex;
             }
