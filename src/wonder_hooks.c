@@ -8,11 +8,13 @@
 
 #include "overlays/actors/ovl_En_Hit_Tag/z_en_hit_tag.h"
 #include "overlays/actors/ovl_En_Invisible_Ruppe/z_en_invisible_ruppe.h"
+#include "overlays/actors/ovl_Obj_Dora/z_obj_dora.h"
 
 #define LOCATION_WONDER_HIT (0x150000 | (play->sceneId << 8) \
                             | (randoGetLoadedActorNumInSameRoom(play, thisx) << 4))
 #define LOCATION_WONDER_RUPEE (0x160000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
+#define LOCATION_WONDER_HIT_GONG (0x160000 | (play->sceneId << 8))
 
 ActorExtensionId wonderHitExtension;
 u32* extendedWonderHitData;
@@ -123,5 +125,72 @@ RECOMP_PATCH void func_80C2590C(EnInvisibleRuppe* this, PlayState* play) {
         }
 
         this->actionFunc = func_80C259E8;
+    }
+}
+
+// swordsman school gong
+typedef enum {
+    /* 0x0 */ DORA_HIT_NONE,
+    /* 0x1 */ DORA_HIT_LIGHT,
+    /* 0x2 */ DORA_HIT_STRONG
+} ObjDoraHitStrength;
+
+typedef enum {
+    /* 0x0 */ DORA_DMGEFF_NONE,
+    /* 0xE */ DORA_DMGEFF_STRONG = 0xE,
+    /* 0xF */ DORA_DMGEFF_LIGHT
+} ObjDoraDamageEffect;
+
+void ObjDora_SetupMoveGong(ObjDora* this);
+s32 ObjDora_IsHalfHour(u16 time);
+
+RECOMP_PATCH void ObjDora_UpdateCollision(ObjDora* this, PlayState* play) {
+    Actor* itemDrop;
+    u16 time;
+
+    if (this->colliderTris.base.acFlags & AC_HIT) {
+        time = gSaveContext.save.time;
+        this->colliderTris.base.acFlags &= ~AC_HIT;
+        this->collisionCooldownTimer = 5;
+
+        switch (this->actor.colChkInfo.damageEffect) {
+            case DORA_DMGEFF_STRONG:
+            case DORA_DMGEFF_LIGHT:
+                if (this->actor.colChkInfo.damageEffect == DORA_DMGEFF_LIGHT) {
+                    Actor_PlaySfx(&this->actor, NA_SE_EV_DORA_S);
+                    this->lastGongHitType = DORA_HIT_LIGHT;
+                } else {
+                    Actor_PlaySfx(&this->actor, NA_SE_EV_DORA_L);
+                    this->lastGongHitType = DORA_HIT_STRONG;
+                }
+
+                Actor_RequestQuakeAndRumble(&this->actor, play, 5, 10);
+                ObjDora_SetupMoveGong(this);
+
+                if ((ObjDora_IsHalfHour(time) == true) && (this->rupeeDropTimer == 0)) {
+                    Actor_PlaySfx(&this->actor, NA_SE_SY_TRE_BOX_APPEAR);
+                    if (!rando_location_is_checked(LOCATION_WONDER_HIT_GONG)) {
+                        itemDrop = Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, LOCATION_WONDER_HIT_GONG);
+                    } else {
+                        itemDrop = Item_DropCollectible(play, &this->actor.world.pos, ITEM00_RUPEE_BLUE);
+                    }
+                    itemDrop->world.rot.y = this->actor.world.rot.y;
+                    itemDrop->world.rot.y += (s32)DEG_TO_BINANG_ALT3(Rand_Centered() * 90.0f);
+                    itemDrop->velocity.y = 5.0f;
+                    itemDrop->gravity = -1.0f;
+                    this->rupeeDropTimer = 40;
+                }
+                break;
+        }
+    }
+
+    if (this->rupeeDropTimer > 0) {
+        this->rupeeDropTimer--;
+    }
+
+    if (this->collisionCooldownTimer > 0) {
+        this->collisionCooldownTimer--;
+    } else {
+        CollisionCheck_SetAC(play, &play->colChkCtx, &this->colliderTris.base);
     }
 }

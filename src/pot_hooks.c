@@ -47,13 +47,13 @@ RECOMP_PATCH void func_8092762C(ObjTsubo* this, PlayState* play) {
 
 // TODO: turn into hook after confirming this works as intended
 RECOMP_PATCH void func_80927690(ObjTsubo* this, PlayState* play) {
+    extendedPotData = z64recomp_get_extended_actor_data(&this->actor, potExtension);
     if (!rando_location_is_checked(*extendedPotData)) {
         Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *extendedPotData);
         this->unk_197 = true;
     }
 
     s32 itemDrop;
-    extendedPotData = z64recomp_get_extended_actor_data(&this->actor, potExtension);
     if (!this->unk_197 && (OBJ_TSUBO_ZROT(&this->actor) != 2)) {
         itemDrop = func_800A8150(OBJ_TSUBO_P003F(&this->actor));
         if (itemDrop > ITEM00_NO_DROP) {
