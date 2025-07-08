@@ -31,13 +31,20 @@ authors = [ "LittleCube", "ThatHypedPerson", "PixelShake92", "Muervo_", "G4M3RL1
 game_id = "mm"
 
 # Minimum version of the target recomp (e.g. Zelda 64: Recompiled) that this mod can run on.
-minimum_recomp_version = "1.2.0"
+minimum_recomp_version = "1.2.1"
 
 # Dependency mods. Each entry is the mod's ID and then an optional minimum version of the dependency mod.
 dependencies = [
     "owls_never_quit:1.0.0",
     "mm_recomp_better_double_sot:0.0.1",
     "mm_recomp_colors:0.5.0"
+]
+
+# Optional dependency mods. This has the same format as `dependencies`, but the game will still start if dependencies in this
+# list aren't present. You can query the presence of a given dependency by using `recomp_is_dependency_met` in recomputils.h.
+# Calling a function imported from an optional dependency that isn't present will trigger an error.
+optional_dependencies = [
+
 ]
 
 # Native libraries (e.g. DLLs) and the functions they export.
