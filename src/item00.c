@@ -329,6 +329,8 @@ RECOMP_PATCH void EnItem00_Init(Actor* thisx, PlayState* play) {
     this->actionFunc(this, play);
 }
 
+void EnItem00_RandoGive(EnItem00* this, PlayState* play, s32 getItemId, u32 location);
+
 RECOMP_PATCH void EnItem00_Update(Actor* thisx, PlayState* play) {
     EnItem00* this = THIS;
     s32 pad;
@@ -510,23 +512,28 @@ RECOMP_PATCH void EnItem00_Update(Actor* thisx, PlayState* play) {
     if (getItemId != GI_NONE) {
         if (!Actor_HasParent(&this->actor, play)) {
             u32 location = 0;
-            bool shuffled = false;
             switch (this->actor.params) {
                 case ITEM00_HEART_PIECE:
                     location = LOCATION_HEART_PIECE;
-                    shuffled = true;
                     break;
                 case ITEM00_APITEM:
                     extendedItem00Data = z64recomp_get_extended_actor_data(&this->actor, item00Extension);
                     location = *extendedItem00Data;
-                    shuffled = true;
                     break;
                 default:
                     break;
             }
-            if (this->actor.params != ITEM00_HEART_PIECE || objectLoaded) {
-                // TODO: freeze other actors when grabbing items
-                Actor_OfferGetItemHook(&this->actor, play, getItemId, location, 50.0f, 20.0f, shuffled, shuffled);
+            if (this->actor.params == ITEM00_HEART_PIECE && objectLoaded) {
+                Flags_SetCollectible(play, this->collectibleFlag);
+                Actor_OfferGetItemHook(&this->actor, play, getItemId, 0, 50.0f, 20.0f, true, true);
+            } else if (this->actor.params == ITEM00_APITEM) {
+                // if (this->actor.xzDistToPlayer <= 50.0f && fabsf(this->actor.playerHeightRel) <= fabsf(20.0f)) {
+                if (this->actor.xzDistToPlayer <= 50.0f && fabsf(this->actor.playerHeightRel) <= fabsf(50.0f)) {
+                    recomp_printf("Item00 location: 0x%06X\n", location);
+                    EnItem00_RandoGive(this, play, getItemId, location);
+                }
+            } else if (this->actor.params != ITEM00_APITEM && this->actor.params != ITEM00_HEART_PIECE) {
+                Actor_OfferGetItemHook(&this->actor, play, getItemId, 0, 50.0f, 20.0f, false, false);
             }
         }
     }
@@ -553,13 +560,9 @@ RECOMP_PATCH void EnItem00_Update(Actor* thisx, PlayState* play) {
             return;
         case ITEM00_APITEM:
             if (Actor_HasParent(&this->actor, play)) {
-                // Flags_SetCollectible(play, this->collectibleFlag);
                 extendedItem00Data = z64recomp_get_extended_actor_data(&this->actor, item00Extension);
-                recomp_printf("Item00 location: 0x%06X\n", *extendedItem00Data);
-                objectLoading = false;
-                objectLoaded = false;
-                objectStatic = false;
-                Actor_Kill(thisx);
+                // recomp_printf("Item00 location: 0x%06X\n", *extendedItem00Data);
+                // Actor_Kill(thisx);
             }
             return;
 
@@ -775,6 +778,127 @@ RECOMP_PATCH void func_800A6780(EnItem00* this, PlayState* play) {
 
 // @ap custom item00 below
 
+bool Item_RandoCollectibleShouldBlink(EnItem00* this) {
+    extendedItem00Data = z64recomp_get_extended_actor_data(&this->actor, item00Extension);
+    if ((*extendedItem00Data & 0xFFFF00) == 0x17FF00) { // rupee crow drops
+        return true;
+    }
+    return false;
+}
+
+// could technically be used for heart pieces as well
+void Item_RandoCollectibleDraw(Actor* thisx, PlayState* play) {
+    EnItem00* this = THIS;
+
+    extendedItem00Data = z64recomp_get_extended_actor_data(thisx, item00Extension);
+    this->getItemId = rando_get_item_id(*extendedItem00Data);
+    u16 objectId = getObjectId(this->getItemId);
+
+    if (Item_RandoCollectibleShouldBlink(this) && (this->unk14E & this->unk150)) {
+        return;
+    }
+
+    Matrix_Scale(20.0f, 20.0f, 20.0f, MTXMODE_APPLY);
+    if (isAP(this->getItemId)) {
+        GetItem_Draw(play, getGid(this->getItemId));
+    // } else if (ObjLoad(play, 0x06, objectId)) {
+    //     GetItem_Draw(play, getGid(this->getItemId));
+    //     ObjUnload(play, 0x06, objectId);
+    } else {
+        GetItem_Draw(play, GID_APLOGO_USEFUL);
+    }
+}
+
+void EnItem00_RandoItemAboveHead(EnItem00* this, PlayState* play) {
+    Player* player = GET_PLAYER(play);
+
+    if (this->unk152 > 0) {
+        this->unk152--;
+    }
+
+    this->actor.world.pos = player->actor.world.pos;
+
+    this->actor.shape.rot.y += 0x3C0;
+
+    this->actor.world.pos.y += (40.0f + (Math_SinS(this->unk152 * 7500) * (this->unk152 * 0.3f)));
+
+    if (LINK_IS_ADULT) {
+        this->actor.world.pos.y += 20.0f;
+    }
+}
+
+void EnItem00_RandoTextAndFreeze(EnItem00* this, PlayState* play) {
+    Player* player = GET_PLAYER(play);
+
+    EnItem00_RandoItemAboveHead(this, play);
+
+    extendedItem00Data = z64recomp_get_extended_actor_data(&this->actor, item00Extension);
+    u32 locationType = rando_get_location_type(*extendedItem00Data);
+    if (locationType != 0 && locationType != 2) {
+        player->actor.freezeTimer = 10;
+        player->stateFlags1 |= PLAYER_STATE1_20000000;
+        
+        if (Actor_TextboxIsClosing(&this->actor, play)) {
+            player->actor.freezeTimer = 0;
+            player->stateFlags1 &= ~PLAYER_STATE1_20000000;
+            Actor_Kill(&this->actor);
+            CutsceneManager_Stop(CS_ID_GLOBAL_TALK);
+            return;
+        }
+
+        if (CutsceneManager_GetCurrentCsId() != CS_ID_GLOBAL_TALK) {
+            if (CutsceneManager_IsNext(CS_ID_GLOBAL_TALK)) {
+                CutsceneManager_Start(CS_ID_GLOBAL_TALK, &this->actor);
+            } else {
+                CutsceneManager_Queue(CS_ID_GLOBAL_TALK);
+            }
+        }
+    } else {
+        if (this->unk152 <= 0) {
+            Actor_Kill(&this->actor);
+            return;
+        }
+    }
+}
+
+void EnItem00_RandoGive(EnItem00* this, PlayState* play, s32 getItemId, u32 location) {
+    Player* player = GET_PLAYER(play);
+
+    rando_send_location(location);
+
+    this->actor.gravity = 0.0f;
+    this->actor.velocity.y = 0.0f;
+    this->actor.speed = 0.0f;
+    this->unk152 = 35;
+
+    u32 locationType = rando_get_location_type(location);
+    if (locationType != 0 && locationType != 2) {
+        player->actor.freezeTimer = 10;
+        player->stateFlags1 |= PLAYER_STATE1_20000000;
+
+        Message_StartTextbox(play, getTextId(getItemId), NULL);
+        Audio_PlayFanfare(NA_BGM_GET_ITEM | 0x900);
+        CutsceneManager_Queue(CS_ID_GLOBAL_TALK);
+    } else {
+        Audio_PlayFanfare(NA_BGM_GET_SMALL_ITEM | 0x900);
+        // TODO: have notification for junk/useful ap items
+        // note: this works, but the image doesn't
+        // if (isAP(rando_get_item_id(location))) {
+        //     char item_name[33];
+        //     char player_name[36];
+        //     ItemId item_id = (locationType == 0) ? ITEM_AP_FILLER : ITEM_AP_USEFUL;
+        //     item_id = ITEM_AP_PROG;
+        //     rando_get_location_item_name(location, item_name);
+        //     rando_get_location_item_player(location, player_name);
+        //     randoEmitSendNotification(item_name, player_name, item_id, locationType);
+        // }
+    }
+
+    this->actor.parent = &player->actor;
+
+    this->actionFunc = EnItem00_RandoTextAndFreeze;
+}
+
 void Item_RandoCollectibleGround(EnItem00* this, PlayState* play);
 
 // func_800A6650
@@ -820,7 +944,7 @@ void Item_RandoCollectibleActionFunc(EnItem00* this, PlayState* play) {
     Vec3f pos;
     s32 var1;
 
-    this->unk152++;
+    // this->unk152++;
 
     if (this->actor.velocity.y <= 2.0f) {
         var1 = (u16)this->actor.shape.rot.z + 0x2710;
@@ -863,6 +987,7 @@ Actor* Item_RandoDropCollectible(PlayState* play, Vec3f* spawnPos, u32 params, u
     extendedItem00Data = z64recomp_get_extended_actor_data(spawnedActor, item00Extension);
     *extendedItem00Data = location;
 
+    spawnedActor->draw = Item_RandoCollectibleDraw;
     ((EnItem00*)spawnedActor)->getItemId = rando_get_item_id(location);
 
     if ((spawnedActor != NULL)) {
@@ -880,7 +1005,7 @@ Actor* Item_RandoDropCollectible(PlayState* play, Vec3f* spawnPos, u32 params, u
         spawnedActor->speed = 2.0f;
         spawnedActor->gravity = -0.9f;
         spawnedActor->world.rot.y = Rand_CenteredFloat(0x10000);
-        Actor_SetScale(spawnedActor, 0.0f);
+        Actor_SetScale(spawnedActor, 0.02f); // heart piece scale
         // ((EnItem00*)spawnedActor)->actionFunc = func_800A6780;
         ((EnItem00*)spawnedActor)->actionFunc = Item_RandoCollectibleActionFunc;
         ((EnItem00*)spawnedActor)->unk152 = 0xDC;
@@ -889,6 +1014,7 @@ Actor* Item_RandoDropCollectible(PlayState* play, Vec3f* spawnPos, u32 params, u
         //     spawnedActor->room = -1;
         // }
         spawnedActor->flags |= 0x0010;
+        // spawnedActor->flags |= ACTOR_FLAG_100000;
     }
 
     return spawnedActor;
