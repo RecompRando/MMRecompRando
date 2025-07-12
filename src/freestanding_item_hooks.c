@@ -7,9 +7,12 @@
 #include "actor_helpers.h"
 
 #include "overlays/actors/ovl_Obj_Mure3/z_obj_mure3.h"
+#include "overlays/actors/ovl_En_Scopecoin/z_en_scopecoin.h"
+
 #define LOCATION_RUPEE (0x170000 | (gPlay->sceneId << 8) | (gPlay->roomCtx.curRoom.num << 4) \
                         | randoGetLoadedActorNumInSameRoom(gPlay, actor))
 #define LOCATION_MURE3_RUPEE(index) (0x170000 | (play->sceneId << 8) | (0xF << 4) | index)
+#define LOCATION_TERMINATREE_RUPEE(index) (0x170000 | (play->sceneId << 8) | (0xE << 4) | index)
 
 void Item_RandoCollectibleDraw(Actor* thisx, PlayState* play);
 void Item_RandoCollectibleGround(EnItem00* this, PlayState* play);
@@ -28,7 +31,8 @@ void AfterActor_SpawnEntry() {
             actor->params == ITEM00_RUPEE_BLUE ||
             actor->params == ITEM00_RUPEE_RED ||
             actor->params == ITEM00_RUPEE_PURPLE ||
-            actor->params == ITEM00_RUPEE_HUGE
+            actor->params == ITEM00_RUPEE_HUGE ||
+            actor->params == ITEM00_RECOVERY_HEART
             ) {
             if (!rando_location_is_checked(LOCATION_RUPEE)) {
                 u32* extendedItem00Data;
@@ -119,5 +123,52 @@ void AfterMure3_SevenRupeeSpawn() {
                 ((EnItem00*)actor)->actionFunc = Item_RandoCollectibleGround;
             }
         }
+    }
+}
+
+// termina field tree where the parttimer is climbing
+void EnScopecoin_RandoDraw(Actor* thisx, PlayState* play) {
+    s32 actorIndex = randoGetLoadedActorNumInSameRoom(play, thisx);
+    u32 getItemId = rando_get_item_id(LOCATION_TERMINATREE_RUPEE(actorIndex));
+    u16 objectId = getObjectId(getItemId);
+
+    if (actorIndex == 0) { // hide extra rupee on pillar
+        return;
+    }
+
+    Matrix_Scale(40.0f, 40.0f, 40.0f, MTXMODE_APPLY);
+    if (isAP(getItemId)) {
+        GetItem_Draw(play, getGid(getItemId));
+    // } else if (ObjLoad(play, 0x06, objectId)) {
+    //     GetItem_Draw(play, getGid(getItemId));
+    //     ObjUnload(play, 0x06, objectId);
+    } else {
+        GetItem_Draw(play, GID_APLOGO_USEFUL);
+    }
+}
+
+Actor* sEnScopecoinActor;
+
+RECOMP_HOOK("EnScopecoin_Init")
+void OnEnScopecoin_Init(Actor* thisx, PlayState* play) {
+    sEnScopecoinActor = thisx;
+}
+
+RECOMP_HOOK_RETURN("EnScopecoin_Init")
+void AfterEnScopecoin_Init() {
+    sEnScopecoinActor->draw = EnScopecoin_RandoDraw;
+}
+
+RECOMP_PATCH void EnScopecoin_CheckCollectible(EnScopecoin* this, PlayState* play) {
+    s32 actorIndex = randoGetLoadedActorNumInSameRoom(play, &this->actor);
+
+    this->actor.shape.rot.y += 0x1F4; // spin
+    if (Flags_GetCollectible(play, OBJMUPICT_GET_RUPEE_FLAG(&this->actor))) {
+        if (!rando_location_is_checked(LOCATION_TERMINATREE_RUPEE(actorIndex))) {
+            Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, LOCATION_TERMINATREE_RUPEE(actorIndex));
+        } else {
+            Item_DropCollectible(play, &this->actor.world.pos, ITEM00_RUPEE_RED);
+        }
+        Actor_Kill(&this->actor);
     }
 }

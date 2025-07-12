@@ -8,6 +8,9 @@ extern ActorExtensionId potFlyingExtension;
 extern ActorExtensionId potFlowerExtension;
 extern ActorExtensionId wonderHitExtension;
 extern ActorExtensionId wonderRupeeExtension;
+extern ActorExtensionId rockExtension;
+extern ActorExtensionId snowballExtension;
+extern ActorExtensionId bigSnowballExtension;
 
 s32 randoGetLoadedActorNumInSameRoom(PlayState* play, Actor* actorIn);
 s32 randoGetLoadedActorNumInSameRoomExtra(PlayState* play, Actor* actorIn, s16 extraId);

@@ -14,6 +14,9 @@ void registerActorExtensions() {
     potFlowerExtension = z64recomp_extend_actor(ACTOR_OBJ_FLOWERPOT, sizeof(u32));
     wonderHitExtension = z64recomp_extend_actor(ACTOR_EN_HIT_TAG, sizeof(u32));
     wonderRupeeExtension = z64recomp_extend_actor(ACTOR_EN_INVISIBLE_RUPPE, sizeof(u32));
+    rockExtension = z64recomp_extend_actor(ACTOR_EN_ISHI, sizeof(u32));
+    snowballExtension = z64recomp_extend_actor(ACTOR_OBJ_SNOWBALL2, sizeof(u32));
+    bigSnowballExtension = z64recomp_extend_actor(ACTOR_OBJ_SNOWBALL, sizeof(u32));
 }
 
 s32 randoGetLoadedActorNumInSameRoom(PlayState* play, Actor* actorIn) {
@@ -71,4 +74,30 @@ u16 getCurrentGrotto(PlayState* play) {
             break;
     }
     return 0x80 + entrance; // 0x80 is outside the range of real sceneIds
+}
+
+typedef struct {
+    /* 0x00 */ PlayState* play;
+    /* 0x04 */ Actor* actor;
+    /* 0x08 */ u32 requiredActorFlag;
+    /* 0x0C */ u32 canFreezeCategory;
+    /* 0x10 */ Actor* talkActor;
+    /* 0x14 */ Player* player;
+    /* 0x18 */ u32 unk_18; // Bitmask of actor flags. The actor will only have main called if it has at least 1
+                           // flag set that matches this bitmask
+} UpdateActor_Params;      // size = 0x1C
+
+RECOMP_HOOK("Actor_UpdateActor")
+void FreezeActors(UpdateActor_Params* params) {
+    PlayState* play = params->play;
+    Actor* actor = params->actor;
+    Player* player = GET_PLAYER(play);
+
+    // force actors to freeze when grabbing items w/ text
+    if (CutsceneManager_GetCurrentCsId() == CS_ID_GLOBAL_TALK) {
+        if (actor->id == ACTOR_OBJ_BEAN) { // magic bean plant
+            // PLAYER_STATE1_20000000 is used when grabbing items
+            params->canFreezeCategory |= PLAYER_STATE1_20000000 & player->stateFlags1;
+        }
+    }
 }

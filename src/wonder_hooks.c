@@ -92,32 +92,35 @@ void OnEnInvisibleRuppe_Update(Actor* thisx, PlayState* play) {
 
 void func_80C259E8(EnInvisibleRuppe* this, PlayState* play); // literally just Actor_Kill(&this->actor);
 
-// TODO: just give the items instead of spawning the actor
+void EnItem00_RandoTextAndFreeze(EnItem00* this, PlayState* play);
+
 RECOMP_PATCH void func_80C2590C(EnInvisibleRuppe* this, PlayState* play) {
+    Actor* item;
     if (this->collider.base.ocFlags1 & OC1_HIT) {
         extendedWonderRupeeData = z64recomp_get_extended_actor_data(&this->actor, wonderRupeeExtension);
-        recomp_printf("wonder invisible rupee: 0x%06X\n", *extendedWonderRupeeData);
-        switch (INVISIBLERUPPE_GET_3(&this->actor)) {
-            case 0:
-                Audio_PlaySfx(NA_SE_SY_GET_RUPY);
-                Item_DropCollectible(play, &this->actor.world.pos, 0x8000 | ITEM00_RUPEE_GREEN);
-                // Item_RandoDropCollectible(play, &this->actor.world.pos, 0x8000 | ITEM00_APITEM, LOCATION_WONDER_RUPEE);
-                break;
+        if (!rando_location_is_checked(*extendedWonderRupeeData)) {
+            item = Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *extendedWonderRupeeData);
+            ((EnItem00*)item)->actionFunc = EnItem00_RandoTextAndFreeze;
+        } else {
+            switch (INVISIBLERUPPE_GET_3(&this->actor)) {
+                case 0:
+                    Audio_PlaySfx(NA_SE_SY_GET_RUPY);
+                    Item_DropCollectible(play, &this->actor.world.pos, 0x8000 | ITEM00_RUPEE_GREEN);
+                    break;
 
-            case 1:
-                Audio_PlaySfx(NA_SE_SY_GET_RUPY);
-                Item_DropCollectible(play, &this->actor.world.pos, 0x8000 | ITEM00_RUPEE_BLUE);
-                // Item_RandoDropCollectible(play, &this->actor.world.pos, 0x8000 | ITEM00_APITEM, LOCATION_WONDER_RUPEE);
-                break;
+                case 1:
+                    Audio_PlaySfx(NA_SE_SY_GET_RUPY);
+                    Item_DropCollectible(play, &this->actor.world.pos, 0x8000 | ITEM00_RUPEE_BLUE);
+                    break;
 
-            case 2:
-                Audio_PlaySfx(NA_SE_SY_GET_RUPY);
-                Item_DropCollectible(play, &this->actor.world.pos, 0x8000 | ITEM00_RUPEE_RED);
-                // Item_RandoDropCollectible(play, &this->actor.world.pos, 0x8000 | ITEM00_APITEM, LOCATION_WONDER_RUPEE);
-                break;
+                case 2:
+                    Audio_PlaySfx(NA_SE_SY_GET_RUPY);
+                    Item_DropCollectible(play, &this->actor.world.pos, 0x8000 | ITEM00_RUPEE_RED);
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
+            }
         }
 
         if (this->switchFlag > SWITCH_FLAG_NONE) {
