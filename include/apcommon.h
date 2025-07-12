@@ -189,9 +189,9 @@ u8 getTextId(s16 gi);
 extern s8 giToItemId[];
 
 typedef enum {
+    RANDO_ITEM_CLASS_JUNK,
     RANDO_ITEM_CLASS_PROGRESSION,
     RANDO_ITEM_CLASS_USEFUL,
-    RANDO_ITEM_CLASS_JUNK,
     RANDO_ITEM_CLASS_TRAP
 } RandoItemClassification;
 
