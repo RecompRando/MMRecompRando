@@ -9,9 +9,8 @@
 #include "overlays/actors/ovl_Obj_Bean/z_obj_bean.h"
 #include "overlays/actors/ovl_Obj_Swprize/z_obj_swprize.h"
 
-// #define LOCATION_SOFT_SOIL (0x190000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
-//                         | randoGetLoadedActorNumInSameRoom(play, thisx))
-#define LOCATION_SOFT_SOIL (0x190000 | (play->sceneId << 8) | OBJ_SWPRIZE_GET_SWITCH_FLAG(&this->actor))
+// ignore how mashed together this is
+#define LOCATION_SOFT_SOIL (0x190000 | (play->sceneId << 8) | (OBJ_SWPRIZE_GET_SWITCH_FLAG(&this->actor) + play->roomCtx.curRoom.num) << 4)
 
 // @ap preplant magic beans when receiving the item
 RECOMP_HOOK("ObjBean_Init")
@@ -42,7 +41,7 @@ RECOMP_PATCH void func_80C253D0(ObjSwprize* this, PlayState* play) {
     if (type == 2) {
         for (i = 0; i < 3; i++) {
             if (!rando_location_is_checked(LOCATION_SOFT_SOIL | i)) {
-                collectible = Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, LOCATION_SOFT_SOIL | i);
+                collectible = Item_RandoDropCollectible(play, &thisx->world.pos, ITEM00_APITEM, LOCATION_SOFT_SOIL | i);
             } else {
                 collectible = Item_DropCollectible(play, &thisx->world.pos, temp_s0);
             }
@@ -58,7 +57,7 @@ RECOMP_PATCH void func_80C253D0(ObjSwprize* this, PlayState* play) {
         }
     } else {
         if (!rando_location_is_checked(LOCATION_SOFT_SOIL)) {
-            collectible = Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, LOCATION_SOFT_SOIL);
+            collectible = Item_RandoDropCollectible(play, &thisx->world.pos, ITEM00_APITEM, LOCATION_SOFT_SOIL | 3);
         } else {
             collectible = Item_DropCollectible(play, &thisx->world.pos, temp_s0);
         }
