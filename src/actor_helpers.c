@@ -17,6 +17,7 @@ void registerActorExtensions() {
     rockExtension = z64recomp_extend_actor(ACTOR_EN_ISHI, sizeof(u32));
     snowballExtension = z64recomp_extend_actor(ACTOR_OBJ_SNOWBALL2, sizeof(u32));
     bigSnowballExtension = z64recomp_extend_actor(ACTOR_OBJ_SNOWBALL, sizeof(u32));
+    gamelupyExtension = z64recomp_extend_actor(ACTOR_EN_GAMELUPY, sizeof(u32));
 }
 
 s32 randoGetLoadedActorNumInSameRoom(PlayState* play, Actor* actorIn) {
@@ -95,7 +96,8 @@ void FreezeActors(UpdateActor_Params* params) {
 
     // force actors to freeze when grabbing items w/ text
     if (CutsceneManager_GetCurrentCsId() == CS_ID_GLOBAL_TALK) {
-        if (actor->id == ACTOR_OBJ_BEAN) { // magic bean plant
+        if (actor->id == ACTOR_OBJ_BEAN ||          // magic bean plant
+            actor->id == ACTOR_OBJ_LUPYGAMELIFT) {  // deku playground elevator
             // PLAYER_STATE1_20000000 is used when grabbing items
             params->canFreezeCategory |= PLAYER_STATE1_20000000 & player->stateFlags1;
         }

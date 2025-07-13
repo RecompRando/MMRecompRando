@@ -11,6 +11,7 @@ extern ActorExtensionId wonderRupeeExtension;
 extern ActorExtensionId rockExtension;
 extern ActorExtensionId snowballExtension;
 extern ActorExtensionId bigSnowballExtension;
+extern ActorExtensionId gamelupyExtension;
 
 s32 randoGetLoadedActorNumInSameRoom(PlayState* play, Actor* actorIn);
 s32 randoGetLoadedActorNumInSameRoomExtra(PlayState* play, Actor* actorIn, s16 extraId);

@@ -13,6 +13,7 @@
                         | randoGetLoadedActorNumInSameRoom(gPlay, actor))
 #define LOCATION_MURE3_RUPEE(index) (0x170000 | (play->sceneId << 8) | (0xF << 4) | index)
 #define LOCATION_TERMINATREE_RUPEE(index) (0x170000 | (play->sceneId << 8) | (0xE << 4) | index)
+#define LOCATION_PLAYGROUND_RUPEE (0x170000 | (play->sceneId << 8) | (CURRENT_DAY << 4) | randoGetLoadedActorNumInSameRoom(play, thisx))
 
 void Item_RandoCollectibleDraw(Actor* thisx, PlayState* play);
 void Item_RandoCollectibleGround(EnItem00* this, PlayState* play);
@@ -156,7 +157,11 @@ void OnEnScopecoin_Init(Actor* thisx, PlayState* play) {
 
 RECOMP_HOOK_RETURN("EnScopecoin_Init")
 void AfterEnScopecoin_Init() {
-    sEnScopecoinActor->draw = EnScopecoin_RandoDraw;
+    PlayState* play = gPlay;
+    s32 actorIndex = randoGetLoadedActorNumInSameRoom(play, sEnScopecoinActor);
+    if (!rando_location_is_checked(LOCATION_TERMINATREE_RUPEE(actorIndex))) {
+        sEnScopecoinActor->draw = EnScopecoin_RandoDraw;
+    }
 }
 
 RECOMP_PATCH void EnScopecoin_CheckCollectible(EnScopecoin* this, PlayState* play) {
@@ -171,4 +176,71 @@ RECOMP_PATCH void EnScopecoin_CheckCollectible(EnScopecoin* this, PlayState* pla
         }
         Actor_Kill(&this->actor);
     }
+}
+
+// deku playground
+ActorExtensionId gamelupyExtension;
+u32* extendedGamelupyData;
+Actor* EnGamelupyActor;
+
+void EnGamelupy_RandoDraw(Actor* thisx, PlayState* play) {
+    extendedGamelupyData = z64recomp_get_extended_actor_data(thisx, gamelupyExtension);
+    u32 getItemId = rando_get_item_id(*extendedGamelupyData);
+    u16 objectId = getObjectId(getItemId);
+
+    Matrix_Scale(20.0f, 20.0f, 20.0f, MTXMODE_APPLY);
+    if (isAP(getItemId)) {
+        GetItem_Draw(play, getGid(getItemId));
+    // } else if (ObjLoad(play, 0x06, objectId)) {
+    //     GetItem_Draw(play, getGid(getItemId));
+    //     ObjUnload(play, 0x06, objectId);
+    } else {
+        GetItem_Draw(play, GID_APLOGO_USEFUL);
+    }
+}
+
+RECOMP_HOOK("EnGamelupy_Init")
+void OnEnGamelupy_Init(Actor* thisx, PlayState* play) {
+    extendedGamelupyData = z64recomp_get_extended_actor_data(thisx, gamelupyExtension);
+    *extendedGamelupyData = LOCATION_PLAYGROUND_RUPEE;
+    EnGamelupyActor = thisx;
+}
+
+RECOMP_HOOK_RETURN("EnGamelupy_Init")
+void AfterEnGamelupy_Init() {
+    PlayState* play = gPlay;
+    extendedGamelupyData = z64recomp_get_extended_actor_data(EnGamelupyActor, gamelupyExtension);
+    if (!rando_location_is_checked(*extendedGamelupyData)) {
+        EnGamelupyActor->draw = EnGamelupy_RandoDraw;
+    }
+}
+
+void EnGamelupy_SetupCollected(EnGamelupy* this);
+void EnGamelupy_Collected(EnGamelupy* this, PlayState* play);
+
+void EnItem00_RandoTextAndFreeze(EnItem00* this, PlayState* play);
+
+RECOMP_PATCH void EnGamelupy_Idle(EnGamelupy* this, PlayState* play) {
+    if (this->collider.base.ocFlags1 & OC1_HIT) {
+        *this->minigameScore += ENGAMELUPY_POINTS;
+
+        extendedGamelupyData = z64recomp_get_extended_actor_data(&this->actor, gamelupyExtension);
+        if (!rando_location_is_checked(*extendedGamelupyData)) {
+            this->collectedTimer = 0;
+            this->actor.gravity = 0.0f;
+            Actor* item = Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *extendedGamelupyData);
+            ((EnItem00*)item)->actionFunc = EnItem00_RandoTextAndFreeze;
+            // this->actionFunc = EnGamelupy_Collected;
+            Actor_Kill(&this->actor);
+            return;
+        } else {
+            if (this->type == ENGAMELUPY_TYPE_BLUE) {
+                Rupees_ChangeBy(5);
+            } else {
+                Rupees_ChangeBy(1);
+            }
+            EnGamelupy_SetupCollected(this);
+        }
+    }
+    this->actor.shape.rot.y += 0x1F4;
 }
