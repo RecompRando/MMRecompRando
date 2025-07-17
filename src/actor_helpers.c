@@ -7,6 +7,8 @@
 
 void registerActorExtensions() {
     item00Extension = z64recomp_extend_actor(ACTOR_EN_ITEM00, sizeof(u32));
+    mureExtension = z64recomp_extend_actor(ACTOR_OBJ_MURE, sizeof(u32));
+    mure2Extension = z64recomp_extend_actor(ACTOR_OBJ_MURE2, sizeof(u32));
     kusaGrassExtension = z64recomp_extend_actor(ACTOR_EN_KUSA, sizeof(u32));
     keatonGrassExtension = z64recomp_extend_actor(ACTOR_EN_KUSA2, sizeof(u32));
     potExtension = z64recomp_extend_actor(ACTOR_OBJ_TSUBO, sizeof(u32));
@@ -15,9 +17,15 @@ void registerActorExtensions() {
     wonderHitExtension = z64recomp_extend_actor(ACTOR_EN_HIT_TAG, sizeof(u32));
     wonderRupeeExtension = z64recomp_extend_actor(ACTOR_EN_INVISIBLE_RUPPE, sizeof(u32));
     rockExtension = z64recomp_extend_actor(ACTOR_EN_ISHI, sizeof(u32));
+    boulder2Extension = z64recomp_extend_actor(ACTOR_OBJ_HAMISHI, sizeof(u32));
     snowballExtension = z64recomp_extend_actor(ACTOR_OBJ_SNOWBALL2, sizeof(u32));
     bigSnowballExtension = z64recomp_extend_actor(ACTOR_OBJ_SNOWBALL, sizeof(u32));
     gamelupyExtension = z64recomp_extend_actor(ACTOR_EN_GAMELUPY, sizeof(u32));
+    crateSmallExtension = z64recomp_extend_actor(ACTOR_OBJ_KIBAKO, sizeof(u32));
+    crateBigExtension = z64recomp_extend_actor(ACTOR_OBJ_KIBAKO2, sizeof(u32));
+    barrelExtension = z64recomp_extend_actor(ACTOR_OBJ_TARU, sizeof(u32));
+    icicleExtension = z64recomp_extend_actor(ACTOR_BG_ICICLE, sizeof(u32));
+    beehiveExtension = z64recomp_extend_actor(ACTOR_OBJ_COMB, sizeof(u32));
 }
 
 s32 randoGetLoadedActorNumInSameRoom(PlayState* play, Actor* actorIn) {

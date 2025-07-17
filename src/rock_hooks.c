@@ -7,21 +7,47 @@
 #include "actor_helpers.h"
 
 #include "overlays/actors/ovl_En_Ishi/z_en_ishi.h"
+#include "overlays/actors/ovl_Obj_Hamishi/z_obj_hamishi.h"
 
 #define LOCATION_ROCK (0x180000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
-                        | randoGetLoadedActorNumInSameRoom(play, thisx))
+                        | randoGetLoadedActorNumInSameRoomExtra(play, actor, ACTOR_OBJ_HAMISHI))
+#define LOCATION_BOULDER2 (0x180000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+                        | randoGetLoadedActorNumInSameRoomExtra(play, actor, ACTOR_EN_ISHI))
 
 ActorExtensionId rockExtension;
 u32* extendedRockData;
+ActorExtensionId boulder2Extension;
+u32* extendedBoulder2Data;
 
 // TODO: add these to symbols
 static s16 D_8095F76C[] = { -1, 1, 2, 20, 8, 0 };
 static Vec3f D_8095F778 = { 0.0f, 1.0f, 0.0f };
 
-RECOMP_HOOK("EnIshi_Init")
-void OnEnIshi_Init(Actor* thisx, PlayState* play) {
-    extendedRockData = z64recomp_get_extended_actor_data(thisx, rockExtension);
-    *extendedRockData = LOCATION_ROCK;
+// RECOMP_HOOK("EnIshi_Init")
+// void OnEnIshi_Init(Actor* thisx, PlayState* play) {
+//     extendedRockData = z64recomp_get_extended_actor_data(thisx, rockExtension);
+//     *extendedRockData = LOCATION_ROCK;
+// }
+
+// note: this *should* only run when an actor is spawned on scene/room load
+RECOMP_HOOK_RETURN("Actor_SpawnEntry")
+void add_rock_and_boulder_locations() {
+    Actor* actor = recomphook_get_return_ptr();
+    if (actor == NULL) {
+        return;
+    }
+
+    PlayState* play = gPlay;
+
+    // rocks/silver boulders
+    if (actor->id == ACTOR_EN_ISHI) {
+        extendedRockData = z64recomp_get_extended_actor_data(actor, rockExtension);
+        *extendedRockData = LOCATION_ROCK;
+    // bronze boulders
+    } else if (actor->id == ACTOR_OBJ_HAMISHI) {
+        extendedBoulder2Data = z64recomp_get_extended_actor_data(actor, boulder2Extension);
+        *extendedBoulder2Data = LOCATION_BOULDER2;
+    }
 }
 
 RECOMP_PATCH void func_8095DF90(EnIshi* this, PlayState* play) {
@@ -49,7 +75,7 @@ RECOMP_PATCH void func_8095DFF0(EnIshi* this, PlayState* play) {
     if (temp >= 0) {
         extendedRockData = z64recomp_get_extended_actor_data(&this->actor, rockExtension);
         if (!rando_location_is_checked(*extendedRockData)) {
-            sp3C = Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *extendedRockData);
+            sp3C = Item_RandoDropCollectible(play, &this->actor.world.pos, temp | (ENISHI_GET_FLAG(&this->actor) << 8), *extendedRockData);
         } else {
             sp3C = Item_DropCollectible(play, &this->actor.world.pos, temp | (ENISHI_GET_FLAG(&this->actor) << 8));
         }
@@ -74,5 +100,14 @@ RECOMP_PATCH void func_8095DFF0(EnIshi* this, PlayState* play) {
             }
             Matrix_Pop();
         }
+    }
+}
+
+// bronze boulders
+RECOMP_HOOK("func_809A10F4")
+void ObjHamishi_Broken(ObjHamishi* this, PlayState* play) {
+    extendedBoulder2Data = z64recomp_get_extended_actor_data(&this->actor, boulder2Extension);
+    if (!rando_location_is_checked(*extendedBoulder2Data)) {
+        Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *extendedBoulder2Data);
     }
 }

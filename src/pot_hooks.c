@@ -45,15 +45,15 @@ RECOMP_PATCH void func_8092762C(ObjTsubo* this, PlayState* play) {
     }
 }
 
-// TODO: turn into hook after confirming this works as intended
 RECOMP_PATCH void func_80927690(ObjTsubo* this, PlayState* play) {
+    s32 itemDrop;
     extendedPotData = z64recomp_get_extended_actor_data(&this->actor, potExtension);
     if (!rando_location_is_checked(*extendedPotData)) {
-        Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *extendedPotData);
+        itemDrop = func_800A8150(OBJ_TSUBO_P003F(&this->actor));
+        Item_RandoDropCollectible(play, &this->actor.world.pos, (OBJ_TSUBO_PFE00(&this->actor) << 8) | itemDrop, *extendedPotData);
         this->unk_197 = true;
     }
 
-    s32 itemDrop;
     if (!this->unk_197 && (OBJ_TSUBO_ZROT(&this->actor) != 2)) {
         itemDrop = func_800A8150(OBJ_TSUBO_P003F(&this->actor));
         if (itemDrop > ITEM00_NO_DROP) {
@@ -71,15 +71,15 @@ void OnEnTuboTrap_Init(Actor* thisx, PlayState* play) {
 }
 
 RECOMP_PATCH void EnTuboTrap_DropCollectible(EnTuboTrap* this, PlayState* play) {
+    s32 itemParam = ((this->actor.params >> 8) & 0x3F);
+    s32 dropItem00Id = func_800A8150(itemParam);
+    
     extendedPotFlyingData = z64recomp_get_extended_actor_data(&this->actor, potFlyingExtension);
     if (!rando_location_is_checked(*extendedPotFlyingData)) {
-        Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *extendedPotFlyingData);
+        Item_RandoDropCollectible(play, &this->actor.world.pos, ((this->actor.params & 0x7F) << 8) | dropItem00Id, *extendedPotFlyingData);
         return;
     }
     
-    s32 itemParam = ((this->actor.params >> 8) & 0x3F);
-    s32 dropItem00Id = func_800A8150(itemParam);
-
     if (dropItem00Id > ITEM00_NO_DROP) {
         Item_DropCollectible(play, &this->actor.world.pos, ((this->actor.params & 0x7F) << 8) | dropItem00Id);
     }

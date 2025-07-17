@@ -10,8 +10,8 @@
 #include "overlays/actors/ovl_En_Invisible_Ruppe/z_en_invisible_ruppe.h"
 #include "overlays/actors/ovl_Obj_Dora/z_obj_dora.h"
 
-#define LOCATION_WONDER_HIT (0x150000 | (play->sceneId << 8) \
-                            | (randoGetLoadedActorNumInSameRoom(play, thisx) << 4))
+#define LOCATION_WONDER_HIT (0x150000 | ((play->sceneId + play->roomCtx.curRoom.num) << 8) \
+                            | (randoGetLoadedActorNumInSameRoom(play, thisx)) << 4)
 #define LOCATION_WONDER_RUPEE (0x160000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
 #define LOCATION_WONDER_HIT_GONG (0x160000 | (play->sceneId << 8))

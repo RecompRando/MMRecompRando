@@ -3,38 +3,16 @@
 
 #include "apcommon.h"
 
-struct ObjComb;
+#include "overlays/actors/ovl_Obj_Comb/z_obj_comb.h"
 
-typedef void (*ObjCombActionFunc)(struct ObjComb*, PlayState*);
-
-#define OBJCOMB_GET_F(thisx) ((thisx)->params & 0xF)
-#define OBJCOMB_GET_10(thisx) (((thisx)->params >> 4) & 0x1)
-#define OBJCOMB_GET_1F(thisx) ((thisx)->params & 0x1F)
-#define OBJCOMB_GET_3F(thisx) ((thisx)->params & 0x3F)
-#define OBJCOMB_GET_80(thisx) (((thisx)->params >> 7) & 0x1)
-#define OBJCOMB_GET_7F00(thisx) (((thisx)->params >> 0x8) & 0x7F)
-#define OBJCOMB_GET_8000(thisx) (((thisx)->params >> 0xE) & 2)
+#include "actor_helpers.h"
 
 #define LOCATION_SKULL_TOKEN (0x060000 | (play->sceneId << 8) | OBJCOMB_GET_1F(&this->actor))
+#define LOCATION_BEEHIVE (0x240000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+                            | randoGetLoadedActorNumInSameRoom(play, thisx))
 
-typedef struct ObjComb {
-    /* 0x000 */ Actor actor;
-    /* 0x144 */ ObjCombActionFunc actionFunc;
-    /* 0x148 */ ColliderJntSph collider;
-    /* 0x168 */ ColliderJntSphElement colliderElements[1];
-    /* 0x1A8 */ s16 unk_1A8;
-    /* 0x1AA */ s16 unk_1AA;
-    /* 0x1AC */ s16 unk_1AC;
-    /* 0x1AE */ s16 unk_1AE;
-    /* 0x1B0 */ s16 unk_1B0;
-    /* 0x1B2 */ s8 unk_1B2;
-    /* 0x1B3 */ s8 unk_1B3;
-    /* 0x1B4 */ s8 unk_1B4;
-    /* 0x1B5 */ s8 unk_1B5;
-    /* 0x1B6 */ s8 unk_1B6;
-    /* 0x1B7 */ s8 unk_1B7;
-    /* 0x1B8 */ s8 unk_1B8;
-} ObjComb; // size = 0x1BC
+ActorExtensionId beehiveExtension;
+u32* extendedBeehiveData;
 
 bool func_8098CE40(ObjComb* this, PlayState* play);
 void func_8098CEAC(ObjComb* this, PlayState* play);
@@ -128,5 +106,34 @@ RECOMP_PATCH void func_8098D99C(ObjComb* this, PlayState* play) {
             this->unk_1B6 = 1;
             Audio_PlaySfx(NA_SE_SY_TRE_BOX_APPEAR);
         }
+    }
+}
+
+RECOMP_HOOK("ObjComb_Init")
+void OnObjComb_Init(Actor* thisx, PlayState* play) {
+    extendedBeehiveData = z64recomp_get_extended_actor_data(thisx, beehiveExtension);
+    *extendedBeehiveData = LOCATION_BEEHIVE;
+}
+
+RECOMP_HOOK("func_8098D8C8")
+void ObjComb_SpawnItemWithBees(ObjComb* this, PlayState* play) {
+    extendedBeehiveData = z64recomp_get_extended_actor_data(&this->actor, beehiveExtension);
+    if (!rando_location_is_checked(*extendedBeehiveData)) {
+        Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *extendedBeehiveData);
+        return;
+    }
+}
+
+RECOMP_PATCH void func_8098D870(ObjComb* this, PlayState* play) {
+    s32 temp_v0 = func_800A8150(OBJCOMB_GET_3F(&this->actor));
+
+    extendedBeehiveData = z64recomp_get_extended_actor_data(&this->actor, beehiveExtension);
+    if (temp_v0 != ITEM00_HEART_PIECE && !rando_location_is_checked(*extendedBeehiveData)) {
+        Item_RandoDropCollectible(play, &this->actor.world.pos, ((OBJCOMB_GET_7F00(&this->actor)) << 8) | temp_v0, *extendedBeehiveData);
+        return;
+    }
+
+    if (temp_v0 >= 0) {
+        Item_DropCollectible(play, &this->actor.world.pos, ((OBJCOMB_GET_7F00(&this->actor)) << 8) | temp_v0);
     }
 }

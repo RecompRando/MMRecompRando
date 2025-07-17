@@ -970,17 +970,46 @@ void Item_RandoCollectibleActionFunc(EnItem00* this, PlayState* play) {
     }
 }
 
+#define FAIRY_TYPE_2 0x2
+#define STRAY_FAIRY_AREA_CLOCK_TOWN 0
+#define STRAY_FAIRY_TYPE_COLLECTIBLE 0x7
+#define FAIRY_PARAMS(type, boolParam, collectibleFlag) (((type) /* & 0xF */) | (((boolParam) & 0x1) << 8) | ((((collectibleFlag) & 0x7F) << 9) & 0xFE00))
+#define STRAY_FAIRY_PARAMS(flag, nonDungeonArea, type) ((((flag) & 0x7F) << 9) | (((nonDungeonArea) & 7) << 6) | ((type) & 0xF))
+
 Actor* Item_RandoDropCollectible(PlayState* play, Vec3f* spawnPos, u32 params, u32 location) {
     s32 pad;
     Actor* spawnedActor = NULL;
 
-    // i'm not sure if these params are useful for us
+    // these params are practically only used for fairy spawns
     s32 newParamFF;
     s32 param10000 = params & 0x10000;
     s16 param8000 = params & 0x8000;
     s16 param7F00 = params & 0x7F00;
     s32 param20000 = params & 0x20000;
     s32 paramFF = params & 0xFF;
+    params &= 0x7FFF;
+    newParamFF = params & 0xFF;
+
+    if (((paramFF == ITEM00_FLEXIBLE) || (newParamFF == ITEM00_BIG_FAIRY)) && (param10000 == 0)) {
+        newParamFF = params & 0xFF;
+        if (newParamFF == ITEM00_FLEXIBLE) {
+            spawnedActor = Actor_Spawn(&play->actorCtx, play, ACTOR_EN_ELF, spawnPos->x, spawnPos->y + 40.0f,
+                                       spawnPos->z, 0, 0, 0, FAIRY_PARAMS(FAIRY_TYPE_2, true, param7F00 >> 8));
+            if (!Flags_GetCollectible(play, (param7F00 >> 8) & 0x7F)) {
+                SoundSource_PlaySfxAtFixedWorldPos(play, spawnPos, 40, NA_SE_EV_BUTTERFRY_TO_FAIRY);
+            }
+        } else {
+            spawnedActor = Actor_Spawn(
+                &play->actorCtx, play, ACTOR_EN_ELFORG, spawnPos->x, spawnPos->y + 40.0f, spawnPos->z, 0, 0, 0,
+                STRAY_FAIRY_PARAMS((param7F00 >> 8) & 0x7F, STRAY_FAIRY_AREA_CLOCK_TOWN, STRAY_FAIRY_TYPE_COLLECTIBLE));
+            if (param20000 == 0) {
+                if (!Flags_GetCollectible(play, (param7F00 >> 8) & 0x7F)) {
+                    SoundSource_PlaySfxAtFixedWorldPos(play, spawnPos, 40, NA_SE_EV_BUTTERFRY_TO_FAIRY);
+                }
+            }
+        }
+        return spawnedActor;
+    }
 
     spawnedActor = Actor_Spawn(&play->actorCtx, play, ACTOR_EN_ITEM00, spawnPos->x, spawnPos->y, spawnPos->z, 0,
                                 0, 0, ITEM00_APITEM);
@@ -990,13 +1019,7 @@ Actor* Item_RandoDropCollectible(PlayState* play, Vec3f* spawnPos, u32 params, u
     spawnedActor->draw = Item_RandoCollectibleDraw;
     ((EnItem00*)spawnedActor)->getItemId = rando_get_item_id(location);
 
-    if ((spawnedActor != NULL)) {
-        if (param8000) {
-            // wonder item might fall through the world without this check
-            spawnedActor->world.pos = GET_PLAYER(play)->actor.world.pos;
-            return spawnedActor;
-        }
-        
+    if ((spawnedActor != NULL)) {        
         if (param10000 == 0) {
             spawnedActor->velocity.y = 8.0f;
         } else {

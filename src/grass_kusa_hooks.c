@@ -27,11 +27,28 @@ u32 EnKusa_CreateLocation(PlayState* play, Actor* actor) {
 }
 
 // TODO: handle the different types of grass correctly (i.e. respawning)
-RECOMP_HOOK("EnKusa_Init")
-void OnEnKusa_Init(Actor* thisx, PlayState* play) {
-    extendedKusaGrassData = z64recomp_get_extended_actor_data(thisx, kusaGrassExtension);
-    *extendedKusaGrassData = EnKusa_CreateLocation(play, thisx);
-    // recomp_printf("single grass: 0x%06X\n", *extendedKusaGrassData);
+// RECOMP_HOOK("EnKusa_Init")
+// void OnEnKusa_Init(Actor* thisx, PlayState* play) {
+//     extendedKusaGrassData = z64recomp_get_extended_actor_data(thisx, kusaGrassExtension);
+//     *extendedKusaGrassData = EnKusa_CreateLocation(play, thisx);
+//     // recomp_printf("single grass: 0x%06X\n", *extendedKusaGrassData);
+// }
+
+// note: this *should* only run when an actor is spawned on scene/room load
+RECOMP_HOOK_RETURN("Actor_SpawnEntry")
+void add_grass_locations() {
+    Actor* actor = recomphook_get_return_ptr();
+    if (actor == NULL) {
+        return;
+    }
+
+    PlayState* play = gPlay;
+
+    if (actor->id == ACTOR_EN_KUSA) {
+        u32 location = EnKusa_CreateLocation(play, actor);
+        extendedKusaGrassData = z64recomp_get_extended_actor_data(actor, kusaGrassExtension);
+        *extendedKusaGrassData = location;
+    }
 }
 
 RECOMP_PATCH void EnKusa_DropCollectible(EnKusa* this, PlayState* play) {
@@ -40,7 +57,9 @@ RECOMP_PATCH void EnKusa_DropCollectible(EnKusa* this, PlayState* play) {
 
     extendedKusaGrassData = z64recomp_get_extended_actor_data(&this->actor, kusaGrassExtension);
     if (!rando_location_is_checked(*extendedKusaGrassData)) {
-        Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *extendedKusaGrassData);
+        collectible = func_800A8150(KUSA_GET_PARAM_FC(&this->actor));
+        collectableParams = KUSA_GET_COLLECTIBLE_ID(&this->actor);
+        Item_RandoDropCollectible(play, &this->actor.world.pos, (collectableParams << 8) | collectible, *extendedKusaGrassData);
         return;
     }
 

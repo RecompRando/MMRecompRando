@@ -8,6 +8,7 @@
 
 #include "overlays/actors/ovl_Obj_Mure3/z_obj_mure3.h"
 #include "overlays/actors/ovl_En_Scopecoin/z_en_scopecoin.h"
+#include "overlays/actors/ovl_En_Gamelupy/z_en_gamelupy.h"
 
 #define LOCATION_RUPEE (0x170000 | (gPlay->sceneId << 8) | (gPlay->roomCtx.curRoom.num << 4) \
                         | randoGetLoadedActorNumInSameRoom(gPlay, actor))
@@ -21,7 +22,7 @@ void Item_RandoCollectibleGround(EnItem00* this, PlayState* play);
 // freestanding items
 // note: this *should* only run when an actor is spawned on scene/room load
 RECOMP_HOOK_RETURN("Actor_SpawnEntry")
-void AfterActor_SpawnEntry() {
+void freestanding_item_replacement() {
     Actor* actor = recomphook_get_return_ptr();
     if (actor == NULL) {
         return;
