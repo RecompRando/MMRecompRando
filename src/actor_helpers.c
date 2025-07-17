@@ -26,6 +26,7 @@ void registerActorExtensions() {
     barrelExtension = z64recomp_extend_actor(ACTOR_OBJ_TARU, sizeof(u32));
     icicleExtension = z64recomp_extend_actor(ACTOR_BG_ICICLE, sizeof(u32));
     beehiveExtension = z64recomp_extend_actor(ACTOR_OBJ_COMB, sizeof(u32));
+    fairyExtension = z64recomp_extend_actor(ACTOR_EN_ELF, sizeof(u32));
 }
 
 s32 randoGetLoadedActorNumInSameRoom(PlayState* play, Actor* actorIn) {

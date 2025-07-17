@@ -976,6 +976,9 @@ void Item_RandoCollectibleActionFunc(EnItem00* this, PlayState* play) {
 #define FAIRY_PARAMS(type, boolParam, collectibleFlag) (((type) /* & 0xF */) | (((boolParam) & 0x1) << 8) | ((((collectibleFlag) & 0x7F) << 9) & 0xFE00))
 #define STRAY_FAIRY_PARAMS(flag, nonDungeonArea, type) ((((flag) & 0x7F) << 9) | (((nonDungeonArea) & 7) << 6) | ((type) & 0xF))
 
+extern u32* extendedFairyData;
+void EnElf_RandoDraw(Actor* thisx, PlayState* play);
+
 Actor* Item_RandoDropCollectible(PlayState* play, Vec3f* spawnPos, u32 params, u32 location) {
     s32 pad;
     Actor* spawnedActor = NULL;
@@ -998,6 +1001,9 @@ Actor* Item_RandoDropCollectible(PlayState* play, Vec3f* spawnPos, u32 params, u
             if (!Flags_GetCollectible(play, (param7F00 >> 8) & 0x7F)) {
                 SoundSource_PlaySfxAtFixedWorldPos(play, spawnPos, 40, NA_SE_EV_BUTTERFRY_TO_FAIRY);
             }
+            extendedFairyData = z64recomp_get_extended_actor_data(spawnedActor, fairyExtension);
+            *extendedFairyData = location;
+            spawnedActor->draw = EnElf_RandoDraw;
         } else {
             spawnedActor = Actor_Spawn(
                 &play->actorCtx, play, ACTOR_EN_ELFORG, spawnPos->x, spawnPos->y + 40.0f, spawnPos->z, 0, 0, 0,
