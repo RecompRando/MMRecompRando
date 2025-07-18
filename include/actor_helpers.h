@@ -21,6 +21,7 @@ extern ActorExtensionId barrelExtension;
 extern ActorExtensionId icicleExtension;
 extern ActorExtensionId beehiveExtension;
 extern ActorExtensionId fairyExtension;
+extern ActorExtensionId butterflyExtension;
 
 s32 randoGetLoadedActorNumInSameRoom(PlayState* play, Actor* actorIn);
 s32 randoGetLoadedActorNumInSameRoomExtra(PlayState* play, Actor* actorIn, s16 extraId);
