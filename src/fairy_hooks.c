@@ -39,16 +39,19 @@ void EnElf_RandoDraw(Actor* thisx, PlayState* play) {
 RECOMP_HOOK("func_8088CC48")
 void EnElf_RandoFairyReplace(EnElf* this, PlayState* play) {
     extendedFairyData = z64recomp_get_extended_actor_data(&this->actor, fairyExtension);
-    *extendedFairyData = LOCATION_FAIRY;
-    this->actor.draw = EnElf_RandoDraw;
-    recomp_printf("fairy: 0x%06X\n", *extendedFairyData);
+    if (this->actor.params == FAIRY_TYPE_6) {
+        *extendedFairyData = LOCATION_FAIRY;
+        this->actor.draw = EnElf_RandoDraw;
+    }
 }
 
 // TODO: in-game text boxes
 RECOMP_HOOK("func_8088E0F0")
 void EnElf_RandoFairyTouched(EnElf* this, PlayState* play) {
     extendedFairyData = z64recomp_get_extended_actor_data(&this->actor, fairyExtension);
-    if (!rando_location_is_checked_async(*extendedFairyData)) {
+    // if (!rando_location_is_checked_async(*extendedFairyData)) {
+    if (!rando_location_is_checked_async(*extendedFairyData) && !this->unk_246) { // trying to make it print less
         rando_send_location(*extendedFairyData);
+        recomp_printf("fairy: 0x%06X\n", *extendedFairyData);
     }
 }
