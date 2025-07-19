@@ -51,6 +51,7 @@ s32 randoGetLoadedActorNumInSameRoom(PlayState* play, Actor* actorIn) {
     return -1; // should never return -1 if used correctly
 }
 
+// note: this only works if both actors are in the same category
 s32 randoGetLoadedActorNumInSameRoomExtra(PlayState* play, Actor* actorIn, s16 extraId) {
     u8 actorCat = actorIn->category;
     s8 actorRoom = actorIn->room;

@@ -8,9 +8,9 @@
 #include "overlays/actors/ovl_Obj_Kibako2/z_obj_kibako2.h"
 
 #define LOCATION_CRATE_SMALL (0x250000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
-                            | randoGetLoadedActorNumInSameRoomExtra(play, thisx, ACTOR_OBJ_KIBAKO2))
-#define LOCATION_CRATE_BIG (0x250000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
-                            | randoGetLoadedActorNumInSameRoomExtra(play, thisx, ACTOR_OBJ_KIBAKO))
+                            | randoGetLoadedActorNumInSameRoom(play, thisx))
+#define LOCATION_CRATE_BIG (0x270000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+                            | randoGetLoadedActorNumInSameRoom(play, thisx))
 
 ActorExtensionId crateSmallExtension;
 u32* extendedCrateSmallData;
