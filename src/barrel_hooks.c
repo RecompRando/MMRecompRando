@@ -31,3 +31,12 @@ RECOMP_PATCH void func_80B9BC64(ObjTaru* this, PlayState* play) {
         Item_DropCollectible(play, &this->dyna.actor.world.pos, (OBJ_TARU_GET_7F00(&this->dyna.actor) << 8) | item);
     }
 }
+
+// pirate's fortress barricades?
+RECOMP_HOOK("func_80B9B9C8")
+void ObjTaru_DropBarricadeItem(ObjTaru* this, PlayState* play) {
+    extendedBarrelData = z64recomp_get_extended_actor_data(&this->dyna.actor, barrelExtension);
+    if (!rando_location_is_checked(*extendedBarrelData)) {
+        Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, *extendedBarrelData);
+    }
+}
