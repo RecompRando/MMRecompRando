@@ -10,9 +10,7 @@
 s32 func_80BD6638(s16* csId, s16* csIdList, s32 numCutscenes);
 void func_80BD6754(BgHakaTomb* this);
 
-BgHakaTomb* sBgHakaTomb;
-
-void BgHakaTomb_RandoZTargetActionFunc(BgHakaTomb* this, PlayState* play) {
+RECOMP_PATCH void func_80BD66AC(BgHakaTomb* this, PlayState* play) {
     s16 csId;
 
     if (Flags_GetClear(play, this->dyna.actor.room)) {
@@ -28,14 +26,4 @@ void BgHakaTomb_RandoZTargetActionFunc(BgHakaTomb* this, PlayState* play) {
     } else {
         this->dyna.actor.flags &= ~ACTOR_FLAG_TARGETABLE;
     }
-}
-
-RECOMP_HOOK("func_80BD6624")
-void OnBgHakaTomb_SetZTargetActionFunc(BgHakaTomb* this) {
-    sBgHakaTomb = this;
-}
-
-RECOMP_HOOK_RETURN("func_80BD6624")
-void AfterBgHakaTomb_SetZTargetActionFunc(BgHakaTomb* this) {
-    sBgHakaTomb->actionFunc = BgHakaTomb_RandoZTargetActionFunc;
 }
