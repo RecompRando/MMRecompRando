@@ -15,6 +15,11 @@ u32* extendedFairyData;
 #define LOCATION_FAIRY (0x0F0000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, &this->actor))
 
+extern u32* extendedItem00Data;
+
+void Item_RandoCollectibleDraw(Actor* thisx, PlayState* play);
+void EnItem00_RandoGive(EnItem00* this, PlayState* play, s32 getItemId, u32 location);
+
 void func_8088F5F4(EnElf* this, PlayState* play, s32 sparkleLife);
 
 void EnElf_RandoDraw(Actor* thisx, PlayState* play) {
@@ -45,13 +50,19 @@ void EnElf_RandoFairyReplace(EnElf* this, PlayState* play) {
     }
 }
 
-// TODO: in-game text boxes
 RECOMP_HOOK("func_8088E0F0")
 void EnElf_RandoFairyTouched(EnElf* this, PlayState* play) {
     extendedFairyData = z64recomp_get_extended_actor_data(&this->actor, fairyExtension);
-    // if (!rando_location_is_checked_async(*extendedFairyData)) {
     if (!rando_location_is_checked_async(*extendedFairyData) && !this->unk_246) { // trying to make it print less
-        rando_send_location(*extendedFairyData);
+        Actor* item00 = Actor_Spawn(&play->actorCtx, play, ACTOR_EN_ITEM00, this->actor.world.pos.x, this->actor.world.pos.y, this->actor.world.pos.z, 0,
+                                0, 0, ITEM00_APITEM);
+        extendedItem00Data = z64recomp_get_extended_actor_data(item00, item00Extension);
+        *extendedItem00Data = *extendedFairyData;
+
+        item00->draw = Item_RandoCollectibleDraw;
+        Actor_SetScale(item00, 0.0f);
+        ((EnItem00*)item00)->getItemId = rando_get_item_id(*extendedFairyData);
+        EnItem00_RandoGive(((EnItem00*)item00), play, ((EnItem00*)item00)->getItemId, *extendedFairyData);
         recomp_printf("fairy: 0x%06X\n", *extendedFairyData);
     }
 }
