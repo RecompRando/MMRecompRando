@@ -8,23 +8,25 @@
 
 #include "overlays/actors/ovl_En_Kusa2/z_en_kusa2.h"
 
-#define LOCATION_KEATON_GRASS (0x130000 | (play->sceneId << 8) | D_80A5EAF0)
+#define LOCATION_KEATON_GRASS (0x130000 | (play->sceneId << 8) | curGrass)
 #define LOCATION_KEATON_GRASS_INCREMENTAL (0x130000 | (play->sceneId << 8) | kusa2->unk_1BC)
 
 EnKusa2* keatonGrass;
 ActorExtensionId keatonGrassExtension;
 u32* extendedKeatonGrassData;
 
-extern s16 D_80A5EAF0; // cur grass
-
 RECOMP_HOOK("EnKusa2_Init")
 void OnEnKusa2_Init(Actor* thisx, PlayState* play) {
     EnKusa2* this = (EnKusa2*)thisx;
 
-    if (ENKUSA2_GET_1(&this->actor)) { // ignore the spawner
+    static u8 curGrass;
+
+    if (!ENKUSA2_GET_1(&this->actor)) { // spawner
+        curGrass = 0;
+    } else {
         extendedKeatonGrassData = z64recomp_get_extended_actor_data(thisx, keatonGrassExtension);
         *extendedKeatonGrassData = LOCATION_KEATON_GRASS;
-        // recomp_printf("keaton grass: 0x%06X\n", *extendedKeatonGrassData);
+        curGrass++;
     }
 }
 
