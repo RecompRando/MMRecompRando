@@ -29,14 +29,15 @@ void EnElf_RandoDraw(Actor* thisx, PlayState* play);
 
 RECOMP_HOOK("EnButte_Init")
 void OnEnButte_Init(Actor* thisx, PlayState* play) {
+    EnButte* this = ((EnButte*)thisx);
+    this->actor.params = BUTTERFLY_1;
+
     s16 sceneId = play->sceneId;
 
     // handle grottos
     if (sceneId == SCENE_KAKUSIANA) {
         sceneId = getCurrentGrotto(play);
     }
-
-    thisx->params |= 1;
 
     extendedButterflyData = z64recomp_get_extended_actor_data(thisx, butterflyExtension);
     *extendedButterflyData = LOCATION_FAIRY_BUTTERFLY;
