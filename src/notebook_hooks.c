@@ -43,9 +43,10 @@ RECOMP_PATCH s32 Message_BombersNotebookProcessEventQueue(PlayState* play) {
         }
         msgCtx->bombersNotebookEventQueueCount--;
 
-        if ((sBombersNotebookEventMessages[msgCtx->bombersNotebookEventQueue[msgCtx->bombersNotebookEventQueueCount]] != 0) &&
-            CHECK_QUEST_ITEM(QUEST_BOMBERS_NOTEBOOK)) { // add option check here
+        // add option check here
+        if (sBombersNotebookEventMessages[msgCtx->bombersNotebookEventQueue[msgCtx->bombersNotebookEventQueueCount]] != 0) {
             u32 location = LOCATION_NOTEBOOK(msgCtx->bombersNotebookEventQueue[msgCtx->bombersNotebookEventQueueCount]);
+            recomp_printf("notebook location: 0x%06X\n", location);
             if (!rando_location_is_checked(location)) {
                 rando_send_location(location);
                 Message_ContinueTextbox(play, getTextId(rando_get_item_id(location)));
