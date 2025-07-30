@@ -525,7 +525,7 @@ RECOMP_PATCH void EnItem00_Update(Actor* thisx, PlayState* play) {
             }
             if (this->actor.params == ITEM00_HEART_PIECE && objectLoaded) {
                 Flags_SetCollectible(play, this->collectibleFlag);
-                Actor_OfferGetItemHook(&this->actor, play, getItemId, 0, 50.0f, 20.0f, true, true);
+                Actor_OfferGetItemHook(&this->actor, play, getItemId, location, 50.0f, 20.0f, true, true);
             } else if (this->actor.params == ITEM00_APITEM) {
                 // if (this->actor.xzDistToPlayer <= 50.0f && fabsf(this->actor.playerHeightRel) <= fabsf(20.0f)) {
                 if (this->actor.xzDistToPlayer <= 50.0f && fabsf(this->actor.playerHeightRel) <= fabsf(50.0f)) {

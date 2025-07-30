@@ -10,7 +10,7 @@
 #include "overlays/actors/ovl_En_Elf/z_en_elf.h"
 #include "overlays/actors/ovl_En_Gs/z_en_gs.h"
 
-#define LOCATION_FAIRY_GOSSIP (0x1F0000 | (this->actor.params << 4) | this->unk_195)
+#define LOCATION_FAIRY_GOSSIP (0x1F0000 | (play->sceneId << 8) | (this->actor.params << 4) | this->unk_195)
 
 void func_80999AC0(EnGs* this);
 void func_809984F4(EnGs* this, PlayState* play);
