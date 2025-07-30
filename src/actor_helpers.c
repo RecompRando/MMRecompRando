@@ -17,6 +17,7 @@ void registerActorExtensions() {
     wonderHitExtension = z64recomp_extend_actor(ACTOR_EN_HIT_TAG, sizeof(u32));
     wonderRupeeExtension = z64recomp_extend_actor(ACTOR_EN_INVISIBLE_RUPPE, sizeof(u32));
     rockExtension = z64recomp_extend_actor(ACTOR_EN_ISHI, sizeof(u32));
+    boulderExtension = z64recomp_extend_actor(ACTOR_OBJ_BOMBIWA, sizeof(u32));
     boulder2Extension = z64recomp_extend_actor(ACTOR_OBJ_HAMISHI, sizeof(u32));
     snowballExtension = z64recomp_extend_actor(ACTOR_OBJ_SNOWBALL2, sizeof(u32));
     bigSnowballExtension = z64recomp_extend_actor(ACTOR_OBJ_SNOWBALL, sizeof(u32));

@@ -11,6 +11,7 @@ extern ActorExtensionId potFlowerExtension;
 extern ActorExtensionId wonderHitExtension;
 extern ActorExtensionId wonderRupeeExtension;
 extern ActorExtensionId rockExtension;
+extern ActorExtensionId boulderExtension;
 extern ActorExtensionId boulder2Extension;
 extern ActorExtensionId snowballExtension;
 extern ActorExtensionId bigSnowballExtension;
