@@ -1,7 +1,13 @@
 #include "global.h"
 #include "modding.h"
+#include "recomputils.h"
+
+#include "apcommon.h"
 
 #include "overlays/kaleido_scope/ovl_kaleido_scope/z_kaleido_scope.h"
+#include "overlays/actors/ovl_Obj_Warpstone/z_obj_warpstone.h"
+
+bool owlsanity_enabled_temp = true;
 
 #define OWL_WARP_HIDDEN_OWL 0xF
 
@@ -9,6 +15,7 @@ extern s16 sKaleidoSetupRightPageIndex[];
 extern f32 sKaleidoSetupRightPageEyeX[];
 extern f32 sKaleidoSetupRightPageEyeZ[];
 
+// TODO: move to a different mod
 RECOMP_PATCH void func_800F4A10(PlayState* play) {
     PauseContext* pauseCtx = &play->pauseCtx;
     s16 i;
@@ -66,4 +73,63 @@ RECOMP_PATCH void func_800F4A10(PlayState* play) {
     R_PAUSE_WORLD_MAP_YAW = -0x622;
     R_PAUSE_WORLD_MAP_Y_OFFSET = -90;
     R_PAUSE_WORLD_MAP_DEPTH = -14400;
+}
+
+// ford f150
+#define LOCATION_OWL_STATUE (0xFF1500 | OBJ_WARPSTONE_GET_ID(&this->dyna.actor))
+
+s32 ObjWarpstone_OpenedIdle(ObjWarpstone* this, PlayState* play);
+s32 ObjWarpstone_ClosedIdle(ObjWarpstone* this, PlayState* play);
+s32 ObjWarpstone_BeginOpeningCutscene(ObjWarpstone* this, PlayState* play);
+void ObjWarpstone_SetupAction(ObjWarpstone* this, ObjWarpstoneActionFunc actionFunc);
+
+ObjWarpstone* sObjWarpstone;
+
+RECOMP_HOOK("ObjWarpstone_Init")
+void OnObjWarpstone_Init(Actor* thisx, PlayState* play) {
+    sObjWarpstone = ((ObjWarpstone*)thisx);
+}
+
+RECOMP_HOOK_RETURN("ObjWarpstone_Init")
+void AfterObjWarpstone_Init(Actor* thisx, PlayState* play) {
+    ObjWarpstone* this = sObjWarpstone;
+    if (owlsanity_enabled_temp) {
+        if (!rando_location_is_checked(LOCATION_OWL_STATUE)) {
+            ObjWarpstone_SetupAction(this, ObjWarpstone_ClosedIdle);
+        } else {
+            ObjWarpstone_SetupAction(this, ObjWarpstone_OpenedIdle);
+        }
+
+        // if (rando_has_item(OWL_ITEM)) {
+        //     this->modelIndex = SEK_MODEL_OPENED;
+        // } else {
+        //     this->modelIndex = SEK_MODEL_CLOSED;
+        // }
+    }
+}
+
+s32 ObjWarpstone_OfferItem(ObjWarpstone* this, PlayState* play) {
+    if (Actor_HasParent(&this->dyna.actor, play)) {
+        this->dyna.actor.parent = NULL;
+        this->actionFunc = ObjWarpstone_OpenedIdle;
+    } else {
+        Actor_OfferGetItemHook(&this->dyna.actor, play, rando_get_item_id(LOCATION_OWL_STATUE), LOCATION_OWL_STATUE, 1000.0f, 1000.0f, true, true);
+    }
+    return true;
+}
+
+RECOMP_PATCH s32 ObjWarpstone_ClosedIdle(ObjWarpstone* this, PlayState* play) {
+    if (this->collider.base.acFlags & AC_HIT) {
+        if (owlsanity_enabled_temp) {
+            ObjWarpstone_SetupAction(this, ObjWarpstone_OfferItem);
+            recomp_printf("owl location: 0x%06X\n", LOCATION_OWL_STATUE);
+        } else {
+            ObjWarpstone_SetupAction(this, ObjWarpstone_BeginOpeningCutscene);
+        }
+        return true;
+    } else {
+        /*Ye who hold the sacred sword, leave proof of our encounter.*/
+        this->dyna.actor.textId = 0xC00;
+        return false;
+    }
 }
