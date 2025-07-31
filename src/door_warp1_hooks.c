@@ -24,6 +24,9 @@ typedef void (*DoorWarp1ActionFunc)(struct DoorWarp1*, PlayState*);
 #define LOCATION_REMAINS_TWINMOLD GI_REMAINS_TWINMOLD
 #define LOCATION_SONG_OATH 0x040065
 
+#define IN_BOSS_ROOM ((play->sceneId == SCENE_MITURIN_BS) || (play->sceneId == SCENE_HAKUGIN_BS) || \
+                      (play->sceneId == SCENE_INISIE_BS) || (play->sceneId == SCENE_SEA_BS))
+
 typedef enum {
     /* 0 */ ENDOORWARP1_FF_0,
     /* 1 */ ENDOORWARP1_FF_1,
@@ -202,7 +205,7 @@ void func_808B9ED8(DoorWarp1* this, PlayState* play);
 
 RECOMP_PATCH void func_808B9E94(DoorWarp1* this, PlayState* play) {
     // @rando don't count down warp unless oath is checked in DmHina (remains)
-    if (!rando_location_is_checked(LOCATION_SONG_OATH)) {
+    if (IN_BOSS_ROOM && !rando_location_is_checked(LOCATION_SONG_OATH)) {
         return;
     }
 
@@ -215,10 +218,9 @@ RECOMP_PATCH void func_808B9E94(DoorWarp1* this, PlayState* play) {
 void func_808B9FD0(DoorWarp1* this, PlayState* play);
 s32 func_808B866C(DoorWarp1* this, PlayState* play);
 
-// already collected remains
 RECOMP_PATCH void func_808B9F10(DoorWarp1* this, PlayState* play) {
     // @rando backup offer in case remains location was checked without oath location (i.e. from a release)
-    if (!Actor_HasParent(&this->dyna.actor, play) && !rando_location_is_checked(LOCATION_SONG_OATH)) {
+    if (IN_BOSS_ROOM && !Actor_HasParent(&this->dyna.actor, play) && !rando_location_is_checked(LOCATION_SONG_OATH)) {
         Actor_OfferGetItemHook(&this->dyna.actor, play, rando_get_item_id(LOCATION_SONG_OATH), LOCATION_SONG_OATH, 30.0f, 80.0f, true, true);
         return;
     }

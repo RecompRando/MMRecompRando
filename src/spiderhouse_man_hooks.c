@@ -58,6 +58,16 @@ typedef enum EnSthAnimation {
     /*  8 */ STH_ANIM_MAX          // set in init, not an actual index to the array
 } EnSthAnimation;
 
+RECOMP_HOOK("EnSth_Init")
+void OnEnSth_Init(Actor* thisx, PlayState* play) {
+    // TODO: replace swamp guy's mask with its randomzied reward (in a return hook?)
+    
+    // unset flag whenever the location isn't checked (because its set by mikau's grave???)
+    if (!rando_location_is_checked(GI_WALLET_GIANT)) {
+        CLEAR_WEEKEVENTREG(WEEKEVENTREG_OCEANSIDE_SPIDER_HOUSE_BUYER_MOVED_IN);
+    }
+}
+
 void EnSth_ChangeAnim(EnSth* this, s16 animIndex);
 
 RECOMP_PATCH void EnSth_GetInitialSwampSpiderHouseText(EnSth* this, PlayState* play) {
@@ -93,24 +103,6 @@ RECOMP_PATCH void EnSth_GetInitialSwampSpiderHouseText(EnSth* this, PlayState* p
     Message_StartTextbox(play, nextTextId, &this->actor);
 }
 
-void EnSth_TalkAfterSwampSpiderHouseGiveMask(EnSth* this, PlayState* play);
-
-RECOMP_PATCH void EnSth_SwampSpiderHouseGiveMask(EnSth* this, PlayState* play) {
-    SkelAnime_Update(&this->skelAnime);
-
-    if (Actor_HasParent(&this->actor, play)) {
-        this->actor.parent = NULL;
-        this->actionFunc = EnSth_TalkAfterSwampSpiderHouseGiveMask;
-        this->actor.flags |= ACTOR_FLAG_10000;
-        Actor_OfferTalkExchange(&this->actor, play, 1000.0f, 1000.0f, PLAYER_IA_MINUS1);
-    } else {
-        this->sthFlags &= ~STH_FLAG_DRAW_MASK_OF_TRUTH;
-        // This flag is used to keep track if the player has already spoken to the actor, triggering secondary dialogue.
-        SET_WEEKEVENTREG(WEEKEVENTREG_TALKED_SWAMP_SPIDER_HOUSE_MAN);
-        Actor_OfferGetItem(&this->actor, play, GI_MASK_TRUTH, 10000.0f, 50.0f);
-    }
-}
-
 void EnSth_PostOceanspiderhouseReward(EnSth* this, PlayState* play);
 
 RECOMP_PATCH void EnSth_GiveOceansideSpiderHouseReward(EnSth* this, PlayState* play) {
@@ -127,11 +119,13 @@ RECOMP_PATCH void EnSth_GiveOceansideSpiderHouseReward(EnSth* this, PlayState* p
             EnSth_ChangeAnim(this, STH_ANIM_WAIT);
         }
     } else {
-        // Actor_OfferGetItem(&this->actor, play, STH_GI_ID(&this->actor), 10000.0f, 500.0f);
+        // this could all be moved into a hook?
+        // handle all 3 day checks here as well
         if (rando_location_is_checked(GI_WALLET_GIANT)) {
-            Actor_OfferGetItem(&this->actor, play, GI_RUPEE_SILVER, 10000.0f, 500.0f);
+            STH_GI_ID(&this->actor) = GI_RUPEE_SILVER;
         } else {
-            Actor_OfferGetItem(&this->actor, play, GI_WALLET_GIANT, 10000.0f, 500.0f);
+            STH_GI_ID(&this->actor) = GI_WALLET_GIANT;
         }
+        Actor_OfferGetItem(&this->actor, play, STH_GI_ID(&this->actor), 10000.0f, 500.0f);
     }
 }
