@@ -261,7 +261,8 @@ RECOMP_PATCH void KaleidoScope_UpdateItemCursor(PlayState* play) {
 
             if ((pauseCtx->debugEditor == DEBUG_EDITOR_NONE) && (pauseCtx->state == PAUSE_STATE_MAIN) &&
                 (pauseCtx->mainState == PAUSE_MAIN_STATE_IDLE) &&
-                CHECK_BTN_ALL(CONTROLLER1(&play->state)->press.button, BTN_L)) {
+                (CHECK_BTN_ALL(CONTROLLER1(&play->state)->press.button, BTN_L) || CHECK_BTN_ALL(CONTROLLER1(&play->state)->press.button, BTN_A))) {
+                CONTROLLER1(&play->state)->press.button &= ~BTN_A;
                 int i;
                 int first_i;
                 if (pauseCtx->cursorSlot[PAUSE_ITEM] == SLOT(ITEM_MOONS_TEAR)) {
