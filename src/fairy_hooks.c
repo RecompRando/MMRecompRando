@@ -41,6 +41,12 @@ void EnElf_RandoDraw(Actor* thisx, PlayState* play) {
     }
 }
 
+RECOMP_HOOK("EnElf_Init")
+void OnEnElf_Init(Actor* thisx, PlayState* play2) {
+    extendedFairyData = z64recomp_get_extended_actor_data(thisx, fairyExtension);
+    *extendedFairyData = 0;
+}
+
 RECOMP_HOOK("func_8088CC48")
 void EnElf_RandoFairyReplace(EnElf* this, PlayState* play) {
     extendedFairyData = z64recomp_get_extended_actor_data(&this->actor, fairyExtension);
@@ -53,7 +59,12 @@ void EnElf_RandoFairyReplace(EnElf* this, PlayState* play) {
 RECOMP_HOOK("func_8088E0F0")
 void EnElf_RandoFairyTouched(EnElf* this, PlayState* play) {
     extendedFairyData = z64recomp_get_extended_actor_data(&this->actor, fairyExtension);
-    if (!rando_location_is_checked_async(*extendedFairyData) && !this->unk_246) { // trying to make it print less
+    
+    if (!*extendedFairyData) {
+        return;
+    }
+
+    if (!rando_location_is_checked(*extendedFairyData) && !this->unk_246) { // trying to make it print less
         Actor* item00 = Actor_Spawn(&play->actorCtx, play, ACTOR_EN_ITEM00, this->actor.world.pos.x, this->actor.world.pos.y, this->actor.world.pos.z, 0,
                                 0, 0, ITEM00_APITEM);
         extendedItem00Data = z64recomp_get_extended_actor_data(item00, item00Extension);
