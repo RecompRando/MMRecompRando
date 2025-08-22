@@ -75,12 +75,15 @@ void createUiFrame(RecompuiContext context, UiFrame* frame) {
 RECOMP_IMPORT(".", int rando_get_tunic_color());
 RECOMP_IMPORT("mm_recomp_colors", void colors_set_human_tunic(u8 r, u8 g, u8 b));
 
+RECOMP_DECLARE_EVENT(rando_on_start());
+
 bool rando_started = false;
 bool is_multiworld = false;
 
 void randoStart(bool multiworld) {
     rando_started = true;
     is_multiworld = multiworld;
+    rando_on_start();
 }
 
 // Startup Menu
