@@ -124,10 +124,12 @@ RECOMP_IMPORT(".", u32 rando_damage_multiplier());
 RECOMP_IMPORT(".", u32 rando_death_behavior());
 RECOMP_IMPORT(".", u32 rando_get_moon_remains_required());
 RECOMP_IMPORT(".", u32 rando_get_majora_remains_required());
+RECOMP_IMPORT(".", u32 rando_get_random_seed());
 RECOMP_IMPORT(".", bool rando_is_magic_trap());
 RECOMP_IMPORT(".", bool rando_skulltulas_enabled());
 RECOMP_IMPORT(".", bool rando_shopsanity_enabled());
 RECOMP_IMPORT(".", bool rando_advanced_shops_enabled());
+RECOMP_IMPORT(".", bool rando_get_curiostity_shop_trades());
 RECOMP_IMPORT(".", bool rando_scrubs_enabled());
 RECOMP_IMPORT(".", bool rando_cows_enabled());
 RECOMP_IMPORT(".", u32 rando_get_location_type(u32 location_id));
@@ -148,6 +150,7 @@ RECOMP_IMPORT(".", void rando_get_location_item_player(u32 location_id, char* ou
 RECOMP_IMPORT(".", void rando_get_location_item_name(u32 location_id, char* out_str));
 RECOMP_IMPORT(".", u32 rando_get_last_location_sent());
 RECOMP_IMPORT(".", u32 rando_get_seed_name(char* seed_name_out, u32 buffer_size));
+RECOMP_IMPORT(".", void rando_get_own_slot_name(char* out_str));
 
 // WEEKEVENTREG_17_80: we have given the Moon's Tear to the scrub
 // WEEKEVENTREG_74_80: the Moon's Tear has fallen
