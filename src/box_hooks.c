@@ -497,6 +497,10 @@ RECOMP_PATCH void EnBox_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList
                     gSPDisplayList((*gfx)++, &apProgChestBaseDL);
                     return;
                 case GI_KEY_SMALL:
+                case GI_KEY_SMALL_WOODFALL:
+                case GI_KEY_SMALL_SNOWHEAD:
+                case GI_KEY_SMALL_GREATBAY:
+                case GI_KEY_SMALL_STONETOWER:
                     gSPDisplayList((*gfx)++, &keyChestBaseDL);
                     return;
                 case GI_B2:
@@ -516,6 +520,10 @@ RECOMP_PATCH void EnBox_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList
                     gSPDisplayList((*gfx)++, &spiderChestBaseDL);
                     return;
                 case GI_KEY_BOSS:
+                case GI_KEY_BOSS_WOODFALL:
+                case GI_KEY_BOSS_SNOWHEAD:
+                case GI_KEY_BOSS_GREATBAY:
+                case GI_KEY_BOSS_STONETOWER:
                     gSPDisplayList((*gfx)++, &gBoxChestBaseOrnateDL);
                     return;
             }
@@ -539,6 +547,10 @@ RECOMP_PATCH void EnBox_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList
                     gSPDisplayList((*gfx)++, &apProgChestLidDL);
                     return;
                 case GI_KEY_SMALL:
+                case GI_KEY_SMALL_WOODFALL:
+                case GI_KEY_SMALL_SNOWHEAD:
+                case GI_KEY_SMALL_GREATBAY:
+                case GI_KEY_SMALL_STONETOWER:
                     gSPDisplayList((*gfx)++, &keyChestLidDL);
                     return;
                 case GI_B2:
@@ -558,6 +570,10 @@ RECOMP_PATCH void EnBox_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList
                     gSPDisplayList((*gfx)++, &spiderChestLidDL);
                     return;
                 case GI_KEY_BOSS:
+                case GI_KEY_BOSS_WOODFALL:
+                case GI_KEY_BOSS_SNOWHEAD:
+                case GI_KEY_BOSS_GREATBAY:
+                case GI_KEY_BOSS_STONETOWER:
                     gSPDisplayList((*gfx)++, &gBoxChestLidOrnateDL);
                     return;
             }
