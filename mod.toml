@@ -97,7 +97,9 @@ native_libraries = [
                                     "rando_solo_generate",
                                     "rando_get_location_item_player",
                                     "rando_get_location_item_name",
-                                    "rando_get_last_location_sent"] }
+                                    "rando_get_last_location_sent",
+                                    "rando_get_saved_apconnect",
+                                    "rando_set_saved_apconnect"] }
 ]
 
 # Inputs to the mod tool.
