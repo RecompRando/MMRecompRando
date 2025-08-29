@@ -29,11 +29,11 @@ void EnScRuppe_RandoDraw(Actor* thisx, PlayState* play) {
     Matrix_Scale(20.0f, 20.0f, 20.0f, MTXMODE_APPLY);
     if (isAP(getItemId)) {
         GetItem_Draw(play, getGid(getItemId));
-    // } else if (ObjLoad(play, 0x06, objectId)) {
-    //     GetItem_Draw(play, getGid(getItemId));
-    //     ObjUnload(play, 0x06, objectId);
-    } else {
-        GetItem_Draw(play, GID_APLOGO_USEFUL);
+    } else if (ObjLoad(play, 0x06, objectId)) {
+        GetItem_Draw(play, getGid(getItemId));
+        ObjUnload(play, 0x06, objectId);
+    // } else {
+    //     GetItem_Draw(play, GID_APLOGO_USEFUL);
     }
 }
 

@@ -801,11 +801,11 @@ void Item_RandoCollectibleDraw(Actor* thisx, PlayState* play) {
     Matrix_Scale(20.0f, 20.0f, 20.0f, MTXMODE_APPLY);
     if (isAP(this->getItemId)) {
         GetItem_Draw(play, getGid(this->getItemId));
-    // } else if (ObjLoad(play, 0x06, objectId)) {
-    //     GetItem_Draw(play, getGid(this->getItemId));
-    //     ObjUnload(play, 0x06, objectId);
-    } else {
-        GetItem_Draw(play, GID_APLOGO_USEFUL);
+    } else if (ObjLoad(play, 0x06, objectId)) {
+        GetItem_Draw(play, getGid(this->getItemId));
+        ObjUnload(play, 0x06, objectId);
+    // } else {
+    //     GetItem_Draw(play, GID_APLOGO_USEFUL);
     }
 }
 
