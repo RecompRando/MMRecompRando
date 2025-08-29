@@ -43,8 +43,10 @@ void AfterEnRuppecrow_SpawnRupee() {
         *extendedItem00Data = LOCATION_RUPEE_CROW(rupeeIndex + 20); // arbitrary +20
     }
 
-    rupee->actor.params = ITEM00_APITEM;
-    rupee->actor.draw = Item_RandoCollectibleDraw;
-    rupee->getItemId = rando_get_item_id(*extendedItem00Data);
-    rupee->actionFunc = Item_RandoCollectibleActionFunc;
+    if (!rando_location_is_checked(*extendedItem00Data)) {
+        rupee->actor.params = ITEM00_APITEM;
+        rupee->actor.draw = Item_RandoCollectibleDraw;
+        rupee->getItemId = rando_get_item_id(*extendedItem00Data);
+        rupee->actionFunc = Item_RandoCollectibleActionFunc;
+    }
 }
