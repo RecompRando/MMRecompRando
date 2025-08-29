@@ -49,9 +49,15 @@ u32 ObjGrass_GetLocation(ObjGrassElement* grass) {
     return 0x100000 | (groupId << 12) | (sceneId << 4) | bushId;
 }
 
+void grab_grass_texture();
+void ObjGrass_DrawRando(Actor* thisx, PlayState* play);
+
 RECOMP_HOOK("ObjGrass_Init")
 void OnObjGrass_Init(Actor* thisx, PlayState* play) {
     gObjGrass = THIS;
+
+    grab_grass_texture();
+    gObjGrass->actor.draw = ObjGrass_DrawRando;
 }
 
 RECOMP_HOOK("ObjGrass_DropCollectible")
@@ -63,6 +69,20 @@ void ObjGrass_ReplaceCollectible(ObjGrassElement* grassElem, PlayState* play) {
 }
 
 ObjGrassCarry* carriedGrass;
+
+void ObjGrassCarry_DrawRando(Actor* this, PlayState* play);
+
+RECOMP_HOOK("ObjGrassCarry_Main") 
+void OnObjGrassCarry_Main(ObjGrassCarry* this, PlayState* play) {
+    carriedGrass = this;
+}
+
+RECOMP_HOOK_RETURN("ObjGrassCarry_Main") 
+void AfterObjGrassCarry_Main() {
+    if (Actor_HasParent(&carriedGrass->actor, gPlay)) {
+        carriedGrass->actor.draw = ObjGrassCarry_DrawRando;
+    }
+}
 
 RECOMP_HOOK("ObjGrassCarry_Fall")
 void OnObjGrassCarry_Fall(ObjGrassCarry* this, PlayState* play) {

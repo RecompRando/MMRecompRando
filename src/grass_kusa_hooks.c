@@ -11,6 +11,8 @@
 ActorExtensionId kusaGrassExtension;
 u32* extendedKusaGrassData;
 
+void grab_grass_texture();
+
 u32 EnKusa_CreateLocation(PlayState* play, Actor* actor) {
     s16 sceneId = play->sceneId;
     s8 curRoom = play->roomCtx.curRoom.num;
@@ -75,6 +77,32 @@ RECOMP_PATCH void EnKusa_DropCollectible(EnKusa* this, PlayState* play) {
         if (collectible >= 0) {
             collectableParams = KUSA_GET_COLLECTIBLE_ID(&this->actor);
             Item_DropCollectible(play, &this->actor.world.pos, (collectableParams << 8) | collectible);
+        }
+    }
+}
+
+EnKusa* savedKusa;
+
+void EnKusa_DrawBushRando(Actor* thisx, PlayState* play2);
+
+RECOMP_HOOK("EnKusa_WaitObject")
+void OnEnKusa_WaitObject(EnKusa* this, PlayState* play) {
+    savedKusa = this;
+    grab_grass_texture();
+}
+
+RECOMP_HOOK_RETURN("EnKusa_WaitObject")
+void AfterEnKusa_WaitObject() {
+    EnKusa* this = savedKusa;
+    PlayState* play = gPlay;
+
+    if (Object_IsLoaded(&play->objectCtx, this->objectSlot)) {
+        s32 kusaType = KUSA_GET_TYPE(&this->actor);
+    
+        if (kusaType == ENKUSA_TYPE_BUSH) {
+            this->actor.draw = EnKusa_DrawBushRando;
+        // } else {
+        //     this->actor.draw = EnKusa_DrawGrass; // TODO
         }
     }
 }
