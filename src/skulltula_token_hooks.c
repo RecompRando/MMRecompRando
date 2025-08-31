@@ -138,22 +138,8 @@ RECOMP_PATCH void EnSi_GiveToken(EnSi* this, PlayState* play) {
         Audio_PlayFanfare(NA_BGM_GET_SMALL_ITEM);
     }
 
-    // actor seems to be killed before this can loop properly
-    // this->actionFunc = EnSi_TokenCollected;
-    
-    // alternate fix to turn tokens into item00
-    // if (rando_skulltulas_enabled()) {
-    //     Actor* item00 = Actor_Spawn(&play->actorCtx, play, ACTOR_EN_ITEM00, this->actor.world.pos.x, this->actor.world.pos.y, this->actor.world.pos.z, 0,
-    //                             0, 0, ITEM00_APITEM);
-    //     extendedItem00Data = z64recomp_get_extended_actor_data(item00, item00Extension);
-    //     *extendedItem00Data = LOCATION_SKULL_TOKEN;
-
-    //     item00->draw = Item_RandoCollectibleDraw;
-    //     ((EnItem00*)item00)->getItemId = rando_get_item_id(LOCATION_SKULL_TOKEN);
-    //     EnItem00_RandoGive(((EnItem00*)item00), play, ((EnItem00*)item00)->getItemId, LOCATION_SKULL_TOKEN);
-    // }
-
     Actor_Kill(&this->actor);
+    // this->actionFunc = EnSi_TokenCollected;
 }
 
 RECOMP_PATCH void EnSi_DraggedByHookshot(EnSi* this, PlayState* play) {
