@@ -1,5 +1,6 @@
 #include "apcommon.h"
 #include "apconnect_menu.h"
+#include "recompconfig.h"
 #include "recomputils.h"
 
 RECOMP_IMPORT(".", bool rando_init(char* address, char* player_name, char* password));
@@ -12,9 +13,6 @@ static void connectPressed(RecompuiResource resource, const RecompuiEventData* d
         char* slot_text = recompui_get_input_text(connect_menu.slot_textinput);
         char* password_text = recompui_get_input_text(connect_menu.password_textinput);
         bool success = rando_init(server_text, slot_text, password_text);
-        recomp_free(server_text);
-        recomp_free(slot_text);
-        recomp_free(password_text);
 
         if (success) {
             randoStart(true);
@@ -22,12 +20,17 @@ static void connectPressed(RecompuiResource resource, const RecompuiEventData* d
             recompui_close_context(connect_menu.context);
             randoEmitNormalNotification("Successfully connected");
             recompui_open_context(connect_menu.context);
+            rando_set_saved_apconnect(recomp_get_save_file_path(), server_text, slot_text, password_text);
         }
         else {
             recompui_close_context(connect_menu.context);
             randoEmitErrorNotification("Failed to connect");
             recompui_open_context(connect_menu.context);
         }
+
+        recomp_free(server_text);
+        recomp_free(slot_text);
+        recomp_free(password_text);
     }
 }
 
@@ -54,6 +57,11 @@ void randoCreateAPConnectMenu() {
 
     createUiFrame(connect_menu.context, &connect_menu.frame);
 
+    char address[64];
+    char player_name[17];
+    char password[128];
+    rando_get_saved_apconnect(recomp_get_save_file_path(), address, player_name, password);
+
     // Create a label for the server address.
     connect_menu.server_label = recompui_create_label(connect_menu.context, connect_menu.frame.container, "Server Address:Port", LABELSTYLE_NORMAL);
     recompui_set_font_size(connect_menu.server_label, 30.0f, UNIT_DP);
@@ -61,7 +69,7 @@ void randoCreateAPConnectMenu() {
     // Create a text input for the server address.
     connect_menu.server_textinput = recompui_create_textinput(connect_menu.context, connect_menu.frame.container);
     recompui_set_font_size(connect_menu.server_textinput, 30.0f, UNIT_DP);
-    recompui_set_input_text(connect_menu.server_textinput, "archipelago.gg:38281");
+    recompui_set_input_text(connect_menu.server_textinput, address);
     recompui_set_margin_top(connect_menu.server_textinput, 10.0f, UNIT_DP);
     recompui_set_margin_bottom(connect_menu.server_textinput, 20.0f, UNIT_DP);
     recompui_set_max_width(connect_menu.server_textinput, 100.0f, UNIT_PERCENT);
@@ -73,7 +81,7 @@ void randoCreateAPConnectMenu() {
     // Create a text input for the slotname.
     connect_menu.slot_textinput = recompui_create_textinput(connect_menu.context, connect_menu.frame.container);
     recompui_set_font_size(connect_menu.slot_textinput, 30.0f, UNIT_DP);
-    recompui_set_input_text(connect_menu.slot_textinput, "Player");
+    recompui_set_input_text(connect_menu.slot_textinput, player_name);
     recompui_set_margin_top(connect_menu.slot_textinput, 10.0f, UNIT_DP);
     recompui_set_margin_bottom(connect_menu.slot_textinput, 20.0f, UNIT_DP);
     recompui_set_max_width(connect_menu.slot_textinput, 100.0f, UNIT_PERCENT);
@@ -85,7 +93,7 @@ void randoCreateAPConnectMenu() {
     // Create a text input for the password.
     connect_menu.password_textinput = recompui_create_passwordinput(connect_menu.context, connect_menu.frame.container);
     recompui_set_font_size(connect_menu.password_textinput, 30.0f, UNIT_DP);
-    recompui_set_input_text(connect_menu.password_textinput, "");
+    recompui_set_input_text(connect_menu.password_textinput, password);
     recompui_set_margin_top(connect_menu.password_textinput, 20.0f, UNIT_DP);
     recompui_set_max_width(connect_menu.password_textinput, 100.0f, UNIT_PERCENT);
 

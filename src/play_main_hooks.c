@@ -392,6 +392,8 @@ ItemId randoConvertItemId(u32 ap_item_id) {
     }
 }
 
+RECOMP_DECLARE_EVENT(rando_on_start());
+
 RECOMP_CALLBACK("*", recomp_on_play_main)
 void update_rando(PlayState* play) {
     u32 new_items_size;
@@ -560,6 +562,8 @@ void update_rando(PlayState* play) {
 
             old_items_size = new_items_size;
             initItems = true;
+
+            rando_on_start();
         }
 
         if (new_items_size > old_items_size) {

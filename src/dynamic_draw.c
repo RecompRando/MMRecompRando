@@ -818,7 +818,7 @@ RECOMP_PATCH void GetItem_Draw(PlayState* play, s16 drawId) {
         case GID_DEFENSE_DOUBLE:
             GetItem_DrawXlu01DL(play, gGiDDHeartBorderDL, gGiDDHeartContainerDL);
             return;
-        case GID_SKULL_TOKEN:
+        case GID_SWAMP_SKULL_TOKEN:
             GetItem_DrawSkullTokenDL(play, gGiSkulltulaTokenDL, gGiSkulltulaTokenSwampFlameDL);
             return;
         case GID_OCEAN_SKULL_TOKEN:
@@ -877,7 +877,7 @@ void GetItem_DrawDynamic(PlayState* play, void* objectSegment, s16 drawId) {
                 gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
                 gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
                 break;
-            case GID_SKULL_TOKEN:
+            case GID_SWAMP_SKULL_TOKEN:
                 gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
                 gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
                 break;

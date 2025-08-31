@@ -360,7 +360,7 @@ GetItemEntry sGetItemTable_ap[] = {
     // GI_74
     GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_RUPY, GID_RUPOOR, 0x74, 0, 0),
     // GI_75
-    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_SUTARU, GID_SKULL_TOKEN, 0x75, GIFIELD(GIFIELD_NO_COLLECTIBLE, 0), CHEST_ANIM_SHORT),
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_SUTARU, GID_SWAMP_SKULL_TOKEN, 0x75, GIFIELD(GIFIELD_NO_COLLECTIBLE, 0), CHEST_ANIM_SHORT),
     // GI_ICE_TRAP
     GET_ITEM(ITEM_DEED_LAND, OBJECT_UNSET_0, GID_NONE, 0x76, 0, 0),
     // GI_77
@@ -1993,7 +1993,7 @@ u8 randoItemGive(u32 gi) {
         //! @bug: Sets QUEST_QUIVER instead of QUEST_SKULL_TOKEN
         // Setting `QUEST_SKULL_TOKEN` will result in misplaced digits on the pause menu - Quest Status page.
         SET_QUEST_ITEM(item - ITEM_SKULL_TOKEN + QUEST_QUIVER);
-        Inventory_IncrementSkullTokenCount(0x27);
+        Inventory_IncrementSkullTokenCount(play->sceneId); // this should only be reached in skull houses
         return ITEM_NONE;
 
     } else if (item == ITEM_DEED_LAND) {

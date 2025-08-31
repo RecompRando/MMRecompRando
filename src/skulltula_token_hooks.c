@@ -8,7 +8,7 @@ RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
 #define ENSI_GET_CHEST_FLAG(thisx) (((thisx)->params & 0xFC) >> 2)
 
 #define LOCATION_SKULL_TOKEN (0x060000 | (play->sceneId << 8) | ENSI_GET_CHEST_FLAG(&this->actor))
-#define GET_GI_TOKEN ((rando_skulltulas_enabled()) ? rando_get_item_id(LOCATION_SKULL_TOKEN) : GI_TRUE_SKULL_TOKEN)
+#define GET_GI_TOKEN ((rando_skulltulas_enabled()) ? rando_get_item_id(LOCATION_SKULL_TOKEN) : GI_SKULL_TOKEN)
 
 #define SPIDER_HOUSE_TOKENS_REQUIRED 30
 
@@ -126,16 +126,19 @@ RECOMP_PATCH void EnSi_GiveToken(EnSi* this, PlayState* play) {
     tokenPickedUp[chestFlag] = true;
 
     recomp_printf("token location: 0x%06X\n", LOCATION_SKULL_TOKEN);
-    rando_send_location(LOCATION_SKULL_TOKEN);
-    if (!rando_skulltulas_enabled()) {
-        randoItemGive(GI_TRUE_SKULL_TOKEN);
-    }
-
-    Message_StartTextbox(play, getTextId(tokenPrevGI[chestFlag]), NULL);
-    if (Inventory_GetSkullTokenCount(0x27) >= SPIDER_HOUSE_TOKENS_REQUIRED) {
-        Audio_PlayFanfare(NA_BGM_GET_ITEM | 0x900);
-    } else {
+    if (rando_skulltulas_enabled()) {
+        rando_send_location(LOCATION_SKULL_TOKEN);
+        Message_StartTextbox(play, getTextId(tokenPrevGI[chestFlag]), NULL);
         Audio_PlayFanfare(NA_BGM_GET_SMALL_ITEM);
+    } else {
+        randoItemGive(GI_SKULL_TOKEN);
+        if (Inventory_GetSkullTokenCount(play->sceneId) >= SPIDER_HOUSE_TOKENS_REQUIRED) {
+            Message_StartTextbox(play, 0xFC, NULL); // You collected all tokens, curse lifted
+            Audio_PlayFanfare(NA_BGM_GET_ITEM | 0x900);
+        } else {
+            Message_StartTextbox(play, 0x52, NULL); // You got one more gold token, your [count] one!
+            Audio_PlayFanfare(NA_BGM_GET_SMALL_ITEM);
+        }
     }
 
     Actor_Kill(&this->actor);

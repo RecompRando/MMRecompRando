@@ -74,6 +74,7 @@ native_libraries = [
                                     "rando_advanced_shops_enabled",
                                     "rando_scrubs_enabled",
                                     "rando_cows_enabled",
+                                    "rando_get_curiostity_shop_trades",
                                     "rando_damage_multiplier",
                                     "rando_death_behavior",
                                     "rando_get_location_type",
@@ -83,8 +84,10 @@ native_libraries = [
                                     "rando_complete_goal",
                                     "rando_has_item",
                                     "rando_has_item_async",
+                                    "rando_get_random_seed",
                                     "rando_get_seed_name",
                                     "rando_get_own_slot_id",
+                                    "rando_get_own_slot_name",
                                     "rando_get_items_size",
                                     "rando_get_item",
                                     "rando_get_sending_player",
@@ -101,7 +104,9 @@ native_libraries = [
                                     "rando_solo_generate",
                                     "rando_get_location_item_player",
                                     "rando_get_location_item_name",
-                                    "rando_get_last_location_sent"] }
+                                    "rando_get_last_location_sent",
+                                    "rando_get_saved_apconnect",
+                                    "rando_set_saved_apconnect"] }
 ]
 
 # Inputs to the mod tool.

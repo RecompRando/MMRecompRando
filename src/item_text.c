@@ -122,7 +122,7 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
 
     // recomp_printf("text id: 0x%04X\n", textId);
 
-    if (textId == 0x52) {
+    if (textId == 0x52 && rando_skulltulas_enabled()) {
         textId = 0x75;
     }
 
