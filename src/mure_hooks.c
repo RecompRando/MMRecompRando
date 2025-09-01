@@ -51,6 +51,9 @@ void AfterObjMure_SpawnActors() {
     mureIndex = z64recomp_get_extended_actor_data(&this->actor, mureExtension);
 
     for (s32 i = 0; i < maxChildren; i++) {
+        if (this->children[i] == NULL) {
+            continue;
+        }
         if (this->children[i]->id == ACTOR_EN_KUSA) {
             extendedKusaGrassData = z64recomp_get_extended_actor_data(this->children[i], kusaGrassExtension);
             *extendedKusaGrassData = LOCATION_MURE(i);
@@ -114,16 +117,19 @@ void AfterObjMure2_SpawnChildren() {
     mure2Index = z64recomp_get_extended_actor_data(&this->actor, mure2Extension);
 
     for (s32 i = 0; i < sChildCounts[childType]; i++) {
+        if (this->actors[i] == NULL) {
+            continue;
+        }
         switch (childType) {
             case OBJMURE2_CHILDTYPE_BUSH_RING:
             case OBJMURE2_CHILDTYPE_BUSH_SCATTERED:
-                    extendedKusaGrassData = z64recomp_get_extended_actor_data(this->actors[i], kusaGrassExtension);
-                    *extendedKusaGrassData = LOCATION_MURE2(i);
-                    break;
+                extendedKusaGrassData = z64recomp_get_extended_actor_data(this->actors[i], kusaGrassExtension);
+                *extendedKusaGrassData = LOCATION_MURE2(i);
+                break;
             case OBJMURE2_CHILDTYPE_ROCK_RING:
-                    extendedRockData = z64recomp_get_extended_actor_data(this->actors[i], rockExtension);
-                    *extendedRockData = LOCATION_MURE2_ROCK(i);
-                    break;
+                extendedRockData = z64recomp_get_extended_actor_data(this->actors[i], rockExtension);
+                *extendedRockData = LOCATION_MURE2_ROCK(i);
+                break;
             default:
                 break;
         }
