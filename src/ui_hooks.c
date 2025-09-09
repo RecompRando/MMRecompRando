@@ -693,79 +693,31 @@ RECOMP_PATCH void KaleidoScope_DrawAmmoCount(PauseContext* pauseCtx, GraphicsCon
 extern s16 sAmmoDigitsXPositions[4];
 extern s16 sAmmoDigitsYPositions[4];
 
+u8 currentI;
+u16 oldBombCapacity;
+
+RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
+
 // @ap Draw green 10 Bombchu ammo count if no bomb bag.
-RECOMP_PATCH void Interface_DrawAmmoCount(PlayState* play, s16 button, s16 alpha) {
-    u8 i;
-    u16 ammo;
+RECOMP_HOOK("Interface_DrawAmmoCount")
+void green_chu_count(PlayState* play, s16 button, s16 alpha) {
+    currentI = ((void) 0, GET_CUR_FORM_BTN_ITEM(button));
 
     OPEN_DISPS(play->state.gfxCtx);
 
-    i = ((void)0, GET_CUR_FORM_BTN_ITEM(button));
-
-    if ((i == ITEM_DEKU_STICK) || (i == ITEM_DEKU_NUT) || (i == ITEM_BOMB) || (i == ITEM_BOW) ||
-        ((i >= ITEM_BOW_FIRE) && (i <= ITEM_BOW_LIGHT)) || (i == ITEM_BOMBCHU) || (i == ITEM_POWDER_KEG) ||
-        (i == ITEM_MAGIC_BEANS) || (i == ITEM_PICTOGRAPH_BOX)) {
-
-        if ((i >= ITEM_BOW_FIRE) && (i <= ITEM_BOW_LIGHT)) {
-            i = ITEM_BOW;
-        }
-
-        ammo = AMMO(i);
-
-        if (i == ITEM_PICTOGRAPH_BOX) {
-            if (!CHECK_QUEST_ITEM(QUEST_PICTOGRAPH)) {
-                ammo = 0;
-            } else {
-                ammo = 1;
-            }
-        }
-
-        gDPPipeSync(OVERLAY_DISP++);
-        //! @bug Missing a gDPSetEnvColor here, which means the ammo count will be drawn with the last env color set.
-        //! Once you have the magic meter, this becomes a non issue, as the magic meter will set the color to black,
-        //! but prior to that, when certain conditions are met, the color will have last been set by the wallet icon
-        //! causing the ammo count to be drawn incorrectly. This is most obvious when you get deku nuts early on, and
-        //! the ammo count is drawn with a shade of green.
-        //!! not anymore dumbass
-        gDPSetEnvColor(OVERLAY_DISP++, 0, 0, 0, 255);
-
-        if ((button == EQUIP_SLOT_B) && (gSaveContext.minigameStatus == MINIGAME_STATUS_ACTIVE)) {
-            ammo = play->interfaceCtx.minigameAmmo;
-        } else if ((button == EQUIP_SLOT_B) && (play->unk_1887C > 1)) {
-            ammo = play->unk_1887C - 1;
-        } else if (((i == ITEM_BOW) && (AMMO(i) == CUR_CAPACITY(UPG_QUIVER))) ||
-                   ((i == ITEM_BOMB) && (AMMO(i) == CUR_CAPACITY(UPG_BOMB_BAG))) ||
-                   ((i == ITEM_DEKU_STICK) && (AMMO(i) == CUR_CAPACITY(UPG_DEKU_STICKS))) ||
-                   ((i == ITEM_DEKU_NUT) && (AMMO(i) == CUR_CAPACITY(UPG_DEKU_NUTS))) ||
-                   // @ap Draw green 10 Bombchu ammo count if no bomb bag.
-                   ((i == ITEM_BOMBCHU) && (AMMO(i) == (s8) (MAX_BOMBCHUS))) ||
-                   ((i == ITEM_POWDER_KEG) && (ammo == 1)) || ((i == ITEM_PICTOGRAPH_BOX) && (ammo == 1)) ||
-                   ((i == ITEM_MAGIC_BEANS) && (ammo == 20))) {
-            gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 120, 255, 0, alpha);
-        }
-
-        if ((u32)ammo == 0) {
-            gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 100, 100, 100, alpha);
-        }
-
-        for (i = 0; ammo >= 10; i++) {
-            ammo -= 10;
-        }
-
-        // Draw upper digit (tens)
-        if ((u32)i != 0) {
-            OVERLAY_DISP =
-                Gfx_DrawTexRectIA8(OVERLAY_DISP, (u8*)gAmmoDigit0Tex + i * AMMO_DIGIT_TEX_SIZE, AMMO_DIGIT_TEX_WIDTH,
-                                   AMMO_DIGIT_TEX_HEIGHT, sAmmoDigitsXPositions[button], sAmmoDigitsYPositions[button],
-                                   AMMO_DIGIT_TEX_WIDTH, AMMO_DIGIT_TEX_HEIGHT, 1 << 10, 1 << 10);
-        }
-
-        // Draw lower digit (ones)
-        OVERLAY_DISP =
-            Gfx_DrawTexRectIA8(OVERLAY_DISP, (u8*)gAmmoDigit0Tex + ammo * AMMO_DIGIT_TEX_SIZE, AMMO_DIGIT_TEX_WIDTH,
-                               AMMO_DIGIT_TEX_HEIGHT, sAmmoDigitsXPositions[button] + 6, sAmmoDigitsYPositions[button],
-                               AMMO_DIGIT_TEX_WIDTH, AMMO_DIGIT_TEX_HEIGHT, 1 << 10, 1 << 10);
-    }
+    gDPSetEnvColor(OVERLAY_DISP++, 0, 0, 0, 255);
 
     CLOSE_DISPS(play->state.gfxCtx);
+
+    if (currentI == ITEM_BOMBCHU) {
+        oldBombCapacity = CUR_CAPACITY(UPG_BOMB_BAG);
+        CUR_CAPACITY(UPG_BOMB_BAG) = MAX_BOMBCHUS;
+    }
+}
+
+RECOMP_HOOK_RETURN("Interface_DrawAmmoCount")
+void green_chu_count_return() {
+    if (currentI == ITEM_BOMBCHU) {
+        CUR_CAPACITY(UPG_BOMB_BAG) = oldBombCapacity;
+    }
 }
