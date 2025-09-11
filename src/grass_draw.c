@@ -232,6 +232,77 @@ void ObjGrass_DrawXluRando(Actor* thisx, PlayState* play) {
     CLOSE_DISPS(play->state.gfxCtx);
 }
 
+extern MtxF D_80A60908[8];
+
+void func_80A5B954(MtxF* matrix, f32 arg1);
+
+RECOMP_PATCH void EnKusa2_Draw(Actor* thisx, PlayState* play) {
+    EnKusa2* this = (EnKusa2*)thisx;
+    s32 alpha;
+
+    if (!Object_IsLoaded(&play->objectCtx, this->actor.objectSlot)) {
+        return;
+    }
+
+    u32* keatonLocation = z64recomp_get_extended_actor_data(thisx, keatonGrassExtension);
+
+    if (this->actor.projectedPos.z <= 1200.0f) {
+        if ((play->roomCtx.curRoom.behaviorType1 == ROOM_BEHAVIOR_TYPE1_0) && (this->actor.projectedPos.z > -150.0f) &&
+            (this->actor.projectedPos.z < 400.0f)) {
+            func_80A5B954(&D_80A60908[this->unk_1CE], 0.0015f);
+        }
+        // Gfx_DrawDListOpa(play, gKusaBushType1DL);
+        OPEN_DISPS(play->state.gfxCtx);
+        Gfx_SetupDL25_Opa(play->state.gfxCtx);
+        gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+
+        POLY_OPA_DISP = GenericGrass_DrawRandoColored(play, gKusaBushType1DL, POLY_OPA_DISP, 255, *keatonLocation);
+        // gSPDisplayList(POLY_OPA_DISP++, gKusaBushType1DL);
+
+        CLOSE_DISPS(play->state.gfxCtx);
+    } else if (this->actor.projectedPos.z < 1300.0f) {
+        // func_80A5E80C(play, (1300.0f - this->actor.projectedPos.z) * 2.55f);
+        OPEN_DISPS(play->state.gfxCtx);
+
+        alpha = (1300.0f - this->actor.projectedPos.z) * 2.55f;
+        Gfx_SetupDL25_Xlu(play->state.gfxCtx);
+
+        gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+        // gDPSetPrimColor(POLY_XLU_DISP++, 0, 0, 255, 255, 255, alpha);
+        // gSPDisplayList(POLY_XLU_DISP++, gKusaBushType2DL);
+
+        POLY_XLU_DISP = GenericGrass_DrawRandoColored(play, gKusaBushType2DL, POLY_XLU_DISP, alpha, *keatonLocation);
+        CLOSE_DISPS(play->state.gfxCtx);
+    }
+}
+
+RECOMP_PATCH void func_80A5EA48(Actor* thisx, PlayState* play) {
+    EnKusa2* this = (EnKusa2*)thisx;
+    s32 alpha;
+
+    u32* keatonLocation = z64recomp_get_extended_actor_data(thisx, keatonGrassExtension);
+
+    if (this->unk_1CF == 0xFF) {
+        OPEN_DISPS(play->state.gfxCtx);
+        Gfx_SetupDL25_Opa(play->state.gfxCtx);
+        gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+
+        POLY_OPA_DISP = GenericGrass_DrawRandoColored(play, gKusaBushType1DL, POLY_OPA_DISP, 255, *keatonLocation);
+
+        CLOSE_DISPS(play->state.gfxCtx);
+    } else {
+        OPEN_DISPS(play->state.gfxCtx);
+
+        alpha = (1300.0f - this->actor.projectedPos.z) * 2.55f;
+        Gfx_SetupDL25_Xlu(play->state.gfxCtx);
+
+        gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+
+        POLY_XLU_DISP = GenericGrass_DrawRandoColored(play, gKusaBushType2DL, POLY_XLU_DISP, alpha, *keatonLocation);
+        CLOSE_DISPS(play->state.gfxCtx);
+    }
+}
+
 void ObjGrass_DrawRando(Actor* thisx, PlayState* play) {
     ObjGrass* this = ((ObjGrass*)thisx);
 

@@ -15,6 +15,8 @@ EnKusa2* keatonGrass;
 ActorExtensionId keatonGrassExtension;
 u32* extendedKeatonGrassData;
 
+void grab_grass_texture();
+
 RECOMP_HOOK("EnKusa2_Init")
 void OnEnKusa2_Init(Actor* thisx, PlayState* play) {
     EnKusa2* this = (EnKusa2*)thisx;
@@ -28,6 +30,11 @@ void OnEnKusa2_Init(Actor* thisx, PlayState* play) {
         *extendedKeatonGrassData = LOCATION_KEATON_GRASS;
         curGrass++;
     }
+}
+
+RECOMP_HOOK("func_80A5D7A4")
+void OnEnKusa2_SetupDrawFuncs(EnKusa2* this) {
+    grab_grass_texture();
 }
 
 // this could possibly be a patch, but seriously why would someone else edit this
