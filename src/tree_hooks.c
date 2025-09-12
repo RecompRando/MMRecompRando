@@ -9,13 +9,15 @@
 #include "overlays/actors/ovl_Obj_Yasi/z_obj_yasi.h" // palm trees
 #include "overlays/actors/ovl_En_Snowwd/z_en_snowwd.h" // snow covered trees
 #include "overlays/actors/ovl_En_Wood02/z_en_wood02.h" // generic trees?
+#include "overlays/actors/ovl_Obj_Tree/z_obj_tree.h" // beefier tree
 
 #define LOCATION_PALM_TREE (0x2A0000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
 #define LOCATION_SNOW_TREE (0x2B0000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
-#define LOCATION_WOOD_TREE (0x2C0000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
-                            | randoGetLoadedActorNumInSameRoom(play, &this->actor))
+#define LOCATION_WOOD_TREE (0x2C0000 | (play->sceneId << 8) | EnWood02_GetIDHash(this))
+#define LOCATION_THIC_TREE (0x2D0000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+                            | randoGetLoadedActorNumInSameRoom(play, &this->dyna.actor))
 
 // palm trees
 RECOMP_HOOK("ObjYasi_Update")
@@ -60,7 +62,14 @@ void OnEnSnowwd_Idle(EnSnowwd* this, PlayState* play) {
     }
 }
 
-// generic trees?
+// generic trees/bushes?
+u16 EnWood02_GetIDHash(EnWood02* this) {
+    // tree/bush indexes aren't constant so a hashing approach is used instead
+    u16 xPos = (u16)(this->actor.home.pos.x);
+    u16 zPos = (u16)(this->actor.home.pos.z);
+    return (xPos ^ zPos) & 0xFF;
+}
+
 RECOMP_HOOK("func_808C4458")
 void EnWood02_DropRandoItem(EnWood02* this, PlayState* play, Vec3f* dropsSpawnPt, u16 arg3) {
     // no idea how this is meant to work, could be simplified further with better understanding
@@ -79,4 +88,18 @@ void EnWood02_DropRandoItem(EnWood02* this, PlayState* play, Vec3f* dropsSpawnPt
 
         this->unk_148 = 0; // should prevent normal drops from happening
     }
+}
+
+// beefier trees
+RECOMP_HOOK("ObjTree_SetupSway")
+void OnObjTree_SetupSway(ObjTree* this) {
+    PlayState* play = gPlay;
+    Vec3f dropPos;
+
+    dropPos.x = this->dyna.actor.world.pos.x;
+    dropPos.y = this->dyna.actor.world.pos.y + 280.0f;
+    dropPos.z = this->dyna.actor.world.pos.z;
+    
+    // TODO: add way to prevent duplicate items from falling after being hit once
+    Item_RandoDropCollectible(play, &dropPos, ITEM00_APITEM, LOCATION_THIC_TREE);
 }
