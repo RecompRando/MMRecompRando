@@ -19,11 +19,14 @@ u32* extendedSnowballData;
 ActorExtensionId bigSnowballExtension;
 u32* extendedBigSnowballData;
 
+void grab_snowball_texture();
+
 // small snowball
 RECOMP_HOOK("ObjSnowball2_Init")
 void OnObjSnowball2_Init(Actor* thisx, PlayState* play) {
     extendedSnowballData = z64recomp_get_extended_actor_data(thisx, snowballExtension);
     *extendedSnowballData = LOCATION_SNOWBALL;
+    grab_snowball_texture();
 }
 
 RECOMP_PATCH void func_80B38E88(ObjSnowball2* this, PlayState* play) {
@@ -51,6 +54,7 @@ RECOMP_HOOK("ObjSnowball_Init")
 void OnObjSnowball_Init(Actor* thisx, PlayState* play) {
     extendedBigSnowballData = z64recomp_get_extended_actor_data(thisx, bigSnowballExtension);
     *extendedBigSnowballData = LOCATION_SNOWBALL_BIG;
+    grab_snowball_texture();
 }
 
 s32 func_800A8150(s32 index);
@@ -95,4 +99,56 @@ RECOMP_PATCH void func_80B0457C(ObjSnowball* this, PlayState* play) {
     } else {
         CutsceneManager_Queue(this->actor.csId);
     }
+}
+
+// custom draw
+#include "snowball.h"
+#include "rando_colors.h"
+
+u16 snowballTex[2048];
+u16 originalSnowballTex[2048];
+extern u16 object_goroiwa_Tex_008DA0[];
+extern Gfx object_goroiwa_DL_008B90[];
+
+void grab_snowball_texture() {
+    Lib_MemCpy(originalSnowballTex, SEGMENTED_TO_K0(object_goroiwa_Tex_008DA0), sizeof(originalSnowballTex));
+    RGBA16toIA16_Texture(originalSnowballTex, snowballTex, ARRAY_COUNT(originalSnowballTex)); // why was it rgba16 lmao
+}
+
+Gfx* GenericSnowball_DrawRandoColored(PlayState* play, u32 location, Gfx* gfx) {
+    Color_RGB8 color;
+    
+    if (!get_rando_color(&color, location)) {
+        gDPSetPrimColor(gfx++, 0, 0, 255, 255, 255, 255);
+        gSPDisplayList(gfx++, object_goroiwa_DL_008B90);
+        return gfx;
+    }
+    
+    gDPSetPrimColor(gfx++, 0, 0, color.r, color.g, color.b, 255);
+    gSPDisplayList(gfx++, randoSnowballDL);
+    return gfx;
+}
+
+RECOMP_PATCH void ObjSnowball_Draw(Actor* thisx, PlayState* play) {
+    OPEN_DISPS(play->state.gfxCtx);
+
+    Gfx_SetupDL25_Opa(play->state.gfxCtx);
+    gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+
+    extendedBigSnowballData = z64recomp_get_extended_actor_data(thisx, bigSnowballExtension);
+    POLY_OPA_DISP = GenericSnowball_DrawRandoColored(play, *extendedBigSnowballData, POLY_OPA_DISP);
+
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
+RECOMP_PATCH void ObjSnowball2_Draw(Actor* thisx, PlayState* play) {
+    OPEN_DISPS(play->state.gfxCtx);
+
+    Gfx_SetupDL25_Opa(play->state.gfxCtx);
+    gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+
+    extendedSnowballData = z64recomp_get_extended_actor_data(thisx, snowballExtension);
+    POLY_OPA_DISP = GenericSnowball_DrawRandoColored(play, *extendedSnowballData, POLY_OPA_DISP);
+
+    CLOSE_DISPS(play->state.gfxCtx);
 }
