@@ -1169,3 +1169,21 @@ void DmStk_ClockTower_WaitForDropOcarinaCutsceneToEnd(DmStk* this, PlayState* pl
         this->actionFunc = DmStk_ClockTower_Idle;
     }
 }*/
+
+RECOMP_HOOK("DmStk_DoNothing")
+void DmStk_WarpToLostWoods(DmStk* this, PlayState* play) {
+    if (play->sceneId != SCENE_OPENINGDAN) {
+        return;
+    }
+
+    this->actor.flags |= ACTOR_FLAG_TARGETABLE;
+    if (this->actor.isLockedOn) {
+        Actor_OfferTalkExchangeEquiCylinder(&this->actor, play, 400.0f, PLAYER_IA_MINUS1);
+        if (Actor_ProcessTalkRequest(&this->actor, &play->state)) {
+            play->nextEntrance = ENTRANCE(LOST_WOODS, 0);
+            play->transitionType = TRANS_TYPE_TRIFORCE;
+            gSaveContext.nextTransitionType = TRANS_TYPE_WIPE_FAST;
+            play->transitionTrigger = TRANS_TRIGGER_START;
+        }
+    }
+}
