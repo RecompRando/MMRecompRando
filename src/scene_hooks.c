@@ -19,6 +19,10 @@ void onPlayInit(GameState* thisx) {
             gSaveContext.save.time = CLOCK_TIME(6, 0);
             Sram_SaveEndOfCycle(play);
             break;
+        // change the respawn point in the pre-clock town area
+        case ENTRANCE(OPENING_DUNGEON, 3):
+            gSaveContext.save.entrance = ENTRANCE(OPENING_DUNGEON, 1);
+            break;
         // dungeon entrance rando
         // case ENTRANCE(STONE_TOWER_TEMPLE, 0): // stone tower -> stone tower temple
         //     gSaveContext.save.entrance = ENTRANCE(WOODFALL_TEMPLE, 0);
