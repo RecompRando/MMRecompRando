@@ -15,6 +15,8 @@
 static u32 flowerLocation;
 static bool waitingForOffer;
 
+void EnItem00_RandoTextAndFreeze(EnItem00* this, PlayState* play);
+
 RECOMP_HOOK("ObjEtcetera_Init")
 void OnObjEtcetera_Init(Actor* thisx, PlayState* play) {
     waitingForOffer = false;
@@ -28,15 +30,12 @@ void OnObjEtcetera_Idle(ObjEtcetera* this, PlayState* play) {
     //     return;
     // }
 
-    if (waitingForOffer && !(player->stateFlags3 & PLAYER_STATE3_100)) {
-        if (Actor_HasParent(&this->dyna.actor, play)) {
-            recomp_printf("flower location: 0x%06X\n", flowerLocation);
-            this->dyna.actor.parent = NULL;
-            flowerLocation = 0;
-            waitingForOffer = false;
-        } else {
-            Actor_OfferGetItemHook(&this->dyna.actor, play, rando_get_item_id(flowerLocation), flowerLocation, 1000.0f, 1000.0f, true, true);
-        }
+    if (waitingForOffer && !(player->stateFlags3 & PLAYER_STATE3_100) && !rando_location_is_checked_async(flowerLocation)) {
+        recomp_printf("flower location: 0x%06X\n", flowerLocation);
+        Actor* item = Item_RandoDropCollectible(play, &player->actor.world.pos, ITEM00_APITEM, flowerLocation);
+        ((EnItem00*)item)->actionFunc = EnItem00_RandoTextAndFreeze;
+        flowerLocation = 0;
+        waitingForOffer = false;
     }
 
     if ((player->stateFlags3 & PLAYER_STATE3_200) && (this->dyna.actor.xzDistToPlayer < 20.0f)) {
