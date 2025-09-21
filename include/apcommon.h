@@ -135,8 +135,10 @@ RECOMP_IMPORT(".", bool rando_advanced_shops_enabled());
 RECOMP_IMPORT(".", bool rando_get_curiostity_shop_trades());
 RECOMP_IMPORT(".", bool rando_scrubs_enabled());
 RECOMP_IMPORT(".", bool rando_cows_enabled());
+RECOMP_IMPORT(".", u32 rando_get_slotdata_u32(char* key));
 RECOMP_IMPORT(".", u32 rando_get_location_type(u32 location_id));
-RECOMP_IMPORT(".", u32 rando_get_item_id(u32 location_id));
+RECOMP_IMPORT(".", u32 rando_get_location_has_local_item(u32 location_id));
+RECOMP_IMPORT(".", u32 rando_get_item_at_location(u32 location_id));
 RECOMP_IMPORT(".", void rando_broadcast_location_hint(u32 location_id));
 RECOMP_IMPORT(".", void rando_send_location(u32 location_id));
 RECOMP_IMPORT(".", void rando_complete_goal());
@@ -156,6 +158,10 @@ RECOMP_IMPORT(".", u32 rando_get_seed_name(char* seed_name_out, u32 buffer_size)
 RECOMP_IMPORT(".", void rando_get_own_slot_name(char* out_str));
 RECOMP_IMPORT(".", void rando_get_saved_apconnect(u8* save_dir, char* address, char* player_name, char* password));
 RECOMP_IMPORT(".", void rando_set_saved_apconnect(u8* save_dir, char* address, char* player_name, char* password));
+RECOMP_IMPORT(".", void rando_queue_scout(u32 location));
+RECOMP_IMPORT(".", void rando_queue_scouts_all());
+RECOMP_IMPORT(".", void rando_remove_queued_scout(u32 location));
+RECOMP_IMPORT(".", void rando_send_queued_scouts(int hint));
 
 // WEEKEVENTREG_17_80: we have given the Moon's Tear to the scrub
 // WEEKEVENTREG_74_80: the Moon's Tear has fallen
@@ -177,6 +183,7 @@ s32 Actor_OfferGetItemHook(Actor* actor, PlayState* play, GetItemId getItemId, u
 Actor* Item_RandoDropCollectible(PlayState* play, Vec3f* spawnPos, u32 params, u32 location);
 
 u8 randoItemGive(u32 gi);
+u32 rando_get_item_id(u32 location_id);
 
 typedef struct GetItemEntry {
     /* 0x0 */ u8 itemId;

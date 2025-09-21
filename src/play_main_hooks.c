@@ -392,6 +392,120 @@ ItemId randoConvertItemId(u32 ap_item_id) {
     }
 }
 
+u32 rando_get_item_id(u32 location)
+{
+    if (location == 0) return GI_NONE;
+    
+    if (rando_get_location_has_local_item(location))
+    {
+        u32 item = rando_get_item_at_location(location);
+        
+        if ((item & 0xFF0000) == 0x000000) {
+            u8 gi = item & 0xFF;
+            
+            if (gi == GI_SWORD_KOKIRI)
+            {
+                return MIN(GI_SWORD_KOKIRI + rando_has_item(GI_SWORD_KOKIRI), GI_SWORD_GILDED);
+            }
+            
+            else if (gi == GI_QUIVER_30)
+            {
+                return MIN(GI_QUIVER_30 + rando_has_item(GI_QUIVER_30), GI_QUIVER_50);
+            }
+            
+            else if (gi == GI_BOMB_BAG_20)
+            {
+                return MIN(GI_BOMB_BAG_20 + rando_has_item(GI_BOMB_BAG_20), GI_BOMB_BAG_40);
+            }
+            
+            else if (gi == GI_WALLET_ADULT)
+            {
+                return MIN(GI_WALLET_ADULT + rando_has_item(GI_WALLET_ADULT), GI_WALLET_GIANT);
+            }
+            
+            return gi;
+        }
+        switch (item & 0xFF0000)
+        {
+            case 0x010000:
+                switch (item & 0xFF)
+                {
+                    case 0x7F:
+                        return GI_B2;
+                    case 0x00:
+                        return GI_46;
+                    case 0x01:
+                        return GI_47;
+                    case 0x02:
+                        return GI_48;
+                    case 0x03:
+                        return GI_49;
+                }
+                return GI_NONE;
+            case 0x020000:
+                switch (item & 0xFF)
+                {
+                    case 0x00:
+                        return GI_MAGIC_JAR_SMALL;
+                    case 0x01:
+                        return GI_71;
+                    case 0x03:
+                        return GI_73;
+                }
+                return GI_NONE;
+            case 0x040000:
+                switch (item & 0xFF)
+                {
+                    case ITEM_SONG_TIME:
+                        return GI_A6;
+                    case ITEM_SONG_HEALING:
+                        return GI_AF;
+                    case ITEM_SONG_EPONA:
+                        return GI_A5;
+                    case ITEM_SONG_SOARING:
+                        return GI_A3;
+                    case ITEM_SONG_STORMS:
+                        return GI_A2;
+                    case ITEM_SONG_SONATA:
+                        return GI_AE;
+                    case ITEM_SONG_LULLABY:
+                        return GI_AD;
+                    case ITEM_SONG_NOVA:
+                        return GI_AC;
+                    case ITEM_SONG_ELEGY:
+                        return GI_A8;
+                    case ITEM_SONG_OATH:
+                        return GI_A7;
+                }
+                return GI_NONE;
+            case 0x090000:
+                switch (item & 0xFF)
+                {
+                    case ITEM_KEY_BOSS:
+                        return (GI_MAX + (((item >> 8) & 0xF) * 4) + 1);
+                    case ITEM_KEY_SMALL:
+                        return (GI_MAX + (((item >> 8) & 0xF) * 4) + 2);
+                    case ITEM_DUNGEON_MAP:
+                        return (GI_MAX + (((item >> 8) & 0xF) * 4) + 3);
+                    case ITEM_COMPASS:
+                        return (GI_MAX + (((item >> 8) & 0xF) * 4) + 4);
+                }
+                return GI_NONE;
+        }
+    }
+    
+    switch (rando_get_location_type(location)) {
+        case RANDO_ITEM_CLASS_PROGRESSION:
+        case RANDO_ITEM_CLASS_TRAP:
+            return GI_AP_PROG;
+        case RANDO_ITEM_CLASS_USEFUL:
+            return GI_AP_USEFUL;
+        case RANDO_ITEM_CLASS_JUNK:
+        default:
+            return GI_AP_FILLER;
+    }
+}
+
 RECOMP_DECLARE_EVENT(rando_on_start());
 
 RECOMP_CALLBACK("*", recomp_on_play_main)
