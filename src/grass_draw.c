@@ -29,13 +29,23 @@ extern Gfx gObjGrass_D_809AAAE0[];
 extern Gfx gKusaBushType1DL[];
 extern Gfx gKusaBushType2DL[];
 
+extern Gfx gKusaSproutDL[];
+extern Gfx gKusaStumpDL[];
+
 u16 grassTex[1024];
+u16 grassSproutTex[1024];
 u16 originalGrassTex[1024];
 extern u16 gameplay_field_keep_Tex_007010[];
+extern u16 gameplay_keep_Tex_052940[];
 
 void grab_grass_texture() {
     Lib_MemCpy(originalGrassTex, SEGMENTED_TO_K0(gameplay_field_keep_Tex_007010), sizeof(originalGrassTex));
     RGBA16toIA16_Texture(originalGrassTex, grassTex, ARRAY_COUNT(originalGrassTex));
+}
+
+void grab_sprout_texture() {
+    Lib_MemCpy(originalGrassTex, SEGMENTED_TO_K0(gameplay_keep_Tex_052940), sizeof(originalGrassTex));
+    RGBA16toIA16_Texture(originalGrassTex, grassSproutTex, ARRAY_COUNT(originalGrassTex));
 }
 
 RECOMP_IMPORT("*", ActorExtensionId actor_transform_id(Actor* actor));
@@ -64,6 +74,8 @@ Gfx* GenericGrass_DrawRandoColored(PlayState* play, Gfx* original, Gfx* gfx, u8 
         customDL = gObjGrass_GrayscaleOpaDL;
     } else if (original == gObjGrass_D_809AAA68) {
         customDL = gObjGrass_GrayscaleXluDL;
+    } else if (original == gKusaSproutDL) {
+        customDL = gKusaSproutGrayscaleDL;
     }
     
     gDPSetPrimColor(gfx++, 0, 0, color.r, color.g, color.b, alpha);
@@ -113,6 +125,32 @@ void EnKusa_DrawBushRando(Actor* thisx, PlayState* play2) {
         // gSPDisplayList(POLY_XLU_DISP++, gKusaBushType2DL);
 
         POLY_XLU_DISP = GenericGrass_DrawRandoColored(play, gKusaBushType2DL, POLY_XLU_DISP, alpha, *kusaLocation);
+
+        CLOSE_DISPS(play->state.gfxCtx);
+    }
+}
+
+void EnKusa_DrawGrassRando(Actor* thisx, PlayState* play) {
+    EnKusa* this = ((EnKusa*)thisx);
+
+    u32* kusaLocation = z64recomp_get_extended_actor_data(thisx, kusaGrassExtension);
+
+    if (this->isCut) {
+        Gfx_DrawDListOpa(play, gKusaStumpDL);
+    } else {
+        if ((play->roomCtx.curRoom.behaviorType1 == ROOM_BEHAVIOR_TYPE1_0) &&
+            (this->actionFunc == EnKusa_WaitForInteract)) {
+            if ((this->actor.projectedPos.z > -150.0f) && (this->actor.projectedPos.z < 400.0f)) {
+                EnKusa_ApplySway(&D_80936AD8[this->kusaMtxIdx]);
+            }
+        }
+        // Gfx_DrawDListOpa(play, gKusaSproutDL);
+        
+        OPEN_DISPS(play->state.gfxCtx);
+        Gfx_SetupDL25_Opa(play->state.gfxCtx);
+        gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+        
+        POLY_OPA_DISP = GenericGrass_DrawRandoColored(play, gKusaSproutDL, POLY_OPA_DISP, 255, *kusaLocation);
 
         CLOSE_DISPS(play->state.gfxCtx);
     }
