@@ -446,11 +446,11 @@ u32 rando_get_item_id(u32 location)
                 switch (item & 0xFF)
                 {
                     case 0x00:
-                        return GI_MAGIC_JAR_SMALL;
+                        return GI_MAGIC_UPGRADE;
                     case 0x01:
-                        return GI_71;
+                        return GI_SPIN_ATTACK;
                     case 0x03:
-                        return GI_73;
+                        return GI_DEFENSE_DOUBLE;
                 }
                 return GI_NONE;
             case 0x040000:

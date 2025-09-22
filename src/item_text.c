@@ -82,6 +82,7 @@ static unsigned char ssht_msg[128] = "You got a\x02 Swamp Token\x00!\xbf";
 static unsigned char osht_msg[128] = "You got an\x03 Ocean Token\x00!\xbf";
 static unsigned char sword_msg[128] = "You got the\x01 Kokiri Sword\x00!\xbf";
 static unsigned char spin_msg[128] = "You mastered the\x01 Spin Attack\x00!\xbf";
+static unsigned char magic_msg[128] = "You've been granted\x01 Magic Power\x00!\xbf";
 static unsigned char sk_msg[128] = "You got a\x01 Small Key\x00! \xbf";
 static unsigned char bk_msg[128] = "You got the\x01 Boss Key\x00! \xbf";
 static unsigned char map_msg[128] = "You found a\x01 Map\x00! \xbf";
@@ -124,6 +125,10 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
 
     if (textId == 0x52 && rando_skulltulas_enabled()) {
         textId = 0x75;
+    }
+
+    if (textId == 0xC8 && rando_has_item(0x020000) > 1) {
+        textId = 0xCC;
     }
 
     if (play->msgCtx.msgMode == MSGMODE_NONE) {
@@ -230,6 +235,9 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
             break;
         case 0xCA:
             msg = spin_msg;
+            break;
+        case 0xC8:
+            msg = magic_msg;
             break;
         case 0x72:
             msg = osht_msg;
