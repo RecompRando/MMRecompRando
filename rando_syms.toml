@@ -49,3 +49,23 @@ symbols = [
     { name = "sAmmoDigitsXPositions", vram = 0x801BFB04 },
     { name = "sAmmoDigitsYPositions", vram = 0x801BFB0C }
 ]
+
+[[section]]
+name = "..ovl_En_Ossan"
+rom = 0x00D222B0
+vram = 0x808A80A0
+size = 0x4880
+
+symbols = [
+    { name = "sShops_ovl_En_Ossan", vram = 0x808AC1D4 },
+]
+
+[[section]]
+name = "..ovl_En_Sob1"
+rom = 0x00E765A0
+vram = 0x80A0C810
+size = 0x47C0
+
+symbols = [
+    { name = "sShops_ovl_En_Sob1", vram = 0x80A10918 },
+]
