@@ -30,6 +30,16 @@ symbols = [
 ]
 
 [[section]]
+name = "..ovl_En_Bal"
+rom = 0x00EC9990
+vram = 0x80A61810
+size = 0x2C90
+
+symbols = [
+    { name = "sBuyMapOptions", vram = 0x80A63D40 }
+]
+
+[[section]]
 name = "..boot"
 rom = 0x00001060
 vram = 0x80080060
