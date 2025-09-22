@@ -19,10 +19,14 @@ CFLAGS   := -target mips -mips2 -mabi=32 -O2 -G0 -mno-abicalls -mno-odd-spreg -m
 CPPFLAGS := -nostdinc -D_LANGUAGE_C -DMIPS -I include -I include/dummy_headers -I mm-decomp/include -I mm-decomp/src -I mm-decomp/assets
 LDFLAGS  := -nostdlib -T $(LDSCRIPT) -Map $(BUILD_DIR)/mod.map --unresolved-symbols=ignore-all --emit-relocs -e 0 --no-nmagic
 
-C_SRCS := $(wildcard src/*.c)
+rwildcard = $(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
+getdirs = $(sort $(dir $(1)))
+
+C_SRCS := $(call rwildcard,src,*.c)
 C_OBJS := $(addprefix $(BUILD_DIR)/, $(C_SRCS:.c=.o))
 C_DEPS := $(addprefix $(BUILD_DIR)/, $(C_SRCS:.c=.d))
 
+BUILD_DIRS := $(call getdirs,$(C_OBJS))
 
 $(OUTPUT_NAME)/mod_binary.bin: $(TARGET) $(MOD_TOML) rando_syms.toml $(LIBFILES) | $(OUTPUT_NAME)
 	$(MOD_TOOL) $(MOD_TOML) $(OUTPUT_NAME)
@@ -33,7 +37,7 @@ CC      = ./bin/clang
 LD      = ./bin/ld.lld
 
 define make_folder
-	mkdir $(subst /,\,$(1))
+	bash -c "mkdir -p $@"
 endef
 
 $(OUTPUT_NAME)/$(OUTPUT_NAME_W_VER).dll: build/mod_recompiled.c
@@ -51,7 +55,7 @@ offline: $(OUTPUT_NAME)/$(OUTPUT_NAME_W_VER).dll
 else
 
 define make_folder
-	mkdir -p $(1)
+	mkdir -p $@
 endef
 
 ifeq ($(shell uname),Darwin)
@@ -94,14 +98,14 @@ $(OUTPUT_NAME):
 $(TARGET): $(C_OBJS) $(LDSCRIPT) | $(BUILD_DIR)
 	$(LD) $(C_OBJS) $(LDFLAGS) -o $@
 
-$(BUILD_DIR) $(BUILD_DIR)/src:
+$(BUILD_DIR) $(BUILD_DIRS):
 	$(call make_folder, $@)
 
-$(C_OBJS): $(BUILD_DIR)/%.o : %.c | $(BUILD_DIR) $(BUILD_DIR)/src
+$(C_OBJS): $(BUILD_DIR)/%.o : %.c | $(BUILD_DIRS)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $< -MMD -MF $(@:.o=.d) -c -o $@
 
 clean:
-	rm -rf $(BUILD_DIR) $(OUTPUT_NAME)
+	bash -c "rm -rf $(BUILD_DIR) $(OUTPUT_NAME)"
 
 -include $(C_DEPS)
 
