@@ -14,6 +14,9 @@
 #include "dungeon_items.h"
 #include "rupoor.h"
 
+// ty neirn
+#define SEGMENTED_TO_GLOBAL_PTR(obj, segmentedPtr) ((void *)((uintptr_t)obj + SEGMENT_OFFSET(segmentedPtr)))
+
 void GetItem_DrawBombchu(PlayState* play, s16 drawId);
 void GetItem_DrawPoes(PlayState* play, s16 drawId);
 void GetItem_DrawFairyBottle(PlayState* play, s16 drawId);
@@ -50,6 +53,8 @@ void GetItem_DrawXlu01DL(PlayState* play, void* dl0, void* dl1);
 void GetItem_DrawAPFiller(PlayState* play, s16 drawId);
 void GetItem_DrawOpa0WithFlame(PlayState* play, void* dl0);
 void GetItem_DrawOpa01WithFlame(PlayState* play, void* dl0, void* dl1);
+void GetItem_DrawOwlStatue(PlayState* play);
+void GetItem_DrawFrog(PlayState* play, s16 drawId);
 
 extern Gfx gGiEmptyBottleCorkDL[];
 extern Gfx gGiEmptyBottleGlassDL[];
@@ -286,6 +291,8 @@ extern Gfx gGiBoleroColorDL[];
 extern Gfx archilogo_grayscale_archilogo_bw_mesh[];
 extern Gfx archilogo_arrow_archilogo_mesh[];
 extern Gfx archilogo_archilogo_mesh[];
+
+extern Gfx gOwlStatueOpenedDL[];
 
 Gfx gGiTimeColorDL[] = {
     gsDPSetEnvColor(50, 64, 168, 255),
@@ -864,6 +871,16 @@ RECOMP_PATCH void GetItem_Draw(PlayState* play, s16 drawId) {
         case GID_MAGIC_UPGRADE:
             GetItem_DrawOpa0WithFlame(play, gGiMagicJarLargeDL);
             return;
+        case GID_OWL_STATUE:
+            GetItem_DrawOwlStatue(play);
+            return;
+        case GID_FROG_YELLOW:
+        case GID_FROG_CYAN:
+        case GID_FROG_PINK:
+        case GID_FROG_BLUE:
+        case GID_FROG_WHITE:
+            GetItem_DrawFrog(play, drawId);
+            return;
     }
     sDrawItemTable_new[drawId].drawFunc(play, drawId);
 }
@@ -931,6 +948,17 @@ void GetItem_DrawDynamic(PlayState* play, void* objectSegment, s16 drawId) {
                 gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
                 break;
             case GID_MAGIC_UPGRADE:
+                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
+                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
+                break;
+            case GID_OWL_STATUE:
+                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
+                break;
+            case GID_FROG_YELLOW:
+            case GID_FROG_CYAN:
+            case GID_FROG_PINK:
+            case GID_FROG_BLUE:
+            case GID_FROG_WHITE:
                 gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
                 gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
                 break;
@@ -1303,6 +1331,59 @@ void GetItem_DrawXlu01DL(PlayState* play, void* dl0, void* dl1) {
     gSPDisplayList(POLY_XLU_DISP++, dl1);
 
     CLOSE_DISPS(play->state.gfxCtx);
+}
+
+void GetItem_DrawOwlStatue(PlayState* play) {
+    if (ObjLoad(play, 0x06, OBJECT_SEK)) {
+        Matrix_Translate(0.0f, -34.0f, 0.0f, MTXMODE_APPLY);
+        Matrix_Scale(0.01f, 0.01f, 0.01f, MTXMODE_APPLY);
+        Gfx_DrawDListOpa(play, SEGMENTED_TO_GLOBAL_PTR(objectSegments[OBJECT_SEK], gOwlStatueOpenedDL));
+        ObjUnload(play, 0x06, OBJECT_SEK);
+    }
+}
+
+extern FlexSkeletonHeader gFrogSkel;
+extern AnimationHeader gFrogIdleAnim;
+extern Color_RGBA8 sFrogEnvColors[];
+extern TexturePtr sEyeTextures_ovl_En_Minifrog[];
+
+// note: the static colors/textures don't seem to work
+void GetItem_DrawFrog(PlayState* play, s16 drawId) {
+    static bool initialized = false;
+    static SkelAnime skelAnime;
+    static TexturePtr sEyeTextures[2];
+
+    if (ObjLoad(play, 0x06, OBJECT_FR)) {
+        if (!initialized) {
+            initialized = true;
+            for (u8 i = 0; i < ARRAY_COUNT(sEyeTextures); i++) {
+                sEyeTextures[i] = Lib_SegmentedToVirtual(sEyeTextures_ovl_En_Minifrog[i]);
+            }
+
+            SkelAnime_InitFlex(play, &skelAnime, &gFrogSkel, &gFrogIdleAnim, NULL, NULL, 0);
+        }
+        
+        // Color_RGBA8* envColor;
+
+        OPEN_DISPS(play->state.gfxCtx);
+
+        Matrix_Translate(0.0f, -25.0f, -10.0f, MTXMODE_APPLY);
+        Matrix_Scale(0.03f, 0.03f, 0.03f, MTXMODE_APPLY);
+
+        Gfx_SetupDL25_Opa(play->state.gfxCtx);
+        // envColor = &sFrogEnvColors[drawId - GID_FROG_YELLOW];
+        // recomp_printf("frog index: %d\n", drawId - GID_FROG_YELLOW);
+        // recomp_printf("frog color: %d %d %d\n", envColor->r, envColor->g, envColor->b);
+        gSPSegment(POLY_OPA_DISP++, 0x08, sEyeTextures_ovl_En_Minifrog[0]);
+        gSPSegment(POLY_OPA_DISP++, 0x09, sEyeTextures_ovl_En_Minifrog[0]);
+        // gDPSetEnvColor(POLY_OPA_DISP++, envColor->r, envColor->g, envColor->b, envColor->a);
+        gDPSetEnvColor(POLY_OPA_DISP++, rainbowColor.r, rainbowColor.g, rainbowColor.b, 255);
+        SkelAnime_DrawFlexOpa(play, skelAnime.skeleton, skelAnime.jointTable, skelAnime.dListCount, NULL, NULL, NULL);
+
+        CLOSE_DISPS(play->state.gfxCtx);
+
+        ObjUnload(play, 0x06, OBJECT_FR);
+    }
 }
 
 void GetItem_DrawAPFiller(PlayState* play, s16 drawId) {

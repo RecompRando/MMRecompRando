@@ -1,6 +1,7 @@
 #include "modding.h"
 #include "global.h"
 #include "recompconfig.h"
+#include "recomputils.h"
 
 #include "apcommon.h"
 #include "yaml_generation.h"
@@ -489,6 +490,21 @@ u32 rando_get_item_id(u32 location)
                         return (GI_MAX + (((item >> 8) & 0xF) * 4) + 3);
                     case ITEM_COMPASS:
                         return (GI_MAX + (((item >> 8) & 0xF) * 4) + 4);
+                }
+                return GI_NONE;
+            case 0xFF0000:
+                switch (item & 0x00FF00)
+                {
+                    case (0x001500): // 0xFF1500 for owls
+                        switch (item & 0xF)
+                        {
+                            case 0xF:
+                                return GI_OWL_HIDDEN;
+                            default:
+                                return GI_OWL_GREAT_BAY_COAST + (item & 0xF);
+                        }
+                    case (0x000000): // 0xFF0000 for frogs
+                        return GI_FROG_YELLOW + (item & 0xF);
                 }
                 return GI_NONE;
         }

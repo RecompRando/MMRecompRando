@@ -7,8 +7,6 @@
 #include "overlays/kaleido_scope/ovl_kaleido_scope/z_kaleido_scope.h"
 #include "overlays/actors/ovl_Obj_Warpstone/z_obj_warpstone.h"
 
-bool owlsanity_enabled_temp = true;
-
 #define OWL_WARP_HIDDEN_OWL 0xF
 
 extern s16 sKaleidoSetupRightPageIndex[];
@@ -93,14 +91,15 @@ void OnObjWarpstone_Init(Actor* thisx, PlayState* play) {
 RECOMP_HOOK_RETURN("ObjWarpstone_Init")
 void AfterObjWarpstone_Init(Actor* thisx, PlayState* play) {
     ObjWarpstone* this = sObjWarpstone;
-    if (owlsanity_enabled_temp) {
+    if (rando_get_slotdata_u32("owlsanity")) {
         if (!rando_location_is_checked(LOCATION_OWL_STATUE)) {
             ObjWarpstone_SetupAction(this, ObjWarpstone_ClosedIdle);
         } else {
             ObjWarpstone_SetupAction(this, ObjWarpstone_OpenedIdle);
         }
 
-        // if (rando_has_item(OWL_ITEM)) {
+        // if we want to be really fancy put this in both idles
+        // if (rando_has_item(LOCATION_OWL_STATUE)) {
         //     this->modelIndex = SEK_MODEL_OPENED;
         // } else {
         //     this->modelIndex = SEK_MODEL_CLOSED;
@@ -120,7 +119,7 @@ s32 ObjWarpstone_OfferItem(ObjWarpstone* this, PlayState* play) {
 
 RECOMP_PATCH s32 ObjWarpstone_ClosedIdle(ObjWarpstone* this, PlayState* play) {
     if (this->collider.base.acFlags & AC_HIT) {
-        if (owlsanity_enabled_temp) {
+        if (rando_get_slotdata_u32("owlsanity")) {
             ObjWarpstone_SetupAction(this, ObjWarpstone_OfferItem);
             recomp_printf("owl location: 0x%06X\n", LOCATION_OWL_STATUE);
         } else {

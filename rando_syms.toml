@@ -79,3 +79,15 @@ size = 0x47C0
 symbols = [
     { name = "sShops_ovl_En_Sob1", vram = 0x80A10918 },
 ]
+
+[[section]]
+name = "..ovl_En_Minifrog"
+rom = 0x00D1D880
+vram = 0x808A3670
+size = 0x19E0
+
+symbols = [
+    { name = "sEyeTextures_ovl_En_Minifrog", vram = 0x808A4D74 },
+    { name = "sIsFrogReturnedFlags_ovl_En_Minifrog", vram = 0x808A4D7C },
+    { name = "sFrogEnvColors", vram = 0x808A4D98 },
+]

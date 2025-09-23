@@ -12,13 +12,7 @@
 
 EnMinifrog* sEnMinifrog;
 
-static u16 sIsFrogReturnedFlags[] = {
-    0,                  // FROG_YELLOW
-    WEEKEVENTREG_32_40, // FROG_CYAN
-    WEEKEVENTREG_32_80, // FROG_PINK
-    WEEKEVENTREG_33_01, // FROG_BLUE
-    WEEKEVENTREG_33_02, // FROG_WHITE
-};
+extern u16 sIsFrogReturnedFlags_ovl_En_Minifrog[];
 
 void EnMinifrog_SpawnDust(EnMinifrog* this, PlayState* play);
 void EnMinifrog_ReturnFrogCutscene(EnMinifrog* this, PlayState* play);
@@ -26,30 +20,30 @@ void EnMinifrog_ReturnFrogCutscene(EnMinifrog* this, PlayState* play);
 RECOMP_HOOK("EnMinifrog_Init")
 void OnEnMinifrog_Init(Actor* thisx, PlayState* play) {
     EnMinifrog* this = ((EnMinifrog*)thisx);
-    sEnMinifrog = this;
 
+    this->frogIndex = (this->actor.params & 0xF);
+    if (this->frogIndex >= 5) {
+        this->frogIndex = FROG_YELLOW;
+    }
+    
     if (!EN_FROG_IS_RETURNED(&this->actor)) {
         if (!rando_location_is_checked(LOCATION_FROG)) {
-            CLEAR_WEEKEVENTREG(sIsFrogReturnedFlags[this->frogIndex]);
+            CLEAR_WEEKEVENTREG(sIsFrogReturnedFlags_ovl_En_Minifrog[this->frogIndex]);
         } else {
-            SET_WEEKEVENTREG(sIsFrogReturnedFlags[this->frogIndex]);
+            SET_WEEKEVENTREG(sIsFrogReturnedFlags_ovl_En_Minifrog[this->frogIndex]);
+        }
+    } else {
+        if (this->frogIndex != FROG_YELLOW && rando_has_item(LOCATION_FROG)) { // location and item share ids
+            SET_WEEKEVENTREG(sIsFrogReturnedFlags_ovl_En_Minifrog[this->frogIndex]);
+        } else {
+            CLEAR_WEEKEVENTREG(sIsFrogReturnedFlags_ovl_En_Minifrog[this->frogIndex]);
+        }
+    
+        if (this->frogIndex == FROG_YELLOW && !rando_has_item(LOCATION_FROG)) {
+            this->actor.params &= ~0xF0; // kill yellow frog
         }
     }
 }
-
-// RECOMP_HOOK_RETURN("EnMinifrog_Init")
-// void AfterEnMinifrog_Init(Actor* thisx, PlayState* play) {
-//     EnMinifrog* this = sEnMinifrog;
-//     PlayState* play = gPlay;
-// 
-//     if (!EN_FROG_IS_RETURNED(&this->actor)) {
-//         if (rando_has_item(FROG_ITEM)) {
-//             SET_WEEKEVENTREG(sIsFrogReturnedFlags[this->frogIndex]);
-//         } else {
-//             CLEAR_WEEKEVENTREG(sIsFrogReturnedFlags[this->frogIndex]);
-//         }
-//     }
-// }
 
 void EnMinifrog_Dissapear(EnMinifrog* this, PlayState* play) {
     EnMinifrog_SpawnDust(this, play);

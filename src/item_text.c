@@ -63,6 +63,7 @@ extern s32 sCharTexScale;
 extern s32 D_801F6B08;
 
 static unsigned char ap_msg[128];
+static unsigned char self_msg[128];
 static unsigned char ctsf_msg[128] = "You found\x08 Clock Town's\x06 Stray Fairy\x00!\xbf";
 static unsigned char wfsf_msg[128] = "You found a\x02 Woodfall\x06 Stray Fairy\x00!\xbf";
 static unsigned char shsf_msg[128] = "You found a\x05 Snowhead\x06 Stray Fairy\x00!\xbf";
@@ -350,6 +351,9 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
             break;
         case 0x74:
             msg = fool_msg;
+            break;
+        case 0x71:
+            msg = self_msg;
             break;
         default:
             break;
@@ -781,6 +785,37 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
             font->msgBuf.schar[msg_i + i] = c;
             i += 1;
             c = player_str[i];
+        }
+
+        msg_i += i;
+        font->msgBuf.schar[msg_i] = 0x00;
+        font->msgBuf.schar[msg_i + 1] = '!';
+        font->msgBuf.schar[msg_i + 2] = 0xBF;
+    } else if (msg == self_msg) {
+        char you_found_str[128] = "You found your\x11\x01";
+        char item_str[67];
+
+        rando_get_location_item_name(rando_get_last_location_sent(), item_str);
+        sanitizeRandoText(item_str);
+
+        char c = you_found_str[0];
+        u32 msg_i = 11;
+        font->msgBuf.schar[msg_i] = 0x00;
+        msg_i += 1;
+
+        while (c != 0) {
+            font->msgBuf.schar[msg_i] = c;
+            msg_i += 1;
+            c = you_found_str[msg_i - 12];
+        }
+
+        u32 i = 0;
+        c = item_str[0];
+
+        while (c != 0) {
+            font->msgBuf.schar[msg_i + i] = c;
+            i += 1;
+            c = item_str[i];
         }
 
         msg_i += i;

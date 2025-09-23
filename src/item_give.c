@@ -606,6 +606,38 @@ GetItemEntry sGetItemTable_ap[] = {
     // GI_MAGIC_UPGRADE
     GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_MAGICPOT, GID_MAGIC_UPGRADE, 0xC8,
              GIFIELD(GIFIELD_20 | GIFIELD_40, ITEM00_MAGIC_JAR_BIG), CHEST_ANIM_LONG),
+    // GI_OWL_GREAT_BAY_COAST
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_RUPY, GID_OWL_STATUE, 0x71, 0, 0),
+    // GI_OWL_ZORA_CAPE
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_RUPY, GID_OWL_STATUE, 0x71, 0, 0),
+    // GI_OWL_SNOWHEAD
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_RUPY, GID_OWL_STATUE, 0x71, 0, 0),
+    // GI_OWL_MOUNTAIN_VILLAGE
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_RUPY, GID_OWL_STATUE, 0x71, 0, 0),
+    // GI_OWL_CLOCK_TOWN
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_RUPY, GID_OWL_STATUE, 0x71, 0, 0),
+    // GI_OWL_MILK_ROAD
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_RUPY, GID_OWL_STATUE, 0x71, 0, 0),
+    // GI_OWL_WOODFALL
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_RUPY, GID_OWL_STATUE, 0x71, 0, 0),
+    // GI_OWL_SOUTHERN_SWAMP
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_RUPY, GID_OWL_STATUE, 0x71, 0, 0),
+    // GI_OWL_IKANA_CANYON
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_RUPY, GID_OWL_STATUE, 0x71, 0, 0),
+    // GI_OWL_STONE_TOWER
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_RUPY, GID_OWL_STATUE, 0x71, 0, 0),
+    // GI_OWL_HIDDEN
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_RUPY, GID_OWL_STATUE, 0x71, 0, 0),
+    // GI_FROG_YELLOW
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_RUPY, GID_FROG_YELLOW, 0x71, 0, 0),
+    // GI_FROG_CYAN
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_RUPY, GID_FROG_CYAN, 0x71, 0, 0),
+    // GI_FROG_PINK
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_RUPY, GID_FROG_PINK, 0x71, 0, 0),
+    // GI_FROG_BLUE
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_RUPY, GID_FROG_BLUE, 0x71, 0, 0),
+    // GI_FROG_WHITE
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_RUPY, GID_FROG_WHITE, 0x71, 0, 0),
 };
 
 bool isAP(s16 gi) {
@@ -1886,6 +1918,8 @@ RECOMP_PATCH bool func_8083FFEC(PlayState* play, Player* this) {
 
 s32 Health_ChangeBy_NoSound(PlayState* play, s16 healthChange);
 
+extern u16 sIsFrogReturnedFlags_ovl_En_Minifrog[];
+
 u8 randoItemGive(u32 gi) {
     PlayState* play = gPlay;
     Player* player = GET_PLAYER(play);
@@ -1960,13 +1994,20 @@ u8 randoItemGive(u32 gi) {
                     break;
             }
             return ITEM_NONE;
-        // traps go here idfk
-        // case 0x690000:
-        //     item = gi & 0xFF;
-        //     switch (item) {
-        //         case ITEM_RUPOOR:
-        //             Rupees_ChangeBy(-10);
-        //     }
+        case 0xFF0000:
+            switch (gi & 0x00FF00)
+            {
+                case (0x001500): // 0xFF1500 for owls
+                    Sram_ActivateOwl(gi & 0xF);
+                    break;
+                case (0x000000): // 0xFF0000 for frogs
+                    // redundant
+                    if (gi & 0xF) {
+                        SET_WEEKEVENTREG(sIsFrogReturnedFlags_ovl_En_Minifrog[gi & 0xF]);
+                    }
+                    break;
+            }
+            return ITEM_NONE;
         default:
             if (gi == 0) {
                 return ITEM_NONE;
