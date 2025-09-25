@@ -6,7 +6,7 @@
 #include "apcommon.h"
 #include "actor_helpers.h"
 
-#define LOCATION_SCOPECROW_RUPEE (0x170000 | (play->sceneId << 8) | (0xD << 4) | this->ruppeIndex)
+#define LOCATION_SCOPECROW_RUPEE (0x170000 | (play->sceneId << 8) | (0xC << 4) | this->ruppeIndex)
 
 #define OBJECT_CROW_LIMB_MAX 0x09
 #include "overlays/actors/ovl_En_Scopecrow/z_en_scopecrow.h"
@@ -14,7 +14,7 @@
 
 RECOMP_HOOK("EnScopecrow_Init")
 void OnEnScopecrow_Init(Actor* thisx, PlayState* play) {
-    // fix oversight where both telescope guays drop the same item
+    // fix oversight where both telescope guays drop the same item (offset to drop a different rupee)
     thisx->params += randoGetLoadedActorNumInSameRoom(play, thisx);
 }
 
