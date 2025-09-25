@@ -6,8 +6,8 @@
 #include "apcommon.h"
 #include "yaml_generation.h"
 
-#define LOCATION_INVENTORY_SWORD 0x000037
-#define LOCATION_INVENTORY_SHIELD 0x000032
+#define LOCATION_INVENTORY_SWORD GI_SWORD_KOKIRI
+#define LOCATION_INVENTORY_SHIELD GI_SHIELD_HERO
 
 #define C_TO_PARAMS(c) (c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF
 
@@ -507,6 +507,21 @@ u32 rando_get_item_id(u32 location)
                         return GI_FROG_YELLOW + (item & 0xF);
                 }
                 return GI_NONE;
+            case 0x0B0000: // boss souls
+                switch (item)
+                {
+                    case (AP_ITEM_ID_SOUL_BOSS_ODOLWA):
+                        return GI_BOSS_SOUL_ODOLWA;
+                    case (AP_ITEM_ID_SOUL_BOSS_GOHT):
+                        return GI_BOSS_SOUL_GOHT;
+                    case (AP_ITEM_ID_SOUL_BOSS_GYORG):
+                        return GI_BOSS_SOUL_GYORG;
+                    case (AP_ITEM_ID_SOUL_BOSS_TWINMOLD):
+                        return GI_BOSS_SOUL_TWINMOLD;
+                    case (AP_ITEM_ID_SOUL_BOSS_MAJORA):
+                        return GI_BOSS_SOUL_MAJORA;
+                }
+                return GI_NONE;
         }
     }
     
@@ -684,6 +699,8 @@ void update_rando(PlayState* play) {
 
             rando_send_location(LOCATION_INVENTORY_SWORD);
             rando_send_location(LOCATION_INVENTORY_SHIELD);
+            rando_send_location(0x0D0000 | GI_OCARINA_OF_TIME);
+            rando_send_location(0x0D0067);
 
             for (int i = 0; i < rando_get_starting_heart_locations(); ++i)
             {

@@ -138,3 +138,11 @@ description = "Sets where incoming item notifications appear on your screen"
 type = "Enum"
 options = [ "Top Left", "Top Right", "Bottom Left", "Bottom Right" ]
 default = "Top Left"
+
+[[manifest.config_options]]
+id = "show_soul_model"
+name = "Show Full Models for Souls"
+description = "Sets whether or not Soul items display as their in-game model or a generic token."
+type = "Enum"
+options = [ "Disabled", "Enabled" ]
+default = "Enabled"

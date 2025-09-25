@@ -4,6 +4,7 @@
 #include "z64recomp_api.h"
 
 #include "actor_helpers.h"
+#include "apcommon.h"
 
 void registerActorExtensions() {
     item00Extension = z64recomp_extend_actor(ACTOR_EN_ITEM00, sizeof(u32));
@@ -99,5 +100,40 @@ void FreezeActors(UpdateActor_Params* params) {
             // PLAYER_STATE1_20000000 is used when grabbing items
             params->canFreezeCategory |= PLAYER_STATE1_20000000 & player->stateFlags1;
         }
+    }
+}
+
+RECOMP_CALLBACK("*", recomp_should_actor_init)
+void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
+    if(actor == NULL) return;
+    if(gSaveContext.gameMode != GAMEMODE_NORMAL) return;
+
+    switch (actor->category) {
+        case ACTORCAT_BOSS:
+            // recomp_printf("actor id: 0x%02X 0x%06X %d\n", actor->id, 0x0B0000 | actor->id, rando_has_item(0x0B0000 | actor->id));
+            switch (actor->id) {
+                case ACTOR_BOSS_01: // odolwa
+                case ACTOR_BOSS_HAKUGIN: // goht
+                case ACTOR_BOSS_03: // gyorg
+                case ACTOR_BOSS_02: // twinmold
+                case ACTOR_BOSS_07: // majora
+                    if (rando_get_slotdata_u32("boss_souls")) {
+                        // *should = rando_has_item(0x0B0000 | actor->id);
+                        if (!rando_has_item(0x0B0000 | actor->id)) {
+                            *should = false;
+                        }
+                        return;
+                    }
+            }
+    }
+
+    switch(actor->id) {
+        // case ACTOR_BOSS_01:
+        // case ACTOR_BOSS_07:
+        // case ACTOR_EN_COW:
+        //     *should = true;
+        //     break;
+        default:
+            break;
     }
 }
