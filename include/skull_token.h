@@ -105,3 +105,4 @@ typedef enum {
 Color_RGB8 gGiDefaultFlameColor = {0xFF, 0x00, 0x00};
 Color_RGB8 gGiSwampFlameColor = {0x82, 0xFF, 0x80};
 Color_RGB8 gGiOceanFlameColor = {0x7D, 0x83, 0xFF};
+Color_RGB8 gGiSoulBossFlameColor = {0x64, 0x00, 0x64};

@@ -118,6 +118,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 case ACTOR_BOSS_02: // twinmold
                 case ACTOR_BOSS_07: // majora
                     if (rando_get_slotdata_u32("boss_souls")) {
+                        if (actor->id == ACTOR_BOSS_07 && rando_get_slotdata_u32("boss_souls") != 2) return;
                         // *should = rando_has_item(0x0B0000 | actor->id);
                         if (!rando_has_item(0x0B0000 | actor->id)) {
                             *should = false;
