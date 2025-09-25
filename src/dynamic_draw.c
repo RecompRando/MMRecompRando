@@ -57,6 +57,7 @@ void GetItem_DrawOpa01WithFlame(PlayState* play, void* dl0, void* dl1);
 void GetItem_DrawOwlStatue(PlayState* play);
 void GetItem_DrawFrog(PlayState* play, s16 drawId);
 void GetItem_DrawSoulBoss(PlayState* play, s16 drawId);
+void GetItem_DrawSoulMisc(PlayState* play, s16 drawId);
 
 extern Gfx gGiEmptyBottleCorkDL[];
 extern Gfx gGiEmptyBottleGlassDL[];
@@ -891,6 +892,11 @@ RECOMP_PATCH void GetItem_Draw(PlayState* play, s16 drawId) {
         case GID_BOSS_SOUL_MAJORA:
             GetItem_DrawSoulBoss(play, drawId);
             return;
+        case GID_MISC_SOUL_COW:
+        case GID_MISC_SOUL_KEATON:
+        case GID_MISC_SOUL_GOLD_SKULLTULAS:
+            GetItem_DrawSoulMisc(play, drawId);
+            return;
     }
     sDrawItemTable_new[drawId].drawFunc(play, drawId);
 }
@@ -977,6 +983,12 @@ void GetItem_DrawDynamic(PlayState* play, void* objectSegment, s16 drawId) {
             case GID_BOSS_SOUL_GYORG:
             case GID_BOSS_SOUL_TWINMOLD:
             case GID_BOSS_SOUL_MAJORA:
+                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
+                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
+                break;
+            case GID_MISC_SOUL_COW:
+            case GID_MISC_SOUL_KEATON:
+            case GID_MISC_SOUL_GOLD_SKULLTULAS:
                 gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
                 gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
                 break;
@@ -1198,8 +1210,20 @@ void GetItem_DrawSkullTokenGeneric(PlayState* play, TokenType type) {
         case TOKEN_OCEAN:
             flameColor = gGiSwampFlameColor;
             break;
-        case TOKEN_BOSS_SOUL:
+        case TOKEN_SOUL_BOSS:
             flameColor = gGiSoulBossFlameColor;
+            break;
+        case TOKEN_SOUL_ENEMY:
+            flameColor = gGiDefaultFlameColor;
+            break;
+        case TOKEN_SOUL_NPC:
+            flameColor = gGiSoulNPCFlameColor;
+            break;
+        case TOKEN_SOUL_MISC:
+            flameColor = gGiSoulMiscFlameColor;
+            break;
+        case TOKEN_SOUL_ABSURD:
+            flameColor = gGiSoulAbsurdFlameColor;
             break;
         default:
             flameColor = gGiDefaultFlameColor;
@@ -1428,6 +1452,7 @@ void GetItem_DrawSoulBoss(PlayState* play, s16 drawId) {
                     break;
             }
             ObjUnload(play, 0x06, OBJECT_BSMASK);
+            return;
         }
 
         // Majora's Soul
@@ -1439,7 +1464,89 @@ void GetItem_DrawSoulBoss(PlayState* play, s16 drawId) {
             ObjUnload(play, 0x06, OBJECT_STK);
         }
     } else {
-        GetItem_DrawSkullTokenGeneric(play, TOKEN_BOSS_SOUL);
+        GetItem_DrawSkullTokenGeneric(play, TOKEN_SOUL_BOSS);
+    }
+}
+
+extern FlexSkeletonHeader gCowSkel;
+extern AnimationHeader gCowChewAnim;
+extern FlexSkeletonHeader object_kitan_Skel_007FA8; // gKeatonSkel
+extern AnimationHeader object_kitan_Anim_002770; // gKeatonIdleAnim
+extern FlexSkeletonHeader object_st_Skel_005298;
+extern AnimationHeader object_st_Anim_000304;
+
+void GetItem_DrawSoulMisc(PlayState* play, s16 drawId) {
+    static bool initializedCow = false;
+    static bool initializedKeaton = false;
+    static bool initializedSkulltula = false;
+    static SkelAnime skelAnimeCow;
+    static SkelAnime skelAnimeKeaton;
+    static SkelAnime skelAnimeSkulltula;
+    static u32 lastUpdateKeaton = 0;
+
+    if (recomp_get_config_u32("show_soul_model")) {
+        // the gold skulltula model is too weird to draw so we have to fallback
+        if (drawId == GID_MISC_SOUL_GOLD_SKULLTULAS) {
+            GetItem_DrawSkullTokenGeneric(play, TOKEN_SOUL_MISC);
+            return;
+        }
+
+        GetItem_DrawFire(play, gGiSoulMiscFlameColor);
+
+        // TODO: simplify
+        // maybe a new function for (object_id, skel, anim, should_animate)
+        switch (drawId) {
+            case GID_MISC_SOUL_COW:
+                if (ObjLoad(play, 0x06, OBJECT_COW)) {
+                    if (!initializedCow) {
+                        initializedCow = true;
+                        SkelAnime_InitFlex(play, &skelAnimeCow, &gCowSkel, &gCowChewAnim, NULL, NULL, 0);
+                    }
+
+                    OPEN_DISPS(play->state.gfxCtx);
+
+                    Matrix_Translate(0.0f, -25.0f, 0.0f, MTXMODE_APPLY);
+                    Matrix_Scale(0.0075f, 0.0075f, 0.0075f, MTXMODE_APPLY);
+
+                    Gfx_SetupDL25_Opa(play->state.gfxCtx);
+                    SkelAnime_DrawFlexOpa(play, skelAnimeCow.skeleton, skelAnimeCow.jointTable, skelAnimeCow.dListCount, NULL, NULL, NULL);
+
+                    CLOSE_DISPS(play->state.gfxCtx);
+
+                    ObjUnload(play, 0x06, OBJECT_COW);
+                }
+                break;
+            case GID_MISC_SOUL_KEATON:
+                if (ObjLoad(play, 0x06, OBJECT_KITAN)) {
+                    if (!initializedKeaton) {
+                        initializedKeaton = true;
+                        SkelAnime_InitFlex(play, &skelAnimeKeaton, &object_kitan_Skel_007FA8, &object_kitan_Anim_002770, NULL, NULL, 0);
+                    }
+
+                    if (play != NULL && lastUpdateKeaton != play->state.frames) {
+                        lastUpdateKeaton = play->state.frames;
+                        SkelAnime_Update(&skelAnimeKeaton);
+                    }
+
+                    OPEN_DISPS(play->state.gfxCtx);
+
+                    Matrix_Translate(0.0f, -30.0f, 0.0f, MTXMODE_APPLY);
+                    Matrix_Scale(0.02f, 0.02f, 0.02f, MTXMODE_APPLY);
+
+                    Gfx_SetupDL25_Opa(play->state.gfxCtx);
+                    SkelAnime_DrawFlexOpa(play, skelAnimeKeaton.skeleton, skelAnimeKeaton.jointTable, skelAnimeKeaton.dListCount, NULL, NULL, NULL);
+
+                    CLOSE_DISPS(play->state.gfxCtx);
+
+                    ObjUnload(play, 0x06, OBJECT_KITAN);
+                }
+                break;
+            // case GID_MISC_SOUL_GOLD_SKULLTULAS:
+            //     // these draw way too weird to add in
+            //     break;
+        }
+    } else {
+        GetItem_DrawSkullTokenGeneric(play, TOKEN_SOUL_MISC);
     }
 }
 

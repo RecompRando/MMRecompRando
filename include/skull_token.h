@@ -99,10 +99,17 @@ Gfx gGiSkulltulaTokenFullDL[] = {
 typedef enum {
     TOKEN_SWAMP,
     TOKEN_OCEAN,
-    TOKEN_BOSS_SOUL
+    TOKEN_SOUL_BOSS,
+    TOKEN_SOUL_ENEMY,
+    TOKEN_SOUL_NPC,
+    TOKEN_SOUL_MISC,
+    TOKEN_SOUL_ABSURD
 } TokenType;
 
-Color_RGB8 gGiDefaultFlameColor = {0xFF, 0x00, 0x00};
+Color_RGB8 gGiDefaultFlameColor = {0xFF, 0x00, 0x00}; // also enemy souls
 Color_RGB8 gGiSwampFlameColor = {0x82, 0xFF, 0x80};
 Color_RGB8 gGiOceanFlameColor = {0x7D, 0x83, 0xFF};
-Color_RGB8 gGiSoulBossFlameColor = {0x64, 0x00, 0x64};
+Color_RGB8 gGiSoulNPCFlameColor = {0x00, 0xFF, 0x00};
+Color_RGB8 gGiSoulBossFlameColor = {0x88, 0x00, 0xFF};
+Color_RGB8 gGiSoulMiscFlameColor = {0x88, 0x88, 0x88};
+Color_RGB8 gGiSoulAbsurdFlameColor = {0x00, 0x00, 0x00};

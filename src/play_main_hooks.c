@@ -507,6 +507,17 @@ u32 rando_get_item_id(u32 location)
                         return GI_FROG_YELLOW + (item & 0xF);
                 }
                 return GI_NONE;
+            case 0x0A0000: // misc. souls
+                switch (item)
+                {
+                    case (AP_ITEM_ID_SOUL_MISC_COW):
+                        return GI_MISC_SOUL_COW;
+                    case (AP_ITEM_ID_SOUL_MISC_KEATON):
+                        return GI_MISC_SOUL_KEATON;
+                    case (AP_ITEM_ID_SOUL_MISC_GOLD_SKULLTULA):
+                        return GI_MISC_SOUL_GOLD_SKULLTULAS;
+                }
+                return GI_NONE;
             case 0x0B0000: // boss souls
                 switch (item)
                 {
