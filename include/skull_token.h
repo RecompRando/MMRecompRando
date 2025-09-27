@@ -103,6 +103,7 @@ typedef enum {
     TOKEN_SOUL_ENEMY,
     TOKEN_SOUL_NPC,
     TOKEN_SOUL_MISC,
+    TOKEN_SOUL_UTILITY,
     TOKEN_SOUL_ABSURD
 } TokenType;
 
@@ -112,4 +113,5 @@ Color_RGB8 gGiOceanFlameColor = {0x7D, 0x83, 0xFF};
 Color_RGB8 gGiSoulNPCFlameColor = {0x00, 0xFF, 0x00};
 Color_RGB8 gGiSoulBossFlameColor = {0x88, 0x00, 0xFF};
 Color_RGB8 gGiSoulMiscFlameColor = {0x88, 0x88, 0x88};
+Color_RGB8 gGiSoulUtilityFlameColor = {0xFF, 0xA5, 0x00};
 Color_RGB8 gGiSoulAbsurdFlameColor = {0x00, 0x00, 0x00};

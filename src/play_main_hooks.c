@@ -533,6 +533,12 @@ u32 rando_get_item_id(u32 location)
                         return GI_BOSS_SOUL_MAJORA;
                 }
                 return GI_NONE;
+            case 0x0C0000: // npc souls
+                return GI_NPC_GENERIC;
+            case 0x0D0000: // utility souls
+                return GI_UTILITY_GENERIC;
+            case 0x0E0000: // absurd souls
+                return GI_ABSURD_GENERIC;
         }
     }
     
