@@ -129,6 +129,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_SW:
         case ACTOR_EN_COW:
         case ACTOR_EN_KITAN:
+        case ACTOR_EN_BUTTE:
             if (rando_get_slotdata_u32("misc_souls")) {
                 // *should = rando_has_item(0x0A0000 | actor->id);
                 if (!rando_has_item(0x0A0000 | actor->id)) {
@@ -139,14 +140,72 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             break;
     }
 
-    switch(actor->id) {
-        // case ACTOR_BOSS_01:
-        // case ACTOR_BOSS_07:
-        // case ACTOR_EN_COW:
-        // case ACTOR_EN_GIRLA:
-            // *should = false;
-            // break;
-        default:
+    switch (actor->id) {
+        case ACTOR_EN_TAKARAYA:
+        case ACTOR_EN_JA:
+        case ACTOR_EN_DAIKU:
+        case ACTOR_EN_DAIKU2:
+        case ACTOR_EN_GURUGURU:
+        case ACTOR_EN_YB:
+        case ACTOR_EN_NB:
+        case ACTOR_EN_AN:
+        case ACTOR_EN_PM:
+        case ACTOR_EN_OSSAN:
+        case ACTOR_EN_HG:
+        case ACTOR_EN_SHN:
+        case ACTOR_EN_STONE_HEISHI:
+        case ACTOR_EN_GAKUFU:
+        case ACTOR_EN_PO_COMPOSER:
+        case ACTOR_EN_S_GORO:
+        case ACTOR_EN_FU:
+        case ACTOR_EN_SSH:
+        case ACTOR_EN_IG:
+        case ACTOR_EN_AOB_01:
+        case ACTOR_EN_JG:
+        case ACTOR_EN_TRT:
+        case ACTOR_EN_KENDO_JS:
+        case ACTOR_EN_GINKO_MAN:
+        case ACTOR_EN_RZ:
+        case ACTOR_EN_TOTO:
+        case ACTOR_EN_HS:
+        case ACTOR_EN_AL:
+        case ACTOR_EN_OSN:
+        case ACTOR_EN_ELFGRP:
+        case ACTOR_EN_BAL:
+        case ACTOR_EN_MK:
+        case ACTOR_EN_BJT:
+        case ACTOR_EN_AH:
+        case ACTOR_EN_TAB:
+        case ACTOR_EN_RECEPGIRL:
+        case ACTOR_EN_FSN:
+        case ACTOR_EN_BJI_01:
+        case ACTOR_EN_TEST3:
+        case ACTOR_EN_BABA:
+        case ACTOR_EN_SUTTARI:
+        case ACTOR_EN_KAKASI:
+        case ACTOR_EN_GUARD_NUTS:
+        case ACTOR_EN_LOOK_NUTS:
+        case ACTOR_EN_TRU:
+        case ACTOR_EN_ZOW:
+        case ACTOR_EN_ZOT:
+        case ACTOR_EN_ZOV:
+        // case ACTOR_EN_:
+
+
+            if (rando_get_slotdata_u32("npc_souls")) {
+                *should = rando_has_item(0x0C0000 | actor->id);
+                if (!rando_has_item(0x0C0000 | actor->id)) {
+                    *should = false;
+                }
+                return;
+            }
+            break;
+    }
+
+    switch (actor->id) {
+        case ACTOR_EN_AKINDONUTS:
+            recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
+            *should = false;
             break;
     }
 }

@@ -80,7 +80,7 @@ void randoYAMLGenerateCallback(RecompuiResource button, const RecompuiEventData*
             if (!option->is_callback) {
                 switch (option->type) {
                     case OPTION_BOOL:
-                        rando_yaml_printf("  %s:\n    '%s': 1\n", option->option_id, recompui_get_input_value_u32(option->input_element) ? "true" : "false");
+                        rando_yaml_printf("  %s:\n    %s: 1\n", option->option_id, recompui_get_input_value_u32(option->input_element) ? "true" : "false");
                         break;
                     case OPTION_RADIO:
                         {
@@ -485,13 +485,12 @@ void randoCreateYamlConfigMenu() {
     yaml_config_menu.num_options = 0;
     randoCreateRadioOption(&yaml_config_menu, "accessibility", "Accessibility:", rando_accessibility_options, ARRAY_COUNT(rando_accessibility_options), RANDO_ACCESSABILITY_FULL);
     randoCreateRadioOption(&yaml_config_menu, "logic_difficulty", "Logic Difficulty:", rando_logic_difficulty_options, ARRAY_COUNT(rando_logic_difficulty_options), RANDO_LOGIC_DIFFICULTY_NORMAL);
+    randoCreateIntSliderOption(&yaml_config_menu, "moon_remains_required", "Moon Boss Remains Required:", 1, 4, 1, 4);
+    randoCreateIntSliderOption(&yaml_config_menu, "majora_remains_required", "Majora Boss Remains Required:", 1, 4, 1, 4);
     randoCreateBoolPropOption(&yaml_config_menu, "camc", "Chests Match Contents:", true);
     randoCreateBoolPropOption(&yaml_config_menu, "swordless", "Start Swordless:", false);
     randoCreateBoolPropOption(&yaml_config_menu, "shieldless", "Start Shieldless:", false);
     randoCreateBoolPropOption(&yaml_config_menu, "start_with_soaring", "Start with Song of Soaring:", true);
-    // randoCreateBoolPropOption(&yaml_config_menu, "", "Starting Hearts are Random:", false);
-    // randoCreateIntSliderOption(&yaml_config_menu, "", "Random Starting Hearts Segments - Minimum:", 1, 12, 1, 4);
-    // randoCreateIntSliderOption(&yaml_config_menu, "", "Random Starting Hearts Segments - Maximum:", 1, 12, 1, 12);
     randoCreateIntSliderOption(&yaml_config_menu, "starting_hearts", "Starting Heart Segments:", 4, 12, 1, 12);
     randoCreateRadioOption(&yaml_config_menu, "starting_hearts_are_containers_or_pieces", "Unused Starting Hearts are Distributed as:", rando_starting_hearts_type_options, ARRAY_COUNT(rando_starting_hearts_type_options), RANDO_STARTING_HEARTS_ARE_CONTAINERS);
     randoCreateRadioOption(&yaml_config_menu, "shuffle_regional_maps", "Shuffle Regional Maps:", rando_shuffle_regional_maps_options, ARRAY_COUNT(rando_shuffle_regional_maps_options), RANDO_SHUFFLE_REGIONAL_MAPS_VANILLA);
@@ -504,7 +503,10 @@ void randoCreateYamlConfigMenu() {
     randoCreateBoolPropOption(&yaml_config_menu, "scrubsanity", "Scrub-Sanity:", false);
     randoCreateBoolPropOption(&yaml_config_menu, "cowsanity", "Cow-Sanity:", false);
     randoCreateBoolPropOption(&yaml_config_menu, "keysanity", "Key-Sanity:", false);
+    randoCreateBoolPropOption(&yaml_config_menu, "bosskeysanity", "Boss-Key-Sanity:", false);
     randoCreateBoolPropOption(&yaml_config_menu, "fairysanity", "Fairy-Sanity:", false);
+    randoCreateBoolPropOption(&yaml_config_menu, "curiostity_shop_trades", "Curiosity Shop Trades:", false);
+    randoCreateBoolPropOption(&yaml_config_menu, "intro_checks", "Intro Checks:", false);
     randoCreateBoolPropOption(&yaml_config_menu, "start_with_consumables", "Start With Consumables:", true);
     randoCreateBoolPropOption(&yaml_config_menu, "permanent_chateau_romani", "Permanent Chateau Romani:", true);
     randoCreateBoolPropOption(&yaml_config_menu, "start_with_inverted_time", "Start With Inverted Time:", true);
