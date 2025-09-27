@@ -189,11 +189,10 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_ZOW:
         case ACTOR_EN_ZOT:
         case ACTOR_EN_ZOV:
-        // case ACTOR_EN_:
-
-
+        case ACTOR_EN_LIFT_NUTS:
+        case ACTOR_EN_KUJIYA:
             if (rando_get_slotdata_u32("npc_souls")) {
-                *should = rando_has_item(0x0C0000 | actor->id);
+                // *should = rando_has_item(0x0C0000 | actor->id);
                 if (!rando_has_item(0x0C0000 | actor->id)) {
                     *should = false;
                 }
