@@ -58,6 +58,9 @@ void GetItem_DrawOwlStatue(PlayState* play);
 void GetItem_DrawFrog(PlayState* play, s16 drawId);
 void GetItem_DrawSoulBoss(PlayState* play, s16 drawId);
 void GetItem_DrawSoulMisc(PlayState* play, s16 drawId);
+void GetItem_DrawSoulNPC(PlayState* play, s16 drawId);
+void GetItem_DrawSoulUtility(PlayState* play, s16 drawId);
+void GetItem_DrawSoulAbsurd(PlayState* play, s16 drawId);
 
 extern Gfx gGiEmptyBottleCorkDL[];
 extern Gfx gGiEmptyBottleGlassDL[];
@@ -895,7 +898,17 @@ RECOMP_PATCH void GetItem_Draw(PlayState* play, s16 drawId) {
         case GID_MISC_SOUL_COW:
         case GID_MISC_SOUL_KEATON:
         case GID_MISC_SOUL_GOLD_SKULLTULAS:
+        case GID_MISC_SOUL_BUTTERFLY:
             GetItem_DrawSoulMisc(play, drawId);
+            return;
+        case GID_NPC_SOUL_GENERIC:
+            GetItem_DrawSoulNPC(play, drawId);
+            return;
+        case GID_UTILITY_SOUL_GENERIC:
+            GetItem_DrawSoulUtility(play, drawId);
+            return;
+        case GID_ABSURD_SOUL_GENERIC:
+            GetItem_DrawSoulAbsurd(play, drawId);
             return;
     }
     sDrawItemTable_new[drawId].drawFunc(play, drawId);
@@ -1485,14 +1498,6 @@ void GetItem_DrawSoulMisc(PlayState* play, s16 drawId) {
     static u32 lastUpdateKeaton = 0;
 
     if (recomp_get_config_u32("show_soul_model")) {
-        // the gold skulltula model is too weird to draw so we have to fallback
-        if (drawId == GID_MISC_SOUL_GOLD_SKULLTULAS) {
-            GetItem_DrawSkullTokenGeneric(play, TOKEN_SOUL_MISC);
-            return;
-        }
-
-        GetItem_DrawFire(play, gGiSoulMiscFlameColor);
-
         // TODO: simplify
         // maybe a new function for (object_id, skel, anim, should_animate)
         switch (drawId) {
@@ -1544,9 +1549,36 @@ void GetItem_DrawSoulMisc(PlayState* play, s16 drawId) {
             // case GID_MISC_SOUL_GOLD_SKULLTULAS:
             //     // these draw way too weird to add in
             //     break;
+            default: // fallback
+                GetItem_DrawSkullTokenGeneric(play, TOKEN_SOUL_MISC);
+                return;
         }
+        GetItem_DrawFire(play, gGiSoulMiscFlameColor);
     } else {
         GetItem_DrawSkullTokenGeneric(play, TOKEN_SOUL_MISC);
+    }
+}
+
+void GetItem_DrawSoulNPC(PlayState* play, s16 drawId) {
+    if (recomp_get_config_u32("show_soul_model")) {
+        GetItem_DrawSkullTokenGeneric(play, TOKEN_SOUL_NPC);
+    } else {
+        GetItem_DrawSkullTokenGeneric(play, TOKEN_SOUL_NPC);
+    }
+}
+
+void GetItem_DrawSoulUtility(PlayState* play, s16 drawId) {
+    if (recomp_get_config_u32("show_soul_model")) {
+        GetItem_DrawSkullTokenGeneric(play, TOKEN_SOUL_UTILITY);
+    } else {
+        GetItem_DrawSkullTokenGeneric(play, TOKEN_SOUL_UTILITY);
+    }
+}
+void GetItem_DrawSoulAbsurd(PlayState* play, s16 drawId) {
+    if (recomp_get_config_u32("show_soul_model")) {
+        GetItem_DrawSkullTokenGeneric(play, TOKEN_SOUL_ABSURD);
+    } else {
+        GetItem_DrawSkullTokenGeneric(play, TOKEN_SOUL_ABSURD);
     }
 }
 
