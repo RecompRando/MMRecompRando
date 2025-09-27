@@ -703,6 +703,14 @@ void update_rando(PlayState* play) {
                         case AP_ITEM_ID_KEY_SMALL_STONETOWER:
                             continue;
                     }
+                    switch (item_id & 0xFF0000) {
+                        case 0x0A0000:
+                        case 0x0B0000:
+                        case 0x0C0000:
+                        case 0x0D0000:
+                        case 0x0E0000:
+                            continue;
+                    }
                 }
                 randoItemGive(item_id);
             }
