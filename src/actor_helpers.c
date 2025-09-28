@@ -154,7 +154,6 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_HG:
         case ACTOR_EN_SHN:
         case ACTOR_EN_STONE_HEISHI:
-        case ACTOR_EN_GAKUFU:
         case ACTOR_EN_PO_COMPOSER:
         case ACTOR_EN_S_GORO:
         case ACTOR_EN_FU:
@@ -202,6 +201,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
     }
     switch (actor->id) {
         case ACTOR_EN_GAKUFU:
+            recomp_printf("actor id: 0x%02X 0x%06X %d\n", actor->id, 0x0E0000 | actor->id, rando_has_item(0x0E0000 | actor->id));
             if (rando_get_slotdata_u32("absurd_souls")) {
                 // *should = rando_has_item(0x0E0000 | actor->id);
                 if (!rando_has_item(0x0E0000 | actor->id)) {
