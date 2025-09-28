@@ -191,8 +191,6 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_ZOV:
         case ACTOR_EN_KUJIYA:
         case ACTOR_EN_LIFT_NUTS:
-
-
             if (rando_get_slotdata_u32("npc_souls")) {
                 // *should = rando_has_item(0x0C0000 | actor->id);
                 if (!rando_has_item(0x0C0000 | actor->id)) {
@@ -202,6 +200,30 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             }
             break;
     }
+    switch (actor->id) {
+        case ACTOR_EN_GAKUFU:
+            if (rando_get_slotdata_u32("absurd_souls")) {
+                // *should = rando_has_item(0x0E0000 | actor->id);
+                if (!rando_has_item(0x0E0000 | actor->id)) {
+                    *should = false;
+                }
+                return;
+            }
+            break;
+    }
+    
+    switch (actor->id) {
+        case ACTOR_EN_PST:
+            if (rando_get_slotdata_u32("utility_souls")) {
+                // *should = rando_has_item(0x0D0000 | actor->id);
+                if (!rando_has_item(0x0D0000 | actor->id)) {
+                    *should = false;
+                }
+                return;
+            }
+            break;
+    }
+
 
     // switch (actor->id) {
     //     case ACTOR_EN_AKINDONUTS:

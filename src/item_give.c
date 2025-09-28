@@ -2032,6 +2032,13 @@ u8 randoItemGive(u32 gi) {
                     break;
             }
             return ITEM_NONE;
+        case 0x0A0000:
+        case 0x0B0000:
+        case 0x0C0000:
+        case 0x0D0000:
+        case 0x0E0000:
+        case 0x0F0000:
+            return ITEM_NONE;
         default:
             if (gi == 0) {
                 return ITEM_NONE;
