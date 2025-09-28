@@ -198,7 +198,19 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 return;
             }
             break;
+        case ACTOR_EN_DT:
+        case ACTOR_EN_MUTO:
+        case ACTOR_EN_BAISEN:
+            if (rando_get_slotdata_u32("npc_souls")) {
+                // *should = rando_has_item(0x0C0000 | ACTOR_EN_DT);
+                if (!rando_has_item(0x0C0000 | ACTOR_EN_DT)) {
+                    *should = false;
+                }
+                return;
+            }
+            break;
     }
+
     switch (actor->id) {
         case ACTOR_EN_GAKUFU:
             recomp_printf("actor id: 0x%02X 0x%06X %d\n", actor->id, 0x0E0000 | actor->id, rando_has_item(0x0E0000 | actor->id));
