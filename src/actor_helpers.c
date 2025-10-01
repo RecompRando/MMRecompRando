@@ -194,6 +194,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_DG:
         case ACTOR_EN_STOP_HEISHI:
         case ACTOR_DM_STK:
+        case ACTOR_EN_GB2:
             if (rando_get_slotdata_u32("npc_souls")) {
                 // *should = rando_has_item(0x0C0000 | actor->id);
                 if (!rando_has_item(0x0C0000 | actor->id)) {
@@ -214,7 +215,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 return;
             }
             break;
-        case ACTOR_EN_AKINDONUTS:
+        case ACTOR_EN_AKINDONUTS: // Council Soul
         case ACTOR_EN_SELLNUTS:
         case ACTOR_EN_SCOPENUTS:
             if (rando_get_slotdata_u32("npc_souls")) {
@@ -225,7 +226,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 return;
             }
             break;
-        case ACTOR_EN_BOMJIMA:
+        case ACTOR_EN_BOMJIMA: //Bombers Soul
         case ACTOR_EN_BOMBERS:
         case ACTOR_EN_BOMBERS2:
         case ACTOR_EN_BOMJIMB:
@@ -238,11 +239,41 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 return;
             }
             break;
-        case ACTOR_EN_TOTO:
+        case ACTOR_EN_TOTO: //Toto and Gorman (To prevent Gorman Softlock)
         case ACTOR_EN_GM:
             if (rando_get_slotdata_u32("npc_souls")) {
                 // *should = rando_has_item(0x0C0000 | ACTOR_EN_TOTO);
                 if (!rando_has_item(0x0C0000 | ACTOR_EN_TOTO)) {
+                    *should = false;
+                }
+                return;
+            }
+            break;
+        case ACTOR_EN_JGAME_TSN: //Fisherman
+        case ACTOR_EN_TSN:
+            if (rando_get_slotdata_u32("npc_souls")) {
+                // *should = rando_has_item(0x0C0000 | ACTOR_EN_TOTO);
+                if (!rando_has_item(0x0C0000 | ACTOR_EN_TSN)) {
+                    *should = false;
+                }
+                return;
+            }
+            break;
+        case ACTOR_EN_SKB:
+        case ACTOR_EN_RAIL_SKB: // Graveyard Stalchildren
+            if (rando_get_slotdata_u32("npc_souls")) {
+                // *should = rando_has_item(0x0C0000 | ACTOR_EN_TOTO);
+                if (!rando_has_item(0x0C0000 | ACTOR_EN_SKB)) {
+                    *should = false;
+                }
+                return;
+            }
+            break;
+        case ACTOR_EN_RAILGIBUD: //Gibdo Soul
+        case ACTOR_EN_TALK_GIBUD:
+            if (rando_get_slotdata_u32("npc_souls")) {
+                // *should = rando_has_item(0x0C0000 | ACTOR_EN_BOMJIMA);
+                if (!rando_has_item(0x0C0000 | ACTOR_EN_TALK_GIBUD)) {
                     *should = false;
                 }
                 return;
@@ -274,7 +305,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             break;
     }
     switch (actor->id) {
-        case ACTOR_EN_GO:
+        //case ACTOR_EN_GB2:
             recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
             *should = false;
             break;
