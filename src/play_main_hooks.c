@@ -359,6 +359,15 @@ ItemId randoConvertItemId(u32 ap_item_id) {
             return ITEM_OCARINA_FAIRY; // could use music notes instead, but this is funnier
         case 0x090000:
             return ap_item_id & 0xFF;
+        case 0x0A0000:
+        case 0x0B0000:
+        case 0x0C0000:
+        case 0x0D0000:
+        case 0x0E0000:
+        case 0x0F0000:
+            return ITEM_BLUE_FIRE; // temp
+        case 0xFF0000:
+            return ITEM_MASK_DON_GERO; // temp
         case 0x000000:
             switch (ap_item_id & 0xFF) {
                 case GI_TRUE_SKULL_TOKEN:
@@ -709,6 +718,7 @@ void update_rando(PlayState* play) {
                         case 0x0C0000:
                         case 0x0D0000:
                         case 0x0E0000:
+                        case 0x0F0000:
                             continue;
                     }
                 }
