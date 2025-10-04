@@ -44,6 +44,7 @@ void GetItem_DrawBossKeyRecolor(PlayState* play, void* dl0, void* dl1, s16 drawI
 void GetItem_DrawCompassRecolor(PlayState* play, void* dl0, void* dl1, s16 drawId);
 void GetItem_DrawXlu01DL(PlayState* play, void* dl0, void* dl1);
 void GetItem_DrawAPFiller(PlayState* play, s16 drawId);
+void GetItem_DrawStrayFairy(PlayState* play, s16 drawId);
 
 extern Gfx gGiEmptyBottleCorkDL[];
 extern Gfx gGiEmptyBottleGlassDL[];
@@ -807,6 +808,12 @@ RECOMP_PATCH void GetItem_Draw(PlayState* play, s16 drawId) {
         case GID_RUPOOR:
             GetItem_DrawRupeeDL(play, gGiRupeeInnerDL, gGiRupoorInnerColorDL, gGiRupeeOuterDL, gGiRupoorOuterColorDL);
             return;
+        case GID_SF_CLOCKTOWN:
+        case GID_SF_WOODFALL:
+        case GID_SF_SNOWHEAD:
+        case GID_SF_GREATBAY:
+        case GID_SF_STONETOWER:
+            GetItem_DrawStrayFairy(play, drawId);
     }
     sDrawItemTable_new[drawId].drawFunc(play, drawId);
 }
@@ -866,6 +873,14 @@ void GetItem_DrawDynamic(PlayState* play, void* objectSegment, s16 drawId) {
                 gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
                 break;
             case GID_RUPOOR:
+                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
+                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
+                break;
+            case GID_SF_CLOCKTOWN:
+            case GID_SF_WOODFALL:
+            case GID_SF_SNOWHEAD:
+            case GID_SF_GREATBAY:
+            case GID_SF_STONETOWER:
                 gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
                 gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
                 break;
@@ -1158,6 +1173,96 @@ void GetItem_DrawXlu01DL(PlayState* play, void* dl0, void* dl1) {
     gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
     gSPDisplayList(POLY_XLU_DISP++, dl0);
     gSPDisplayList(POLY_XLU_DISP++, dl1);
+
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
+extern AnimatedMaterial gStrayFairyWoodfallTexAnim[];
+extern AnimatedMaterial gStrayFairySnowheadTexAnim[];
+extern AnimatedMaterial gStrayFairyGreatBayTexAnim[];
+extern AnimatedMaterial gStrayFairyStoneTowerTexAnim[];
+extern AnimatedMaterial gStrayFairyClockTownTexAnim[];
+extern FlexSkeletonHeader gStrayFairySkel;
+extern AnimationHeader gStrayFairyFlyingAnim;
+
+#define STRAY_FAIRY_LIMB_RIGHT_FACING_HEAD 0x01
+#define STRAY_FAIRY_LIMB_LEFT_FACING_HEAD 0x09
+
+s32 GetItem_StrayFairyOverrideLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot, Actor* thisx, Gfx** gfx) {
+    static u8 direction = 0;
+
+    // 1% chance for fairy's head to change direction
+    if (limbIndex == STRAY_FAIRY_LIMB_RIGHT_FACING_HEAD) {
+        if (Rand_ZeroOne() > 0.99f) {
+            direction += 1;
+            if (direction > 1) {
+                direction = 0;
+            }
+        }
+    }
+
+    if (direction > 0) {
+        if (limbIndex == STRAY_FAIRY_LIMB_LEFT_FACING_HEAD) {
+            *dList = NULL;
+        }
+    } else if (limbIndex == STRAY_FAIRY_LIMB_RIGHT_FACING_HEAD) {
+        *dList = NULL;
+    }
+
+    return false;
+}
+
+void GetItem_DrawStrayFairy(PlayState* play, s16 drawId) {
+    static bool initialized = false;
+    static SkelAnime skelAnime;
+    static u32 lastUpdate = 0;
+    static s16 lastScene; // rough fix for skelAnime unloading
+    
+    if (!initialized || lastScene != play->sceneId) {
+        initialized = true;
+        lastScene = play->sceneId;
+        SkelAnime_InitFlex(play, &skelAnime, &gStrayFairySkel, &gStrayFairyFlyingAnim, NULL, NULL, 0xA);
+    }
+
+    if (play != NULL && lastUpdate != play->state.frames) {
+        lastUpdate = play->state.frames;
+        SkelAnime_Update(&skelAnime);
+    }
+    
+    OPEN_DISPS(play->state.gfxCtx);
+
+    Matrix_Scale(0.025f, 0.025f, 0.025f, MTXMODE_APPLY);
+
+    Gfx_SetupDL25_Xlu(play->state.gfxCtx);
+
+    switch (drawId) {
+        case GID_SF_WOODFALL:
+            AnimatedMat_Draw(play, Lib_SegmentedToVirtual(gStrayFairyWoodfallTexAnim));
+            break;
+
+        case GID_SF_SNOWHEAD:
+            AnimatedMat_Draw(play, Lib_SegmentedToVirtual(gStrayFairySnowheadTexAnim));
+            break;
+
+        case GID_SF_GREATBAY:
+            AnimatedMat_Draw(play, Lib_SegmentedToVirtual(gStrayFairyGreatBayTexAnim));
+            break;
+
+        case GID_SF_STONETOWER:
+            AnimatedMat_Draw(play, Lib_SegmentedToVirtual(gStrayFairyStoneTowerTexAnim));
+            break;
+
+        default: // GID_SF_CLOCKTOWN
+            AnimatedMat_Draw(play, Lib_SegmentedToVirtual(gStrayFairyClockTownTexAnim));
+            break;
+    }
+
+    Matrix_Mult(&play->billboardMtxF, MTXMODE_APPLY);
+    Matrix_ReplaceRotation(&play->billboardMtxF);
+
+    POLY_XLU_DISP =
+        SkelAnime_DrawFlex(play, skelAnime.skeleton, skelAnime.jointTable, skelAnime.dListCount,
+                           GetItem_StrayFairyOverrideLimbDraw, NULL, NULL, POLY_XLU_DISP);
 
     CLOSE_DISPS(play->state.gfxCtx);
 }
