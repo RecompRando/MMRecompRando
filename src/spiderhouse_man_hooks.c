@@ -4,46 +4,8 @@
 #include "apcommon.h"
 
 #define STH_LIMB_MAX 0x10
-
-struct EnSth;
-
-typedef void (*EnSthActionFunc)(struct EnSth*, PlayState*);
-
-typedef enum {
-    /* 1 */ STH_TYPE_UNUSED_1 = 1,
-    /* 2 */ STH_TYPE_SWAMP_SPIDER_HOUSE_CURED, // cursed is EnSsh
-    /* 3 */ STH_TYPE_MOON_LOOKING, // South Clock Town, looking up at the moon
-    /* 4 */ STH_TYPE_OCEANSIDE_SPIDER_HOUSE_GREET, // looking for shelter
-    /* 5 */ STH_TYPE_OCEANSIDE_SPIDER_HOUSE_PANIC // shelter was not enough
-    // Other values: Actor will spawn and animate with arm waving, no further interaction.
-} EnSthType;
-
-// Note: Vanilla types usually have 0xFEXX typing, but this upper section is unused by the code, reason unknown
-#define STH_GET_TYPE(thisx) ((thisx)->params & 0xF)
-#define STH_GET_SWAMP_BODY(thisx) ((thisx)->params & 0x100)
-
-// The get item ID for the reward for Oceanside Spider House (wallet, or rupees) is set here
-#define STH_GI_ID(thisx) ((thisx)->home.rot.z)
-
-// This actor has its own flags system
-#define STH_FLAG_DRAW_MASK_OF_TRUTH             (1 << 0)
-#define STH_FLAG_OCEANSIDE_SPIDER_HOUSE_GREET   (1 << 1)
-#define STH_FLAG_SWAMP_SPIDER_HOUSE_SAVED       (1 << 2) // set, but not read 
-#define STH_FLAG_DISABLE_HEAD_TRACK             (1 << 3)
-
-typedef struct EnSth {
-    /* 0x000 */ Actor actor;
-    /* 0x144 */ ColliderCylinder collider;
-    /* 0x190 */ SkelAnime skelAnime;
-    /* 0x1D4 */ Vec3s jointTable[STH_LIMB_MAX];
-    /* 0x234 */ Vec3s morphTable[STH_LIMB_MAX];
-    /* 0x294 */ Vec3s headRot;
-    /* 0x29A */ s16 animIndex;
-    /* 0x29C */ u16 sthFlags;
-    /* 0x29E */ u8 mainObjectSlot;
-    /* 0x29F */ u8 maskOfTruthObjectSlot;
-    /* 0x2A0 */ EnSthActionFunc actionFunc;
-} EnSth; // size = 0x2A4
+#include "overlays/actors/ovl_En_Sth/z_en_sth.h"
+#include "overlays/actors/ovl_En_Ssh/z_en_ssh.h"
 
 typedef enum EnSthAnimation {
     /* -1 */ STH_ANIM_NONE = -1,
@@ -58,6 +20,40 @@ typedef enum EnSthAnimation {
     /*  8 */ STH_ANIM_MAX          // set in init, not an actual index to the array
 } EnSthAnimation;
 
+u32 savedTokenCount;
+
+// sets current skull token count to 30 if it exceeds set requirement
+void Inventory_FakeSkullTokenCount(s16 sceneIndex) {
+    s16 currentTokens;
+    savedTokenCount = gSaveContext.save.saveInfo.skullTokenCount;
+    
+    if (sceneIndex == SCENE_KINSTA1) { // Swamp Spider House
+        currentTokens = (gSaveContext.save.saveInfo.skullTokenCount & 0xFFFF0000) >> 0x10;
+        if (currentTokens >= (s16) rando_get_slotdata_u32("required_skull_tokens")) {
+            gSaveContext.save.saveInfo.skullTokenCount |= 30 << 0x10;
+        }
+    } else { // Ocean Spider House
+        currentTokens = gSaveContext.save.saveInfo.skullTokenCount & 0xFFFF;
+        if (currentTokens >= (s16) rando_get_slotdata_u32("required_skull_tokens")) {
+            gSaveContext.save.saveInfo.skullTokenCount |= 30;
+        }
+    }
+}
+
+// cursed swamp spider house guy
+RECOMP_HOOK("EnSsh_Init")
+void OnEnSsh_Init(Actor* thisx, PlayState* play) {
+    // TODO: replace swamp guy's mask with its randomzied reward
+    // fake skull token count for lower requirements
+    Inventory_FakeSkullTokenCount(play->sceneId);
+}
+
+RECOMP_HOOK_RETURN("EnSsh_Init")
+void AfterEnSsh_Init() {
+    gSaveContext.save.saveInfo.skullTokenCount = savedTokenCount; // revert skull token count
+}
+
+// standard/cured spider house guy
 RECOMP_HOOK("EnSth_Init")
 void OnEnSth_Init(Actor* thisx, PlayState* play) {
     // TODO: replace swamp guy's mask with its randomzied reward (in a return hook?)
@@ -66,6 +62,14 @@ void OnEnSth_Init(Actor* thisx, PlayState* play) {
     if (!rando_location_is_checked(GI_WALLET_GIANT)) {
         CLEAR_WEEKEVENTREG(WEEKEVENTREG_OCEANSIDE_SPIDER_HOUSE_BUYER_MOVED_IN);
     }
+
+    // fake skull token count for lower requirements
+    Inventory_FakeSkullTokenCount(play->sceneId);
+}
+
+RECOMP_HOOK_RETURN("EnSth_Init")
+void AfterEnSth_Init() {
+    gSaveContext.save.saveInfo.skullTokenCount = savedTokenCount; // revert skull token count
 }
 
 void EnSth_ChangeAnim(EnSth* this, s16 animIndex);
@@ -86,7 +90,7 @@ RECOMP_PATCH void EnSth_GetInitialSwampSpiderHouseText(EnSth* this, PlayState* p
             nextTextId = 0x918; // I've had enough of this, going home
         }
         EnSth_ChangeAnim(this, STH_ANIM_TALK);
-    } else if (Inventory_GetSkullTokenCount(0x27) >= 30) {
+    } else if (Inventory_GetSkullTokenCount(SCENE_KINSTA1) >= (s16) rando_get_slotdata_u32("required_skull_tokens")) {
         if (rando_location_is_checked(GI_MASK_TRUTH)) {
             this->sthFlags |= STH_FLAG_SWAMP_SPIDER_HOUSE_SAVED;
             nextTextId = 0x919; // I've been saved!
@@ -128,4 +132,30 @@ RECOMP_PATCH void EnSth_GiveOceansideSpiderHouseReward(EnSth* this, PlayState* p
         }
         Actor_OfferGetItem(&this->actor, play, STH_GI_ID(&this->actor), 10000.0f, 500.0f);
     }
+}
+
+void EnSth_Update(Actor* thisx, PlayState* play);
+void EnSth_Draw(Actor* thisx, PlayState* play);
+
+// could honestly also work as a patch
+RECOMP_HOOK("EnSth_UpdateOceansideSpiderHouseWaitForTokens")
+void EnSth_UpdateOceansideSpiderHouseWaitForTokensRando(Actor* thisx, PlayState* play) {
+    EnSth* this = ((EnSth*)thisx);
+
+    if (Inventory_GetSkullTokenCount(play->sceneId) >= (s16) rando_get_slotdata_u32("required_skull_tokens")) {
+        this->actor.update = EnSth_Update;
+        this->actor.draw = EnSth_Draw;
+        this->actor.flags |= ACTOR_FLAG_TARGETABLE;
+    }
+}
+
+RECOMP_HOOK("EnSth_UpdateWaitForObject")
+void OnEnSth_UpdateWaitForObject(Actor* thisx, PlayState* play) {
+    // fake skull token count for lower requirements
+    Inventory_FakeSkullTokenCount(play->sceneId);
+}
+
+RECOMP_HOOK_RETURN("EnSth_UpdateWaitForObject")
+void AfterEnSth_UpdateWaitForObject() {
+    gSaveContext.save.saveInfo.skullTokenCount = savedTokenCount; // revert skull token count
 }
