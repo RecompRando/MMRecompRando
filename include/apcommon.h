@@ -298,6 +298,8 @@ void randoCreateAPConnectMenu();
 void randoShowAPConnectMenu();
 void randoStart(bool multiworld);
 
+void randoScout();
+
 void notificationUpdateCycle();
 void randoCreateNotificationContainer();
 void randoEmitRecieveNotification(const char* item_name, const char* from_name, const ItemId item, RandoItemClassification item_class);

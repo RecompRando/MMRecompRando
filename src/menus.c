@@ -84,6 +84,7 @@ void randoStart(bool multiworld) {
     rando_started = true;
     is_multiworld = multiworld;
     rando_on_connect();
+    randoScout();
 }
 
 // Startup Menu

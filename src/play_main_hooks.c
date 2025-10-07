@@ -6,6 +6,8 @@
 #include "apcommon.h"
 #include "yaml_generation.h"
 
+#include "../mm-decomp/src/overlays/actors/ovl_En_GirlA/z_en_girla.h"
+
 #define LOCATION_INVENTORY_SWORD GI_SWORD_KOKIRI
 #define LOCATION_INVENTORY_SHIELD GI_SHIELD_HERO
 
@@ -49,6 +51,107 @@ void init_rando()
     randoCreateAPConnectMenu();
 
     randoCreateNotificationContainer();
+}
+
+void randoScout() {
+    rando_queue_scouts_all();
+
+    if (rando_get_slotdata_u32("skullsanity") == 2)
+    {
+        for (int i = 0x00; i <= 0x1E; ++i)
+        {
+            if (i == 0x03)
+            {
+                continue;
+            }
+            
+            u32 location_id = 0x062700 | i;
+            rando_remove_queued_scout(location_id);
+        }
+        for (int i = 0x01; i <= 0x1E; ++i)
+        {
+            u32 location_id = 0x062800 | i;
+            rando_remove_queued_scout(location_id);
+        }
+    }
+    
+    for (u32 i = rando_get_slotdata_u32("starting_heart_locations"); i < 8; ++i)
+    {
+        u32 location_id = 0x0D0000 | i;
+        rando_remove_queued_scout(location_id);
+    }
+
+    if (rando_get_slotdata_u32("cowsanity") == 0)
+    {
+        for (int i = 0x10; i <= 0x17; ++i)
+        {
+            u32 location_id = 0xBEEF00 | i;
+            rando_remove_queued_scout(location_id);
+        }
+    }
+    
+    if (rando_get_slotdata_u32("scrubsanity") == 0)
+    {
+        rando_remove_queued_scout(0x090100 | GI_MAGIC_BEANS);
+        rando_remove_queued_scout(0x090100 | GI_BOMB_BAG_40);
+        rando_remove_queued_scout(0x090100 | GI_POTION_GREEN);
+        rando_remove_queued_scout(0x090100 | GI_POTION_BLUE);
+    }
+    
+    if (rando_get_slotdata_u32("shopsanity") != 2)
+    {
+        rando_remove_queued_scout(0x05481E);
+        rando_remove_queued_scout(0x024234);
+        
+        if (rando_get_slotdata_u32("shopsanity") == 1)
+        {
+            for (int i = SI_FAIRY_2; i <= SI_POTION_RED_3; ++i)
+            {
+                u32 location_id = 0x090000 | i;
+                rando_remove_queued_scout(location_id);
+            }
+            
+            rando_remove_queued_scout(0x090000 | SI_BOMB_3);
+            rando_remove_queued_scout(0x090000 | SI_ARROWS_SMALL_3);
+            rando_remove_queued_scout(0x090000 | SI_POTION_RED_6);
+        }
+        else
+        {
+            for (int i = SI_POTION_RED_1; i <= SI_POTION_RED_6; ++i)
+            {
+                if (i == SI_BOMB_BAG_20_1 || i == SI_BOMB_BAG_40)
+                {
+                    continue;
+                }
+                
+                u32 location_id = 0x090000 | i;
+                rando_remove_queued_scout(location_id);
+            }
+            
+            rando_remove_queued_scout(0x090013);
+            rando_remove_queued_scout(0x090015);
+            
+            rando_remove_queued_scout(0x026392);
+            rando_remove_queued_scout(0x090000 | GI_CHATEAU);
+            rando_remove_queued_scout(0x006792);
+            rando_remove_queued_scout(0x000091);
+        }
+    }
+    
+    if (rando_get_slotdata_u32("curiostity_shop_trades") == 0)
+    {
+        rando_remove_queued_scout(0x07C402);
+        rando_remove_queued_scout(0x07C404);
+        rando_remove_queued_scout(0x07C405);
+        rando_remove_queued_scout(0x07C407);
+    }
+    
+    if (rando_get_slotdata_u32("intro_checks") == 0)
+    {
+        rando_remove_queued_scout(0x061A00);
+    }
+
+    rando_send_queued_scouts(0);
 }
 
 s8 giToItemId[GI_MAX] = {
