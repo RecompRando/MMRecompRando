@@ -92,7 +92,7 @@ void Setup_InitImpl(SetupState* this);
 
 void RandoMenu_Main(GameState* thisx) {
     SetupState* this = (SetupState*)thisx;
-    
+
     notificationUpdateCycle();
 
     // Perform the original setup init after connection.
