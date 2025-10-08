@@ -99,7 +99,16 @@ native_libraries = [
                                     "rando_get_location_item_name",
                                     "rando_get_last_location_sent",
                                     "rando_get_saved_apconnect",
-                                    "rando_set_saved_apconnect"] }
+                                    "rando_set_saved_apconnect",
+                                    "rando_get_slotdata_u32",
+                                    "rando_get_slotdata_raw_o32",
+                                    "rando_access_slotdata_raw_u32_o32",
+                                    "rando_access_slotdata_raw_array_o32",
+                                    "rando_access_slotdata_raw_dict_o32",
+                                    "rando_queue_scout",
+                                    "rando_queue_scouts_all",
+                                    "rando_remove_queued_scout",
+                                    "rando_send_queued_scouts"] }
 ]
 
 # Inputs to the mod tool.
