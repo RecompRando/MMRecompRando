@@ -272,3 +272,98 @@ RECOMP_PATCH void func_808B8C48(DoorWarp1* this, PlayState* play) {
         DoorWarp1_SetupAction(this, func_808BABF4);
     }
 }
+
+#include "recomputils.h"
+
+s16 doorWarp1SavedSceneID;
+// s16 doorWarp1ReplaceSceneID;
+
+// probably broken, logic is mostly there just needs a bit more tweaking
+// todo: fix cleared boss warps as well
+RECOMP_HOOK("func_808BA10C")
+void DoorWarp1_ChangeERExit(DoorWarp1* this, PlayState* play) {
+    doorWarp1SavedSceneID = play->sceneId;
+    
+    if (!rando_get_slotdata_u32("entrance_rando")) return;
+
+    u32 bossSceneIndex;
+
+    if (!(play->sceneId == SCENE_MITURIN_BS) || (play->sceneId == SCENE_HAKUGIN_BS) ||
+        (play->sceneId == SCENE_INISIE_BS) || (play->sceneId == SCENE_SEA_BS)) {
+        return;
+    }
+
+    if (play->sceneId == SCENE_MITURIN_BS) {
+        bossSceneIndex = 0;
+    } else if (play->sceneId == SCENE_HAKUGIN_BS) {
+        bossSceneIndex = 1;
+    } else if (play->sceneId == SCENE_SEA_BS) {
+        bossSceneIndex = 2;
+    } else if (play->sceneId == SCENE_INISIE_BS) {
+        bossSceneIndex = 3;
+    } else {
+        bossSceneIndex = 0;
+    }
+
+    // double reverse er index adventure
+
+    u32 er_placements[rando_get_slotdata_u32("er_placement_count")];
+    u32 incomingPtr[2]; // not sure why this needs to be 2
+    u32 boss = 0;
+    u32 original_boss = 0;
+    
+    rando_get_slotdata_raw_o32("er_placement_ids", er_placements);
+
+    // figure out what the original dungeon was
+    for (int i = 4; i < 8; i++) { // 4 - 7 for boss er indexes
+        rando_access_slotdata_raw_array_o32(er_placements, i, incomingPtr);
+
+        boss = rando_access_slotdata_raw_u32_o32(incomingPtr) & 0xF;
+
+        if (boss == bossSceneIndex + 4) {
+            original_boss = i;
+            break;
+        }
+    }
+
+    rando_access_slotdata_raw_array_o32(er_placements, original_boss - 4, incomingPtr);
+    u32 incoming_dungeon = rando_access_slotdata_raw_u32_o32(incomingPtr) & 0xF;
+    u32 dungeon = 0;
+    u32 dungeon_entrance = 0;
+
+    // figure out what the original dungeon entrance was
+    for (int i = 0; i < 4; i++) { // 1 - 3 for boss er indexes
+        rando_access_slotdata_raw_array_o32(er_placements, i, incomingPtr);
+
+        dungeon = rando_access_slotdata_raw_u32_o32(incomingPtr) & 0xF;
+
+        if (dungeon == incoming_dungeon) {
+            dungeon_entrance = i;
+            break;
+        }
+    }
+
+    switch (dungeon_entrance) {
+        case 0:
+            play->sceneId = SCENE_MITURIN_BS;
+            break;
+        case 1:
+            play->sceneId = SCENE_HAKUGIN_BS;
+            break;
+        case 2:
+            play->sceneId = SCENE_SEA_BS;
+            break;
+        case 3:
+            play->sceneId = SCENE_INISIE_BS;
+            break;
+    }
+
+    recomp_printf("results %d %d\n", original_boss, dungeon_entrance);
+}
+
+// RECOMP_HOOK("func_808BA10C")
+// void DoorWarp1_FixSceneAfterER() {
+//     recomp_printf("cur scene id 0x%02X\n", gPlay->sceneId);
+//     gPlay->sceneId = doorWarp1SavedSceneID;
+//     recomp_printf("fixed scene id 0x%02X\n", gPlay->sceneId);
+// }
