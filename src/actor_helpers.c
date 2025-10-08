@@ -191,10 +191,11 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_LIFT_NUTS:
         case ACTOR_EN_GO:
         case ACTOR_EN_STH:
-        case ACTOR_EN_DG:
-        case ACTOR_EN_STOP_HEISHI:
+        case ACTOR_EN_DG: //Dogs
+        case ACTOR_EN_STOP_HEISHI: //Town Guards
         case ACTOR_DM_STK:
         case ACTOR_EN_GB2:
+        case ACTOR_EN_GEG: // Hungry Goron
             if (rando_get_slotdata_u32("npc_souls")) {
                 // *should = rando_has_item(0x0C0000 | actor->id);
                 if (!rando_has_item(0x0C0000 | actor->id)) {
@@ -203,10 +204,10 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 return;
             }
             break;
-        case ACTOR_EN_DT:
+        case ACTOR_EN_DT: // Council Soul
         case ACTOR_EN_MUTO:
         case ACTOR_EN_BAISEN:
-        case ACTOR_EN_HEISHI:
+        case ACTOR_EN_HEISHI: 
             if (rando_get_slotdata_u32("npc_souls")) {
                 // *should = rando_has_item(0x0C0000 | ACTOR_EN_DT);
                 if (!rando_has_item(0x0C0000 | ACTOR_EN_DT)) {
@@ -215,7 +216,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 return;
             }
             break;
-        case ACTOR_EN_AKINDONUTS: // Council Soul
+        case ACTOR_EN_AKINDONUTS: // Business Scrub Soul
         case ACTOR_EN_SELLNUTS:
         case ACTOR_EN_SCOPENUTS:
             if (rando_get_slotdata_u32("npc_souls")) {
@@ -249,10 +250,20 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 return;
             }
             break;
+        case ACTOR_EN_KGY: //Smithy
+        case ACTOR_EN_KBT:
+            if (rando_get_slotdata_u32("npc_souls")) {
+                // *should = rando_has_item(0x0C0000 | ACTOR_EN_KGY);
+                if (!rando_has_item(0x0C0000 | ACTOR_EN_KGY)) {
+                    *should = false;
+                }
+                return;
+            }
+            break;
         case ACTOR_EN_JGAME_TSN: //Fisherman
         case ACTOR_EN_TSN:
             if (rando_get_slotdata_u32("npc_souls")) {
-                // *should = rando_has_item(0x0C0000 | ACTOR_EN_TOTO);
+                // *should = rando_has_item(0x0C0000 | ACTOR_EN_TSN);
                 if (!rando_has_item(0x0C0000 | ACTOR_EN_TSN)) {
                     *should = false;
                 }
@@ -262,7 +273,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_SKB:
         case ACTOR_EN_RAIL_SKB: // Graveyard Stalchildren
             if (rando_get_slotdata_u32("npc_souls")) {
-                // *should = rando_has_item(0x0C0000 | ACTOR_EN_TOTO);
+                // *should = rando_has_item(0x0C0000 | ACTOR_EN_SKB);
                 if (!rando_has_item(0x0C0000 | ACTOR_EN_SKB)) {
                     *should = false;
                 }
@@ -272,7 +283,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_RAILGIBUD: //Gibdo Soul
         case ACTOR_EN_TALK_GIBUD:
             if (rando_get_slotdata_u32("npc_souls")) {
-                // *should = rando_has_item(0x0C0000 | ACTOR_EN_BOMJIMA);
+                // *should = rando_has_item(0x0C0000 | ACTOR_EN_TALK_GIBUD);
                 if (!rando_has_item(0x0C0000 | ACTOR_EN_TALK_GIBUD)) {
                     *should = false;
                 }
@@ -283,7 +294,6 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
     switch (actor->id) {
         case ACTOR_EN_GAKUFU:
         // case ACTOR_OBJ_ETCETERA:
-            recomp_printf("actor id: 0x%02X 0x%06X %d\n", actor->id, 0x0E0000 | actor->id, rando_has_item(0x0E0000 | actor->id));
             if (rando_get_slotdata_u32("absurd_souls")) {
                 // *should = rando_has_item(0x0E0000 | actor->id);
                 if (!rando_has_item(0x0E0000 | actor->id)) {
@@ -292,9 +302,21 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 return;
             }
             break;
+        case ACTOR_EN_WOOD02: //Trees/Shrubs
+        case ACTOR_EN_SNOWWD: //
+        case ACTOR_OBJ_TREE:
+        case ACTOR_OBJ_YASI:
+            if (rando_get_slotdata_u32("absurd_souls")) {
+                // *should = rando_has_item(0x0E0000 | ACTOR_EN_WOOD2);
+                if (!rando_has_item(0x0E0000 | ACTOR_EN_WOOD02)) {
+                    *should = false;
+                }
+                return;
+            }
+            break;
     }
     switch (actor->id) {
-        case ACTOR_EN_PST:
+        case ACTOR_EN_PST:    // Postboxes
             if (rando_get_slotdata_u32("utility_souls")) {
                 // *should = rando_has_item(0x0D0000 | actor->id);
                 if (!rando_has_item(0x0D0000 | actor->id)) {
