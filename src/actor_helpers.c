@@ -183,6 +183,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_KAKASI:
         case ACTOR_EN_GUARD_NUTS:
         case ACTOR_EN_LOOK_NUTS:
+        case ACTOR_EN_MNK:
         case ACTOR_EN_TRU:
         case ACTOR_EN_ZOW:
         case ACTOR_EN_ZOT:
@@ -194,6 +195,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_DG: //Dogs
         case ACTOR_EN_STOP_HEISHI: //Town Guards
         case ACTOR_DM_STK:
+        case ACTOR_EN_TK: //Dampe
         case ACTOR_EN_GB2:
         case ACTOR_EN_GEG: // Hungry Goron
             if (rando_get_slotdata_u32("npc_souls")) {
@@ -309,6 +311,20 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             if (rando_get_slotdata_u32("absurd_souls")) {
                 // *should = rando_has_item(0x0E0000 | ACTOR_EN_WOOD2);
                 if (!rando_has_item(0x0E0000 | ACTOR_EN_WOOD02)) {
+                    *should = false;
+                }
+                return;
+            }
+            break;
+            break;
+        case ACTOR_OBJ_GRASS: //Grass
+        case ACTOR_OBJ_GRASS_UNIT:
+        case ACTOR_OBJ_GRASS_CARRY:
+        case ACTOR_EN_KUSA:
+        case ACTOR_EN_KUSA2:
+            if (rando_get_slotdata_u32("absurd_souls")) {
+                // *should = rando_has_item(0x0E0000 | ACTOR_EN_WOOD2);
+                if (!rando_has_item(0x0E0000 | ACTOR_OBJ_GRASS)) {
                     *should = false;
                 }
                 return;
