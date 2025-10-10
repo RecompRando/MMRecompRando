@@ -1554,6 +1554,16 @@ void GetItem_DrawSoulBoss(PlayState* play, s16 drawId) {
     if (recomp_get_config_u32("show_soul_model")) {        
         GetItem_DrawFire(play, gGiSoulBossFlameColor);
 
+        // Majora's Soul
+        if (drawId == GID_BOSS_SOUL_MAJORA && ObjLoad(play, 0x06, OBJECT_STK)) {
+            Matrix_Translate(25.0f, -10.0f, 0.0f, MTXMODE_APPLY);
+            Matrix_RotateZYX(0, 0, DEG_TO_BINANG(180), MTXMODE_APPLY);
+            Matrix_Scale(0.045f, 0.045f, 0.045f, MTXMODE_APPLY);
+            Gfx_DrawDListOpa(play, SEGMENTED_TO_GLOBAL_PTR(objectSegments[OBJECT_STK], gSkullKidMajorasMask1DL));            
+            ObjUnload(play, 0x06, OBJECT_STK);
+            return;
+        }
+
         // annoying object dependency bs(mask)
         if (ObjLoad(play, 0x06, OBJECT_BSMASK)) {
             switch (drawId) {
@@ -1571,16 +1581,6 @@ void GetItem_DrawSoulBoss(PlayState* play, s16 drawId) {
                     break;
             }
             ObjUnload(play, 0x06, OBJECT_BSMASK);
-            return;
-        }
-
-        // Majora's Soul
-        if (ObjLoad(play, 0x06, OBJECT_STK)) {
-            Matrix_Translate(25.0f, -10.0f, 0.0f, MTXMODE_APPLY);
-            Matrix_RotateZYX(0, 0, DEG_TO_BINANG(180), MTXMODE_APPLY);
-            Matrix_Scale(0.045f, 0.045f, 0.045f, MTXMODE_APPLY);
-            Gfx_DrawDListOpa(play, SEGMENTED_TO_GLOBAL_PTR(objectSegments[OBJECT_STK], gSkullKidMajorasMask1DL));            
-            ObjUnload(play, 0x06, OBJECT_STK);
         }
     } else {
         GetItem_DrawSkullTokenGeneric(play, TOKEN_SOUL_BOSS);
