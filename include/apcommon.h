@@ -23,6 +23,7 @@
 #define GI_DEFENSE_DOUBLE GI_73
 #define GI_TRUE_SKULL_TOKEN GI_75
 
+// this enum MUST match sGetItemTable_ap in item_give.c
 typedef enum {
     GI_OFFSET = GI_MAX,
     // dungeon items
