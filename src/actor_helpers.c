@@ -304,7 +304,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 return;
             }
             break;
-}
+    }
+
     switch (actor->id) {
         case ACTOR_EN_GAKUFU:
         // case ACTOR_OBJ_ETCETERA:
@@ -354,11 +355,12 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             }
             break;
     }
-    switch (actor->id) {
-        //case ACTOR_EN_GB2:
-            recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
-            *should = false;
-            break;
-    }
-    recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
+    
+    // switch (actor->id) {
+    //     case ACTOR_EN_GB2:
+    //         recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
+    //         *should = false;
+    //         break;
+    // }
+    // recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
 }
