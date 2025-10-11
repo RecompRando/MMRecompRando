@@ -167,7 +167,6 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_RZ:
         case ACTOR_EN_HS:
         case ACTOR_EN_AL:
-        case ACTOR_EN_OSN:
         case ACTOR_EN_ELFGRP:
         case ACTOR_EN_BAL:
         case ACTOR_EN_MK:
@@ -199,6 +198,19 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_GB2:
         case ACTOR_EN_GEG: // Hungry Goron
             if (rando_get_slotdata_u32("npc_souls")) {
+                // *should = rando_has_item(0x0C0000 | actor->id);
+                if (!rando_has_item(0x0C0000 | actor->id)) {
+                    *should = false;
+                }
+                return;
+            }
+            break;
+        case ACTOR_EN_OSN: // Happy Mask Salesman
+            if (rando_get_slotdata_u32("npc_souls")) {
+                // don't prevent happy mask salesman from spawning on moon crash
+                if (justDied) {
+                    return;
+                }
                 // *should = rando_has_item(0x0C0000 | actor->id);
                 if (!rando_has_item(0x0C0000 | actor->id)) {
                     *should = false;
