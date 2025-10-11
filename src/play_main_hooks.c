@@ -628,6 +628,8 @@ u32 rando_get_item_id(u32 location)
                         return GI_MISC_SOUL_KEATON;
                     case (AP_ITEM_ID_SOUL_MISC_GOLD_SKULLTULA):
                         return GI_MISC_SOUL_GOLD_SKULLTULAS;
+                    case (AP_ITEM_ID_SOUL_MISC_BUTTERFLY):
+                        return GI_MISC_SOUL_BUTTERFLY;
                 }
                 return GI_NONE;
             case 0x0B0000: // boss souls
