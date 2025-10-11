@@ -344,8 +344,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             break;
         case ACTOR_DOOR_ANA: //Grottos
             if (rando_get_slotdata_u32("absurd_souls")) {
-                // *should = rando_has_item(0x0E0000 | ACTOR_DOOR_ANA);
-                if (!rando_has_item(0x0E0000 | ACTOR_DOOR_ANA)) {
+                // *should = rando_has_item(0x0E0000 | actor->id);
+                if (!rando_has_item(0x0E0000 | actor->id)) {
                     *should = false;
                 }
                 return;
