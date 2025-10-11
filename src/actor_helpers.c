@@ -308,7 +308,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
 
     switch (actor->id) {
         case ACTOR_EN_GAKUFU:
-        // case ACTOR_OBJ_ETCETERA:
+        case ACTOR_OBJ_ETCETERA:
             if (rando_get_slotdata_u32("absurd_souls")) {
                 // *should = rando_has_item(0x0E0000 | actor->id);
                 if (!rando_has_item(0x0E0000 | actor->id)) {
@@ -329,7 +329,6 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 return;
             }
             break;
-            break;
         case ACTOR_OBJ_GRASS: //Grass
         case ACTOR_OBJ_GRASS_UNIT:
         case ACTOR_OBJ_GRASS_CARRY:
@@ -338,6 +337,15 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             if (rando_get_slotdata_u32("absurd_souls")) {
                 // *should = rando_has_item(0x0E0000 | ACTOR_EN_WOOD2);
                 if (!rando_has_item(0x0E0000 | ACTOR_OBJ_GRASS)) {
+                    *should = false;
+                }
+                return;
+            }
+            break;
+        case ACTOR_DOOR_ANA: //Grottos
+            if (rando_get_slotdata_u32("absurd_souls")) {
+                // *should = rando_has_item(0x0E0000 | ACTOR_DOOR_ANA);
+                if (!rando_has_item(0x0E0000 | ACTOR_DOOR_ANA)) {
                     *should = false;
                 }
                 return;
