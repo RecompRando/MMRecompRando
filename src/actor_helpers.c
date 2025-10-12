@@ -143,21 +143,20 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
     switch (actor->id) {
         case ACTOR_EN_TAKARAYA:
         case ACTOR_EN_JA:
-        case ACTOR_EN_DAIKU:
-        case ACTOR_EN_DAIKU2:
+        case ACTOR_EN_DAIKU: //Carpenters
+        case ACTOR_EN_DAIKU2: //Milk road Carpenter
         case ACTOR_EN_GURUGURU:
         case ACTOR_EN_YB:
         case ACTOR_EN_NB:
-        case ACTOR_EN_AN:
-        case ACTOR_EN_PM:
-        case ACTOR_EN_OSSAN:
+        case ACTOR_EN_AN: //Anju
+        case ACTOR_EN_PM: //Postman
+        case ACTOR_EN_OSSAN: //EVERY SHOP EVER
         case ACTOR_EN_HG:
         case ACTOR_EN_SHN:
-        case ACTOR_EN_STONE_HEISHI:
-        case ACTOR_EN_PO_COMPOSER:
+        case ACTOR_EN_STONE_HEISHI: //Town Exit Guards
+        case ACTOR_EN_PO_COMPOSER: //Poe Composer
         case ACTOR_EN_S_GORO:
         case ACTOR_EN_FU:
-        case ACTOR_EN_SSH:
         case ACTOR_EN_IG:
         case ACTOR_EN_AOB_01:
         case ACTOR_EN_JG:
@@ -167,7 +166,6 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_RZ:
         case ACTOR_EN_HS:
         case ACTOR_EN_AL:
-        case ACTOR_EN_ELFGRP:
         case ACTOR_EN_BAL:
         case ACTOR_EN_MK:
         case ACTOR_EN_BJT:
@@ -190,7 +188,6 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_KUJIYA:
         case ACTOR_EN_LIFT_NUTS:
         case ACTOR_EN_GO:
-        case ACTOR_EN_STH:
         case ACTOR_EN_DG: //Dogs
         case ACTOR_EN_STOP_HEISHI: //Town Guards
         case ACTOR_DM_STK:
@@ -229,6 +226,17 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 }
                 return;
             }
+            break;
+        case ACTOR_EN_SSH: // Spider Man
+        case ACTOR_EN_STH:
+            if (rando_get_slotdata_u32("npc_souls")) {
+                // *should = rando_has_item(0x0C0000 | ACTOR_EN_SSH);
+                if (!rando_has_item(0x0C0000 | ACTOR_EN_SSH)) {
+                    *should = false;
+                }
+                return;
+            }
+            
             break;
         case ACTOR_EN_AKINDONUTS: // Business Scrub Soul
         case ACTOR_EN_SELLNUTS:
@@ -285,7 +293,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             }
             break;
         case ACTOR_EN_SKB:
-        case ACTOR_EN_RAIL_SKB: // Graveyard Stalchildren
+        case ACTOR_EN_RAIL_SKB: 
+        case ACTOR_EN_HINT_SKB: // Graveyard and OSH Stalchildren
             if (rando_get_slotdata_u32("npc_souls")) {
                 // *should = rando_has_item(0x0C0000 | ACTOR_EN_SKB);
                 if (!rando_has_item(0x0C0000 | ACTOR_EN_SKB)) {
@@ -299,6 +308,16 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             if (rando_get_slotdata_u32("npc_souls")) {
                 // *should = rando_has_item(0x0C0000 | ACTOR_EN_TALK_GIBUD);
                 if (!rando_has_item(0x0C0000 | ACTOR_EN_TALK_GIBUD)) {
+                    *should = false;
+                }
+                return;
+            }
+            break;
+        case ACTOR_EN_ELFGRP: // Great Fairy Soul
+        case ACTOR_BG_DY_YOSEIZO:
+            if (rando_get_slotdata_u32("npc_souls")) {
+                // *should = rando_has_item(0x0C0000 | ACTOR_EN_ELFGRP);
+                if (!rando_has_item(0x0C0000 | ACTOR_EN_ELFGRP)) {
                     *should = false;
                 }
                 return;
