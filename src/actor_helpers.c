@@ -158,7 +158,6 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_S_GORO:
         case ACTOR_EN_FU:
         case ACTOR_EN_IG:
-        case ACTOR_EN_AOB_01:
         case ACTOR_EN_JG:
         case ACTOR_EN_TRT:
         case ACTOR_EN_KENDO_JS:
@@ -182,18 +181,19 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_LOOK_NUTS:
         case ACTOR_EN_MNK:
         case ACTOR_EN_TRU:
+        case ACTOR_EN_IN: //Gorman Bros
         case ACTOR_EN_ZOW:
         case ACTOR_EN_ZOT:
         case ACTOR_EN_ZOV:
         case ACTOR_EN_KUJIYA:
         case ACTOR_EN_LIFT_NUTS:
         case ACTOR_EN_GO:
-        case ACTOR_EN_DG: //Dogs
         case ACTOR_EN_STOP_HEISHI: //Town Guards
         case ACTOR_DM_STK:
         case ACTOR_EN_TK: //Dampe
         case ACTOR_EN_GB2:
         case ACTOR_EN_GEG: // Hungry Goron
+        case ACTOR_EN_JS: //Moon Kids
             if (rando_get_slotdata_u32("npc_souls")) {
                 // *should = rando_has_item(0x0C0000 | actor->id);
                 if (!rando_has_item(0x0C0000 | actor->id)) {
@@ -271,6 +271,30 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 }
                 return;
             }
+             break;
+        case ACTOR_EN_AOB_01: //Doggy Race Lady
+        case ACTOR_EN_DG: //Dogs
+            if (rando_get_slotdata_u32("npc_souls")) {
+                // *should = rando_has_item(0x0C0000 | ACTOR_EN_AOB_01);
+                if (!rando_has_item(0x0C0000 | ACTOR_EN_AOB_01)) {
+                    *should = false;
+                }
+                return;
+            }
+            break;
+        case ACTOR_EN_MA_YTO: //(Cremia) Romani and Cremia
+        case ACTOR_EN_MA_YTS: //(Romani)
+        case ACTOR_EN_MA4:
+        case ACTOR_EN_INVADEPOH:
+        case ACTOR_OBJ_DINNER: //(I wonder what's for dinner?)
+        case ACTOR_OBJ_UM: // Cremia Escort Milk Bottles
+            if (rando_get_slotdata_u32("npc_souls")) {
+                // *should = rando_has_item(0x0C0000 | ACTOR_EN_MA_YTS);
+                if (!rando_has_item(0x0C0000 | ACTOR_EN_MA_YTS)) {
+                    *should = false;
+                }
+                return;
+            }
             break;
         case ACTOR_EN_KGY: //Smithy
         case ACTOR_EN_KBT:
@@ -324,7 +348,6 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             }
             break;
     }
-
     switch (actor->id) {
         case ACTOR_EN_GAKUFU:
         case ACTOR_OBJ_ETCETERA: // Deku Flowers
@@ -388,11 +411,11 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             break;
     }
     
-    // switch (actor->id) {
-    //     case ACTOR_EN_GB2:
-    //         recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
-    //         *should = false;
-    //         break;
-    // }
-    // recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
+    switch (actor->id) {
+        case ACTOR_OBJ_KEPN_KOYA: //Gorman Racetrack Buildings
+            recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
+            *should = false;
+            break;
+    }
+    recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
 }
