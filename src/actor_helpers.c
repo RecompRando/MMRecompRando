@@ -179,6 +179,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_KAKASI:
         case ACTOR_EN_GUARD_NUTS:
         case ACTOR_EN_LOOK_NUTS:
+        case ACTOR_EN_MS: //Bean Daddy
         case ACTOR_EN_MNK:
         case ACTOR_EN_TRU:
         case ACTOR_EN_IN: //Gorman Bros
