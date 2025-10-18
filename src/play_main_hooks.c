@@ -439,6 +439,88 @@ s32 Health_ChangeBy_NoSound(PlayState* play, s16 healthChange) {
     }
 }
 
+#define CURRENT_TIME ((void)0, gSaveContext.save.time)
+
+void randoHandleTime(PlayState* play) {    
+    if (!rando_get_slotdata_u32("shuffle_time")) return;
+
+    // recomp_printf("day %d hour %d\n", gSaveContext.save.day, gSaveContext.save.time / CLOCK_TIME_HOUR);
+
+    s32 curDay = gSaveContext.save.day;
+    s32 curHour = gSaveContext.save.time / CLOCK_TIME_HOUR;
+    u16 curTime = gSaveContext.save.time;
+
+    // format 0x1F0DHH | D = day H = hour (24H format)
+
+    switch (rando_get_slotdata_u32("shuffle_time")) {
+        case 1: // days only
+            while (curDay <= 3) {
+                if (rando_has_item(0x1F0000 | (curDay << 8) | 6)) {
+                    gSaveContext.save.day = curDay;
+                    gSaveContext.save.time = curTime;
+                    break;
+                } else {
+                    curDay++;
+                    rando_advance_hour(play, 6);
+                    curTime = CURRENT_TIME;
+                }
+            }
+            break;
+        case 2: // days/nights
+            while (curDay <= 3) {
+                if (curHour >= 6 && curHour < 18) {
+                    if (rando_has_item(0x1F0000 | (curDay << 8) | 6)) {
+                        gSaveContext.save.day = curDay;
+                        gSaveContext.save.time = curTime;
+                        break;
+                    } else {
+                        curHour = 18;
+                        rando_advance_hour(play, curHour);
+                        curTime = CURRENT_TIME;
+                    }
+                } else {
+                    if (rando_has_item(0x1F0000 | (curDay << 8) | 18)) {
+                        gSaveContext.save.day = curDay;
+                        gSaveContext.save.time = curTime;
+                        break;
+                    } else {
+                        curDay++;
+                        curHour = 6;
+                        rando_advance_hour(play, curHour);
+                        curTime = CURRENT_TIME;
+                    }
+                }
+            }
+            break;
+        case 3: // hours
+            while (curDay <= 3) {
+                if (curHour >= 6 && curHour < 18) {
+                    if (rando_has_item(0x1F0000 | (curDay << 8) | curHour)) {
+                        gSaveContext.save.day = curDay;
+                        gSaveContext.save.time = curTime;
+                        break;
+                    } else {
+                        curHour++;
+                        rando_advance_hour(play, curHour);
+                        curTime = CURRENT_TIME;
+                    }
+                } else {
+                    if (rando_has_item(0x1F0000 | (curDay << 8) | curHour)) {
+                        gSaveContext.save.day = curDay;
+                        gSaveContext.save.time = curTime;
+                        break;
+                    } else {
+                        curDay++;
+                        curHour = 6;
+                        rando_advance_hour(play, curHour);
+                        curTime = CURRENT_TIME;
+                    }
+                }
+            }
+            break;
+    }
+}
+
 ItemId randoConvertItemId(u32 ap_item_id) {
     ap_item_id &= 0xFFFFFF;
 
@@ -604,6 +686,8 @@ u32 rando_get_item_id(u32 location)
                         return (GI_MAX + (((item >> 8) & 0xF) * 4) + 4);
                 }
                 return GI_NONE;
+            case 0x1F0000: // time
+                return GI_TIME;
             case 0xFF0000:
                 switch (item & 0x00FF00)
                 {
@@ -841,6 +925,7 @@ void update_rando(PlayState* play) {
             rando_send_location(LOCATION_INVENTORY_SHIELD);
             rando_send_location(0x0D0000 | GI_OCARINA_OF_TIME);
             rando_send_location(0x0D0067);
+            rando_send_location(0x1F0106); // day 1 6 am
 
             for (int i = 0; i < rando_get_starting_heart_locations(); ++i)
             {
@@ -874,6 +959,8 @@ void update_rando(PlayState* play) {
             }
             rando_reset_death_link_pending();
         }
+
+        randoHandleTime(play);
     }
 }
 

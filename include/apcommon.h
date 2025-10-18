@@ -78,6 +78,8 @@ typedef enum {
     GI_NPC_GENERIC,
     GI_UTILITY_GENERIC,
     GI_ABSURD_GENERIC,
+    // time
+    GI_TIME,
     // end
     GI_EXTENDED_MAX,
 } ExtendedGITable;
@@ -150,6 +152,8 @@ typedef enum {
     GID_NPC_SOUL_GENERIC,
     GID_UTILITY_SOUL_GENERIC,
     GID_ABSURD_SOUL_GENERIC,
+    // time
+    GID_TIME,
     // end
     GID_EXTENDED_MAX,
 } ExtendedGIDTable;
@@ -268,6 +272,8 @@ extern bool saveOpened;
 extern bool playing;
 
 extern bool justDied;
+
+void rando_advance_hour(PlayState* play, u8 choiceHour);
 
 bool ObjLoad(PlayState* play, u8 segment, s16 objectId);
 void ObjUnload(PlayState* play, u8 segment, s16 objectId);

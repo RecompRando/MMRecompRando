@@ -793,6 +793,9 @@ RECOMP_PATCH void GetItem_Draw(PlayState* play, s16 drawId) {
         case GID_ABSURD_SOUL_GENERIC:
             GetItem_DrawSoulAbsurd(play, drawId);
             return;
+        case GID_TIME:
+            GetItem_DrawSoulAbsurd(play, drawId); // temp
+            return;
     }
     sDrawItemTable_new[drawId].drawFunc(play, drawId);
 }
