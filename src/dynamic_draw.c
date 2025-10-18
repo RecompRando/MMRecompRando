@@ -608,145 +608,6 @@ static DrawItemTableEntry sDrawItemTable_new[] = {
     //~ { GetItem_DrawRecompImport, { archilogo_arrow_archilogo_mesh } },
 };
 
-typedef enum {
-    OPA0,
-    XLU0,
-    OPA01,
-    OPA0XLU1,
-    XLU01
-} ObjectType;
-
-ObjectType sGetObjectType[] = {
-    OPA0XLU1,
-    OPA0,
-    OPA01,
-    OPA0XLU1,
-    XLU01,
-    XLU01,
-    XLU01,
-    XLU01,
-    XLU0,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA01,
-    OPA0XLU1,
-    OPA01,
-    OPA0XLU1,
-    OPA0,
-    XLU01,
-    XLU0,
-    OPA01,  // ?
-    OPA01,  // ?
-    OPA01,  // ?
-    OPA01,  // ?
-    OPA01,  // ?
-    OPA01,  // ?
-    OPA0,
-    OPA0,
-    OPA0,
-    OPA0,
-    OPA0,
-    OPA0,
-    OPA01,  // ?
-    OPA01,  // ?
-    OPA0XLU1,
-    OPA0,
-    OPA0,
-    OPA0,
-    OPA0,
-    OPA0XLU1,
-    OPA01,
-    OPA01,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA01,
-    OPA01,
-    OPA0XLU1,
-    OPA0XLU1,  // ?
-    OPA0XLU1,  // ?
-    OPA0XLU1,  // ?
-    OPA0XLU1,
-    OPA0,
-    XLU0,
-    OPA0XLU1,
-    OPA0,
-    OPA0,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,  // ?
-    OPA01,
-    OPA01,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA01,
-    OPA01,
-    OPA0XLU1,
-    OPA01,
-    OPA0XLU1,
-    OPA01,
-    OPA0,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA01,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA01,
-    OPA0XLU1,
-    OPA0,
-    OPA0XLU1,
-    OPA01,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0,
-    OPA0,
-    OPA0,
-    OPA01,
-    OPA01,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA01,
-    OPA0XLU1,
-    OPA0XLU1,
-    OPA01,
-    XLU01,
-    XLU01,
-    XLU01,
-    XLU01,
-    XLU01,
-    XLU01,
-    XLU01,
-    XLU01,
-    XLU01,
-    XLU01
-};
-
 static DmaRequest objectDmaRequest;
 static OSMesg objectLoadMsg;
 
@@ -820,11 +681,25 @@ void ObjUnload(PlayState* play, u8 segment, s16 objectId) {
     // For now, even with everything loaded, the memory usage is minimal so we aren't going to worry about it.
 }
 
+// @rando add export for other mods to create their own draws for items
+typedef void (*randoDrawFunc)(PlayState*, s16);
+randoDrawFunc customRandoItemDraws[GID_EXTENDED_MAX];
+
+RECOMP_EXPORT void rando_add_custom_draw(s16 drawId, randoDrawFunc customItemDrawFunc) {
+    customRandoItemDraws[drawId] = customItemDrawFunc;
+}
+
 /**
  * Draw "Get Item" Model
  * Calls the corresponding draw function for the given draw ID
  */
 RECOMP_PATCH void GetItem_Draw(PlayState* play, s16 drawId) {
+    // @rando override for external custom draw
+    if (customRandoItemDraws[drawId] != NULL) {
+        customRandoItemDraws[drawId](play, drawId);
+        return;
+    }
+
     switch (drawId) {
         case GID_SONG_SOARING:
             GetItem_DrawXlu01DL(play, gGiSoaringColorDL, gGiSongNoteDL);
@@ -928,122 +803,9 @@ void GetItem_DrawDynamic(PlayState* play, void* objectSegment, s16 drawId) {
     u32 prevSegment = gSegments[6];
     gSegments[6] = OS_K0_TO_PHYSICAL(objectSegment);
 
-    if (drawId >= GID_SONG_SOARING) {
-        switch(drawId) {
-            case GID_SONG_SOARING:
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_SONG_STORMS:
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_DEFENSE_DOUBLE:
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_SWAMP_SKULL_TOKEN:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_OCEAN_SKULL_TOKEN:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_KEY_BOSS_WOODFALL:
-            case GID_KEY_BOSS_SNOWHEAD:
-            case GID_KEY_BOSS_GREATBAY:
-            case GID_KEY_BOSS_STONETOWER:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_KEY_SMALL_WOODFALL:
-            case GID_KEY_SMALL_SNOWHEAD:
-            case GID_KEY_SMALL_GREATBAY:
-            case GID_KEY_SMALL_STONETOWER:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                break;
-            case GID_MAP_WOODFALL:
-            case GID_MAP_SNOWHEAD:
-            case GID_MAP_GREATBAY:
-            case GID_MAP_STONETOWER:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                break;
-            case GID_COMPASS_WOODFALL:
-            case GID_COMPASS_SNOWHEAD:
-            case GID_COMPASS_GREATBAY:
-            case GID_COMPASS_STONETOWER:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_RUPOOR:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_SPIN_ATTACK:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_MAGIC_UPGRADE:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_OWL_STATUE:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                break;
-            case GID_FROG_YELLOW:
-            case GID_FROG_CYAN:
-            case GID_FROG_PINK:
-            case GID_FROG_BLUE:
-            case GID_FROG_WHITE:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_BOSS_SOUL_ODOLWA:
-            case GID_BOSS_SOUL_GOHT:
-            case GID_BOSS_SOUL_GYORG:
-            case GID_BOSS_SOUL_TWINMOLD:
-            case GID_BOSS_SOUL_MAJORA:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_MISC_SOUL_COW:
-            case GID_MISC_SOUL_KEATON:
-            case GID_MISC_SOUL_GOLD_SKULLTULAS:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_SF_CLOCKTOWN:
-            case GID_SF_WOODFALL:
-            case GID_SF_SNOWHEAD:
-            case GID_SF_GREATBAY:
-            case GID_SF_STONETOWER:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-        }
-    } else {
-        switch (sGetObjectType[drawId]) {
-            case OPA0:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                break;
-            case XLU0:
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case OPA01:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                break;
-            case XLU01:
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case OPA0XLU1:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-        }
-    }
+    // there doesn't seem to be a problem letting everything opa and xlu
+    gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
+    gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
 
     GetItem_Draw(play, drawId);
 

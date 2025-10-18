@@ -78,6 +78,8 @@ typedef enum {
     GI_NPC_GENERIC,
     GI_UTILITY_GENERIC,
     GI_ABSURD_GENERIC,
+    // end
+    GI_EXTENDED_MAX,
 } ExtendedGITable;
 
 typedef enum {
@@ -148,6 +150,8 @@ typedef enum {
     GID_NPC_SOUL_GENERIC,
     GID_UTILITY_SOUL_GENERIC,
     GID_ABSURD_SOUL_GENERIC,
+    // end
+    GID_EXTENDED_MAX,
 } ExtendedGIDTable;
 
 #define AP_ITEM_ID_STRAY_FAIRY_WOODFALL 0x010000
