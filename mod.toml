@@ -104,11 +104,7 @@ native_libraries = [
                                     "rando_get_slotdata_raw_o32",
                                     "rando_access_slotdata_raw_u32_o32",
                                     "rando_access_slotdata_raw_array_o32",
-                                    "rando_access_slotdata_raw_dict_o32",
-                                    "rando_queue_scout",
-                                    "rando_queue_scouts_all",
-                                    "rando_remove_queued_scout",
-                                    "rando_send_queued_scouts"] }
+                                    "rando_access_slotdata_raw_dict_o32"] }
 ]
 
 # Inputs to the mod tool.

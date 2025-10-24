@@ -814,6 +814,7 @@ RECOMP_PATCH void GetItem_Draw(PlayState* play, s16 drawId) {
         case GID_SF_GREATBAY:
         case GID_SF_STONETOWER:
             GetItem_DrawStrayFairy(play, drawId);
+            return;
     }
     sDrawItemTable_new[drawId].drawFunc(play, drawId);
 }
