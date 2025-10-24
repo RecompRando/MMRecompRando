@@ -83,6 +83,7 @@ native_libraries = [
                                     "rando_get_own_slot_name",
                                     "rando_get_items_size",
                                     "rando_get_item",
+                                    "rando_get_item_location",
                                     "rando_get_sending_player",
                                     "rando_get_item_name_from_id",
                                     "rando_get_sending_player_name",
