@@ -855,7 +855,7 @@ void update_rando(PlayState* play) {
 
         if (new_items_size > old_items_size) {
             u32 item_id = rando_get_item(old_items_size);
-            if (rando_get_sending_player(old_items_size) != rando_get_own_slot_id()) {
+            if (rando_get_sending_player(old_items_size) != rando_get_own_slot_id() || rando_get_item_location(old_items_size) <= 0) {
                 char item_name[33];
                 char player_name[36];
                 rando_get_item_name_from_id(item_id, item_name);
