@@ -10,22 +10,22 @@
 #define LOCATION_MURE2(i) (AP_PREFIX_MURE_GRASS | (play->sceneId << 8) | ((play->roomCtx.curRoom.num + *mure2Index) << 4) | i)
 #define LOCATION_MURE2_ROCK(i) (0x260000 | (play->sceneId << 8) | ((play->roomCtx.curRoom.num + *mure2Index) << 4) | i)
 
-ActorExtensionId mureExtension;
+ActorExtensionId mureIndexExtension;
 u32* mureIndex;
-ActorExtensionId mure2Extension;
+ActorExtensionId mure2IndexExtension;
 u32* mure2Index;
 
-extern ActorExtensionId kusaGrassExtension;
-extern u32* extendedKusaGrassData;
-extern ActorExtensionId rockExtension;
-extern u32* extendedRockData;
+extern ActorExtensionId kusaGrassLocationExtension;
+extern u32* kusaLocation;
+extern ActorExtensionId rockLocationExtension;
+extern u32* rockLocation;
 
 u32 EnKusa_CreateLocation(PlayState* play, Actor* actor);
 
 // probably not the best way to do this
 RECOMP_HOOK("ObjMure_Init")
 void OnObjMure_Init(Actor* thisx, PlayState* play) {
-    mureIndex = z64recomp_get_extended_actor_data(thisx, mureExtension);
+    mureIndex = z64recomp_get_extended_actor_data(thisx, mureIndexExtension);
     *mureIndex = randoGetLoadedActorNumInSameRoomExtra(play, thisx, ACTOR_OBJ_MURE2);
 }
 
@@ -48,15 +48,15 @@ void AfterObjMure_SpawnActors() {
     }
 
     s32 maxChildren = ObjMure_GetMaxChildSpawns(this);
-    mureIndex = z64recomp_get_extended_actor_data(&this->actor, mureExtension);
+    mureIndex = z64recomp_get_extended_actor_data(&this->actor, mureIndexExtension);
 
     for (s32 i = 0; i < maxChildren; i++) {
         if (this->children[i] == NULL) {
             continue;
         }
         if (this->children[i]->id == ACTOR_EN_KUSA) {
-            extendedKusaGrassData = z64recomp_get_extended_actor_data(this->children[i], kusaGrassExtension);
-            *extendedKusaGrassData = LOCATION_MURE(i);
+            kusaLocation = z64recomp_get_extended_actor_data(this->children[i], kusaGrassLocationExtension);
+            *kusaLocation = LOCATION_MURE(i);
         }
     }
 }
@@ -64,7 +64,7 @@ void AfterObjMure_SpawnActors() {
 // again, probably not the best way to do this
 RECOMP_HOOK("ObjMure2_Init")
 void OnObjMure2_Init(Actor* thisx, PlayState* play) {
-    mure2Index = z64recomp_get_extended_actor_data(thisx, mure2Extension);
+    mure2Index = z64recomp_get_extended_actor_data(thisx, mure2IndexExtension);
     *mure2Index = randoGetLoadedActorNumInSameRoomExtra(play, thisx, ACTOR_OBJ_MURE);
 }
 
@@ -114,7 +114,7 @@ void AfterObjMure2_SpawnChildren() {
     ObjMure2* this = sObjMure2;
     PlayState* play = gPlay;
     Mure2ChildType childType = OBJ_MURE2_GET_CHILD_TYPE(&this->actor);
-    mure2Index = z64recomp_get_extended_actor_data(&this->actor, mure2Extension);
+    mure2Index = z64recomp_get_extended_actor_data(&this->actor, mure2IndexExtension);
 
     for (s32 i = 0; i < sChildCounts[childType]; i++) {
         if (this->actors[i] == NULL) {
@@ -123,12 +123,12 @@ void AfterObjMure2_SpawnChildren() {
         switch (childType) {
             case OBJMURE2_CHILDTYPE_BUSH_RING:
             case OBJMURE2_CHILDTYPE_BUSH_SCATTERED:
-                extendedKusaGrassData = z64recomp_get_extended_actor_data(this->actors[i], kusaGrassExtension);
-                *extendedKusaGrassData = LOCATION_MURE2(i);
+                kusaLocation = z64recomp_get_extended_actor_data(this->actors[i], kusaGrassLocationExtension);
+                *kusaLocation = LOCATION_MURE2(i);
                 break;
             case OBJMURE2_CHILDTYPE_ROCK_RING:
-                extendedRockData = z64recomp_get_extended_actor_data(this->actors[i], rockExtension);
-                *extendedRockData = LOCATION_MURE2_ROCK(i);
+                rockLocation = z64recomp_get_extended_actor_data(this->actors[i], rockLocationExtension);
+                *rockLocation = LOCATION_MURE2_ROCK(i);
                 break;
             default:
                 break;

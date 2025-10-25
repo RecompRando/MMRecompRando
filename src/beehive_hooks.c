@@ -11,8 +11,8 @@
 #define LOCATION_BEEHIVE (0x240000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
 
-ActorExtensionId beehiveExtension;
-u32* extendedBeehiveData;
+ActorExtensionId beehiveLocationExtension;
+u32* beehiveLocation;
 
 bool func_8098CE40(ObjComb* this, PlayState* play);
 void func_8098CEAC(ObjComb* this, PlayState* play);
@@ -111,15 +111,15 @@ RECOMP_PATCH void func_8098D99C(ObjComb* this, PlayState* play) {
 
 RECOMP_HOOK("ObjComb_Init")
 void OnObjComb_Init(Actor* thisx, PlayState* play) {
-    extendedBeehiveData = z64recomp_get_extended_actor_data(thisx, beehiveExtension);
-    *extendedBeehiveData = LOCATION_BEEHIVE;
+    beehiveLocation = z64recomp_get_extended_actor_data(thisx, beehiveLocationExtension);
+    *beehiveLocation = LOCATION_BEEHIVE;
 }
 
 RECOMP_HOOK("func_8098D8C8")
 void ObjComb_SpawnItemWithBees(ObjComb* this, PlayState* play) {
-    extendedBeehiveData = z64recomp_get_extended_actor_data(&this->actor, beehiveExtension);
-    if (!rando_location_is_checked(*extendedBeehiveData)) {
-        Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *extendedBeehiveData);
+    beehiveLocation = z64recomp_get_extended_actor_data(&this->actor, beehiveLocationExtension);
+    if (!rando_location_is_checked(*beehiveLocation)) {
+        Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *beehiveLocation);
         return;
     }
 }
@@ -127,9 +127,9 @@ void ObjComb_SpawnItemWithBees(ObjComb* this, PlayState* play) {
 RECOMP_PATCH void func_8098D870(ObjComb* this, PlayState* play) {
     s32 temp_v0 = func_800A8150(OBJCOMB_GET_3F(&this->actor));
 
-    extendedBeehiveData = z64recomp_get_extended_actor_data(&this->actor, beehiveExtension);
-    if (temp_v0 != ITEM00_HEART_PIECE && !rando_location_is_checked(*extendedBeehiveData)) {
-        Item_RandoDropCollectible(play, &this->actor.world.pos, ((OBJCOMB_GET_7F00(&this->actor)) << 8) | temp_v0, *extendedBeehiveData);
+    beehiveLocation = z64recomp_get_extended_actor_data(&this->actor, beehiveLocationExtension);
+    if (temp_v0 != ITEM00_HEART_PIECE && !rando_location_is_checked(*beehiveLocation)) {
+        Item_RandoDropCollectible(play, &this->actor.world.pos, ((OBJCOMB_GET_7F00(&this->actor)) << 8) | temp_v0, *beehiveLocation);
         return;
     }
 

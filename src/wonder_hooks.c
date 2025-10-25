@@ -16,10 +16,10 @@
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
 #define LOCATION_WONDER_HIT_GONG (0x160000 | (play->sceneId << 8))
 
-ActorExtensionId wonderHitExtension;
-u32* extendedWonderHitData;
-ActorExtensionId wonderRupeeExtension;
-u32* extendedWonderRupeeData;
+ActorExtensionId wonderHitLocationExtension;
+u32* wonderHitLocation;
+ActorExtensionId wonderRupeeLocationExtension;
+u32* wonderRupeeLocation;
 
 static Vec3f sEffectVelocity = { 0.0f, 0.1f, 0.0f };
 static Vec3f sEffectAccel = { 0.0f, 0.01f, 0.0f };
@@ -30,8 +30,8 @@ static Color_RGBA8 sEffectEnvColor = { 255, 255, 255, 255 };
 // Hit Tag (Invisible hitbox that can spawn rupees)
 RECOMP_HOOK("EnHitTag_Init")
 void OnEnHitTag_Init(Actor* thisx, PlayState* play) {
-    extendedWonderHitData = z64recomp_get_extended_actor_data(thisx, wonderHitExtension);
-    *extendedWonderHitData = LOCATION_WONDER_HIT;
+    wonderHitLocation = z64recomp_get_extended_actor_data(thisx, wonderHitLocationExtension);
+    *wonderHitLocation = LOCATION_WONDER_HIT;
 }
 
 RECOMP_HOOK("EnHitTag_Update")
@@ -50,7 +50,7 @@ RECOMP_PATCH void EnHitTag_WaitForHit(EnHitTag* this, PlayState* play) {
     Vec3f dropLocation;
     s32 i;
 
-    extendedWonderHitData = z64recomp_get_extended_actor_data(&this->actor, wonderHitExtension);
+    wonderHitLocation = z64recomp_get_extended_actor_data(&this->actor, wonderHitLocationExtension);
 
     if (this->collider.base.acFlags & AC_HIT) {
         Audio_PlaySfx(NA_SE_SY_GET_RUPY);
@@ -60,7 +60,7 @@ RECOMP_PATCH void EnHitTag_WaitForHit(EnHitTag* this, PlayState* play) {
         dropLocation.z = this->actor.world.pos.z;
 
         for (i = 0; i < 3; i++) {
-            u32 wonderHitRupeeLocation = *extendedWonderHitData | i;
+            u32 wonderHitRupeeLocation = *wonderHitLocation | i;
             if (!rando_location_is_checked(wonderHitRupeeLocation)) {
                 Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, wonderHitRupeeLocation);
             } else {
@@ -75,8 +75,8 @@ RECOMP_PATCH void EnHitTag_WaitForHit(EnHitTag* this, PlayState* play) {
 // Invisible Rupees
 RECOMP_HOOK("EnInvisibleRuppe_Init")
 void OnEnInvisibleRuppe_Init(Actor* thisx, PlayState* play) {
-    extendedWonderRupeeData = z64recomp_get_extended_actor_data(thisx, wonderRupeeExtension);
-    *extendedWonderRupeeData = LOCATION_WONDER_RUPEE;
+    wonderRupeeLocation = z64recomp_get_extended_actor_data(thisx, wonderRupeeLocationExtension);
+    *wonderRupeeLocation = LOCATION_WONDER_RUPEE;
 }
 
 RECOMP_HOOK("EnInvisibleRuppe_Update")
@@ -97,9 +97,9 @@ void EnItem00_RandoTextAndFreeze(EnItem00* this, PlayState* play);
 RECOMP_PATCH void func_80C2590C(EnInvisibleRuppe* this, PlayState* play) {
     Actor* item;
     if (this->collider.base.ocFlags1 & OC1_HIT) {
-        extendedWonderRupeeData = z64recomp_get_extended_actor_data(&this->actor, wonderRupeeExtension);
-        if (!rando_location_is_checked(*extendedWonderRupeeData)) {
-            item = Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *extendedWonderRupeeData);
+        wonderRupeeLocation = z64recomp_get_extended_actor_data(&this->actor, wonderRupeeLocationExtension);
+        if (!rando_location_is_checked(*wonderRupeeLocation)) {
+            item = Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *wonderRupeeLocation);
             ((EnItem00*)item)->actionFunc = EnItem00_RandoTextAndFreeze;
         } else {
             switch (INVISIBLERUPPE_GET_3(&this->actor)) {

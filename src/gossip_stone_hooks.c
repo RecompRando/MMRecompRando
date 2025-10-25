@@ -17,7 +17,7 @@ void func_809984F4(EnGs* this, PlayState* play);
 void func_80998300(EnGs* this, PlayState* play);
 void func_80997D14(EnGs* this, PlayState* play);
 
-extern u32* extendedFairyData;
+extern u32* fairyLocation;
 void EnElf_RandoDraw(Actor* thisx, PlayState* play);
 
 // randomize fairy
@@ -96,8 +96,8 @@ RECOMP_PATCH void func_8099807C(EnGs* this, PlayState* play) {
     }
 
     if (fairy != NULL) {
-        extendedFairyData = z64recomp_get_extended_actor_data(fairy, fairyExtension);
-        *extendedFairyData = LOCATION_FAIRY_GOSSIP;
+        fairyLocation = z64recomp_get_extended_actor_data(fairy, fairyLocationExtension);
+        *fairyLocation = LOCATION_FAIRY_GOSSIP;
         fairy->draw = EnElf_RandoDraw;
     }
 }

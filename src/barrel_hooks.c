@@ -9,21 +9,21 @@
 #define LOCATION_BARREL (0x220000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
 
-ActorExtensionId barrelExtension;
-u32* extendedBarrelData;
+ActorExtensionId barrelLocationExtension;
+u32* barrelLocation;
 
 RECOMP_HOOK("ObjTaru_Init")
 void OnObjTaru_Init(Actor* thisx, PlayState* play) {
-    extendedBarrelData = z64recomp_get_extended_actor_data(thisx, barrelExtension);
-    *extendedBarrelData = LOCATION_BARREL;
+    barrelLocation = z64recomp_get_extended_actor_data(thisx, barrelLocationExtension);
+    *barrelLocation = LOCATION_BARREL;
 }
 
 RECOMP_PATCH void func_80B9BC64(ObjTaru* this, PlayState* play) {
     s32 item = func_800A8150(OBJ_TARU_GET_3F(&this->dyna.actor));
 
-    extendedBarrelData = z64recomp_get_extended_actor_data(&this->dyna.actor, barrelExtension);
-    if (!rando_location_is_checked(*extendedBarrelData)) {
-        Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, (OBJ_TARU_GET_7F00(&this->dyna.actor) << 8) | item, *extendedBarrelData);
+    barrelLocation = z64recomp_get_extended_actor_data(&this->dyna.actor, barrelLocationExtension);
+    if (!rando_location_is_checked(*barrelLocation)) {
+        Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, (OBJ_TARU_GET_7F00(&this->dyna.actor) << 8) | item, *barrelLocation);
         return;
     }
     
@@ -35,8 +35,8 @@ RECOMP_PATCH void func_80B9BC64(ObjTaru* this, PlayState* play) {
 // pirate's fortress barricades?
 RECOMP_HOOK("func_80B9B9C8")
 void ObjTaru_DropBarricadeItem(ObjTaru* this, PlayState* play) {
-    extendedBarrelData = z64recomp_get_extended_actor_data(&this->dyna.actor, barrelExtension);
-    if (!rando_location_is_checked(*extendedBarrelData)) {
-        Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, *extendedBarrelData);
+    barrelLocation = z64recomp_get_extended_actor_data(&this->dyna.actor, barrelLocationExtension);
+    if (!rando_location_is_checked(*barrelLocation)) {
+        Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, *barrelLocation);
     }
 }

@@ -17,26 +17,26 @@
 #define LOCATION_POT_FLOWER (0x200000 | (play->sceneId << 8) | (0xF << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
 
-ActorExtensionId potExtension;
-u32* extendedPotData;
-ActorExtensionId potFlyingExtension;
-u32* extendedPotFlyingData;
-ActorExtensionId potFlowerExtension;
-u32* extendedPotFlowerData;
+ActorExtensionId potLocationExtension;
+u32* potLocation;
+ActorExtensionId potFlyingLocationExtension;
+u32* potFlyingLocation;
+ActorExtensionId potFlowerLocationExtension;
+u32* potFlowerLocation;
 
 // note: different pot behaviors aren't accounted for yet
 
 // Normal Pots (including green pots)
 RECOMP_HOOK("ObjTsubo_Init")
 void OnObjTsubo_Init(Actor* thisx, PlayState* play) {
-    extendedPotData = z64recomp_get_extended_actor_data(thisx, potExtension);
-    *extendedPotData = LOCATION_POT;
+    potLocation = z64recomp_get_extended_actor_data(thisx, potLocationExtension);
+    *potLocation = LOCATION_POT;
 }
 
 RECOMP_PATCH void func_8092762C(ObjTsubo* this, PlayState* play) {
-    extendedPotData = z64recomp_get_extended_actor_data(&this->actor, potExtension);
-    if (!rando_location_is_checked(*extendedPotData)) {
-        Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *extendedPotData);
+    potLocation = z64recomp_get_extended_actor_data(&this->actor, potLocationExtension);
+    if (!rando_location_is_checked(*potLocation)) {
+        Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *potLocation);
         return;
     } 
 
@@ -47,10 +47,10 @@ RECOMP_PATCH void func_8092762C(ObjTsubo* this, PlayState* play) {
 
 RECOMP_PATCH void func_80927690(ObjTsubo* this, PlayState* play) {
     s32 itemDrop;
-    extendedPotData = z64recomp_get_extended_actor_data(&this->actor, potExtension);
-    if (!rando_location_is_checked(*extendedPotData)) {
+    potLocation = z64recomp_get_extended_actor_data(&this->actor, potLocationExtension);
+    if (!rando_location_is_checked(*potLocation)) {
         itemDrop = func_800A8150(OBJ_TSUBO_P003F(&this->actor));
-        Item_RandoDropCollectible(play, &this->actor.world.pos, (OBJ_TSUBO_PFE00(&this->actor) << 8) | itemDrop, *extendedPotData);
+        Item_RandoDropCollectible(play, &this->actor.world.pos, (OBJ_TSUBO_PFE00(&this->actor) << 8) | itemDrop, *potLocation);
         this->unk_197 = true;
     }
 
@@ -66,17 +66,17 @@ RECOMP_PATCH void func_80927690(ObjTsubo* this, PlayState* play) {
 // Flying Pots
 RECOMP_HOOK("EnTuboTrap_Init")
 void OnEnTuboTrap_Init(Actor* thisx, PlayState* play) {
-    extendedPotFlyingData = z64recomp_get_extended_actor_data(thisx, potFlyingExtension);
-    *extendedPotFlyingData = LOCATION_POT_FLYING;
+    potFlyingLocation = z64recomp_get_extended_actor_data(thisx, potFlyingLocationExtension);
+    *potFlyingLocation = LOCATION_POT_FLYING;
 }
 
 RECOMP_PATCH void EnTuboTrap_DropCollectible(EnTuboTrap* this, PlayState* play) {
     s32 itemParam = ((this->actor.params >> 8) & 0x3F);
     s32 dropItem00Id = func_800A8150(itemParam);
     
-    extendedPotFlyingData = z64recomp_get_extended_actor_data(&this->actor, potFlyingExtension);
-    if (!rando_location_is_checked(*extendedPotFlyingData)) {
-        Item_RandoDropCollectible(play, &this->actor.world.pos, ((this->actor.params & 0x7F) << 8) | dropItem00Id, *extendedPotFlyingData);
+    potFlyingLocation = z64recomp_get_extended_actor_data(&this->actor, potFlyingLocationExtension);
+    if (!rando_location_is_checked(*potFlyingLocation)) {
+        Item_RandoDropCollectible(play, &this->actor.world.pos, ((this->actor.params & 0x7F) << 8) | dropItem00Id, *potFlyingLocation);
         return;
     }
     
@@ -88,15 +88,15 @@ RECOMP_PATCH void EnTuboTrap_DropCollectible(EnTuboTrap* this, PlayState* play) 
 // Flower Pots
 RECOMP_HOOK("ObjFlowerpot_Init")
 void OnObjFlowerpot_Init(Actor* thisx, PlayState* play) {
-    extendedPotFlowerData = z64recomp_get_extended_actor_data(thisx, potFlowerExtension);
-    *extendedPotFlowerData = LOCATION_POT_FLOWER;
+    potFlowerLocation = z64recomp_get_extended_actor_data(thisx, potFlowerLocationExtension);
+    *potFlowerLocation = LOCATION_POT_FLOWER;
 }
 
 // can technically be made into a hook
 RECOMP_PATCH void func_80A1B914(ObjFlowerpot* this, PlayState* play) {
-    extendedPotFlowerData = z64recomp_get_extended_actor_data(&this->actor, potFlowerExtension);
-    if (!rando_location_is_checked(*extendedPotFlowerData)) {
-        Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *extendedPotFlowerData);
+    potFlowerLocation = z64recomp_get_extended_actor_data(&this->actor, potFlowerLocationExtension);
+    if (!rando_location_is_checked(*potFlowerLocation)) {
+        Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *potFlowerLocation);
         return;
     }
     

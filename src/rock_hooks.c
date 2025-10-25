@@ -11,8 +11,8 @@
 #define LOCATION_ROCK (0x180000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                         | randoGetLoadedActorNumInSameRoom(play, actor))
 
-ActorExtensionId rockExtension;
-u32* extendedRockData;
+ActorExtensionId rockLocationExtension;
+u32* rockLocation;
 
 // TODO: add these to symbols
 static s16 D_8095F76C[] = { -1, 1, 2, 20, 8, 0 };
@@ -20,8 +20,8 @@ static Vec3f D_8095F778 = { 0.0f, 1.0f, 0.0f };
 
 // RECOMP_HOOK("EnIshi_Init")
 // void OnEnIshi_Init(Actor* thisx, PlayState* play) {
-//     extendedRockData = z64recomp_get_extended_actor_data(thisx, rockExtension);
-//     *extendedRockData = LOCATION_ROCK;
+//     rockLocation = z64recomp_get_extended_actor_data(thisx, rockLocationExtension);
+//     *rockLocation = LOCATION_ROCK;
 // }
 
 // note: this *should* only run when an actor is spawned on scene/room load
@@ -36,15 +36,15 @@ void add_rock_and_boulder_locations() {
 
     // rocks/silver boulders (?)
     if (actor->id == ACTOR_EN_ISHI) {
-        extendedRockData = z64recomp_get_extended_actor_data(actor, rockExtension);
-        *extendedRockData = LOCATION_ROCK;
+        rockLocation = z64recomp_get_extended_actor_data(actor, rockLocationExtension);
+        *rockLocation = LOCATION_ROCK;
     }
 }
 
 RECOMP_PATCH void func_8095DF90(EnIshi* this, PlayState* play) {
-    extendedRockData = z64recomp_get_extended_actor_data(&this->actor, rockExtension);
-    if (!rando_location_is_checked(*extendedRockData)) {
-        Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *extendedRockData);
+    rockLocation = z64recomp_get_extended_actor_data(&this->actor, rockLocationExtension);
+    if (!rando_location_is_checked(*rockLocation)) {
+        Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *rockLocation);
         return;
     }
 
@@ -64,9 +64,9 @@ RECOMP_PATCH void func_8095DFF0(EnIshi* this, PlayState* play) {
     s16 temp_v1_2;
 
     if (temp >= 0) {
-        extendedRockData = z64recomp_get_extended_actor_data(&this->actor, rockExtension);
-        if (!rando_location_is_checked(*extendedRockData)) {
-            sp3C = Item_RandoDropCollectible(play, &this->actor.world.pos, temp | (ENISHI_GET_FLAG(&this->actor) << 8), *extendedRockData);
+        rockLocation = z64recomp_get_extended_actor_data(&this->actor, rockLocationExtension);
+        if (!rando_location_is_checked(*rockLocation)) {
+            sp3C = Item_RandoDropCollectible(play, &this->actor.world.pos, temp | (ENISHI_GET_FLAG(&this->actor) << 8), *rockLocation);
         } else {
             sp3C = Item_DropCollectible(play, &this->actor.world.pos, temp | (ENISHI_GET_FLAG(&this->actor) << 8));
         }

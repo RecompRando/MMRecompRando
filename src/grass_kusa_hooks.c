@@ -8,8 +8,8 @@
 
 #include "overlays/actors/ovl_En_Kusa/z_en_kusa.h"
 
-ActorExtensionId kusaGrassExtension;
-u32* extendedKusaGrassData;
+ActorExtensionId kusaGrassLocationExtension;
+u32* kusaLocation;
 
 void grab_grass_texture();
 void grab_sprout_texture();
@@ -32,9 +32,9 @@ u32 EnKusa_CreateLocation(PlayState* play, Actor* actor) {
 // TODO: handle the different types of grass correctly (i.e. respawning)
 // RECOMP_HOOK("EnKusa_Init")
 // void OnEnKusa_Init(Actor* thisx, PlayState* play) {
-//     extendedKusaGrassData = z64recomp_get_extended_actor_data(thisx, kusaGrassExtension);
-//     *extendedKusaGrassData = EnKusa_CreateLocation(play, thisx);
-//     // recomp_printf("single grass: 0x%06X\n", *extendedKusaGrassData);
+//     kusaLocation = z64recomp_get_extended_actor_data(thisx, kusaGrassLocationExtension);
+//     *kusaLocation = EnKusa_CreateLocation(play, thisx);
+//     // recomp_printf("single grass: 0x%06X\n", *kusaLocation);
 // }
 
 // note: this *should* only run when an actor is spawned on scene/room load
@@ -49,8 +49,8 @@ void add_grass_locations() {
 
     if (actor->id == ACTOR_EN_KUSA) {
         u32 location = EnKusa_CreateLocation(play, actor);
-        extendedKusaGrassData = z64recomp_get_extended_actor_data(actor, kusaGrassExtension);
-        *extendedKusaGrassData = location;
+        kusaLocation = z64recomp_get_extended_actor_data(actor, kusaGrassLocationExtension);
+        *kusaLocation = location;
     }
 }
 
@@ -58,11 +58,11 @@ RECOMP_PATCH void EnKusa_DropCollectible(EnKusa* this, PlayState* play) {
     s32 collectible;
     s32 collectableParams;
 
-    extendedKusaGrassData = z64recomp_get_extended_actor_data(&this->actor, kusaGrassExtension);
-    if (rando_get_slotdata_u32("grasssanity") && !rando_location_is_checked(*extendedKusaGrassData)) {
+    kusaLocation = z64recomp_get_extended_actor_data(&this->actor, kusaGrassLocationExtension);
+    if (rando_get_slotdata_u32("grasssanity") && !rando_location_is_checked(*kusaLocation)) {
         collectible = func_800A8150(KUSA_GET_PARAM_FC(&this->actor));
         collectableParams = KUSA_GET_COLLECTIBLE_ID(&this->actor);
-        Item_RandoDropCollectible(play, &this->actor.world.pos, (collectableParams << 8) | collectible, *extendedKusaGrassData);
+        Item_RandoDropCollectible(play, &this->actor.world.pos, (collectableParams << 8) | collectible, *kusaLocation);
         return;
     }
 

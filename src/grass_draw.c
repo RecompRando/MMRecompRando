@@ -91,7 +91,7 @@ void EnKusa_DrawBushRando(Actor* thisx, PlayState* play2) {
     PlayState* play = play2;
     EnKusa* this = ((EnKusa*)thisx);
     
-    u32* kusaLocation = z64recomp_get_extended_actor_data(thisx, kusaGrassExtension);
+    u32* kusaLocation = z64recomp_get_extended_actor_data(thisx, kusaGrassLocationExtension);
 
     if ((this->actor.projectedPos.z <= 1200.0f) || ((this->isInWater & 1) && (this->actor.projectedPos.z < 1300.0f))) {
 
@@ -133,7 +133,7 @@ void EnKusa_DrawBushRando(Actor* thisx, PlayState* play2) {
 void EnKusa_DrawGrassRando(Actor* thisx, PlayState* play) {
     EnKusa* this = ((EnKusa*)thisx);
 
-    u32* kusaLocation = z64recomp_get_extended_actor_data(thisx, kusaGrassExtension);
+    u32* kusaLocation = z64recomp_get_extended_actor_data(thisx, kusaGrassLocationExtension);
 
     if (this->isCut) {
         Gfx_DrawDListOpa(play, gKusaStumpDL);
@@ -283,7 +283,7 @@ RECOMP_PATCH void EnKusa2_Draw(Actor* thisx, PlayState* play) {
         return;
     }
 
-    u32* keatonLocation = z64recomp_get_extended_actor_data(thisx, keatonGrassExtension);
+    u32* keatonLocation = z64recomp_get_extended_actor_data(thisx, keatonGrassLocationExtension);
 
     if (this->actor.projectedPos.z <= 1200.0f) {
         if ((play->roomCtx.curRoom.behaviorType1 == ROOM_BEHAVIOR_TYPE1_0) && (this->actor.projectedPos.z > -150.0f) &&
@@ -325,7 +325,7 @@ RECOMP_PATCH void func_80A5EA48(Actor* thisx, PlayState* play) {
     EnKusa2* this = (EnKusa2*)thisx;
     s32 alpha;
 
-    u32* keatonLocation = z64recomp_get_extended_actor_data(thisx, keatonGrassExtension);
+    u32* keatonLocation = z64recomp_get_extended_actor_data(thisx, keatonGrassLocationExtension);
 
     if (this->unk_1CF == 0xFF) {
         OPEN_DISPS(play->state.gfxCtx);

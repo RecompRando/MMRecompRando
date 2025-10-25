@@ -37,9 +37,9 @@ void freestanding_item_replacement() {
             actor->params == ITEM00_RECOVERY_HEART
             ) {
             if (!rando_location_is_checked(LOCATION_RUPEE)) {
-                u32* extendedItem00Data;
-                extendedItem00Data = z64recomp_get_extended_actor_data(actor, item00Extension);
-                *extendedItem00Data = LOCATION_RUPEE;
+                u32* item00Location;
+                item00Location = z64recomp_get_extended_actor_data(actor, item00LocationExtension);
+                *item00Location = LOCATION_RUPEE;
                 actor->params = ITEM00_APITEM;
                 actor->draw = Item_RandoCollectibleDraw;
                 ((EnItem00*)actor)->getItemId = rando_get_item_id(LOCATION_RUPEE);
@@ -66,9 +66,9 @@ void AfterMure3_FiveRupeeSpawn() {
         if (this->unk148[i] != NULL) {
             if (!rando_location_is_checked(LOCATION_MURE3_RUPEE(i))) {
                 Actor* actor = &this->unk148[i]->actor;
-                u32* extendedItem00Data;
-                extendedItem00Data = z64recomp_get_extended_actor_data(actor, item00Extension);
-                *extendedItem00Data = LOCATION_MURE3_RUPEE(i);
+                u32* item00Location;
+                item00Location = z64recomp_get_extended_actor_data(actor, item00LocationExtension);
+                *item00Location = LOCATION_MURE3_RUPEE(i);
                 actor->params = ITEM00_APITEM;
                 actor->draw = Item_RandoCollectibleDraw;
                 ((EnItem00*)actor)->getItemId = rando_get_item_id(LOCATION_MURE3_RUPEE(i));
@@ -91,9 +91,9 @@ void AfterMure3_FiveRupeeSpawn2() {
         if (this->unk148[i] != NULL) {
             if (!rando_location_is_checked(LOCATION_MURE3_RUPEE(i))) {
                 Actor* actor = &this->unk148[i]->actor;
-                u32* extendedItem00Data;
-                extendedItem00Data = z64recomp_get_extended_actor_data(actor, item00Extension);
-                *extendedItem00Data = LOCATION_MURE3_RUPEE(i);
+                u32* item00Location;
+                item00Location = z64recomp_get_extended_actor_data(actor, item00LocationExtension);
+                *item00Location = LOCATION_MURE3_RUPEE(i);
                 actor->params = ITEM00_APITEM;
                 actor->draw = Item_RandoCollectibleDraw;
                 ((EnItem00*)actor)->getItemId = rando_get_item_id(LOCATION_MURE3_RUPEE(i));
@@ -116,9 +116,9 @@ void AfterMure3_SevenRupeeSpawn() {
         if (this->unk148[i] != NULL) {
             if (!rando_location_is_checked(LOCATION_MURE3_RUPEE(i))) {
                 Actor* actor = &this->unk148[i]->actor;
-                u32* extendedItem00Data;
-                extendedItem00Data = z64recomp_get_extended_actor_data(actor, item00Extension);
-                *extendedItem00Data = LOCATION_MURE3_RUPEE(i);
+                u32* item00Location;
+                item00Location = z64recomp_get_extended_actor_data(actor, item00LocationExtension);
+                *item00Location = LOCATION_MURE3_RUPEE(i);
                 actor->params = ITEM00_APITEM;
                 actor->draw = Item_RandoCollectibleDraw;
                 ((EnItem00*)actor)->getItemId = rando_get_item_id(LOCATION_MURE3_RUPEE(i));
@@ -180,13 +180,13 @@ RECOMP_PATCH void EnScopecoin_CheckCollectible(EnScopecoin* this, PlayState* pla
 }
 
 // deku playground
-ActorExtensionId gamelupyExtension;
-u32* extendedGamelupyData;
+ActorExtensionId gamelupyLocationExtension;
+u32* gamelupyLocation;
 Actor* EnGamelupyActor;
 
 void EnGamelupy_RandoDraw(Actor* thisx, PlayState* play) {
-    extendedGamelupyData = z64recomp_get_extended_actor_data(thisx, gamelupyExtension);
-    u32 getItemId = rando_get_item_id(*extendedGamelupyData);
+    gamelupyLocation = z64recomp_get_extended_actor_data(thisx, gamelupyLocationExtension);
+    u32 getItemId = rando_get_item_id(*gamelupyLocation);
     u16 objectId = getObjectId(getItemId);
 
     Matrix_Scale(20.0f, 20.0f, 20.0f, MTXMODE_APPLY);
@@ -202,16 +202,16 @@ void EnGamelupy_RandoDraw(Actor* thisx, PlayState* play) {
 
 RECOMP_HOOK("EnGamelupy_Init")
 void OnEnGamelupy_Init(Actor* thisx, PlayState* play) {
-    extendedGamelupyData = z64recomp_get_extended_actor_data(thisx, gamelupyExtension);
-    *extendedGamelupyData = LOCATION_PLAYGROUND_RUPEE;
+    gamelupyLocation = z64recomp_get_extended_actor_data(thisx, gamelupyLocationExtension);
+    *gamelupyLocation = LOCATION_PLAYGROUND_RUPEE;
     EnGamelupyActor = thisx;
 }
 
 RECOMP_HOOK_RETURN("EnGamelupy_Init")
 void AfterEnGamelupy_Init() {
     PlayState* play = gPlay;
-    extendedGamelupyData = z64recomp_get_extended_actor_data(EnGamelupyActor, gamelupyExtension);
-    if (!rando_location_is_checked(*extendedGamelupyData)) {
+    gamelupyLocation = z64recomp_get_extended_actor_data(EnGamelupyActor, gamelupyLocationExtension);
+    if (!rando_location_is_checked(*gamelupyLocation)) {
         EnGamelupyActor->draw = EnGamelupy_RandoDraw;
     }
 }
@@ -225,11 +225,11 @@ RECOMP_PATCH void EnGamelupy_Idle(EnGamelupy* this, PlayState* play) {
     if (this->collider.base.ocFlags1 & OC1_HIT) {
         *this->minigameScore += ENGAMELUPY_POINTS;
 
-        extendedGamelupyData = z64recomp_get_extended_actor_data(&this->actor, gamelupyExtension);
-        if (!rando_location_is_checked(*extendedGamelupyData)) {
+        gamelupyLocation = z64recomp_get_extended_actor_data(&this->actor, gamelupyLocationExtension);
+        if (!rando_location_is_checked(*gamelupyLocation)) {
             this->collectedTimer = 0;
             this->actor.gravity = 0.0f;
-            Actor* item = Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *extendedGamelupyData);
+            Actor* item = Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *gamelupyLocation);
             ((EnItem00*)item)->actionFunc = EnItem00_RandoTextAndFreeze;
             // this->actionFunc = EnGamelupy_Collected;
             Actor_Kill(&this->actor);

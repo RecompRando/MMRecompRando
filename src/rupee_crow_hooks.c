@@ -35,18 +35,18 @@ void AfterEnRuppecrow_SpawnRupee() {
     s16 rupeeIndex = this->rupeeIndex - 1;
     EnItem00* rupee = this->rupees[rupeeIndex];
 
-    u32* extendedItem00Data;
-    extendedItem00Data = z64recomp_get_extended_actor_data(&rupee->actor, item00Extension);
-    *extendedItem00Data = LOCATION_RUPEE_CROW(rupeeIndex);
+    u32* item00Location;
+    item00Location = z64recomp_get_extended_actor_data(&rupee->actor, item00LocationExtension);
+    *item00Location = LOCATION_RUPEE_CROW(rupeeIndex);
 
     if (EnRuppecrow_CanSpawnBlueRupees(play) && (rupeeIndex % 5) == 4 && rupeeIndex != 19) {
-        *extendedItem00Data = LOCATION_RUPEE_CROW(rupeeIndex + 20); // arbitrary +20
+        *item00Location = LOCATION_RUPEE_CROW(rupeeIndex + 20); // arbitrary +20
     }
 
-    if (!rando_location_is_checked(*extendedItem00Data)) {
+    if (!rando_location_is_checked(*item00Location)) {
         rupee->actor.params = ITEM00_APITEM;
         rupee->actor.draw = Item_RandoCollectibleDraw;
-        rupee->getItemId = rando_get_item_id(*extendedItem00Data);
+        rupee->getItemId = rando_get_item_id(*item00Location);
         rupee->actionFunc = Item_RandoCollectibleActionFunc;
     }
 }

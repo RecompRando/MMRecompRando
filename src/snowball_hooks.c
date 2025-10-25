@@ -14,18 +14,18 @@
 #define LOCATION_SNOWBALL_BIG (0x210000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoomExtra(play, thisx, ACTOR_OBJ_SNOWBALL2))
 
-ActorExtensionId snowballExtension;
-u32* extendedSnowballData;
-ActorExtensionId bigSnowballExtension;
-u32* extendedBigSnowballData;
+ActorExtensionId snowballLocationExtension;
+u32* snowballLocation;
+ActorExtensionId bigSnowballLocationExtension;
+u32* bigSnowballLocation;
 
 void grab_snowball_texture();
 
 // small snowball
 RECOMP_HOOK("ObjSnowball2_Init")
 void OnObjSnowball2_Init(Actor* thisx, PlayState* play) {
-    extendedSnowballData = z64recomp_get_extended_actor_data(thisx, snowballExtension);
-    *extendedSnowballData = LOCATION_SNOWBALL;
+    snowballLocation = z64recomp_get_extended_actor_data(thisx, snowballLocationExtension);
+    *snowballLocation = LOCATION_SNOWBALL;
     grab_snowball_texture();
 }
 
@@ -35,9 +35,9 @@ RECOMP_PATCH void func_80B38E88(ObjSnowball2* this, PlayState* play) {
     if (this->unk_1AE == 0) {
         temp_v0 = func_800A8150(ENOBJSNOWBALL2_GET_3F(&this->actor));
         
-        extendedSnowballData = z64recomp_get_extended_actor_data(&this->actor, snowballExtension);
-        if (!rando_location_is_checked(*extendedSnowballData)) {
-            Item_RandoDropCollectible(play, &this->actor.world.pos, (ENOBJSNOWBALL2_GET_7F00(&this->actor) << 8) | temp_v0, *extendedSnowballData);
+        snowballLocation = z64recomp_get_extended_actor_data(&this->actor, snowballLocationExtension);
+        if (!rando_location_is_checked(*snowballLocation)) {
+            Item_RandoDropCollectible(play, &this->actor.world.pos, (ENOBJSNOWBALL2_GET_7F00(&this->actor) << 8) | temp_v0, *snowballLocation);
             this->unk_1AE = 1;
             return;
         }
@@ -52,8 +52,8 @@ RECOMP_PATCH void func_80B38E88(ObjSnowball2* this, PlayState* play) {
 // large snowball
 RECOMP_HOOK("ObjSnowball_Init")
 void OnObjSnowball_Init(Actor* thisx, PlayState* play) {
-    extendedBigSnowballData = z64recomp_get_extended_actor_data(thisx, bigSnowballExtension);
-    *extendedBigSnowballData = LOCATION_SNOWBALL_BIG;
+    bigSnowballLocation = z64recomp_get_extended_actor_data(thisx, bigSnowballLocationExtension);
+    *bigSnowballLocation = LOCATION_SNOWBALL_BIG;
     grab_snowball_texture();
 }
 
@@ -63,9 +63,9 @@ RECOMP_HOOK("func_80B03FF8")
 void on_func_80B03FF8(ObjSnowball* this, PlayState* play) {
     // s16 rotY = this->actor.home.rot.y; // snowball type (only 0 normally drops items)
     s32 temp_v0 = func_800A8150(OBJSNOWBALL_GET_SWITCH_FLAG(&this->actor));
-    extendedBigSnowballData = z64recomp_get_extended_actor_data(&this->actor, bigSnowballExtension);
-    if (!rando_location_is_checked(*extendedBigSnowballData)) {
-        Item_RandoDropCollectible(play, &this->actor.world.pos, (OBJSNOWBALL_GET_7F00(&this->actor) << 8) | temp_v0, *extendedBigSnowballData);
+    bigSnowballLocation = z64recomp_get_extended_actor_data(&this->actor, bigSnowballLocationExtension);
+    if (!rando_location_is_checked(*bigSnowballLocation)) {
+        Item_RandoDropCollectible(play, &this->actor.world.pos, (OBJSNOWBALL_GET_7F00(&this->actor) << 8) | temp_v0, *bigSnowballLocation);
         return;
     }
 }
@@ -73,8 +73,8 @@ void on_func_80B03FF8(ObjSnowball* this, PlayState* play) {
 RECOMP_PATCH void func_80B02D58(ObjSnowball* this, PlayState* play) {
     s32 temp_v0 = func_800A8150(OBJSNOWBALL_GET_SWITCH_FLAG(&this->actor));
 
-    extendedBigSnowballData = z64recomp_get_extended_actor_data(&this->actor, bigSnowballExtension);
-    if (rando_location_is_checked(*extendedBigSnowballData)) {
+    bigSnowballLocation = z64recomp_get_extended_actor_data(&this->actor, bigSnowballLocationExtension);
+    if (rando_location_is_checked(*bigSnowballLocation)) {
         if (temp_v0 >= 0) {
             Item_DropCollectible(play, &this->actor.home.pos, (OBJSNOWBALL_GET_7F00(&this->actor) << 8) | temp_v0);
         }
@@ -135,8 +135,8 @@ RECOMP_PATCH void ObjSnowball_Draw(Actor* thisx, PlayState* play) {
     Gfx_SetupDL25_Opa(play->state.gfxCtx);
     gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
 
-    extendedBigSnowballData = z64recomp_get_extended_actor_data(thisx, bigSnowballExtension);
-    POLY_OPA_DISP = GenericSnowball_DrawRandoColored(play, *extendedBigSnowballData, POLY_OPA_DISP);
+    bigSnowballLocation = z64recomp_get_extended_actor_data(thisx, bigSnowballLocationExtension);
+    POLY_OPA_DISP = GenericSnowball_DrawRandoColored(play, *bigSnowballLocation, POLY_OPA_DISP);
 
     CLOSE_DISPS(play->state.gfxCtx);
 }
@@ -147,8 +147,8 @@ RECOMP_PATCH void ObjSnowball2_Draw(Actor* thisx, PlayState* play) {
     Gfx_SetupDL25_Opa(play->state.gfxCtx);
     gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
 
-    extendedSnowballData = z64recomp_get_extended_actor_data(thisx, snowballExtension);
-    POLY_OPA_DISP = GenericSnowball_DrawRandoColored(play, *extendedSnowballData, POLY_OPA_DISP);
+    snowballLocation = z64recomp_get_extended_actor_data(thisx, snowballLocationExtension);
+    POLY_OPA_DISP = GenericSnowball_DrawRandoColored(play, *snowballLocation, POLY_OPA_DISP);
 
     CLOSE_DISPS(play->state.gfxCtx);
 }

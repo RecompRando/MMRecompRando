@@ -14,16 +14,16 @@
 #define LOCATION_BOULDER2 (0x1B0000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                         | randoGetLoadedActorNumInSameRoomExtra(play, thisx, ACTOR_OBJ_BOMBIWA))
 
-ActorExtensionId boulderExtension;
-u32* extendedBoulderData;
-ActorExtensionId boulder2Extension;
-u32* extendedBoulder2Data;
+ActorExtensionId boulderLocationExtension;
+u32* boulderLocation;
+ActorExtensionId boulder2LocationExtension;
+u32* boulder2Location;
 
 // normal boulders
 RECOMP_HOOK("ObjBombiwa_Init")
 void OnObjBombiwa_Init(Actor* thisx, PlayState* play) {
-    extendedBoulderData = z64recomp_get_extended_actor_data(thisx, boulderExtension);
-    *extendedBoulderData = LOCATION_BOULDER;
+    boulderLocation = z64recomp_get_extended_actor_data(thisx, boulderLocationExtension);
+    *boulderLocation = LOCATION_BOULDER;
 }
 
 ObjBombiwa* sObjBombiwa;
@@ -39,9 +39,9 @@ void AfterObjBombiwa_CheckBroken() {
     PlayState* play = gPlay;
 
     if (Flags_GetSwitch(play, OBJBOMBIWA_GET_SWITCH_FLAG(&this->actor))) {
-        extendedBoulderData = z64recomp_get_extended_actor_data(&this->actor, boulderExtension);
-        if (!rando_location_is_checked(*extendedBoulderData)) {
-            Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *extendedBoulderData);
+        boulderLocation = z64recomp_get_extended_actor_data(&this->actor, boulderLocationExtension);
+        if (!rando_location_is_checked(*boulderLocation)) {
+            Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *boulderLocation);
         }
     }
 }
@@ -49,14 +49,14 @@ void AfterObjBombiwa_CheckBroken() {
 // bronze boulders
 RECOMP_HOOK("ObjHamishi_Init")
 void OnObjHamishi_Init(Actor* thisx, PlayState* play) {
-    extendedBoulder2Data = z64recomp_get_extended_actor_data(thisx, boulder2Extension);
-    *extendedBoulder2Data = LOCATION_BOULDER2;
+    boulder2Location = z64recomp_get_extended_actor_data(thisx, boulder2LocationExtension);
+    *boulder2Location = LOCATION_BOULDER2;
 }
 
 RECOMP_HOOK("func_809A10F4")
 void ObjHamishi_Broken(ObjHamishi* this, PlayState* play) {
-    extendedBoulder2Data = z64recomp_get_extended_actor_data(&this->actor, boulder2Extension);
-    if (!rando_location_is_checked(*extendedBoulder2Data)) {
-        Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *extendedBoulder2Data);
+    boulder2Location = z64recomp_get_extended_actor_data(&this->actor, boulder2LocationExtension);
+    if (!rando_location_is_checked(*boulder2Location)) {
+        Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *boulder2Location);
     }
 }

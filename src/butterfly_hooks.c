@@ -14,10 +14,10 @@
 #define LOCATION_FAIRY_BUTTERFLY (0xBF0000 | (sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                                     | randoGetLoadedActorNumInSameRoom(play, thisx))
 
-ActorExtensionId butterflyExtension;
-u32* extendedButterflyData;
-extern ActorExtensionId fairyExtension;
-extern u32* extendedFairyData;
+ActorExtensionId butterflyLocationExtension;
+u32* butterflyLocation;
+extern ActorExtensionId fairyLocationExtension;
+extern u32* fairyLocation;
 
 EnButte* sEnButte;
 
@@ -39,8 +39,8 @@ void OnEnButte_Init(Actor* thisx, PlayState* play) {
         sceneId = getCurrentGrotto(play);
     }
 
-    extendedButterflyData = z64recomp_get_extended_actor_data(thisx, butterflyExtension);
-    *extendedButterflyData = LOCATION_FAIRY_BUTTERFLY;
+    butterflyLocation = z64recomp_get_extended_actor_data(thisx, butterflyLocationExtension);
+    *butterflyLocation = LOCATION_FAIRY_BUTTERFLY;
 }
 
 RECOMP_PATCH void func_8091CFB4(EnButte* this, PlayState* play) {
@@ -55,9 +55,9 @@ RECOMP_PATCH void func_8091CFB4(EnButte* this, PlayState* play) {
                     this->actor.focus.pos.z, 0, this->actor.shape.rot.y, 0, FAIRY_PARAMS(FAIRY_TYPE_2, false, 0));
         this->unk_250 = 0;
         
-        extendedButterflyData = z64recomp_get_extended_actor_data(&this->actor, butterflyExtension);
-        extendedFairyData = z64recomp_get_extended_actor_data(fairy, fairyExtension);
-        *extendedFairyData = *extendedButterflyData;
+        butterflyLocation = z64recomp_get_extended_actor_data(&this->actor, butterflyLocationExtension);
+        fairyLocation = z64recomp_get_extended_actor_data(fairy, fairyLocationExtension);
+        *fairyLocation = *butterflyLocation;
         fairy->draw = EnElf_RandoDraw;
     } else if (this->unk_24C <= 0) {
         func_8091D070(this);
