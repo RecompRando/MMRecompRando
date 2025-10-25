@@ -57,6 +57,7 @@ void GetItem_DrawOpa01WithFlame(PlayState* play, void* dl0, void* dl1);
 void GetItem_DrawOwlStatue(PlayState* play);
 void GetItem_DrawFrog(PlayState* play, s16 drawId);
 void GetItem_DrawStrayFairy(PlayState* play, s16 drawId);
+void GetItem_DrawScarecrow(PlayState* play, s16 drawId);
 void GetItem_DrawSoulBoss(PlayState* play, s16 drawId);
 void GetItem_DrawSoulMisc(PlayState* play, s16 drawId);
 void GetItem_DrawSoulNPC(PlayState* play, s16 drawId);
@@ -757,6 +758,9 @@ RECOMP_PATCH void GetItem_Draw(PlayState* play, s16 drawId) {
         case GID_OWL_STATUE:
             GetItem_DrawOwlStatue(play);
             return;
+        case GID_SCARECROW:
+            GetItem_DrawScarecrow(play, drawId);
+            return;
         case GID_FROG_YELLOW:
         case GID_FROG_CYAN:
         case GID_FROG_PINK:
@@ -1219,6 +1223,36 @@ void GetItem_DrawFrog(PlayState* play, s16 drawId) {
         CLOSE_DISPS(play->state.gfxCtx);
 
         ObjUnload(play, 0x06, OBJECT_FR);
+    }
+}
+
+extern FlexSkeletonHeader object_ka_Skel_0065B0;
+extern AnimationHeader object_ka_Anim_000214;
+
+// credit to proxy for original code
+void GetItem_DrawScarecrow(PlayState* play, s16 drawId) {
+    static bool initialized = false;
+    static SkelAnime skelAnime;
+    static u32 lastUpdate = 0;
+
+    if (ObjLoad(play, 0x06, OBJECT_KA)) {
+        if (!initialized) {
+            initialized = true;
+            SkelAnime_InitFlex(play, &skelAnime, &object_ka_Skel_0065B0, &object_ka_Anim_000214, NULL, NULL, 0);
+        }
+
+        if (play != NULL && lastUpdate != play->state.frames) {
+            lastUpdate = play->state.frames;
+            SkelAnime_Update(&skelAnime);
+        }
+
+        Matrix_Translate(0.0f, -30.0f, 0.0f, MTXMODE_APPLY);
+        Matrix_Scale(0.0075f, 0.0075f, 0.0075f, MTXMODE_APPLY);
+
+        Gfx_SetupDL25_Opa(play->state.gfxCtx);
+        SkelAnime_DrawFlexOpa(play, skelAnime.skeleton, skelAnime.jointTable, skelAnime.dListCount, NULL, NULL, NULL);
+
+        ObjUnload(play, 0x06, OBJECT_KA);
     }
 }
 

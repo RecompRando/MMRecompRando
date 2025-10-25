@@ -8,17 +8,37 @@
 #define ACTOR_FLAG_LOCK_ON_DISABLED  (1 << 27)
 #include "overlays/actors/ovl_En_Kakasi/z_en_kakasi.h"
 
-#define LOCATION_SCARECROW (0x300000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+#define LOCATION_SCARECROW (AP_PREFIX_SCARECROW | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, &this->picto.actor))
 
+EnKakasi* savedEnKakasi;
+EnKakasiActionFunc savedEnKakasiActionFunc;
+
+void EnKakasi_Draw(Actor* thisx, PlayState* play);
+void EnKakasi_RisingOutOfGround(EnKakasi* this, PlayState* play);
 void EnKakasi_SetupRiseOutOfGround(EnKakasi* this, PlayState* play);
-void EnKakasi_IdleUnderground(EnKakasi* this, PlayState* play);
+
+RECOMP_HOOK("EnKakasi_Init")
+void OnEnKakasi_Init(Actor* thisx, PlayState* play) {
+    savedEnKakasi = ((EnKakasi*)thisx);
+}
+
+RECOMP_HOOK_RETURN("EnKakasi_Init")
+void AfterEnKakasi_Init() {
+    EnKakasi* this = savedEnKakasi;
+    PlayState* play = gPlay;
+    // there's some weird bug that seems to not know if the player has this item?
+    if (rando_has_item(LOCATION_SCARECROW)) { // locations and items share ids
+        this->picto.actor.draw = EnKakasi_Draw;
+        this->unkState196 = 6;
+        this->actionFunc = EnKakasi_RisingOutOfGround;
+    }
+}
 
 void EnKakasi_GiveRandoItem(EnKakasi* this, PlayState* play) {
     if (Actor_HasParent(&this->picto.actor, play)) {
         this->picto.actor.parent = NULL;
-        // this->actionFunc = EnKakasi_IdleUnderground;
-        this->actionFunc = EnKakasi_SetupRiseOutOfGround;
+        this->actionFunc = savedEnKakasiActionFunc;
     } else {
         Actor_OfferGetItemHook(&this->picto.actor, play, rando_get_item_id(LOCATION_SCARECROW), LOCATION_SCARECROW, 1000.0f, 1000.0f, true, true);
     }
@@ -33,8 +53,26 @@ void EnKakasi_IdleUndergroundAndWaitForSpawn(EnKakasi* this, PlayState* play) {
         play->msgCtx.ocarinaMode = OCARINA_MODE_END;
         AudioOcarina_SetOcarinaDisableTimer(0, 1);
         Message_CloseTextbox(play);
-        if (!rando_location_is_checked(LOCATION_SCARECROW)) {
+        if (rando_get_slotdata_u32("scarecrowsanity") && !rando_location_is_checked(LOCATION_SCARECROW)) {
             recomp_printf("scarecrow location: 0x%06X\n", LOCATION_SCARECROW);
+            savedEnKakasiActionFunc = this->actionFunc;
+            this->actionFunc = EnKakasi_GiveRandoItem;
+        } else {
+            this->actionFunc = EnKakasi_SetupRiseOutOfGround;
+        }
+    }
+}
+
+RECOMP_HOOK("EnKakasi_IdleRisen")
+void EnKakasi_IdleRisenCheckForOcarina(EnKakasi* this, PlayState* play) {
+    if ((this->picto.actor.xzDistToPlayer < this->songSummonDist) && ((BREG(1) != 0) || (play->msgCtx.ocarinaMode == OCARINA_MODE_ACTIVE))) {
+        // this->picto.actor.flags &= ~ACTOR_FLAG_LOCK_ON_DISABLED;
+        play->msgCtx.ocarinaMode = OCARINA_MODE_END;
+        AudioOcarina_SetOcarinaDisableTimer(0, 1);
+        Message_CloseTextbox(play);
+        if (rando_get_slotdata_u32("scarecrowsanity") && !rando_location_is_checked(LOCATION_SCARECROW)) {
+            recomp_printf("scarecrow location: 0x%06X\n", LOCATION_SCARECROW);
+            savedEnKakasiActionFunc = this->actionFunc;
             this->actionFunc = EnKakasi_GiveRandoItem;
         } else {
             this->actionFunc = EnKakasi_SetupRiseOutOfGround;

@@ -63,6 +63,8 @@ typedef enum {
     GI_FROG_PINK,
     GI_FROG_BLUE,
     GI_FROG_WHITE,
+    // scarecrows
+    GI_SCARECROW,
     // boss souls
     GI_BOSS_SOUL_ODOLWA,
     GI_BOSS_SOUL_GOHT,
@@ -128,13 +130,14 @@ typedef enum {
     GID_SWAMP_SKULL_TOKEN,
     GID_OCEAN_SKULL_TOKEN,
     GID_RUPOOR, // unimplemented
-    // owls + frogs
+    // owls + frogs + scarecrows
     GID_OWL_STATUE,
     GID_FROG_YELLOW,
     GID_FROG_CYAN,
     GID_FROG_PINK,
     GID_FROG_BLUE,
     GID_FROG_WHITE,
+    GID_SCARECROW,
     // boss souls
     GID_BOSS_SOUL_ODOLWA,
     GID_BOSS_SOUL_GOHT,

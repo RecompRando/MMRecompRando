@@ -167,6 +167,11 @@ void randoScout() {
         removeAllScoutsWithPrefix(AP_PREFIX_GRASS_KEATON);
         removeAllScoutsWithPrefix(AP_PREFIX_MURE_GRASS);
     }
+    
+    if (rando_get_slotdata_u32("scarecrowsanity") == 0)
+    {
+        removeAllScoutsWithPrefix(AP_PREFIX_SCARECROW);
+    }
 
     rando_send_queued_scouts(0);
 }
@@ -636,6 +641,8 @@ u32 rando_get_item_id(u32 location)
                         return GI_FROG_YELLOW + (item & 0xF);
                 }
                 return GI_NONE;
+            case AP_PREFIX_SCARECROW:
+                return GI_SCARECROW;
             case AP_ITEM_PREFIX_SOUL_MISC:
                 switch (item)
                 {
