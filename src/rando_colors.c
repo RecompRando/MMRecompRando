@@ -16,6 +16,7 @@ Color_RGB8 randoHeartColor = {255, 0, 0};
 Color_RGB8 randoSpiderColor = {255, 255, 255};
 Color_RGB8 randoFairyColor = {255, 128, 255};
 Color_RGB8 randoKeyColor = {192, 192, 192};
+Color_RGB8 randoSoulColor = {136, 0, 255};
 
 u16 RGBA16toGrayscale_Color(u16 RGBA) {
     // https://github.com/krimtonz/rgba5551topng/blob/master/rgba5551topng.c#L111-L114
@@ -111,7 +112,13 @@ bool get_rando_color(Color_RGB8* rColor, u32 location) {
     }
 
     s16 getItem = rando_get_item_id(location);
-    
+
+    // souls (bounds need to be extended for more souls)
+    if (getItem >= GI_BOSS_SOUL_ODOLWA && getItem <= GI_ABSURD_GENERIC) {
+        *rColor = randoSoulColor;
+        return true;
+    }
+
     switch (getItem) {
         case GI_AP_PROG:
             *rColor = rainbowColor;

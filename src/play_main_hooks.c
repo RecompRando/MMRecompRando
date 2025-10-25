@@ -636,7 +636,7 @@ u32 rando_get_item_id(u32 location)
                         return GI_FROG_YELLOW + (item & 0xF);
                 }
                 return GI_NONE;
-            case 0x0A0000: // misc. souls
+            case AP_ITEM_PREFIX_SOUL_MISC:
                 switch (item)
                 {
                     case (AP_ITEM_ID_SOUL_MISC_COW):
@@ -649,7 +649,7 @@ u32 rando_get_item_id(u32 location)
                         return GI_MISC_SOUL_BUTTERFLY;
                 }
                 return GI_NONE;
-            case 0x0B0000: // boss souls
+            case AP_ITEM_PREFIX_SOUL_BOSS:
                 switch (item)
                 {
                     case (AP_ITEM_ID_SOUL_BOSS_ODOLWA):
@@ -664,11 +664,11 @@ u32 rando_get_item_id(u32 location)
                         return GI_BOSS_SOUL_MAJORA;
                 }
                 return GI_NONE;
-            case 0x0C0000: // npc souls
+            case AP_ITEM_PREFIX_SOUL_NPC:
                 return GI_NPC_GENERIC;
-            case 0x0D0000: // utility souls
+            case AP_ITEM_PREFIX_SOUL_UTILITY:
                 return GI_UTILITY_GENERIC;
-            case 0x0E0000: // absurd souls
+            case AP_ITEM_PREFIX_SOUL_ABSURD:
                 return GI_ABSURD_GENERIC;
         }
     }
