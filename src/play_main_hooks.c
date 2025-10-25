@@ -53,6 +53,14 @@ void init_rando()
     randoCreateNotificationContainer();
 }
 
+void removeAllScoutsWithPrefix(u32 prefix) {
+    for (int i = 0x00; i <= 0xFFFF; ++i)
+    {
+        u32 location_id = prefix | i;
+        rando_remove_queued_scout(location_id);
+    }
+}
+
 void randoScout() {
     rando_queue_scouts_all();
 
@@ -149,6 +157,15 @@ void randoScout() {
     if (rando_get_slotdata_u32("intro_checks") == 0)
     {
         rando_remove_queued_scout(0x061A00);
+    }
+    
+    if (rando_get_slotdata_u32("grasssanity") == 0)
+    {
+        removeAllScoutsWithPrefix(AP_PREFIX_GRASS_GROUP);
+        removeAllScoutsWithPrefix(AP_PREFIX_GRASS_GROUP2);
+        removeAllScoutsWithPrefix(AP_PREFIX_GRASS_KUSA);
+        removeAllScoutsWithPrefix(AP_PREFIX_GRASS_KEATON);
+        removeAllScoutsWithPrefix(AP_PREFIX_MURE_GRASS);
     }
 
     rando_send_queued_scouts(0);

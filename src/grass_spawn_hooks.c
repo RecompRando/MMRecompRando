@@ -46,7 +46,7 @@ u32 ObjGrass_GetLocation(ObjGrassElement* grass) {
     }
 
     // recomp_printf("pack: %d, bush: %d\n", groupId, bushId);
-    return 0x100000 | (groupId << 12) | (sceneId << 4) | bushId;
+    return AP_PREFIX_GRASS_GROUP | (groupId << 12) | (sceneId << 4) | bushId;
 }
 
 void grab_grass_texture();
@@ -57,12 +57,14 @@ void OnObjGrass_Init(Actor* thisx, PlayState* play) {
     gObjGrass = THIS;
 
     grab_grass_texture();
-    gObjGrass->actor.draw = ObjGrass_DrawRando;
+    if (rando_get_slotdata_u32("grasssanity")) {
+        gObjGrass->actor.draw = ObjGrass_DrawRando;
+    }
 }
 
 RECOMP_HOOK("ObjGrass_DropCollectible")
 void ObjGrass_ReplaceCollectible(ObjGrassElement* grassElem, PlayState* play) {
-    if (!rando_location_is_checked(LOCATION_GRASS(grassElem))) {
+    if (rando_get_slotdata_u32("grasssanity") && !rando_location_is_checked(LOCATION_GRASS(grassElem))) {
         Item_RandoDropCollectible(play, &grassElem->pos, ITEM00_APITEM, LOCATION_GRASS(grassElem));
         grassElem->dropTable = 0x10; // disable further drops
     }
@@ -79,7 +81,7 @@ void OnObjGrassCarry_Main(ObjGrassCarry* this, PlayState* play) {
 
 RECOMP_HOOK_RETURN("ObjGrassCarry_Main") 
 void AfterObjGrassCarry_Main() {
-    if (Actor_HasParent(&carriedGrass->actor, gPlay)) {
+    if (Actor_HasParent(&carriedGrass->actor, gPlay) && rando_get_slotdata_u32("grasssanity")) {
         carriedGrass->actor.draw = ObjGrassCarry_DrawRando;
     }
 }
@@ -91,7 +93,7 @@ void OnObjGrassCarry_Fall(ObjGrassCarry* this, PlayState* play) {
 
 RECOMP_PATCH void ObjGrassCarry_DropCollectible(Vec3f* pos, s16 dropTable, PlayState* play) {
     ObjGrassElement* grassElem = carriedGrass->grassElem;
-    if (!rando_location_is_checked(LOCATION_GRASS(grassElem))) {
+    if (rando_get_slotdata_u32("grasssanity") && !rando_location_is_checked(LOCATION_GRASS(grassElem))) {
         Item_RandoDropCollectible(play, pos, ITEM00_APITEM, LOCATION_GRASS(grassElem));
         return;
     }

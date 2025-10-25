@@ -8,8 +8,8 @@
 
 #include "overlays/actors/ovl_En_Kusa2/z_en_kusa2.h"
 
-#define LOCATION_KEATON_GRASS (0x130000 | (play->sceneId << 8) | curGrass)
-#define LOCATION_KEATON_GRASS_INCREMENTAL (0x130000 | (play->sceneId << 8) | kusa2->unk_1BC)
+#define LOCATION_KEATON_GRASS (AP_PREFIX_GRASS_KEATON | (play->sceneId << 8) | curGrass)
+#define LOCATION_KEATON_GRASS_INCREMENTAL (AP_PREFIX_GRASS_KEATON | (play->sceneId << 8) | kusa2->unk_1BC)
 
 EnKusa2* keatonGrass;
 ActorExtensionId keatonGrassExtension;
@@ -56,7 +56,7 @@ RECOMP_PATCH void func_80A5BD14(EnKusa2* this, PlayState* play, s32 arg2) {
         //     currentGrassLocation = LOCATION_KEATON_GRASS_INCREMENTAL;
         // }
 
-        if (!rando_location_is_checked(currentGrassLocation)) {
+        if (rando_get_slotdata_u32("grasssanity") && !rando_location_is_checked(currentGrassLocation)) {
             Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, currentGrassLocation);
         } else {
             Item_DropCollectible(play, &this->actor.world.pos, D_80A5EB24[kusa2->unk_1BC]);

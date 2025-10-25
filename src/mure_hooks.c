@@ -6,8 +6,8 @@
 
 #include "overlays/actors/ovl_Obj_Mure/z_obj_mure.h"
 
-#define LOCATION_MURE(i) (0x140000 | (play->sceneId << 8) | ((play->roomCtx.curRoom.num + *mureIndex) << 4) | i)
-#define LOCATION_MURE2(i) (0x140000 | (play->sceneId << 8) | ((play->roomCtx.curRoom.num + *mure2Index) << 4) | i)
+#define LOCATION_MURE(i) (AP_PREFIX_MURE_GRASS | (play->sceneId << 8) | ((play->roomCtx.curRoom.num + *mureIndex) << 4) | i)
+#define LOCATION_MURE2(i) (AP_PREFIX_MURE_GRASS | (play->sceneId << 8) | ((play->roomCtx.curRoom.num + *mure2Index) << 4) | i)
 #define LOCATION_MURE2_ROCK(i) (0x260000 | (play->sceneId << 8) | ((play->roomCtx.curRoom.num + *mure2Index) << 4) | i)
 
 ActorExtensionId mureExtension;

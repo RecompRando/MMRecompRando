@@ -273,6 +273,7 @@ void ObjGrass_DrawXluRando(Actor* thisx, PlayState* play) {
 extern MtxF D_80A60908[8];
 
 void func_80A5B954(MtxF* matrix, f32 arg1);
+void func_80A5E80C(PlayState* play, s32 arg1);
 
 RECOMP_PATCH void EnKusa2_Draw(Actor* thisx, PlayState* play) {
     EnKusa2* this = (EnKusa2*)thisx;
@@ -289,7 +290,10 @@ RECOMP_PATCH void EnKusa2_Draw(Actor* thisx, PlayState* play) {
             (this->actor.projectedPos.z < 400.0f)) {
             func_80A5B954(&D_80A60908[this->unk_1CE], 0.0015f);
         }
-        // Gfx_DrawDListOpa(play, gKusaBushType1DL);
+        if (rando_get_slotdata_u32("grasssanity") == 0) {
+            Gfx_DrawDListOpa(play, gKusaBushType1DL);
+            return;
+        }
         OPEN_DISPS(play->state.gfxCtx);
         Gfx_SetupDL25_Opa(play->state.gfxCtx);
         gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
@@ -299,7 +303,10 @@ RECOMP_PATCH void EnKusa2_Draw(Actor* thisx, PlayState* play) {
 
         CLOSE_DISPS(play->state.gfxCtx);
     } else if (this->actor.projectedPos.z < 1300.0f) {
-        // func_80A5E80C(play, (1300.0f - this->actor.projectedPos.z) * 2.55f);
+        if (rando_get_slotdata_u32("grasssanity") == 0) {
+            func_80A5E80C(play, (1300.0f - this->actor.projectedPos.z) * 2.55f);
+            return;
+        }
         OPEN_DISPS(play->state.gfxCtx);
 
         alpha = (1300.0f - this->actor.projectedPos.z) * 2.55f;

@@ -26,7 +26,7 @@ u32 EnKusa_CreateLocation(PlayState* play, Actor* actor) {
         sceneId = getCurrentGrotto(play);
     }
 
-    return (0x120000 | (sceneId << 8) | (curRoom << 4) | actorIndex);
+    return (AP_PREFIX_GRASS_KUSA | (sceneId << 8) | (curRoom << 4) | actorIndex);
 }
 
 // TODO: handle the different types of grass correctly (i.e. respawning)
@@ -59,7 +59,7 @@ RECOMP_PATCH void EnKusa_DropCollectible(EnKusa* this, PlayState* play) {
     s32 collectableParams;
 
     extendedKusaGrassData = z64recomp_get_extended_actor_data(&this->actor, kusaGrassExtension);
-    if (!rando_location_is_checked(*extendedKusaGrassData)) {
+    if (rando_get_slotdata_u32("grasssanity") && !rando_location_is_checked(*extendedKusaGrassData)) {
         collectible = func_800A8150(KUSA_GET_PARAM_FC(&this->actor));
         collectableParams = KUSA_GET_COLLECTIBLE_ID(&this->actor);
         Item_RandoDropCollectible(play, &this->actor.world.pos, (collectableParams << 8) | collectible, *extendedKusaGrassData);
@@ -98,6 +98,8 @@ RECOMP_HOOK_RETURN("EnKusa_WaitObject")
 void AfterEnKusa_WaitObject() {
     EnKusa* this = savedKusa;
     PlayState* play = gPlay;
+
+    if (!rando_get_slotdata_u32("grasssanity")) return;
 
     if (Object_IsLoaded(&play->objectCtx, this->objectSlot)) {
         s32 kusaType = KUSA_GET_TYPE(&this->actor);
