@@ -36,7 +36,7 @@ RECOMP_PATCH void func_80B38E88(ObjSnowball2* this, PlayState* play) {
         temp_v0 = func_800A8150(ENOBJSNOWBALL2_GET_3F(&this->actor));
         
         snowballLocation = z64recomp_get_extended_actor_data(&this->actor, snowballLocationExtension);
-        if (!rando_location_is_checked(*snowballLocation)) {
+        if (rando_get_slotdata_u32("snowsanity") && !rando_location_is_checked(*snowballLocation)) {
             Item_RandoDropCollectible(play, &this->actor.world.pos, (ENOBJSNOWBALL2_GET_7F00(&this->actor) << 8) | temp_v0, *snowballLocation);
             this->unk_1AE = 1;
             return;
@@ -64,7 +64,7 @@ void on_func_80B03FF8(ObjSnowball* this, PlayState* play) {
     // s16 rotY = this->actor.home.rot.y; // snowball type (only 0 normally drops items)
     s32 temp_v0 = func_800A8150(OBJSNOWBALL_GET_SWITCH_FLAG(&this->actor));
     bigSnowballLocation = z64recomp_get_extended_actor_data(&this->actor, bigSnowballLocationExtension);
-    if (!rando_location_is_checked(*bigSnowballLocation)) {
+    if (rando_get_slotdata_u32("snowsanity") && !rando_location_is_checked(*bigSnowballLocation)) {
         Item_RandoDropCollectible(play, &this->actor.world.pos, (OBJSNOWBALL_GET_7F00(&this->actor) << 8) | temp_v0, *bigSnowballLocation);
         return;
     }
@@ -74,7 +74,7 @@ RECOMP_PATCH void func_80B02D58(ObjSnowball* this, PlayState* play) {
     s32 temp_v0 = func_800A8150(OBJSNOWBALL_GET_SWITCH_FLAG(&this->actor));
 
     bigSnowballLocation = z64recomp_get_extended_actor_data(&this->actor, bigSnowballLocationExtension);
-    if (rando_location_is_checked(*bigSnowballLocation)) {
+    if (rando_get_slotdata_u32("snowsanity") && rando_location_is_checked(*bigSnowballLocation)) {
         if (temp_v0 >= 0) {
             Item_DropCollectible(play, &this->actor.home.pos, (OBJSNOWBALL_GET_7F00(&this->actor) << 8) | temp_v0);
         }
@@ -118,7 +118,7 @@ void grab_snowball_texture() {
 Gfx* GenericSnowball_DrawRandoColored(PlayState* play, u32 location, Gfx* gfx) {
     Color_RGB8 color;
     
-    if (!get_rando_color(&color, location)) {
+    if (!rando_get_slotdata_u32("snowsanity") || !get_rando_color(&color, location)) {
         gDPSetPrimColor(gfx++, 0, 0, 255, 255, 255, 255);
         gSPDisplayList(gfx++, object_goroiwa_DL_008B90);
         return gfx;

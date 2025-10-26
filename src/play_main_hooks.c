@@ -173,9 +173,34 @@ void randoScout() {
         removeAllScoutsWithPrefix(AP_PREFIX_POTS);
     }
     
+    if (rando_get_slotdata_u32("soilsanity") == 0)
+    {
+        removeAllScoutsWithPrefix(AP_PREFIX_POTS);
+    }
+    
+    if (rando_get_slotdata_u32("rupeesanity") == 0)
+    {
+        removeAllScoutsWithPrefix(AP_PREFIX_FREESTANDING);
+    }
+    
+    if (rando_get_slotdata_u32("snowsanity") == 0)
+    {
+        removeAllScoutsWithPrefix(AP_PREFIX_SNOWBALLS);
+    }
+    
     if (rando_get_slotdata_u32("scarecrowsanity") == 0)
     {
         removeAllScoutsWithPrefix(AP_PREFIX_SCARECROW);
+    }
+    
+    if (rando_get_slotdata_u32("owlsanity") == 0)
+    {
+        removeAllScoutsWithPrefix(AP_PREFIX_OWLS);
+    }
+    
+    if (rando_get_slotdata_u32("frogsanity") == 0)
+    {
+        removeAllScoutsWithPrefix(AP_PREFIX_FROGS);
     }
 
     rando_send_queued_scouts(0);

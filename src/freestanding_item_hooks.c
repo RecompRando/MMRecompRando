@@ -10,11 +10,11 @@
 #include "overlays/actors/ovl_En_Scopecoin/z_en_scopecoin.h"
 #include "overlays/actors/ovl_En_Gamelupy/z_en_gamelupy.h"
 
-#define LOCATION_RUPEE (0x170000 | (gPlay->sceneId << 8) | (gPlay->roomCtx.curRoom.num << 4) \
+#define LOCATION_RUPEE (AP_PREFIX_FREESTANDING | (gPlay->sceneId << 8) | (gPlay->roomCtx.curRoom.num << 4) \
                         | randoGetLoadedActorNumInSameRoom(gPlay, actor))
-#define LOCATION_MURE3_RUPEE(index) (0x170000 | (play->sceneId << 8) | (0xF << 4) | index)
-#define LOCATION_TERMINATREE_RUPEE(index) (0x170000 | (play->sceneId << 8) | (0xE << 4) | index)
-#define LOCATION_PLAYGROUND_RUPEE (0x170000 | (play->sceneId << 8) | (CURRENT_DAY << 4) | randoGetLoadedActorNumInSameRoom(play, thisx))
+#define LOCATION_MURE3_RUPEE(index) (AP_PREFIX_FREESTANDING | (play->sceneId << 8) | (0xF << 4) | index)
+#define LOCATION_TERMINATREE_RUPEE(index) (AP_PREFIX_FREESTANDING | (play->sceneId << 8) | (0xE << 4) | index)
+#define LOCATION_PLAYGROUND_RUPEE (AP_PREFIX_FREESTANDING | (play->sceneId << 8) | (CURRENT_DAY << 4) | randoGetLoadedActorNumInSameRoom(play, thisx))
 
 void Item_RandoCollectibleDraw(Actor* thisx, PlayState* play);
 void Item_RandoCollectibleGround(EnItem00* this, PlayState* play);
@@ -36,7 +36,7 @@ void freestanding_item_replacement() {
             actor->params == ITEM00_RUPEE_HUGE ||
             actor->params == ITEM00_RECOVERY_HEART
             ) {
-            if (!rando_location_is_checked(LOCATION_RUPEE)) {
+            if (rando_get_slotdata_u32("rupeesanity") && !rando_location_is_checked(LOCATION_RUPEE)) {
                 u32* item00Location;
                 item00Location = z64recomp_get_extended_actor_data(actor, item00LocationExtension);
                 *item00Location = LOCATION_RUPEE;
@@ -64,7 +64,7 @@ void AfterMure3_FiveRupeeSpawn() {
     PlayState* play = gPlay;
     for (s32 i = 0; i < 5; i++) {
         if (this->unk148[i] != NULL) {
-            if (!rando_location_is_checked(LOCATION_MURE3_RUPEE(i))) {
+            if (rando_get_slotdata_u32("rupeesanity") && !rando_location_is_checked(LOCATION_MURE3_RUPEE(i))) {
                 Actor* actor = &this->unk148[i]->actor;
                 u32* item00Location;
                 item00Location = z64recomp_get_extended_actor_data(actor, item00LocationExtension);
@@ -89,7 +89,7 @@ void AfterMure3_FiveRupeeSpawn2() {
     PlayState* play = gPlay;
     for (s32 i = 0; i < 5; i++) {
         if (this->unk148[i] != NULL) {
-            if (!rando_location_is_checked(LOCATION_MURE3_RUPEE(i))) {
+            if (rando_get_slotdata_u32("rupeesanity") && !rando_location_is_checked(LOCATION_MURE3_RUPEE(i))) {
                 Actor* actor = &this->unk148[i]->actor;
                 u32* item00Location;
                 item00Location = z64recomp_get_extended_actor_data(actor, item00LocationExtension);
@@ -114,7 +114,7 @@ void AfterMure3_SevenRupeeSpawn() {
     PlayState* play = gPlay;
     for (s32 i = 0; i < 7; i++) {
         if (this->unk148[i] != NULL) {
-            if (!rando_location_is_checked(LOCATION_MURE3_RUPEE(i))) {
+            if (rando_get_slotdata_u32("rupeesanity") && !rando_location_is_checked(LOCATION_MURE3_RUPEE(i))) {
                 Actor* actor = &this->unk148[i]->actor;
                 u32* item00Location;
                 item00Location = z64recomp_get_extended_actor_data(actor, item00LocationExtension);
@@ -160,7 +160,7 @@ RECOMP_HOOK_RETURN("EnScopecoin_Init")
 void AfterEnScopecoin_Init() {
     PlayState* play = gPlay;
     s32 actorIndex = randoGetLoadedActorNumInSameRoom(play, sEnScopecoinActor);
-    if (!rando_location_is_checked(LOCATION_TERMINATREE_RUPEE(actorIndex))) {
+    if (rando_get_slotdata_u32("rupeesanity") && !rando_location_is_checked(LOCATION_TERMINATREE_RUPEE(actorIndex))) {
         sEnScopecoinActor->draw = EnScopecoin_RandoDraw;
     }
 }
@@ -170,7 +170,7 @@ RECOMP_PATCH void EnScopecoin_CheckCollectible(EnScopecoin* this, PlayState* pla
 
     this->actor.shape.rot.y += 0x1F4; // spin
     if (Flags_GetCollectible(play, OBJMUPICT_GET_RUPEE_FLAG(&this->actor))) {
-        if (!rando_location_is_checked(LOCATION_TERMINATREE_RUPEE(actorIndex))) {
+        if (rando_get_slotdata_u32("rupeesanity") && !rando_location_is_checked(LOCATION_TERMINATREE_RUPEE(actorIndex))) {
             Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, LOCATION_TERMINATREE_RUPEE(actorIndex));
         } else {
             Item_DropCollectible(play, &this->actor.world.pos, ITEM00_RUPEE_RED);
@@ -211,7 +211,7 @@ RECOMP_HOOK_RETURN("EnGamelupy_Init")
 void AfterEnGamelupy_Init() {
     PlayState* play = gPlay;
     gamelupyLocation = z64recomp_get_extended_actor_data(EnGamelupyActor, gamelupyLocationExtension);
-    if (!rando_location_is_checked(*gamelupyLocation)) {
+    if (rando_get_slotdata_u32("rupeesanity") && !rando_location_is_checked(*gamelupyLocation)) {
         EnGamelupyActor->draw = EnGamelupy_RandoDraw;
     }
 }
@@ -226,7 +226,7 @@ RECOMP_PATCH void EnGamelupy_Idle(EnGamelupy* this, PlayState* play) {
         *this->minigameScore += ENGAMELUPY_POINTS;
 
         gamelupyLocation = z64recomp_get_extended_actor_data(&this->actor, gamelupyLocationExtension);
-        if (!rando_location_is_checked(*gamelupyLocation)) {
+        if (rando_get_slotdata_u32("rupeesanity") && !rando_location_is_checked(*gamelupyLocation)) {
             this->collectedTimer = 0;
             this->actor.gravity = 0.0f;
             Actor* item = Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *gamelupyLocation);

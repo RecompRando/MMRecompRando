@@ -74,7 +74,7 @@ RECOMP_PATCH void func_800F4A10(PlayState* play) {
 }
 
 // ford f150
-#define LOCATION_OWL_STATUE (0xFF1500 | OBJ_WARPSTONE_GET_ID(&this->dyna.actor))
+#define LOCATION_OWL_STATUE (AP_PREFIX_OWLS | OBJ_WARPSTONE_GET_ID(&this->dyna.actor))
 
 s32 ObjWarpstone_OpenedIdle(ObjWarpstone* this, PlayState* play);
 s32 ObjWarpstone_ClosedIdle(ObjWarpstone* this, PlayState* play);

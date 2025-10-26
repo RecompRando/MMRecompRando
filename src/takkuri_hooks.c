@@ -42,7 +42,7 @@ RECOMP_PATCH void func_80C11DF0(EnThiefbird* this, PlayState* play) {
         SoundSource_PlaySfxAtFixedWorldPos(play, &this->actor.world.pos, 11, NA_SE_EN_EXTINCT);
         
         // @rando replace takkuri huge rupee drop
-        if (!rando_location_is_checked(LOCATION_TAKKURI_HUGO)) {
+        if (rando_get_slotdata_u32("rupeesanity") && !rando_location_is_checked(LOCATION_TAKKURI_HUGO)) {
             Actor* item = Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, LOCATION_TAKKURI_HUGO);
             Actor_SetScale(item, 0.035f); // make item slightly larger to mimic huge rupee scale (0.045f)
         } else {

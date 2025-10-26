@@ -6,7 +6,7 @@
 #include "apcommon.h"
 #include "actor_helpers.h"
 
-#define LOCATION_SCOPECROW_RUPEE (0x170000 | (play->sceneId << 8) | (0xC << 4) | this->ruppeIndex)
+#define LOCATION_SCOPECROW_RUPEE (AP_PREFIX_FREESTANDING | (play->sceneId << 8) | (0xC << 4) | this->ruppeIndex)
 
 #define OBJECT_CROW_LIMB_MAX 0x09
 #include "overlays/actors/ovl_En_Scopecrow/z_en_scopecrow.h"
@@ -65,7 +65,7 @@ void AfterEnScRuppe_Init() {
     EnScRuppe* this = savedEnScRuppe;
     PlayState* play = gPlay;
 
-    if (!rando_location_is_checked(LOCATION_SCOPECROW_RUPEE)) {
+    if (rando_get_slotdata_u32("rupeesanity") && !rando_location_is_checked(LOCATION_SCOPECROW_RUPEE)) {
         savedEnScRuppe->actor.draw = EnScRuppe_RandoDraw;
         savedEnScRuppe->actionFunc = EnScRuppe_RandoIdle;
     }

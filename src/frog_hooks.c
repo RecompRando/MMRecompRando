@@ -5,7 +5,7 @@
 
 #include "apcommon.h"
 
-#define LOCATION_FROG (0xFF0000 | this->frogIndex)
+#define LOCATION_FROG (AP_PREFIX_FROGS | this->frogIndex)
 
 #define FROG_LIMB_MAX 0x18
 #include "overlays/actors/ovl_En_Minifrog/z_en_minifrog.h"
@@ -20,6 +20,8 @@ void EnMinifrog_ReturnFrogCutscene(EnMinifrog* this, PlayState* play);
 RECOMP_HOOK("EnMinifrog_Init")
 void OnEnMinifrog_Init(Actor* thisx, PlayState* play) {
     EnMinifrog* this = ((EnMinifrog*)thisx);
+
+    if (!rando_get_slotdata_u32("frogsanity")) return;
 
     this->frogIndex = (this->actor.params & 0xF);
     if (this->frogIndex >= 5) {
@@ -76,6 +78,8 @@ RECOMP_HOOK_RETURN("EnMinifrog_Idle")
 void AfterEnMinifrog_Idle() {
     EnMinifrog* this = sEnMinifrog;
     PlayState* play = gPlay;
+
+    if (!rando_get_slotdata_u32("frogsanity")) return;
 
     if (this->actionFunc == EnMinifrog_ReturnFrogCutscene) {
         this->actionFunc = EnMinifrog_OfferItem;
