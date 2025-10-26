@@ -25,7 +25,7 @@ This randomizer is still under development in the beta phase but is considered s
 1. Launch the game with the randomizer mod enabled.
 2. Select `Solo` in the randomizer menu.
 3. Create a new session and choose which settings you'd like.
-    - Details about these settings are currently not available through the mod only, you will have to look at the [multiworld's example YAML](https://github.com/RecompRando/Archipelago-MM/blob/master/worlds/mm_recomp/EXAMPLE_YAML.yaml) for more information on what each setting does.
+    - Details about these settings are currently not available through the mod only, you will have to look at the [multiworld's example YAML](https://github.com/RecompRando/MMRecompRando/releases/download/v0.9.4/EXAMPLE_YAML.yaml) for more information on what each setting does.
 4. Hit `Generate` and select your seed.
 5. Profit.
 
