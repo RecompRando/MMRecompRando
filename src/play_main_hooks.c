@@ -193,6 +193,11 @@ void randoScout() {
         removeAllScoutsWithPrefix(AP_PREFIX_SCARECROW);
     }
     
+    if (rando_get_slotdata_u32("notebooksanity") == 0)
+    {
+        removeAllScoutsWithPrefix(AP_PREFIX_NOTEBOOK);
+    }
+    
     if (rando_get_slotdata_u32("owlsanity") == 0)
     {
         removeAllScoutsWithPrefix(AP_PREFIX_OWLS);

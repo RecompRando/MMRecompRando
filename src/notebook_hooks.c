@@ -1,12 +1,10 @@
-// TODO: add ability to turn this off lmao
-
 #include "modding.h"
 #include "global.h"
 
 #include "apcommon.h"
 #include "recomputils.h"
 
-#define LOCATION_NOTEBOOK(event) (0x0B0000 | event)
+#define LOCATION_NOTEBOOK(event) (AP_PREFIX_NOTEBOOK | event)
 
 extern u16 sBombersNotebookEventMessages[BOMBERS_NOTEBOOK_EVENT_MAX];
 
@@ -15,14 +13,14 @@ RECOMP_PATCH void Message_BombersNotebookQueueEvent(PlayState* play, u8 event) {
 
     if (CHECK_QUEST_ITEM(QUEST_BOMBERS_NOTEBOOK)) {
         if (!CHECK_WEEKEVENTREG(gBombersNotebookWeekEventFlags[event]) || 
-            !rando_location_is_checked(LOCATION_NOTEBOOK(event))) {
+            (rando_get_slotdata_u32("notebooksanity") && !rando_location_is_checked(LOCATION_NOTEBOOK(event)))) {
             msgCtx->bombersNotebookEventQueue[msgCtx->bombersNotebookEventQueueCount] = event;
             msgCtx->bombersNotebookEventQueueCount++;
         }
     } else if (event >= BOMBERS_NOTEBOOK_PERSON_MAX) {
         // Non MET events are processed even if the player does not have the notebook yet
         if (!CHECK_WEEKEVENTREG(gBombersNotebookWeekEventFlags[event]) || 
-            !rando_location_is_checked(LOCATION_NOTEBOOK(event))) {
+            (rando_get_slotdata_u32("notebooksanity") && !rando_location_is_checked(LOCATION_NOTEBOOK(event)))) {
             msgCtx->bombersNotebookEventQueue[msgCtx->bombersNotebookEventQueueCount] = event;
             msgCtx->bombersNotebookEventQueueCount++;
         }
@@ -44,16 +42,18 @@ RECOMP_PATCH s32 Message_BombersNotebookProcessEventQueue(PlayState* play) {
         msgCtx->bombersNotebookEventQueueCount--;
 
         // add option check here
-        if (sBombersNotebookEventMessages[msgCtx->bombersNotebookEventQueue[msgCtx->bombersNotebookEventQueueCount]] != 0) {
-            u32 location = LOCATION_NOTEBOOK(msgCtx->bombersNotebookEventQueue[msgCtx->bombersNotebookEventQueueCount]);
-            recomp_printf("notebook location: 0x%06X\n", location);
-            if (!rando_location_is_checked(location)) {
-                rando_send_location(location);
-                Message_ContinueTextbox(play, getTextId(rando_get_item_id(location)));
-                Audio_PlaySfx(NA_SE_SY_SCHEDULE_WRITE);
-                return true;
-            } else { // temp
-                return true;
+        if (rando_get_slotdata_u32("notebooksanity")) {
+            if (sBombersNotebookEventMessages[msgCtx->bombersNotebookEventQueue[msgCtx->bombersNotebookEventQueueCount]] != 0) {
+                u32 location = LOCATION_NOTEBOOK(msgCtx->bombersNotebookEventQueue[msgCtx->bombersNotebookEventQueueCount]);
+                recomp_printf("notebook location: 0x%06X\n", location);
+                if (!rando_location_is_checked(location)) {
+                    rando_send_location(location);
+                    Message_ContinueTextbox(play, getTextId(rando_get_item_id(location)));
+                    Audio_PlaySfx(NA_SE_SY_SCHEDULE_WRITE);
+                    return true;
+                } else { // temp (note: forgot what this temp was for)
+                    return true;
+                }
             }
         }
 
