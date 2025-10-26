@@ -13,6 +13,7 @@ void registerActorExtensions() {
     kusaGrassLocationExtension = z64recomp_extend_actor(ACTOR_EN_KUSA, sizeof(u32));
     keatonGrassLocationExtension = z64recomp_extend_actor(ACTOR_EN_KUSA2, sizeof(u32));
     potLocationExtension = z64recomp_extend_actor(ACTOR_OBJ_TSUBO, sizeof(u32));
+    potDroppedExtension = z64recomp_extend_actor(ACTOR_OBJ_TSUBO, sizeof(bool));
     potFlyingLocationExtension = z64recomp_extend_actor(ACTOR_EN_TUBO_TRAP, sizeof(u32));
     potFlowerLocationExtension = z64recomp_extend_actor(ACTOR_OBJ_FLOWERPOT, sizeof(u32));
     wonderHitLocationExtension = z64recomp_extend_actor(ACTOR_EN_HIT_TAG, sizeof(u32));

@@ -10,15 +10,17 @@
 #include "overlays/actors/ovl_En_Tubo_Trap/z_en_tubo_trap.h"
 #include "overlays/actors/ovl_Obj_Flowerpot/z_obj_flowerpot.h"
 
-#define LOCATION_POT (0x200000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+#define LOCATION_POT (AP_PREFIX_POTS | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoomExtra(play, thisx, ACTOR_EN_TUBO_TRAP))
-#define LOCATION_POT_FLYING (0x200000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+#define LOCATION_POT_FLYING (AP_PREFIX_POTS | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoomExtra(play, thisx, ACTOR_OBJ_TSUBO))
-#define LOCATION_POT_FLOWER (0x200000 | (play->sceneId << 8) | (0xF << 4) \
+#define LOCATION_POT_FLOWER (AP_PREFIX_POTS | (play->sceneId << 8) | (0xF << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
 
 ActorExtensionId potLocationExtension;
 u32* potLocation;
+ActorExtensionId potDroppedExtension;
+bool* potDropped;
 ActorExtensionId potFlyingLocationExtension;
 u32* potFlyingLocation;
 ActorExtensionId potFlowerLocationExtension;
@@ -31,12 +33,16 @@ RECOMP_HOOK("ObjTsubo_Init")
 void OnObjTsubo_Init(Actor* thisx, PlayState* play) {
     potLocation = z64recomp_get_extended_actor_data(thisx, potLocationExtension);
     *potLocation = LOCATION_POT;
+    potDropped = z64recomp_get_extended_actor_data(thisx, potDroppedExtension);
+    *potDropped = false;
 }
 
 RECOMP_PATCH void func_8092762C(ObjTsubo* this, PlayState* play) {
     potLocation = z64recomp_get_extended_actor_data(&this->actor, potLocationExtension);
-    if (!rando_location_is_checked(*potLocation)) {
+    potDropped = z64recomp_get_extended_actor_data(&this->actor, potDroppedExtension);
+    if (rando_get_slotdata_u32("potsanity") && !rando_location_is_checked(*potLocation) && !(*potDropped)) {
         Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *potLocation);
+        *potDropped = true;
         return;
     } 
 
@@ -48,10 +54,12 @@ RECOMP_PATCH void func_8092762C(ObjTsubo* this, PlayState* play) {
 RECOMP_PATCH void func_80927690(ObjTsubo* this, PlayState* play) {
     s32 itemDrop;
     potLocation = z64recomp_get_extended_actor_data(&this->actor, potLocationExtension);
-    if (!rando_location_is_checked(*potLocation)) {
+    potDropped = z64recomp_get_extended_actor_data(&this->actor, potDroppedExtension);
+    if (rando_get_slotdata_u32("potsanity") && !rando_location_is_checked(*potLocation) && !(*potDropped)) {
         itemDrop = func_800A8150(OBJ_TSUBO_P003F(&this->actor));
         Item_RandoDropCollectible(play, &this->actor.world.pos, (OBJ_TSUBO_PFE00(&this->actor) << 8) | itemDrop, *potLocation);
         this->unk_197 = true;
+        *potDropped = true;
     }
 
     if (!this->unk_197 && (OBJ_TSUBO_ZROT(&this->actor) != 2)) {
@@ -75,7 +83,7 @@ RECOMP_PATCH void EnTuboTrap_DropCollectible(EnTuboTrap* this, PlayState* play) 
     s32 dropItem00Id = func_800A8150(itemParam);
     
     potFlyingLocation = z64recomp_get_extended_actor_data(&this->actor, potFlyingLocationExtension);
-    if (!rando_location_is_checked(*potFlyingLocation)) {
+    if (rando_get_slotdata_u32("potsanity") && !rando_location_is_checked(*potFlyingLocation)) {
         Item_RandoDropCollectible(play, &this->actor.world.pos, ((this->actor.params & 0x7F) << 8) | dropItem00Id, *potFlyingLocation);
         return;
     }
@@ -95,7 +103,7 @@ void OnObjFlowerpot_Init(Actor* thisx, PlayState* play) {
 // can technically be made into a hook
 RECOMP_PATCH void func_80A1B914(ObjFlowerpot* this, PlayState* play) {
     potFlowerLocation = z64recomp_get_extended_actor_data(&this->actor, potFlowerLocationExtension);
-    if (!rando_location_is_checked(*potFlowerLocation)) {
+    if (rando_get_slotdata_u32("potsanity") && !rando_location_is_checked(*potFlowerLocation)) {
         Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *potFlowerLocation);
         return;
     }

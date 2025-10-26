@@ -168,6 +168,11 @@ void randoScout() {
         removeAllScoutsWithPrefix(AP_PREFIX_MURE_GRASS);
     }
     
+    if (rando_get_slotdata_u32("potsanity") == 0)
+    {
+        removeAllScoutsWithPrefix(AP_PREFIX_POTS);
+    }
+    
     if (rando_get_slotdata_u32("scarecrowsanity") == 0)
     {
         removeAllScoutsWithPrefix(AP_PREFIX_SCARECROW);
