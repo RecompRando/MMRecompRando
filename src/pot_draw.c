@@ -172,8 +172,9 @@ RECOMP_PATCH void ObjTsubo_Draw(Actor* thisx, PlayState* play2) {
     potLocation = z64recomp_get_extended_actor_data(&this->actor, potLocationExtension);
     potDropped = z64recomp_get_extended_actor_data(&this->actor, potDroppedExtension);
 
-    if (!rando_get_slotdata_u32("potsanity") || (rando_location_is_checked(*potLocation) && !(*potDropped)) ||
-            OBJ_TSUBO_ZROT(thisx) == 2 || OBJ_TSUBO_PFE00(thisx)) { // has a gold skulltula or stray fairy (unsure if correct/too agressive)
+    // if (!rando_get_slotdata_u32("potsanity") || (rando_location_is_checked(*potLocation) && !(*potDropped)) ||
+    //     (OBJ_TSUBO_PFE00(thisx) && ((func_800A8150(OBJ_TSUBO_P003F(thisx)) != ITEM00_FLEXIBLE)) && !rando_get_slotdata_u32("fairysanity"))) { // stray fairies
+    if (!rando_get_slotdata_u32("potsanity") || (rando_location_is_checked(*potLocation) && !(*potDropped))) {
         Gfx_DrawDListOpa(play, sPotTypeData[OBJ_TSUBO_GET_TYPE(thisx)].modelDL);
         return;
     }

@@ -9,6 +9,7 @@
 #include "overlays/actors/ovl_Obj_Tsubo/z_obj_tsubo.h"
 #include "overlays/actors/ovl_En_Tubo_Trap/z_en_tubo_trap.h"
 #include "overlays/actors/ovl_Obj_Flowerpot/z_obj_flowerpot.h"
+#include "overlays/actors/ovl_En_Sw/z_en_sw.h"
 
 #define LOCATION_POT (AP_PREFIX_POTS | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoomExtra(play, thisx, ACTOR_EN_TUBO_TRAP))
@@ -35,6 +36,19 @@ void OnObjTsubo_Init(Actor* thisx, PlayState* play) {
     *potLocation = LOCATION_POT;
     potDropped = z64recomp_get_extended_actor_data(thisx, potDroppedExtension);
     *potDropped = false;
+
+    // replace location for camc
+    // skulltulas (only matters if we don't drop an item as well...)
+    // if (OBJ_TSUBO_ZROT(thisx) == 2) {
+    //     s32 skulltulaParams = (OBJ_TSUBO_P001F(thisx) << 2) | 0xFF01;
+    //     s32 chestFlag = ENSW_GETS_3FC(skulltulaParams);
+    //     *potLocation = (0x060000 | (play->sceneId << 8) | chestFlag);
+    // }
+
+    // should be stray fairies only
+    if (OBJ_TSUBO_PFE00(thisx) && (func_800A8150(OBJ_TSUBO_P003F(thisx)) != ITEM00_FLEXIBLE)) {
+        *potLocation = (0x010000 | (play->sceneId << 8) | OBJ_TSUBO_PFE00(thisx));
+    }
 }
 
 RECOMP_PATCH void func_8092762C(ObjTsubo* this, PlayState* play) {
