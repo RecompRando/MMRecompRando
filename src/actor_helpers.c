@@ -28,6 +28,7 @@ void registerActorExtensions() {
     crateBigLocationExtension = z64recomp_extend_actor(ACTOR_OBJ_KIBAKO2, sizeof(u32));
     barrelLocationExtension = z64recomp_extend_actor(ACTOR_OBJ_TARU, sizeof(u32));
     icicleLocationExtension = z64recomp_extend_actor(ACTOR_BG_ICICLE, sizeof(u32));
+    icicleDroppedExtension = z64recomp_extend_actor(ACTOR_BG_ICICLE, sizeof(bool));
     beehiveLocationExtension = z64recomp_extend_actor(ACTOR_OBJ_COMB, sizeof(u32));
     fairyLocationExtension = z64recomp_extend_actor(ACTOR_EN_ELF, sizeof(u32));
     butterflyLocationExtension = z64recomp_extend_actor(ACTOR_EN_BUTTE, sizeof(u32));

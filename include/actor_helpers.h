@@ -21,6 +21,7 @@ extern ActorExtensionId crateSmallLocationExtension;
 extern ActorExtensionId crateBigLocationExtension;
 extern ActorExtensionId barrelLocationExtension;
 extern ActorExtensionId icicleLocationExtension;
+extern ActorExtensionId icicleDroppedExtension;
 extern ActorExtensionId beehiveLocationExtension;
 extern ActorExtensionId fairyLocationExtension;
 extern ActorExtensionId butterflyLocationExtension;

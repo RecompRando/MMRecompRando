@@ -188,6 +188,11 @@ void randoScout() {
         removeAllScoutsWithPrefix(AP_PREFIX_SNOWBALLS);
     }
     
+    if (rando_get_slotdata_u32("iciclesanity") == 0)
+    {
+        removeAllScoutsWithPrefix(AP_PREFIX_ICICLES);
+    }
+    
     if (rando_get_slotdata_u32("scarecrowsanity") == 0)
     {
         removeAllScoutsWithPrefix(AP_PREFIX_SCARECROW);
