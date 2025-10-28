@@ -2,7 +2,7 @@
 #include "global.h"
 
 #include "apcommon.h"
-#define LOCATION_TAKKURI_HUGO (0x170000 | (play->sceneId << 8) | (0xD << 4) | ITEM00_RUPEE_HUGE)
+#define LOCATION_TAKKURI_HUGO (AP_PREFIX_FREESTANDING | (play->sceneId << 8) | (0xD << 4) | ITEM00_RUPEE_HUGE)
 
 #define TAKKURI_LIMB_MAX 0x11
 #include "overlays/actors/ovl_En_Thiefbird/z_en_thiefbird.h"
