@@ -14,6 +14,8 @@
 
 extern ActorExtensionId potLocationExtension;
 extern u32* potLocation;
+extern ActorExtensionId potDroppedExtension;
+extern bool* potDropped;
 extern ActorExtensionId potFlyingLocationExtension;
 extern u32* potFlyingLocation;
 extern ActorExtensionId potFlowerLocationExtension;
@@ -159,12 +161,14 @@ RECOMP_PATCH void ObjTsubo_Draw(Actor* thisx, PlayState* play2) {
     PlayState* play = (PlayState*)play2;
     ObjTsubo* this = ((ObjTsubo*)thisx);
 
-    if (!rando_get_slotdata_u32("potsanity") || rando_location_is_checked(*potLocation)) {
+    potLocation = z64recomp_get_extended_actor_data(&this->actor, potLocationExtension);
+    potDropped = z64recomp_get_extended_actor_data(&this->actor, potDroppedExtension);
+
+    if (!rando_get_slotdata_u32("potsanity") || (rando_location_is_checked(*potLocation) && !*potDropped)) {
         Gfx_DrawDListOpa(play, sPotTypeData[OBJ_TSUBO_GET_TYPE(thisx)].modelDL);
         return;
     }
 
-    potLocation = z64recomp_get_extended_actor_data(&this->actor, potLocationExtension);
     GenericPot_DrawRando(play, *potLocation, OBJ_TSUBO_GET_TYPE(thisx));
 }
 

@@ -97,8 +97,9 @@ RECOMP_PATCH void BgIcicle_Draw(Actor* thisx, PlayState* play) {
     Color_RGB8 color = {255, 255, 255};
     BgIcicle* this = ((BgIcicle*)thisx);
     icicleLocation = z64recomp_get_extended_actor_data(&this->dyna.actor, icicleLocationExtension);
+    icicleDropped = z64recomp_get_extended_actor_data(thisx, icicleDroppedExtension);
     
-    if (rando_get_slotdata_u32("iciclesanity") && !rando_location_is_checked(*icicleLocation)) {
+    if (rando_get_slotdata_u32("iciclesanity") && !rando_location_is_checked(*icicleLocation) && !*icicleDropped) {
         get_rando_color(&color, *icicleLocation);
     }
 
