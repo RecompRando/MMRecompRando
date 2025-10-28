@@ -46,9 +46,9 @@ void OnObjTsubo_Init(Actor* thisx, PlayState* play) {
     // }
 
     // should be stray fairies only
-    if (OBJ_TSUBO_PFE00(thisx) && (func_800A8150(OBJ_TSUBO_P003F(thisx)) != ITEM00_FLEXIBLE)) {
-        *potLocation = (0x010000 | (play->sceneId << 8) | OBJ_TSUBO_PFE00(thisx));
-    }
+    // if (OBJ_TSUBO_PFE00(thisx) && (func_800A8150(OBJ_TSUBO_P003F(thisx)) != ITEM00_FLEXIBLE)) {
+    //     *potLocation = (0x010000 | (play->sceneId << 8) | OBJ_TSUBO_PFE00(thisx));
+    // }
 }
 
 RECOMP_PATCH void func_8092762C(ObjTsubo* this, PlayState* play) {
@@ -71,6 +71,7 @@ RECOMP_PATCH void func_80927690(ObjTsubo* this, PlayState* play) {
     potDropped = z64recomp_get_extended_actor_data(&this->actor, potDroppedExtension);
     if (rando_get_slotdata_u32("potsanity") && !rando_location_is_checked(*potLocation) && !(*potDropped)) {
         itemDrop = func_800A8150(OBJ_TSUBO_P003F(&this->actor));
+        // recomp_printf("drop 0x%02X 0x%02X\n", OBJ_TSUBO_PFE00(&this->actor), itemDrop);
         Item_RandoDropCollectible(play, &this->actor.world.pos, (OBJ_TSUBO_PFE00(&this->actor) << 8) | itemDrop, *potLocation);
         this->unk_197 = true;
         *potDropped = true;
