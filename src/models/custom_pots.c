@@ -2,6 +2,7 @@
 #include "global.h"
 
 extern Vtx object_tsuboVtx_001400[];
+extern Vtx gameplay_dangeon_keepVtx_017AE0[];
 extern Vtx object_racetsuboVtx_000000[];
 extern Vtx object_flowerpotVtx_001000[];
 
@@ -47,6 +48,56 @@ Gfx randoPotDL[] = {
     gsDPSetRenderMode(G_RM_FOG_SHADE_A, G_RM_AA_ZB_TEX_EDGE2),
     gsSPVertex(&object_tsuboVtx_001400[56], 4, 0),
     gsSP2Triangles(0, 1, 2, 0, 0, 2, 3, 0),
+    gsSPEndDisplayList(),
+};
+
+Gfx randoDangeonPotDL[] = {
+    gsDPPipeSync(),
+    gsDPSetTextureLUT(G_TT_NONE),
+    gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON),
+    // gsDPLoadTextureBlock(gameplay_dangeon_keep_Tex_010EC0, G_IM_FMT_RGBA, G_IM_SIZ_16b, 32, 64, 0, G_TX_NOMIRROR |
+    //                      G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 5, 6, G_TX_NOLOD, G_TX_NOLOD),
+    gsDPLoadTextureBlock(0x08000000, G_IM_FMT_RGBA, G_IM_SIZ_16b, 32, 64, 0, G_TX_NOMIRROR |
+                         G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 5, 6, G_TX_NOLOD, G_TX_NOLOD),
+    gsDPSetCombineLERP(TEXEL0, 0, SHADE, 0, 0, 0, 0, 1, COMBINED, 0, PRIMITIVE, 0, 0, 0, 0, COMBINED),
+    gsDPSetRenderMode(G_RM_FOG_SHADE_A, G_RM_AA_ZB_OPA_SURF2),
+    gsSPClearGeometryMode(G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR),
+    gsSPSetGeometryMode(G_CULL_BACK | G_FOG | G_LIGHTING),
+    gsDPSetPrimColor(0, 0, 255, 255, 255, 255),
+    gsSPVertex(gameplay_dangeon_keepVtx_017AE0, 32, 0),
+    gsSP2Triangles(0, 1, 2, 0, 3, 4, 2, 0),
+    gsSP2Triangles(5, 6, 7, 0, 8, 9, 2, 0),
+    gsSP2Triangles(1, 0, 10, 0, 1, 10, 11, 0),
+    gsSP2Triangles(12, 13, 9, 0, 12, 9, 8, 0),
+    gsSP2Triangles(14, 15, 4, 0, 14, 4, 3, 0),
+    gsSP2Triangles(16, 17, 18, 0, 19, 20, 21, 0),
+    gsSP2Triangles(22, 23, 24, 0, 25, 26, 27, 0),
+    gsSP1Triangle(28, 29, 30, 0),
+    gsSPVertex(&gameplay_dangeon_keepVtx_017AE0[31], 3, 0),
+    gsSP1Triangle(0, 1, 2, 0),
+    gsDPPipeSync(),
+    // gsDPLoadTextureBlock(gameplay_dangeon_keep_Tex_011EC0, G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 16, 0, G_TX_NOMIRROR |
+    //                      G_TX_CLAMP, G_TX_NOMIRROR | G_TX_CLAMP, 4, 4, G_TX_NOLOD, G_TX_NOLOD),
+    gsDPLoadTextureBlock(0x09000000, G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 16, 0, G_TX_NOMIRROR |
+                         G_TX_CLAMP, G_TX_NOMIRROR | G_TX_CLAMP, 4, 4, G_TX_NOLOD, G_TX_NOLOD),
+    gsDPSetCombineLERP(TEXEL0, 0, SHADE, 0, 0, 0, 0, TEXEL0, COMBINED, 0, PRIMITIVE, 0, 0, 0, 0, COMBINED),
+    gsDPSetRenderMode(G_RM_FOG_SHADE_A, G_RM_AA_ZB_TEX_EDGE2),
+    gsSPVertex(&gameplay_dangeon_keepVtx_017AE0[34], 4, 0),
+    gsSP2Triangles(0, 1, 2, 0, 0, 2, 3, 0),
+    gsDPPipeSync(),
+    // gsDPLoadTextureBlock(gameplay_dangeon_keep_Tex_010EC0, G_IM_FMT_RGBA, G_IM_SIZ_16b, 32, 64, 0, G_TX_NOMIRROR |
+    //                      G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 5, 6, G_TX_NOLOD, G_TX_NOLOD),
+    gsDPLoadTextureBlock(0x08000000, G_IM_FMT_RGBA, G_IM_SIZ_16b, 32, 64, 0, G_TX_NOMIRROR |
+                         G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, 5, 6, G_TX_NOLOD, G_TX_NOLOD),
+    gsDPSetCombineLERP(TEXEL0, 0, SHADE, 0, 0, 0, 0, 1, COMBINED, 0, PRIMITIVE, 0, 0, 0, 0, COMBINED),
+    gsDPSetRenderMode(G_RM_FOG_SHADE_A, G_RM_AA_ZB_OPA_SURF2),
+    gsSPVertex(&gameplay_dangeon_keepVtx_017AE0[38], 22, 0),
+    gsSP2Triangles(0, 1, 2, 0, 3, 4, 1, 0),
+    gsSP2Triangles(3, 1, 0, 0, 5, 6, 7, 0),
+    gsSP2Triangles(8, 9, 2, 0, 10, 11, 9, 0),
+    gsSP2Triangles(10, 9, 8, 0, 12, 13, 14, 0),
+    gsSP2Triangles(15, 16, 2, 0, 16, 15, 17, 0),
+    gsSP2Triangles(16, 17, 18, 0, 19, 20, 21, 0),
     gsSPEndDisplayList(),
 };
 

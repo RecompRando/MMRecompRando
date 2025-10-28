@@ -1,8 +1,11 @@
 #include "ultra64.h"
 #include "global.h"
 
+extern Gfx gameplay_dangeon_keep_DL_017EA0[];
+
 // custom DL
 extern Gfx randoPotDL[];
+extern Gfx randoDangeonPotDL[];
 extern Gfx randoMagicPotDL[];
 extern Gfx randoFlowerPotLeavesDL[];
 

@@ -147,10 +147,18 @@ void GenericPot_DrawRando(PlayState* play, u32 location, u8 potType) {
 
     gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
     
-    if (potType == 1) { // may also apply to other pots
-        gSPDisplayList(POLY_OPA_DISP++, randoMagicPotDL);
-    } else {
-        gSPDisplayList(POLY_OPA_DISP++, randoPotDL);
+    switch (potType) {
+        case 1:
+            gSPDisplayList(POLY_OPA_DISP++, randoMagicPotDL);
+            break;
+        case 2:
+            gSPDisplayList(POLY_OPA_DISP++, randoPotDL);
+            break;
+        case 0:
+        case 3:
+        default:
+            gSPDisplayList(POLY_OPA_DISP++, randoDangeonPotDL);
+            break;
     }
 
     CLOSE_DISPS(play->state.gfxCtx);
@@ -164,7 +172,8 @@ RECOMP_PATCH void ObjTsubo_Draw(Actor* thisx, PlayState* play2) {
     potLocation = z64recomp_get_extended_actor_data(&this->actor, potLocationExtension);
     potDropped = z64recomp_get_extended_actor_data(&this->actor, potDroppedExtension);
 
-    if (!rando_get_slotdata_u32("potsanity") || (rando_location_is_checked(*potLocation) && !*potDropped)) {
+    if (!rando_get_slotdata_u32("potsanity") || (rando_location_is_checked(*potLocation) && !(*potDropped)) ||
+            OBJ_TSUBO_ZROT(thisx) == 2 || OBJ_TSUBO_PFE00(thisx)) { // has a gold skulltula or stray fairy (unsure if correct/too agressive)
         Gfx_DrawDListOpa(play, sPotTypeData[OBJ_TSUBO_GET_TYPE(thisx)].modelDL);
         return;
     }
@@ -174,12 +183,13 @@ RECOMP_PATCH void ObjTsubo_Draw(Actor* thisx, PlayState* play2) {
 
 // flying pot
 RECOMP_PATCH void EnTuboTrap_Draw(Actor* thisx, PlayState* play) {
-    if (!rando_get_slotdata_u32("potsanity") || rando_location_is_checked(*potLocation)) {
-        Gfx_DrawDListOpa(play, sPotTypeData[OBJ_TSUBO_GET_TYPE(thisx)].modelDL);
+    potFlyingLocation = z64recomp_get_extended_actor_data(thisx, potFlyingLocationExtension);
+    
+    if (!rando_get_slotdata_u32("potsanity") || rando_location_is_checked(*potFlyingLocation)) {
+        Gfx_DrawDListOpa(play, gameplay_dangeon_keep_DL_017EA0);
         return;
     }
 
-    potFlyingLocation = z64recomp_get_extended_actor_data(thisx, potFlyingLocationExtension);
     GenericPot_DrawRando(play, *potFlyingLocation, 0);
 }
 
