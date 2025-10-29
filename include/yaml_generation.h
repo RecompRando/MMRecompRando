@@ -17,13 +17,15 @@ typedef enum {
     OPTION_BOOL,
     OPTION_RADIO,
     OPTION_INT_SLIDER,
-    OPTION_FLOAT_SLIDER
+    OPTION_FLOAT_SLIDER,
+    OPTION_SET
 } RandoOptionType;
 
 typedef void (bool_callback_t)(bool value);
 typedef void (radio_callback_t)(u32 value);
 typedef void (int_callback_t)(int value);
 typedef void (float_callback_t)(float value);
+typedef void (set_callback_t)(void*);
 
 typedef struct {
     RandoOptionType type;
@@ -37,6 +39,7 @@ typedef struct {
         radio_callback_t* radio_callback;
         int_callback_t* int_callback;
         float_callback_t* float_callback;
+        set_callback_t* set_callback;
     };
 } RandoOptionData;
 
@@ -129,6 +132,17 @@ typedef struct {
     u32 num_options;
     RecompuiResource back_button;
 } RandoYamlConfigMenu;
+
+typedef struct {
+    RecompuiContext context;
+    UiFrame frame;
+    RecompuiResource header;
+    RecompuiResource header_label;
+    RecompuiResource body;
+    RandoOptionData all_options[MAX_OPTIONS];
+    u32 num_options;
+    RecompuiResource back_button;
+} RandoYamlSetMenu;
 
 extern RandoYamlConfigMenu yaml_config_menu;
 

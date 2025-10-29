@@ -42,6 +42,8 @@ void init_rando()
     randoCreateStartMenu();
     randoCreateSoloMenu();
     randoCreateYamlConfigMenu();
+    randoCreateYamlTricksMenu();
+    randoCreateYamlGlitchesMenu();
     randoCreateAPConnectMenu();
 
     randoCreateNotificationContainer();

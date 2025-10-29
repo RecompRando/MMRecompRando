@@ -15,6 +15,9 @@ bool randoGenerateMenuOpen() {
 
 RandoYamlConfigMenu yaml_config_menu;
 
+void randoYamlTricksCallback();
+void randoYamlGlitchesCallback();
+
 static void backPressed(RecompuiResource resource, const RecompuiEventData* data, void* userdata) {
     if (data->type == UI_EVENT_CLICK) {
         recompui_hide_context(yaml_config_menu.context);
@@ -23,6 +26,30 @@ static void backPressed(RecompuiResource resource, const RecompuiEventData* data
         recompui_close_context(yaml_config_menu.context);
         randoShowSoloMenu();
         // Reopen the start menu context.
+        recompui_open_context(yaml_config_menu.context);
+    }
+}
+
+static void randoTricksPressed(RecompuiResource resource, const RecompuiEventData* data, void* userdata) {
+    if (data->type == UI_EVENT_CLICK) {
+        recompui_hide_context(yaml_config_menu.context);
+        is_generate_menu_shown = false;
+        // Close the menu context temporarily so that the new context can be opened.
+        recompui_close_context(yaml_config_menu.context);
+        randoShowYamlTricksMenu();
+        // Reopen the menu context.
+        recompui_open_context(yaml_config_menu.context);
+    }
+}
+
+static void randoGlitchesPressed(RecompuiResource resource, const RecompuiEventData* data, void* userdata) {
+    if (data->type == UI_EVENT_CLICK) {
+        recompui_hide_context(yaml_config_menu.context);
+        is_generate_menu_shown = false;
+        // Close the menu context temporarily so that the new context can be opened.
+        recompui_close_context(yaml_config_menu.context);
+        randoShowYamlGlitchesMenu();
+        // Reopen the menu context.
         recompui_open_context(yaml_config_menu.context);
     }
 }
@@ -95,6 +122,8 @@ void randoYAMLGenerateCallback(RecompuiResource button, const RecompuiEventData*
                     case OPTION_FLOAT_SLIDER:
                         rando_yaml_printf("  %s:\n    %f: 1\n", option->option_id, recompui_get_input_value_float(option->input_element));
                         break;
+                    case OPTION_SET:
+                        break;
                 }
             }
             else {
@@ -111,6 +140,9 @@ void randoYAMLGenerateCallback(RecompuiResource button, const RecompuiEventData*
                         break;
                     case OPTION_FLOAT_SLIDER:
                         option->float_callback(recompui_get_input_value_float(option->input_element));
+                        break;
+                    case OPTION_SET:
+                        option->set_callback(NULL);
                         break;
                 }
             }
@@ -155,6 +187,22 @@ RecompuiResource randoYAMLCreateSettingLabel(RecompuiContext context, RecompuiRe
     recompui_set_display(label, DISPLAY_BLOCK);
     recompui_set_margin_bottom(label, 12.0f, UNIT_DP);
     return label;
+}
+
+RandoOptionData* randoCreateSetButtonOption(RandoYamlConfigMenu* menu, const char* option_id, const char* display_name,
+    RecompuiEventHandler* handler, set_callback_t* callback) {
+    RecompuiResource button_area = randoYAMLCreateMenuEntryArea(menu->context, menu->body);
+
+    RandoOptionData* option_data = randoAllocateOption(menu, option_id);
+
+    RecompuiResource button = recompui_create_button(yaml_config_menu.context, button_area, display_name, BUTTONSTYLE_SECONDARY);
+    recompui_register_callback(button, handler, NULL);
+
+    option_data->type = OPTION_SET;
+    option_data->root_element = button_area;
+    option_data->is_callback = true;
+    option_data->set_callback = callback;
+    return option_data;
 }
 
 // Toggle Button Helpers:
@@ -517,6 +565,9 @@ void randoCreateYamlConfigMenu() {
     randoCreateRadioOption(&yaml_config_menu, "death_behavior", "Death Behavior:", rando_death_behavior_options, ARRAY_COUNT(rando_death_behavior_options), RANDO_DEATH_BEHAVIOR_VANILLA);
     randoCreateBoolPropOption(&yaml_config_menu, "magic_is_a_trap", "Magic is a Trap:", false);
     randoCreateCallbackBoolPropOption(&yaml_config_menu, "Randomize Tunic Color:", true, tunicColorCallback);
+
+    randoCreateSetButtonOption(&yaml_config_menu, "logic_tricks", "Logic Tricks", randoTricksPressed, randoYamlTricksCallback);
+    randoCreateSetButtonOption(&yaml_config_menu, "logic_glitches", "Logic Glitches", randoGlitchesPressed, randoYamlGlitchesCallback);
 
     // Create the back button, parenting it to the root with absolute positioning.
     yaml_config_menu.back_button = recompui_create_button(yaml_config_menu.context, yaml_config_menu.frame.root, "Back", BUTTONSTYLE_SECONDARY);
