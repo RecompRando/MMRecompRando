@@ -26,6 +26,7 @@ u16 RGBA16toGrayscale_Color(u16 RGBA, IA_Grayscale_Type type) {
     u8 alpha = (RGBA & 0x0001) * 255;
 
     u8 grayscale;
+    f32 luminosity;
 
     switch (type) {
         case GRAYSCALE_LUMINOSITY:
@@ -39,8 +40,8 @@ u16 RGBA16toGrayscale_Color(u16 RGBA, IA_Grayscale_Type type) {
             break;
         case GRAYSCALE_OOTMM:
             // combo's grayscale conversion
-            f32 luminosity = (MAX(MAX(red, blue), green)) / 255.0f;
-            u8 grayscale = CLAMP_MAX(sqrtf(sqrtf(luminosity)), 1.0) * 255;
+            luminosity = (MAX(MAX(red, blue), green)) / 255.0f;
+            grayscale = CLAMP_MAX(sqrtf(sqrtf(luminosity)), 1.0) * 255;
             break;
     }
 
