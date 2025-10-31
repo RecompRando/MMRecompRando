@@ -202,7 +202,7 @@ extern u64 object_flowerpot_Tex_000800[];
 RECOMP_HOOK("ObjFlowerpot_Init")
 void grab_pot_assets(Actor* thisx, PlayState* play) {
     Lib_MemCpy(originalFlowerPotLeavesTex, SEGMENTED_TO_K0(object_flowerpot_Tex_000800), sizeof(originalFlowerPotLeavesTex));
-    RGBA16toIA16_Texture(originalFlowerPotLeavesTex, flowerPotLeavesTex, ARRAY_COUNT(originalFlowerPotLeavesTex));
+    RGBA16toIA16_Texture(originalFlowerPotLeavesTex, flowerPotLeavesTex, ARRAY_COUNT(originalFlowerPotLeavesTex), GRAYSCALE_OOTMM);
 }
 
 extern Gfx object_flowerpot_DL_0012E0[];

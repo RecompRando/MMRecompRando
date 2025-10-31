@@ -15,8 +15,14 @@ extern Color_RGB8 randoSpiderColor;
 extern Color_RGB8 randoFairyColor;
 extern Color_RGB8 randoKeyColor;
 
-u16 RGBA16toGrayscale_Color(u16 RGBA);
-void RGBA16toIA16_Texture(u16* rgbaTex, u16* outTex, u32 arrayCount);
+typedef enum IA_Grayscale_Type {
+    GRAYSCALE_LUMINOSITY,
+    GRAYSCALE_MAX,
+    GRAYSCALE_OOTMM
+} IA_Grayscale_Type;
+
+u16 RGBA16toGrayscale_Color(u16 RGBA, IA_Grayscale_Type type);
+void RGBA16toIA16_Texture(u16* rgbaTex, u16* outTex, u32 arrayCount, IA_Grayscale_Type type);
 void hsv_to_rgb(float h, float s, float v, Color_RGB8* out);
 bool get_rando_color(Color_RGB8* rColor, u32 location);
 

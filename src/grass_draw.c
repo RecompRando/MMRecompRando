@@ -40,12 +40,12 @@ extern u16 gameplay_keep_Tex_052940[];
 
 void grab_grass_texture() {
     Lib_MemCpy(originalGrassTex, SEGMENTED_TO_K0(gameplay_field_keep_Tex_007010), sizeof(originalGrassTex));
-    RGBA16toIA16_Texture(originalGrassTex, grassTex, ARRAY_COUNT(originalGrassTex));
+    RGBA16toIA16_Texture(originalGrassTex, grassTex, ARRAY_COUNT(originalGrassTex), GRAYSCALE_OOTMM);
 }
 
 void grab_sprout_texture() {
     Lib_MemCpy(originalGrassTex, SEGMENTED_TO_K0(gameplay_keep_Tex_052940), sizeof(originalGrassTex));
-    RGBA16toIA16_Texture(originalGrassTex, grassSproutTex, ARRAY_COUNT(originalGrassTex));
+    RGBA16toIA16_Texture(originalGrassTex, grassSproutTex, ARRAY_COUNT(originalGrassTex), GRAYSCALE_OOTMM);
 }
 
 RECOMP_IMPORT("*", ActorExtensionId actor_transform_id(Actor* actor));

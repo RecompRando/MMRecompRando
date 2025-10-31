@@ -18,26 +18,38 @@ Color_RGB8 randoFairyColor = {255, 128, 255};
 Color_RGB8 randoKeyColor = {192, 192, 192};
 Color_RGB8 randoSoulColor = {136, 0, 255};
 
-u16 RGBA16toGrayscale_Color(u16 RGBA) {
+u16 RGBA16toGrayscale_Color(u16 RGBA, IA_Grayscale_Type type) {
     // https://github.com/krimtonz/rgba5551topng/blob/master/rgba5551topng.c#L111-L114
     u8 red = (((RGBA >> 11) & 0x1F) * 255 + 15) / 31; 
     u8 green = (((RGBA >> 6) & 0x1F) * 255 + 15) / 31;
     u8 blue = (((RGBA >> 1) & 0x1F) * 255 + 15) / 31;
     u8 alpha = (RGBA & 0x0001) * 255;
 
-    // luminosity grayscale conversion
-    // u8 grayscale = (red * 0.299) + (green * 0.587) + (blue * 0.114);
-    
-    // combo's grayscale conversion
-    f32 luminosity = (MAX(MAX(red, blue), green)) / 255.0f;
-    u8 grayscale = CLAMP_MAX(sqrtf(sqrtf(luminosity)), 1.0) * 255;
+    u8 grayscale;
+
+    switch (type) {
+        case GRAYSCALE_LUMINOSITY:
+            // BT.601 luminosity grayscale
+            grayscale = (red * 0.299) + (green * 0.587) + (blue * 0.114);
+            break;
+        case GRAYSCALE_MAX:
+            // simplified version of below
+            // guessing this is decomposition?
+            grayscale = (MAX(MAX(red, blue), green));
+            break;
+        case GRAYSCALE_OOTMM:
+            // combo's grayscale conversion
+            f32 luminosity = (MAX(MAX(red, blue), green)) / 255.0f;
+            u8 grayscale = CLAMP_MAX(sqrtf(sqrtf(luminosity)), 1.0) * 255;
+            break;
+    }
 
     return (grayscale << 8) | (alpha);
 }
 
-void RGBA16toIA16_Texture(u16* rgbaTex, u16* outTex, u32 arrayCount) {
+void RGBA16toIA16_Texture(u16* rgbaTex, u16* outTex, u32 arrayCount, IA_Grayscale_Type type) {
     for (u32 i = 0; i < arrayCount; i++) {
-        outTex[i] = RGBA16toGrayscale_Color(rgbaTex[i]);
+        outTex[i] = RGBA16toGrayscale_Color(rgbaTex[i], type);
     }
 }
 

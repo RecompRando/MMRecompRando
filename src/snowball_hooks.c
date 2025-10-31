@@ -112,7 +112,7 @@ extern Gfx object_goroiwa_DL_008B90[];
 
 void grab_snowball_texture() {
     Lib_MemCpy(originalSnowballTex, SEGMENTED_TO_K0(object_goroiwa_Tex_008DA0), sizeof(originalSnowballTex));
-    RGBA16toIA16_Texture(originalSnowballTex, snowballTex, ARRAY_COUNT(originalSnowballTex)); // why was it rgba16 lmao
+    RGBA16toIA16_Texture(originalSnowballTex, snowballTex, ARRAY_COUNT(originalSnowballTex), GRAYSCALE_OOTMM); // why was it rgba16 lmao
 }
 
 Gfx* GenericSnowball_DrawRandoColored(PlayState* play, u32 location, Gfx* gfx) {
