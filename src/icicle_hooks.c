@@ -36,7 +36,7 @@ RECOMP_PATCH void BgIcicle_UpdateAttacked(BgIcicle* this, PlayState* play) {
 
         if (this->dyna.actor.params == ICICLE_STALAGMITE_RANDOM_DROP) {
             BgIcicle_Break(this, play, 50.0f);
-            if (rando_get_slotdata_u32("iciclesanity") && !rando_location_is_checked(*icicleLocation)) {
+            if (rando_get_slotdata_u32("iciclesanity") && !rando_location_is_checked(*icicleLocation) && (!*icicleDropped)) {
                 Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, *icicleLocation);
                 *icicleDropped = true;
             } else if (this->unk_160 != 0xFF) {
@@ -45,14 +45,14 @@ RECOMP_PATCH void BgIcicle_UpdateAttacked(BgIcicle* this, PlayState* play) {
         } else if (this->dyna.actor.params == ICICLE_STALAGMITE_FIXED_DROP) {
             dropItem00Id = func_800A8150(this->unk_160);
             BgIcicle_Break(this, play, 50.0f);
-            if (rando_get_slotdata_u32("iciclesanity") && !rando_location_is_checked(*icicleLocation)) {
+            if (rando_get_slotdata_u32("iciclesanity") && !rando_location_is_checked(*icicleLocation) && (!*icicleDropped)) {
                 Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, (this->unk_161 << 8) | dropItem00Id, *icicleLocation);
                 *icicleDropped = true;
             } else {
                 Item_DropCollectible(play, &this->dyna.actor.world.pos, (this->unk_161 << 8) | dropItem00Id);
             }
         } else {
-            if (rando_get_slotdata_u32("iciclesanity") && !rando_location_is_checked(*icicleLocation)) {
+            if (rando_get_slotdata_u32("iciclesanity") && !rando_location_is_checked(*icicleLocation) && (!*icicleDropped)) {
                 Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, (this->unk_161 << 8), *icicleLocation);
                 *icicleDropped = true;
             }
@@ -69,6 +69,16 @@ RECOMP_PATCH void BgIcicle_UpdateAttacked(BgIcicle* this, PlayState* play) {
         }
 
         Actor_Kill(&this->dyna.actor);
+    }
+}
+
+RECOMP_HOOK("BgIcicle_Fall")
+void OnBgIcicle_Fall(BgIcicle* this, PlayState* play) {
+    if ((this->collider.base.atFlags & AT_HIT) || (this->dyna.actor.bgCheckFlags & BGCHECKFLAG_GROUND)) {
+        if (rando_get_slotdata_u32("iciclesanity") && !rando_location_is_checked(*icicleLocation)) {
+            Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, (this->unk_161 << 8), *icicleLocation);
+            *icicleDropped = true;
+        }
     }
 }
 
