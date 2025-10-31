@@ -2,6 +2,7 @@
 #include "global.h"
 
 #include "apcommon.h"
+#include "rando_colors.h"
 
 #include "overlays/actors/ovl_Obj_Comb/z_obj_comb.h"
 
@@ -109,16 +110,23 @@ RECOMP_PATCH void func_8098D99C(ObjComb* this, PlayState* play) {
     }
 }
 
+u16 grayBeehiveTex[1024];
+u16 originalBeehiveTex[1024];
+extern u16 gBeehiveTex[];
+
 RECOMP_HOOK("ObjComb_Init")
 void OnObjComb_Init(Actor* thisx, PlayState* play) {
     beehiveLocation = z64recomp_get_extended_actor_data(thisx, beehiveLocationExtension);
     *beehiveLocation = LOCATION_BEEHIVE;
+    // grab texture for camc
+    Lib_MemCpy(originalBeehiveTex, SEGMENTED_TO_K0(gBeehiveTex), sizeof(originalBeehiveTex));
+    RGBA16toIA16_Texture(originalBeehiveTex, grayBeehiveTex, ARRAY_COUNT(originalBeehiveTex), GRAYSCALE_OOTMM);
 }
 
 RECOMP_HOOK("func_8098D8C8")
 void ObjComb_SpawnItemWithBees(ObjComb* this, PlayState* play) {
     beehiveLocation = z64recomp_get_extended_actor_data(&this->actor, beehiveLocationExtension);
-    if (!rando_location_is_checked(*beehiveLocation)) {
+    if (rando_get_slotdata_u32("hivesanity") && !rando_location_is_checked(*beehiveLocation)) {
         Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *beehiveLocation);
         return;
     }
@@ -128,7 +136,7 @@ RECOMP_PATCH void func_8098D870(ObjComb* this, PlayState* play) {
     s32 temp_v0 = func_800A8150(OBJCOMB_GET_3F(&this->actor));
 
     beehiveLocation = z64recomp_get_extended_actor_data(&this->actor, beehiveLocationExtension);
-    if (temp_v0 != ITEM00_HEART_PIECE && !rando_location_is_checked(*beehiveLocation)) {
+    if (rando_get_slotdata_u32("hivesanity") && temp_v0 != ITEM00_HEART_PIECE && !rando_location_is_checked(*beehiveLocation)) {
         Item_RandoDropCollectible(play, &this->actor.world.pos, ((OBJCOMB_GET_7F00(&this->actor)) << 8) | temp_v0, *beehiveLocation);
         return;
     }
@@ -136,4 +144,41 @@ RECOMP_PATCH void func_8098D870(ObjComb* this, PlayState* play) {
     if (temp_v0 >= 0) {
         Item_DropCollectible(play, &this->actor.world.pos, ((OBJCOMB_GET_7F00(&this->actor)) << 8) | temp_v0);
     }
+}
+
+extern Gfx gBeehiveDL[];
+extern Gfx randoBeehiveDL[];
+
+RECOMP_PATCH void ObjComb_Draw(Actor* thisx, PlayState* play) {
+    ObjComb* this = ((ObjComb*)thisx);
+    
+    s32 itemDrop = func_800A8150(OBJCOMB_GET_3F(&this->actor));
+    s32 combType = OBJCOMB_GET_8000(&this->actor) | OBJCOMB_GET_80(&this->actor);
+    beehiveLocation = z64recomp_get_extended_actor_data(&this->actor, beehiveLocationExtension);
+
+    OPEN_DISPS(play->state.gfxCtx);
+
+    Gfx_SetupDL25_Opa(play->state.gfxCtx);
+    Matrix_Translate(this->actor.world.pos.x, this->actor.world.pos.y + (118.0f * this->actor.scale.y),
+                     this->actor.world.pos.z, MTXMODE_NEW);
+    Matrix_RotateYS(this->actor.shape.rot.y, MTXMODE_APPLY);
+    Matrix_RotateXS(this->actor.shape.rot.x, MTXMODE_APPLY);
+    Matrix_RotateZS(this->actor.shape.rot.z, MTXMODE_APPLY);
+    Matrix_Translate(0.0f, -(this->actor.scale.y * 118.0f), 0.0f, MTXMODE_APPLY);
+    Matrix_Scale(this->actor.scale.x, this->actor.scale.y, this->actor.scale.z, MTXMODE_APPLY);
+
+    gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+    
+    Color_RGB8 color;
+    if (rando_get_slotdata_u32("hivesanity") && get_rando_color(&color, *beehiveLocation)
+        && itemDrop != ITEM00_HEART_PIECE && (combType == 0 || combType == 1)) {
+        gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, color.r, color.g, color.b, 255);
+        gSPDisplayList(POLY_OPA_DISP++, randoBeehiveDL);
+    } else {
+        gSPDisplayList(POLY_OPA_DISP++, gBeehiveDL);
+    }
+
+    Collider_UpdateSpheres(0, &this->collider);
+
+    CLOSE_DISPS(play->state.gfxCtx);
 }
