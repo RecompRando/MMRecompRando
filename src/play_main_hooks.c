@@ -188,6 +188,13 @@ void randoScout() {
         removeAllScoutsWithPrefix(AP_PREFIX_SNOWBALLS);
     }
     
+    if (rando_get_slotdata_u32("realfairysanity") == 0)
+    {
+        removeAllScoutsWithPrefix(AP_PREFIX_FAIRIES);
+        removeAllScoutsWithPrefix(AP_PREFIX_GOSSIP);
+        removeAllScoutsWithPrefix(AP_PREFIX_BUTTERFLIES);
+    }
+    
     if (rando_get_slotdata_u32("iciclesanity") == 0)
     {
         removeAllScoutsWithPrefix(AP_PREFIX_ICICLES);

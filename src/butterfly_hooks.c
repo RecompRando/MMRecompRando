@@ -11,7 +11,7 @@
 #include "overlays/actors/ovl_En_Elf/z_en_elf.h"
 #include "overlays/actors/ovl_En_Butte/z_en_butte.h"
 
-#define LOCATION_FAIRY_BUTTERFLY (0xBF0000 | (sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+#define LOCATION_FAIRY_BUTTERFLY (AP_PREFIX_BUTTERFLIES | (sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                                     | randoGetLoadedActorNumInSameRoom(play, thisx))
 
 ActorExtensionId butterflyLocationExtension;
@@ -56,9 +56,11 @@ RECOMP_PATCH void func_8091CFB4(EnButte* this, PlayState* play) {
         this->unk_250 = 0;
         
         butterflyLocation = z64recomp_get_extended_actor_data(&this->actor, butterflyLocationExtension);
-        fairyLocation = z64recomp_get_extended_actor_data(fairy, fairyLocationExtension);
-        *fairyLocation = *butterflyLocation;
-        fairy->draw = EnElf_RandoDraw;
+        if (rando_get_slotdata_u32("realfairysanity") && !rando_location_is_checked(*butterflyLocation)) {
+            fairyLocation = z64recomp_get_extended_actor_data(fairy, fairyLocationExtension);
+            *fairyLocation = *butterflyLocation;
+            fairy->draw = EnElf_RandoDraw;
+        }
     } else if (this->unk_24C <= 0) {
         func_8091D070(this);
     }

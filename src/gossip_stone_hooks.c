@@ -10,7 +10,7 @@
 #include "overlays/actors/ovl_En_Elf/z_en_elf.h"
 #include "overlays/actors/ovl_En_Gs/z_en_gs.h"
 
-#define LOCATION_FAIRY_GOSSIP (0x1F0000 | (play->sceneId << 8) | (this->actor.params << 4) | this->unk_195)
+#define LOCATION_FAIRY_GOSSIP (AP_PREFIX_GOSSIP | (play->sceneId << 8) | (this->actor.params << 4) | this->unk_195)
 
 void func_80999AC0(EnGs* this);
 void func_809984F4(EnGs* this, PlayState* play);
@@ -95,7 +95,7 @@ RECOMP_PATCH void func_8099807C(EnGs* this, PlayState* play) {
             break;
     }
 
-    if (fairy != NULL) {
+    if (fairy != NULL && rando_get_slotdata_u32("realfairysanity") && !rando_location_is_checked(LOCATION_FAIRY_GOSSIP)) {
         fairyLocation = z64recomp_get_extended_actor_data(fairy, fairyLocationExtension);
         *fairyLocation = LOCATION_FAIRY_GOSSIP;
         fairy->draw = EnElf_RandoDraw;

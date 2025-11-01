@@ -12,7 +12,7 @@
 ActorExtensionId fairyLocationExtension;
 u32* fairyLocation;
 
-#define LOCATION_FAIRY (0x0F0000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+#define LOCATION_FAIRY (AP_PREFIX_FAIRIES | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, &this->actor))
 
 extern u32* item00Location;
@@ -50,9 +50,11 @@ void OnEnElf_Init(Actor* thisx, PlayState* play2) {
 RECOMP_HOOK("func_8088CC48")
 void EnElf_RandoFairyReplace(EnElf* this, PlayState* play) {
     fairyLocation = z64recomp_get_extended_actor_data(&this->actor, fairyLocationExtension);
-    if (this->actor.params == FAIRY_TYPE_6) {
+    if (rando_get_slotdata_u32("realfairysanity") && this->actor.params == FAIRY_TYPE_6) {
         *fairyLocation = LOCATION_FAIRY;
-        this->actor.draw = EnElf_RandoDraw;
+        if (!rando_location_is_checked(*fairyLocation)) {
+            this->actor.draw = EnElf_RandoDraw;
+        }
     }
 }
 
@@ -64,7 +66,7 @@ void EnElf_RandoFairyTouched(EnElf* this, PlayState* play) {
         return;
     }
 
-    if (!rando_location_is_checked(*fairyLocation) && !this->unk_246) { // trying to make it print less
+    if (rando_get_slotdata_u32("realfairysanity") && !rando_location_is_checked(*fairyLocation) && !this->unk_246) { // trying to make it print less
         Actor* item00 = Actor_Spawn(&play->actorCtx, play, ACTOR_EN_ITEM00, this->actor.world.pos.x, this->actor.world.pos.y, this->actor.world.pos.z, 0,
                                 0, 0, ITEM00_APITEM);
         item00Location = z64recomp_get_extended_actor_data(item00, item00LocationExtension);
