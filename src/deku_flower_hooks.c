@@ -12,7 +12,7 @@
 #define PINK_DEKU_FLOWER_LIMB_MAX 0x0B
 #include "overlays/actors/ovl_Obj_Etcetera/z_obj_etcetera.h"
 
-#define LOCATION_FLOWER (0x3F0000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+#define LOCATION_FLOWER (AP_PREFIX_FLOWERS | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, &this->dyna.actor))
 
 static u32 flowerLocation;

@@ -212,7 +212,12 @@ void randoScout() {
     {
         removeAllScoutsWithPrefix(AP_PREFIX_FROGS);
     }
-
+    
+    if (rando_get_slotdata_u32("flowersanity") == 0)
+    {
+        removeAllScoutsWithPrefix(AP_PREFIX_FLOWERS);
+    }
+    
     rando_send_queued_scouts(0);
 }
 
