@@ -65,17 +65,18 @@ void EnKakasi_IdleUndergroundAndWaitForSpawn(EnKakasi* this, PlayState* play) {
 
 RECOMP_HOOK("EnKakasi_IdleRisen")
 void EnKakasi_IdleRisenCheckForOcarina(EnKakasi* this, PlayState* play) {
+    if (!rando_get_slotdata_u32("scarecrowsanity") || rando_location_is_checked(LOCATION_SCARECROW)) {
+        return;
+    }
+
     if ((this->picto.actor.xzDistToPlayer < this->songSummonDist) && ((BREG(1) != 0) || (play->msgCtx.ocarinaMode == OCARINA_MODE_ACTIVE))) {
         // this->picto.actor.flags &= ~ACTOR_FLAG_LOCK_ON_DISABLED;
         play->msgCtx.ocarinaMode = OCARINA_MODE_END;
         AudioOcarina_SetOcarinaDisableTimer(0, 1);
         Message_CloseTextbox(play);
-        if (rando_get_slotdata_u32("scarecrowsanity") && !rando_location_is_checked(LOCATION_SCARECROW)) {
-            recomp_printf("scarecrow location: 0x%06X\n", LOCATION_SCARECROW);
-            savedEnKakasiActionFunc = this->actionFunc;
-            this->actionFunc = EnKakasi_GiveRandoItem;
-        } else {
-            this->actionFunc = EnKakasi_SetupRiseOutOfGround;
-        }
+        
+        recomp_printf("scarecrow location: 0x%06X\n", LOCATION_SCARECROW);
+        savedEnKakasiActionFunc = this->actionFunc;
+        this->actionFunc = EnKakasi_GiveRandoItem;
     }
 }
