@@ -15,6 +15,8 @@
 #include "dungeon_items.h"
 #include "rupoor.h"
 
+#include "models/frog.h" // temp
+
 // ty neirn
 #define SEGMENTED_TO_GLOBAL_PTR(obj, segmentedPtr) ((void *)((uintptr_t)obj + SEGMENT_OFFSET(segmentedPtr)))
 
@@ -766,7 +768,8 @@ RECOMP_PATCH void GetItem_Draw(PlayState* play, s16 drawId) {
         case GID_FROG_PINK:
         case GID_FROG_BLUE:
         case GID_FROG_WHITE:
-            GetItem_DrawFrog(play, drawId);
+            // GetItem_DrawFrog(play, drawId);
+            GetItem_DrawOpa0DL(play, frog);
             return;
         case GID_SF_CLOCKTOWN:
         case GID_SF_WOODFALL:
