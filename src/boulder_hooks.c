@@ -9,9 +9,9 @@
 #include "overlays/actors/ovl_Obj_Bombiwa/z_obj_bombiwa.h"
 #include "overlays/actors/ovl_Obj_Hamishi/z_obj_hamishi.h"
 
-#define LOCATION_BOULDER (0x1B0000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+#define LOCATION_BOULDER (AP_PREFIX_BOULDERS | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                         | randoGetLoadedActorNumInSameRoomExtra(play, thisx, ACTOR_OBJ_HAMISHI))
-#define LOCATION_BOULDER2 (0x1B0000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+#define LOCATION_BOULDER2 (AP_PREFIX_BOULDERS | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                         | randoGetLoadedActorNumInSameRoomExtra(play, thisx, ACTOR_OBJ_BOMBIWA))
 
 ActorExtensionId boulderLocationExtension;
@@ -40,7 +40,7 @@ void AfterObjBombiwa_CheckBroken() {
 
     if (Flags_GetSwitch(play, OBJBOMBIWA_GET_SWITCH_FLAG(&this->actor))) {
         boulderLocation = z64recomp_get_extended_actor_data(&this->actor, boulderLocationExtension);
-        if (!rando_location_is_checked(*boulderLocation)) {
+        if (rando_get_slotdata_u32("rocksanity") && !rando_location_is_checked(*boulderLocation)) {
             Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *boulderLocation);
         }
     }
@@ -56,7 +56,7 @@ void OnObjHamishi_Init(Actor* thisx, PlayState* play) {
 RECOMP_HOOK("func_809A10F4")
 void ObjHamishi_Broken(ObjHamishi* this, PlayState* play) {
     boulder2Location = z64recomp_get_extended_actor_data(&this->actor, boulder2LocationExtension);
-    if (!rando_location_is_checked(*boulder2Location)) {
+    if (rando_get_slotdata_u32("rocksanity") && !rando_location_is_checked(*boulder2Location)) {
         Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *boulder2Location);
     }
 }

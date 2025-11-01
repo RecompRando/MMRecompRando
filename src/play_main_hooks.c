@@ -173,6 +173,12 @@ void randoScout() {
         removeAllScoutsWithPrefix(AP_PREFIX_POTS);
     }
     
+    if (rando_get_slotdata_u32("rocksanity") == 0)
+    {
+        removeAllScoutsWithPrefix(AP_PREFIX_ROCKS);
+        removeAllScoutsWithPrefix(AP_PREFIX_BOULDERS);
+    }
+    
     if (rando_get_slotdata_u32("soilsanity") == 0)
     {
         removeAllScoutsWithPrefix(AP_PREFIX_POTS);
