@@ -13,12 +13,12 @@
 #include "overlays/actors/ovl_En_Wood02/z_en_wood02.h" // generic trees?
 #include "overlays/actors/ovl_Obj_Tree/z_obj_tree.h" // beefier tree
 
-#define LOCATION_PALM_TREE (0x2A0000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+#define LOCATION_PALM_TREE (AP_PREFIX_PALM_TREES | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
-#define LOCATION_SNOW_TREE (0x2B0000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+#define LOCATION_SNOW_TREE (AP_PREFIX_SNOW_TREES | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
-#define LOCATION_WOOD_TREE (0x2C0000 | (play->sceneId << 8) | EnWood02_GetIDHash(this))
-#define LOCATION_THIC_TREE (0x2D0000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+#define LOCATION_WOOD_TREE (AP_PREFIX_WOOD_TREES | (play->sceneId << 8) | EnWood02_GetIDHash(this))
+#define LOCATION_THIC_TREE (AP_PREFIX_TREE_TREES | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, &this->dyna.actor))
 
 // palm trees

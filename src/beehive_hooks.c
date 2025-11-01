@@ -9,7 +9,7 @@
 #include "actor_helpers.h"
 
 #define LOCATION_SKULL_TOKEN (0x060000 | (play->sceneId << 8) | OBJCOMB_GET_1F(&this->actor))
-#define LOCATION_BEEHIVE (0x240000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+#define LOCATION_BEEHIVE (AP_PREFIX_BEEHIVES | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
 
 ActorExtensionId beehiveLocationExtension;

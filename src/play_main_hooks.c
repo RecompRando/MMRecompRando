@@ -205,6 +205,11 @@ void randoScout() {
         removeAllScoutsWithPrefix(AP_PREFIX_SCARECROW);
     }
     
+    if (rando_get_slotdata_u32("hivesanity") == 0)
+    {
+        removeAllScoutsWithPrefix(AP_PREFIX_BEEHIVES);
+    }
+    
     if (rando_get_slotdata_u32("notebooksanity") == 0)
     {
         removeAllScoutsWithPrefix(AP_PREFIX_NOTEBOOK);
@@ -218,6 +223,14 @@ void randoScout() {
     if (rando_get_slotdata_u32("frogsanity") == 0)
     {
         removeAllScoutsWithPrefix(AP_PREFIX_FROGS);
+    }
+    
+    if (rando_get_slotdata_u32("treesanity") == 0)
+    {
+        removeAllScoutsWithPrefix(AP_PREFIX_PALM_TREES);
+        removeAllScoutsWithPrefix(AP_PREFIX_SNOW_TREES);
+        removeAllScoutsWithPrefix(AP_PREFIX_WOOD_TREES);
+        removeAllScoutsWithPrefix(AP_PREFIX_TREE_TREES);
     }
     
     if (rando_get_slotdata_u32("flowersanity") == 0)
