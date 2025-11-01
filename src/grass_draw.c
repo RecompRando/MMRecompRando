@@ -16,8 +16,6 @@
 #include "overlays/actors/ovl_En_Kusa/z_en_kusa.h"
 #include "overlays/actors/ovl_En_Kusa2/z_en_kusa2.h"
 
-RECOMP_IMPORT(".", bool rando_get_camc_enabled());
-
 #define LOCATION_GRASS(grassElem) ObjGrass_GetLocation(grassElem)
 
 u32 ObjGrass_GetLocation(ObjGrassElement* grass);

@@ -115,8 +115,6 @@ void cycle_rainbow() {
     hsv_to_rgb(hue, 1.0f, 1.0f, &rainbowColor);
 }
 
-RECOMP_IMPORT(".", bool rando_get_camc_enabled());
-
 // sets rColor based on item/location type, returns false to draw original
 bool get_rando_color(Color_RGB8* rColor, u32 location) {
     // show default grass if camc is off or location was checked
