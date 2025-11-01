@@ -174,7 +174,7 @@ RECOMP_PATCH void ObjTsubo_Draw(Actor* thisx, PlayState* play2) {
 
     // if (!rando_get_slotdata_u32("potsanity") || (rando_location_is_checked(*potLocation) && !(*potDropped)) ||
     //     (OBJ_TSUBO_PFE00(thisx) && ((func_800A8150(OBJ_TSUBO_P003F(thisx)) != ITEM00_FLEXIBLE)) && !rando_get_slotdata_u32("fairysanity"))) { // stray fairies
-    if (!rando_get_slotdata_u32("potsanity") || (rando_location_is_checked(*potLocation) && !(*potDropped))) {
+    if (!rando_get_slotdata_u32("potsanity") || (rando_location_is_checked(*potLocation) && !(*potDropped)) || !rando_get_camc_enabled()) {
         Gfx_DrawDListOpa(play, sPotTypeData[OBJ_TSUBO_GET_TYPE(thisx)].modelDL);
         return;
     }
@@ -186,7 +186,7 @@ RECOMP_PATCH void ObjTsubo_Draw(Actor* thisx, PlayState* play2) {
 RECOMP_PATCH void EnTuboTrap_Draw(Actor* thisx, PlayState* play) {
     potFlyingLocation = z64recomp_get_extended_actor_data(thisx, potFlyingLocationExtension);
     
-    if (!rando_get_slotdata_u32("potsanity") || rando_location_is_checked(*potFlyingLocation)) {
+    if (!rando_get_slotdata_u32("potsanity") || rando_location_is_checked(*potFlyingLocation) || !rando_get_camc_enabled()) {
         Gfx_DrawDListOpa(play, gameplay_dangeon_keep_DL_017EA0);
         return;
     }
