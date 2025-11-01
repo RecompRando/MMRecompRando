@@ -35,7 +35,7 @@ void OnObjEtcetera_Init(Actor* thisx, PlayState* play) {
     RGBA16toIA16_Texture(originalFlowerTex, pinkFlowerTex, ARRAY_COUNT(originalFlowerTex), GRAYSCALE_MAX);
     // copy gold flower texture (redundant?)
     Lib_MemCpy(originalFlowerTex, SEGMENTED_TO_K0(gGoldDekuFlowerPetalAndCenterTex), sizeof(originalFlowerTex));
-    RGBA16toIA16_Texture(originalFlowerTex, goldFlowerTex, ARRAY_COUNT(originalFlowerTex), GRAYSCALE_MAX);
+    RGBA16toIA16_Texture(originalFlowerTex, goldFlowerTex, ARRAY_COUNT(originalFlowerTex), GRAYSCALE_LUMINOSITY);
 }
 
 RECOMP_HOOK("ObjEtcetera_Idle")
@@ -46,7 +46,7 @@ void OnObjEtcetera_Idle(ObjEtcetera* this, PlayState* play) {
         return;
     }
 
-    if (waitingForOffer && !(player->stateFlags3 & PLAYER_STATE3_100) && !rando_location_is_checked_async(flowerLocation)) {
+    if (waitingForOffer && !(player->stateFlags3 & PLAYER_STATE3_100) && !rando_location_is_checked(flowerLocation)) {
         recomp_printf("flower location: 0x%06X\n", flowerLocation);
         Actor* item = Item_RandoDropCollectible(play, &player->actor.world.pos, ITEM00_APITEM, flowerLocation);
         ((EnItem00*)item)->actionFunc = EnItem00_RandoTextAndFreeze;
@@ -55,7 +55,7 @@ void OnObjEtcetera_Idle(ObjEtcetera* this, PlayState* play) {
     }
 
     if ((player->stateFlags3 & PLAYER_STATE3_200) && (this->dyna.actor.xzDistToPlayer < 20.0f)) {
-        if (!rando_location_is_checked_async(LOCATION_FLOWER)) {
+        if (!rando_location_is_checked(LOCATION_FLOWER)) {
             flowerLocation = LOCATION_FLOWER;
             waitingForOffer = true;
         }
