@@ -542,6 +542,10 @@ s32 Health_ChangeBy_NoSound(PlayState* play, s16 healthChange) {
     }
 }
 
+bool rando_get_camc_enabled() {
+    return recomp_get_config_u32("camc_enabled");
+}
+
 ItemId randoConvertItemId(u32 ap_item_id) {
     ap_item_id &= 0xFFFFFF;
 

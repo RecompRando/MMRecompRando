@@ -145,6 +145,14 @@ options = [ "Top Left", "Top Right", "Bottom Left", "Bottom Right" ]
 default = "Top Left"
 
 [[manifest.config_options]]
+id = "camc_enabled"
+name = "Container Appearance Matches Contents"
+description = "Sets if the appearance of different containers match the content within them."
+type = "Enum"
+options = [ "Disabled", "Enabled" ]
+default = "Enabled"
+
+[[manifest.config_options]]
 id = "show_soul_model"
 name = "Show Full Models for Souls"
 description = "Sets whether or not Soul items display as their in-game model or a generic token."

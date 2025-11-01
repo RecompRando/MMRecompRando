@@ -256,7 +256,7 @@ RECOMP_IMPORT(".", u32 rando_get_moon_remains_required());
 RECOMP_IMPORT(".", u32 rando_get_majora_remains_required());
 RECOMP_IMPORT(".", u32 rando_get_random_seed());
 RECOMP_IMPORT(".", bool rando_is_magic_trap());
-RECOMP_IMPORT(".", bool rando_get_camc_enabled());
+// RECOMP_IMPORT(".", bool rando_get_camc_enabled());
 RECOMP_IMPORT(".", bool rando_skulltulas_enabled());
 RECOMP_IMPORT(".", bool rando_shopsanity_enabled());
 RECOMP_IMPORT(".", bool rando_advanced_shops_enabled());
@@ -314,6 +314,8 @@ bool loadObject(PlayState* play, void** objectSegment, OSMesgQueue* objectLoadQu
 void GetItem_DrawDynamic(PlayState* play, void* objectSegment, s16 objectId);
 s32 Actor_OfferGetItemHook(Actor* actor, PlayState* play, GetItemId getItemId, u32 location, f32 xzRange, f32 yRange, bool use_workaround, bool item_is_shuffled);
 Actor* Item_RandoDropCollectible(PlayState* play, Vec3f* spawnPos, u32 params, u32 location);
+
+bool rando_get_camc_enabled();
 
 u8 randoItemGive(u32 gi);
 u32 rando_get_item_id(u32 location_id);
