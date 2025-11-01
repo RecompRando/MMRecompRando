@@ -140,7 +140,7 @@ void OnEnInvisibleRuppe_Update(Actor* thisx, PlayState* play) {
     pos.x = thisx->world.pos.x + ((Rand_ZeroOne() - 0.5f) * 20.0f);
     pos.y = thisx->world.pos.y + ((Rand_ZeroOne() - 0.5f) * 20.0f);
     pos.z = thisx->world.pos.z + ((Rand_ZeroOne() - 0.5f) * 20.0f);
-    EffectSsKirakira_SpawnDispersed(play, &pos, &sEffectVelocity, &sEffectAccel, &sEffectPrimColor2, &sEffectEnvColor, 4000, 20);
+    EffectSsKirakira_SpawnDispersed(play, &pos, &sEffectVelocity, &sEffectAccel, &trueColor, &sEffectEnvColor, 4000, 20);
 }
 
 void func_80C259E8(EnInvisibleRuppe* this, PlayState* play); // literally just Actor_Kill(&this->actor);
