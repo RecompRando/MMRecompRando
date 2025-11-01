@@ -17,6 +17,7 @@ void registerActorExtensions() {
     potFlyingLocationExtension = z64recomp_extend_actor(ACTOR_EN_TUBO_TRAP, sizeof(u32));
     potFlowerLocationExtension = z64recomp_extend_actor(ACTOR_OBJ_FLOWERPOT, sizeof(u32));
     wonderHitLocationExtension = z64recomp_extend_actor(ACTOR_EN_HIT_TAG, sizeof(u32));
+    wonderHitTimerExtension = z64recomp_extend_actor(ACTOR_EN_HIT_TAG, sizeof(u32));
     wonderRupeeLocationExtension = z64recomp_extend_actor(ACTOR_EN_INVISIBLE_RUPPE, sizeof(u32));
     rockLocationExtension = z64recomp_extend_actor(ACTOR_EN_ISHI, sizeof(u32));
     boulderLocationExtension = z64recomp_extend_actor(ACTOR_OBJ_BOMBIWA, sizeof(u32));

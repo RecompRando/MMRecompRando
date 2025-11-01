@@ -173,6 +173,11 @@ void randoScout() {
         removeAllScoutsWithPrefix(AP_PREFIX_POTS);
     }
     
+    if (rando_get_slotdata_u32("hitsanity") == 0)
+    {
+        removeAllScoutsWithPrefix(AP_PREFIX_HITSPOT);
+    }
+    
     if (rando_get_slotdata_u32("rocksanity") == 0)
     {
         removeAllScoutsWithPrefix(AP_PREFIX_ROCKS);
@@ -187,6 +192,11 @@ void randoScout() {
     if (rando_get_slotdata_u32("rupeesanity") == 0)
     {
         removeAllScoutsWithPrefix(AP_PREFIX_FREESTANDING);
+    }
+    
+    if (rando_get_slotdata_u32("invisisanity") == 0)
+    {
+        removeAllScoutsWithPrefix(AP_PREFIX_INVISRUPEES);
     }
     
     if (rando_get_slotdata_u32("snowsanity") == 0)

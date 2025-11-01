@@ -10,6 +10,7 @@ extern ActorExtensionId potDroppedExtension;
 extern ActorExtensionId potFlyingLocationExtension;
 extern ActorExtensionId potFlowerLocationExtension;
 extern ActorExtensionId wonderHitLocationExtension;
+extern ActorExtensionId wonderHitTimerExtension;
 extern ActorExtensionId wonderRupeeLocationExtension;
 extern ActorExtensionId rockLocationExtension;
 extern ActorExtensionId boulderLocationExtension;

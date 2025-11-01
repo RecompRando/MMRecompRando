@@ -5,19 +5,24 @@
 
 #include "apcommon.h"
 #include "actor_helpers.h"
+#include "rando_colors.h"
 
 #include "overlays/actors/ovl_En_Hit_Tag/z_en_hit_tag.h"
 #include "overlays/actors/ovl_En_Invisible_Ruppe/z_en_invisible_ruppe.h"
 #include "overlays/actors/ovl_Obj_Dora/z_obj_dora.h"
 
-#define LOCATION_WONDER_HIT (0x150000 | ((play->sceneId + play->roomCtx.curRoom.num) << 8) \
+#define LOCATION_WONDER_HIT (AP_PREFIX_HITSPOT | ((play->sceneId + play->roomCtx.curRoom.num) << 8) \
                             | (randoGetLoadedActorNumInSameRoom(play, thisx)) << 4)
-#define LOCATION_WONDER_RUPEE (0x160000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+#define LOCATION_WONDER_RUPEE (AP_PREFIX_INVISRUPEES | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
-#define LOCATION_WONDER_HIT_GONG (0x160000 | (play->sceneId << 8))
+#define LOCATION_WONDER_HIT_GONG (AP_PREFIX_HITSPOT | (play->sceneId << 8))
+
+#define DISPLAY_TIME (2 * 20)
 
 ActorExtensionId wonderHitLocationExtension;
 u32* wonderHitLocation;
+ActorExtensionId wonderHitTimerExtension;
+u32* wonderHitTimer;
 ActorExtensionId wonderRupeeLocationExtension;
 u32* wonderRupeeLocation;
 
@@ -32,17 +37,57 @@ RECOMP_HOOK("EnHitTag_Init")
 void OnEnHitTag_Init(Actor* thisx, PlayState* play) {
     wonderHitLocation = z64recomp_get_extended_actor_data(thisx, wonderHitLocationExtension);
     *wonderHitLocation = LOCATION_WONDER_HIT;
+    wonderHitTimer = z64recomp_get_extended_actor_data(thisx, wonderHitTimerExtension);
+    *wonderHitTimer = 0;
 }
 
 RECOMP_HOOK("EnHitTag_Update")
 void OnEnHitTag_Update(Actor* thisx, PlayState* play) {
     Vec3f pos;
+    u32 wonderHitRupeeLocation;
+    Color_RGB8 color = { 255, 255, 127 };
+    bool shouldShow = false;
+
+    wonderHitLocation = z64recomp_get_extended_actor_data(thisx, wonderHitLocationExtension);
+    wonderHitTimer = z64recomp_get_extended_actor_data(thisx, wonderHitTimerExtension);
+
+    if (!rando_get_slotdata_u32("hitsanity")) return;
 
     // TODO: make this a lot nicer
     pos.x = thisx->world.pos.x + ((Rand_ZeroOne() - 0.5f) * 20.0f);
     pos.y = thisx->world.pos.y + ((Rand_ZeroOne() - 0.5f) * 20.0f);
     pos.z = thisx->world.pos.z + ((Rand_ZeroOne() - 0.5f) * 20.0f);
-    EffectSsKirakira_SpawnDispersed(play, &pos, &sEffectVelocity, &sEffectAccel, &sEffectPrimColor, &sEffectEnvColor, 4000, 20);
+    
+    for (u8 i = 0; i < 3; i++) {
+        wonderHitRupeeLocation = *wonderHitLocation | i;
+        if (!rando_location_is_checked(wonderHitRupeeLocation)) {
+            shouldShow = true;
+            break;
+        }
+    }
+
+    if (!shouldShow) return;
+
+    *wonderHitTimer += 1;
+    if (*wonderHitTimer > (DISPLAY_TIME * 3)) {
+        *wonderHitTimer = 0;
+    }
+    
+    if (*wonderHitTimer < DISPLAY_TIME) {
+        wonderHitRupeeLocation = *wonderHitLocation | 0;
+        get_rando_color(&color, wonderHitRupeeLocation);
+    }
+    if (*wonderHitTimer >= DISPLAY_TIME && *wonderHitTimer < (DISPLAY_TIME * 2)) {
+        wonderHitRupeeLocation = *wonderHitLocation | 1;
+        get_rando_color(&color, wonderHitRupeeLocation);
+    }
+    if (*wonderHitTimer >= (DISPLAY_TIME * 2)) {
+        wonderHitRupeeLocation = *wonderHitLocation | 2;
+        get_rando_color(&color, wonderHitRupeeLocation);
+    }
+
+    Color_RGBA8 trueColor = {color.r, color.g, color.b, 255};
+    EffectSsKirakira_SpawnDispersed(play, &pos, &sEffectVelocity, &sEffectAccel, &trueColor, &sEffectEnvColor, 4000, 20);
 }
 
 // could change to a non-patch by changing actionfunc in init
@@ -61,7 +106,7 @@ RECOMP_PATCH void EnHitTag_WaitForHit(EnHitTag* this, PlayState* play) {
 
         for (i = 0; i < 3; i++) {
             u32 wonderHitRupeeLocation = *wonderHitLocation | i;
-            if (!rando_location_is_checked(wonderHitRupeeLocation)) {
+            if (rando_get_slotdata_u32("hitsanity") && !rando_location_is_checked(wonderHitRupeeLocation)) {
                 Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, wonderHitRupeeLocation);
             } else {
                 Item_DropCollectible(play, &dropLocation, ITEM00_RUPEE_GREEN);
@@ -82,6 +127,14 @@ void OnEnInvisibleRuppe_Init(Actor* thisx, PlayState* play) {
 RECOMP_HOOK("EnInvisibleRuppe_Update")
 void OnEnInvisibleRuppe_Update(Actor* thisx, PlayState* play) {
     Vec3f pos;
+    wonderRupeeLocation = z64recomp_get_extended_actor_data(thisx, wonderRupeeLocationExtension);
+    Color_RGB8 color = { 255, 255, 127 };
+
+    if (!rando_get_slotdata_u32("invisisanity") || rando_location_is_checked_async(*wonderRupeeLocation)) return;
+
+    get_rando_color(&color, *wonderRupeeLocation);
+
+    Color_RGBA8 trueColor = {color.r, color.g, color.b, 255};
 
     // TODO: make this a lot nicer
     pos.x = thisx->world.pos.x + ((Rand_ZeroOne() - 0.5f) * 20.0f);
@@ -98,7 +151,7 @@ RECOMP_PATCH void func_80C2590C(EnInvisibleRuppe* this, PlayState* play) {
     Actor* item;
     if (this->collider.base.ocFlags1 & OC1_HIT) {
         wonderRupeeLocation = z64recomp_get_extended_actor_data(&this->actor, wonderRupeeLocationExtension);
-        if (!rando_location_is_checked(*wonderRupeeLocation)) {
+        if (rando_get_slotdata_u32("invisisanity") && !rando_location_is_checked(*wonderRupeeLocation)) {
             item = Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *wonderRupeeLocation);
             ((EnItem00*)item)->actionFunc = EnItem00_RandoTextAndFreeze;
         } else {
@@ -172,7 +225,7 @@ RECOMP_PATCH void ObjDora_UpdateCollision(ObjDora* this, PlayState* play) {
 
                 if ((ObjDora_IsHalfHour(time) == true) && (this->rupeeDropTimer == 0)) {
                     Actor_PlaySfx(&this->actor, NA_SE_SY_TRE_BOX_APPEAR);
-                    if (!rando_location_is_checked(LOCATION_WONDER_HIT_GONG)) {
+                    if (rando_get_slotdata_u32("hitsanity") && !rando_location_is_checked(LOCATION_WONDER_HIT_GONG)) {
                         itemDrop = Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, LOCATION_WONDER_HIT_GONG);
                     } else {
                         itemDrop = Item_DropCollectible(play, &this->actor.world.pos, ITEM00_RUPEE_BLUE);
