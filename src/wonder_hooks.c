@@ -128,7 +128,7 @@ RECOMP_HOOK("EnInvisibleRuppe_Update")
 void OnEnInvisibleRuppe_Update(Actor* thisx, PlayState* play) {
     Vec3f pos;
     wonderRupeeLocation = z64recomp_get_extended_actor_data(thisx, wonderRupeeLocationExtension);
-    Color_RGB8 color = { 255, 255, 127 };
+    Color_RGB8 color = { 127, 255, 255 };
 
     if (!rando_get_slotdata_u32("invisisanity") || rando_location_is_checked_async(*wonderRupeeLocation)) return;
 
