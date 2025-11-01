@@ -44,8 +44,12 @@ void EnKakasi_GiveRandoItem(EnKakasi* this, PlayState* play) {
     }
 }
 
-RECOMP_HOOK("EnKakasi_IdleUnderground")
-void EnKakasi_IdleUndergroundAndWaitForSpawn(EnKakasi* this, PlayState* play) {
+// patched to prevent scarecrow spawns when location is checked
+RECOMP_PATCH void EnKakasi_IdleUnderground(EnKakasi* this, PlayState* play) {
+    if (rando_get_slotdata_u32("scarecrowsanity") && rando_location_is_checked(LOCATION_SCARECROW)) {
+        return;
+    }
+    
     // if (CHECK_WEEKEVENTREG(WEEKEVENTREG_79_08) && (this->picto.actor.xzDistToPlayer < this->songSummonDist) &&
     //     ((BREG(1) != 0) || (play->msgCtx.ocarinaMode == OCARINA_MODE_PLAYED_SCARECROW_SPAWN))) {
     if ((this->picto.actor.xzDistToPlayer < this->songSummonDist) && ((BREG(1) != 0) || (play->msgCtx.ocarinaMode == OCARINA_MODE_ACTIVE))) {
