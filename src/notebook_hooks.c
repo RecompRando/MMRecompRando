@@ -32,45 +32,64 @@ RECOMP_PATCH void Message_BombersNotebookQueueEvent(PlayState* play, u8 event) {
  */
 RECOMP_PATCH s32 Message_BombersNotebookProcessEventQueue(PlayState* play) {
     MessageContext* msgCtx = &play->msgCtx;
-
-    Player* player = GET_PLAYER(play);
-
-    while (true) {
-        if (msgCtx->bombersNotebookEventQueueCount == 0) {
-            return false;
-        }
+    u8 event;
+    u32 location;
+    u16 messageId;
+    
+    while (msgCtx->bombersNotebookEventQueueCount > 0) {
         msgCtx->bombersNotebookEventQueueCount--;
-
-        // add option check here
+        event = msgCtx->bombersNotebookEventQueue[msgCtx->bombersNotebookEventQueueCount];
+        
+        // Handle notebooksanity
         if (rando_get_slotdata_u32("notebooksanity")) {
-            if (sBombersNotebookEventMessages[msgCtx->bombersNotebookEventQueue[msgCtx->bombersNotebookEventQueueCount]] != 0) {
-                u32 location = LOCATION_NOTEBOOK(msgCtx->bombersNotebookEventQueue[msgCtx->bombersNotebookEventQueueCount]);
-                recomp_printf("notebook location: 0x%06X\n", location);
-                if (!rando_location_is_checked(location)) {
+            location = LOCATION_NOTEBOOK(event);
+            messageId = sBombersNotebookEventMessages[event];
+            
+            // Always set the in-game event flag
+            if (!CHECK_WEEKEVENTREG(gBombersNotebookWeekEventFlags[event])) {
+                SET_WEEKEVENTREG(gBombersNotebookWeekEventFlags[event]);
+            }
+            
+            // Check if this location needs to be sent to AP
+            if (!rando_location_is_checked(location)) {
+                // EVENT checks (>= BOMBERS_NOTEBOOK_PERSON_MAX) can be sent without notebook
+                // MET checks (< BOMBERS_NOTEBOOK_PERSON_MAX) require notebook
+                if (event >= BOMBERS_NOTEBOOK_PERSON_MAX || CHECK_QUEST_ITEM(QUEST_BOMBERS_NOTEBOOK)) {
+                    recomp_printf("Sending notebook location: 0x%06X\n", location);
                     rando_send_location(location);
-                    Message_ContinueTextbox(play, getTextId(rando_get_item_id(location)));
+                    
+                    // Show message if there is one AND either:
+                    // - It's an EVENT check (doesn't need notebook), OR
+                    // - Player has the notebook
+                    if (messageId != 0 && (event >= BOMBERS_NOTEBOOK_PERSON_MAX || CHECK_QUEST_ITEM(QUEST_BOMBERS_NOTEBOOK))) {
+                        Message_ContinueTextbox(play, getTextId(rando_get_item_id(location)));
+                        Audio_PlaySfx(NA_SE_SY_SCHEDULE_WRITE);
+                        return true;
+                    }
+                }
+            } else {
+                // Location already checked - show vanilla notebook message to avoid softlock
+                if (messageId != 0 && (event >= BOMBERS_NOTEBOOK_PERSON_MAX || CHECK_QUEST_ITEM(QUEST_BOMBERS_NOTEBOOK))) {
+                    Message_ContinueTextbox(play, messageId);
                     Audio_PlaySfx(NA_SE_SY_SCHEDULE_WRITE);
-                    return true;
-                } else { // temp (note: forgot what this temp was for)
                     return true;
                 }
             }
+            // Event was processed but no message shown - continue to next
+            continue;
         }
-
-        if (!CHECK_WEEKEVENTREG(gBombersNotebookWeekEventFlags
-                                    [msgCtx->bombersNotebookEventQueue[msgCtx->bombersNotebookEventQueueCount]])) {
-            SET_WEEKEVENTREG(gBombersNotebookWeekEventFlags
-                                 [msgCtx->bombersNotebookEventQueue[msgCtx->bombersNotebookEventQueueCount]]);
-
-            if ((sBombersNotebookEventMessages
-                     [msgCtx->bombersNotebookEventQueue[msgCtx->bombersNotebookEventQueueCount]] != 0) &&
-                CHECK_QUEST_ITEM(QUEST_BOMBERS_NOTEBOOK)) {
-                Message_ContinueTextbox(
-                    play, sBombersNotebookEventMessages
-                              [msgCtx->bombersNotebookEventQueue[msgCtx->bombersNotebookEventQueueCount]]);
+        
+        // Original vanilla behavior (no notebooksanity)
+        if (!CHECK_WEEKEVENTREG(gBombersNotebookWeekEventFlags[event])) {
+            SET_WEEKEVENTREG(gBombersNotebookWeekEventFlags[event]);
+            
+            if ((sBombersNotebookEventMessages[event] != 0) && CHECK_QUEST_ITEM(QUEST_BOMBERS_NOTEBOOK)) {
+                Message_ContinueTextbox(play, sBombersNotebookEventMessages[event]);
                 Audio_PlaySfx(NA_SE_SY_SCHEDULE_WRITE);
                 return true;
             }
         }
     }
+    
+    return false;
 }
