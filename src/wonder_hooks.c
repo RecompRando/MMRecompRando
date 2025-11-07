@@ -73,17 +73,19 @@ void OnEnHitTag_Update(Actor* thisx, PlayState* play) {
         *wonderHitTimer = 0;
     }
     
-    if (*wonderHitTimer < DISPLAY_TIME) {
-        wonderHitRupeeLocation = *wonderHitLocation | 0;
-        get_rando_color(&color, wonderHitRupeeLocation);
-    }
-    if (*wonderHitTimer >= DISPLAY_TIME && *wonderHitTimer < (DISPLAY_TIME * 2)) {
-        wonderHitRupeeLocation = *wonderHitLocation | 1;
-        get_rando_color(&color, wonderHitRupeeLocation);
-    }
-    if (*wonderHitTimer >= (DISPLAY_TIME * 2)) {
-        wonderHitRupeeLocation = *wonderHitLocation | 2;
-        get_rando_color(&color, wonderHitRupeeLocation);
+    if (rando_get_camc_enabled() != CAMC_SHOW_UNCHECKED) { // show normal color with "show unchecked" option
+        if (*wonderHitTimer < DISPLAY_TIME) {
+            wonderHitRupeeLocation = *wonderHitLocation | 0;
+            get_rando_color(&color, wonderHitRupeeLocation);
+        }
+        if (*wonderHitTimer >= DISPLAY_TIME && *wonderHitTimer < (DISPLAY_TIME * 2)) {
+            wonderHitRupeeLocation = *wonderHitLocation | 1;
+            get_rando_color(&color, wonderHitRupeeLocation);
+        }
+        if (*wonderHitTimer >= (DISPLAY_TIME * 2)) {
+            wonderHitRupeeLocation = *wonderHitLocation | 2;
+            get_rando_color(&color, wonderHitRupeeLocation);
+        }
     }
 
     Color_RGBA8 trueColor = {color.r, color.g, color.b, 255};
@@ -132,7 +134,9 @@ void OnEnInvisibleRuppe_Update(Actor* thisx, PlayState* play) {
 
     if (!rando_get_slotdata_u32("invisisanity") || rando_location_is_checked_async(*wonderRupeeLocation)) return;
 
-    get_rando_color(&color, *wonderRupeeLocation);
+    if (rando_get_camc_enabled() != CAMC_SHOW_UNCHECKED) { // show normal color with "show unchecked" option
+        get_rando_color(&color, *wonderRupeeLocation);
+    }
 
     Color_RGBA8 trueColor = {color.r, color.g, color.b, 255};
 
