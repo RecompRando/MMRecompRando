@@ -147,9 +147,11 @@ default = "Top Left"
 [[manifest.config_options]]
 id = "camc_enabled"
 name = "Container Appearance Matches Contents"
-description = "Sets if the appearance of different containers match the content within them."
+description = """Sets if the appearance of different containers match the content within them.
+
+The "Show Unchecked" option will set all uncollected container appearances (excluding chests) to be a golden color."""
 type = "Enum"
-options = [ "Disabled", "Enabled" ]
+options = [ "Disabled", "Show Unchecked", "Enabled" ]
 default = "Enabled"
 
 [[manifest.config_options]]

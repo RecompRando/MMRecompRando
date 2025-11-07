@@ -3,8 +3,7 @@
 #include "ultra64.h"
 
 #include "apcommon.h"
-#include "box_ap.h"
-#include "box_ootmm.h"
+#include "models/custom_chest.h"
 
 RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
 
@@ -469,117 +468,83 @@ extern Gfx gBoxChestLidOrnateDL[];
 extern Gfx gBoxChestLidGildedDL[];
 extern Gfx gBoxChestLidDL[];
 
+Gfx* GenericContainer_SetTextures(PlayState* play, Gfx* gfx, u8* customDraw, u32 location);
+
 RECOMP_PATCH void EnBox_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3s* rot, Actor* thisx, Gfx** gfx) {
-    s32 pad;
     EnBox* this = THIS;
-    s16 trueGI;
     s16 sceneId = EnBox_UpdateSceneID(play->sceneId, ENBOX_GET_CHEST_FLAG(&this->dyna.actor));
 
+    u32 location = LOCATION_ENBOX;
+
     if (LOCATION_ENBOX == 0x061700) {
-        trueGI = rando_get_item_id(LOCATION_ENBOX_CHEST_GAME);
-    } else {
-        trueGI = rando_get_item_id(LOCATION_ENBOX);
+        location = rando_get_item_id(LOCATION_ENBOX_CHEST_GAME);
     }
 
+    u8 customDraw;
+    s16 getItem = rando_get_item_id(location);
     if (limbIndex == OBJECT_BOX_CHEST_LIMB_01) {
         gSPMatrix((*gfx)++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
-        if (rando_get_camc_enabled()) {
-            switch (trueGI) {
-                case GI_AP_FILLER:
-                    gSPDisplayList((*gfx)++, &apJunkChestBaseDL);
-                    return;
-                case GI_AP_USEFUL:
-                    gSPDisplayList((*gfx)++, &apUsefulChestBaseDL);
-                    return;
-                case GI_AP_PROG:
-                    gSPDisplayList((*gfx)++, &apProgChestBaseDL);
-                    return;
-                case GI_KEY_SMALL:
-                case GI_KEY_SMALL_WOODFALL:
-                case GI_KEY_SMALL_SNOWHEAD:
-                case GI_KEY_SMALL_GREATBAY:
-                case GI_KEY_SMALL_STONETOWER:
-                    gSPDisplayList((*gfx)++, &keyChestBaseDL);
-                    return;
-                case GI_B2:
-                case GI_46:
-                case GI_47:
-                case GI_48:
-                case GI_49:
-                    gSPDisplayList((*gfx)++, &fairyChestBaseDL);
-                    return;
-                case GI_HEART_PIECE:
-                case GI_HEART_CONTAINER:
-                case GI_DEFENSE_DOUBLE:
-                    gSPDisplayList((*gfx)++, &heartChestBaseDL);
-                    return;
-                case GI_TRUE_SKULL_TOKEN:
-                case GI_OCEAN_SKULL_TOKEN:
-                    gSPDisplayList((*gfx)++, &spiderChestBaseDL);
-                    return;
-                case GI_KEY_BOSS:
-                case GI_KEY_BOSS_WOODFALL:
-                case GI_KEY_BOSS_SNOWHEAD:
-                case GI_KEY_BOSS_GREATBAY:
-                case GI_KEY_BOSS_STONETOWER:
-                    gSPDisplayList((*gfx)++, &gBoxChestBaseOrnateDL);
-                    return;
+        *gfx = GenericContainer_SetTextures(play, (*gfx), &customDraw, location);
+        if (customDraw == CAMC_DRAW_ENABLED) {
+            gSPDisplayList((*gfx)++, randoChestBaseDL);
+        } else if (customDraw == CAMC_DRAW_CUSTOM) {
+            gSPDisplayList((*gfx)++, randoChestBaseAsymmetricDL);
+        } else if (rando_get_camc_enabled() && customDraw != CAMC_DRAW_UNCHECKED) { // unchecked is redundant in-game
+            switch (rando_get_location_type(location)) {
+                case RANDO_ITEM_CLASS_PROGRESSION:
+                case RANDO_ITEM_CLASS_USEFUL:
+                case RANDO_ITEM_CLASS_TRAP:
+                    gSPDisplayList((*gfx)++, &gBoxChestBaseGildedDL);
+                    break;
+                case RANDO_ITEM_CLASS_JUNK:
+                    gSPDisplayList((*gfx)++, &gBoxChestBaseDL);
+                    break;
             }
-        }
-        if (this->type == ENBOX_TYPE_SMALL) {
-            gSPDisplayList((*gfx)++, &gBoxChestBaseDL);
         } else {
-            gSPDisplayList((*gfx)++, &gBoxChestBaseGildedDL);
+            if (ENBOX_GET_TYPE(&this->dyna.actor) == ENBOX_TYPE_BIG_ORNATE) {
+                gSPDisplayList((*gfx)++, &gBoxChestBaseOrnateDL);
+            } else if (Actor_IsSmallChest(this)) {
+                if (ENBOX_GET_ITEM(thisx) == GI_KEY_SMALL) {
+                    gSPDisplayList((*gfx)++, &gBoxChestBaseGildedDL);
+                } else {
+                    gSPDisplayList((*gfx)++, &gBoxChestBaseDL);
+                }
+            } else {
+                gSPDisplayList((*gfx)++, &gBoxChestBaseGildedDL);
+            }
         }
     } else if (limbIndex == OBJECT_BOX_CHEST_LIMB_03) {
         gSPMatrix((*gfx)++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
-        if (rando_get_camc_enabled()) {
-            switch (trueGI) {
-                case GI_AP_FILLER:
-                    gSPDisplayList((*gfx)++, &apJunkChestLidDL);
-                    return;
-                case GI_AP_USEFUL:
-                    gSPDisplayList((*gfx)++, &apUsefulChestLidDL);
-                    return;
-                case GI_AP_PROG:
-                    gSPDisplayList((*gfx)++, &apProgChestLidDL);
-                    return;
-                case GI_KEY_SMALL:
-                case GI_KEY_SMALL_WOODFALL:
-                case GI_KEY_SMALL_SNOWHEAD:
-                case GI_KEY_SMALL_GREATBAY:
-                case GI_KEY_SMALL_STONETOWER:
-                    gSPDisplayList((*gfx)++, &keyChestLidDL);
-                    return;
-                case GI_B2:
-                case GI_46:
-                case GI_47:
-                case GI_48:
-                case GI_49:
-                    gSPDisplayList((*gfx)++, &fairyChestLidDL);
-                    return;
-                case GI_HEART_PIECE:
-                case GI_HEART_CONTAINER:
-                case GI_DEFENSE_DOUBLE:
-                    gSPDisplayList((*gfx)++, &heartChestLidDL);
-                    return;
-                case GI_TRUE_SKULL_TOKEN:
-                case GI_OCEAN_SKULL_TOKEN:
-                    gSPDisplayList((*gfx)++, &spiderChestLidDL);
-                    return;
-                case GI_KEY_BOSS:
-                case GI_KEY_BOSS_WOODFALL:
-                case GI_KEY_BOSS_SNOWHEAD:
-                case GI_KEY_BOSS_GREATBAY:
-                case GI_KEY_BOSS_STONETOWER:
-                    gSPDisplayList((*gfx)++, &gBoxChestLidOrnateDL);
-                    return;
+        *gfx = GenericContainer_SetTextures(play, (*gfx), &customDraw, location);
+        if (customDraw == CAMC_DRAW_ENABLED || customDraw == CAMC_DRAW_CUSTOM) {
+            if (getItem == GI_AP_FILLER) {
+                gSPDisplayList((*gfx)++, randoChestLidJunkDL);
+            } else {
+                gSPDisplayList((*gfx)++, randoChestLidDL);
             }
-        }
-        if (this->type == ENBOX_TYPE_SMALL) {
-            gSPDisplayList((*gfx)++, &gBoxChestLidDL);
+        } else if (rando_get_camc_enabled() && customDraw != CAMC_DRAW_UNCHECKED) { // unchecked is redundant in-game
+            switch (rando_get_location_type(location)) {
+                case RANDO_ITEM_CLASS_PROGRESSION:
+                case RANDO_ITEM_CLASS_USEFUL:
+                case RANDO_ITEM_CLASS_TRAP:
+                    gSPDisplayList((*gfx)++, &gBoxChestLidGildedDL);
+                    break;
+                case RANDO_ITEM_CLASS_JUNK:
+                    gSPDisplayList((*gfx)++, &gBoxChestLidDL);
+                    break;
+            }
         } else {
-            gSPDisplayList((*gfx)++, &gBoxChestLidGildedDL);
+            if (ENBOX_GET_TYPE(&this->dyna.actor) == ENBOX_TYPE_BIG_ORNATE) {
+                gSPDisplayList((*gfx)++, &gBoxChestLidOrnateDL);
+            } else if (Actor_IsSmallChest(this)) {
+                if (ENBOX_GET_ITEM(thisx) == GI_KEY_SMALL) {
+                    gSPDisplayList((*gfx)++, &gBoxChestLidGildedDL);
+                } else {
+                    gSPDisplayList((*gfx)++, &gBoxChestLidDL);
+                }
+            } else {
+                gSPDisplayList((*gfx)++, &gBoxChestLidGildedDL);
+            }
         }
     }
 }

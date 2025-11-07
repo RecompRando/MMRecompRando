@@ -317,6 +317,19 @@ Actor* Item_RandoDropCollectible(PlayState* play, Vec3f* spawnPos, u32 params, u
 
 bool rando_get_camc_enabled();
 
+typedef enum {
+    CAMC_DISABLED,
+    CAMC_SHOW_UNCHECKED,
+    CAMC_ENABLED,
+} CAMCType;
+
+typedef enum {
+    CAMC_DRAW_DISABLED,
+    CAMC_DRAW_UNCHECKED,
+    CAMC_DRAW_ENABLED,
+    CAMC_DRAW_CUSTOM,
+} CAMCDrawType;
+
 u8 randoItemGive(u32 gi);
 u32 rando_get_item_id(u32 location_id);
 
