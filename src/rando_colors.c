@@ -117,9 +117,15 @@ void cycle_rainbow() {
 
 // sets rColor based on item/location type, returns false to draw original
 bool get_rando_color(Color_RGB8* rColor, u32 location) {
-    // show default grass if camc is off or location was checked
+    // show default DL if camc is off or location was checked
     if (!rando_get_camc_enabled() || rando_location_is_checked(location)) {
         return false;
+    }
+
+    // use yellow color if "show unchecked" in enabled
+    if (rando_get_camc_enabled() == CAMC_SHOW_UNCHECKED && !rando_location_is_checked(location)) {
+        *rColor = yellowColor;
+        return true;
     }
 
     s16 getItem = rando_get_item_id(location);
