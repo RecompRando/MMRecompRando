@@ -91,3 +91,13 @@ symbols = [
     { name = "sIsFrogReturnedFlags_ovl_En_Minifrog", vram = 0x808A4D7C },
     { name = "sFrogEnvColors", vram = 0x808A4D98 },
 ]
+
+[[section]]
+name = "..ovl_Obj_Kibako"
+rom = 0x00D99260
+vram = 0x809261B0
+size = 0x1410
+
+symbols = [
+    { name = "sDisplayLists_ovl_Obj_Kibako", vram = 0x809273E8 },
+]

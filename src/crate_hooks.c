@@ -3,19 +3,22 @@
 
 #include "apcommon.h"
 #include "actor_helpers.h"
+#include "models/custom_crates.h"
 
 #include "overlays/actors/ovl_Obj_Kibako/z_obj_kibako.h"
 #include "overlays/actors/ovl_Obj_Kibako2/z_obj_kibako2.h"
 
-#define LOCATION_CRATE_SMALL (0x250000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+#define LOCATION_CRATE_SMALL (AP_PREFIX_SMALL_CRATES | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
-#define LOCATION_CRATE_BIG (0x270000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+#define LOCATION_CRATE_BIG (AP_PREFIX_BIG_CRATES | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
 
 ActorExtensionId crateSmallLocationExtension;
 u32* crateSmallLocation;
 ActorExtensionId crateBigLocationExtension;
 u32* crateBigLocation;
+
+Gfx* GenericContainer_SetTextures(PlayState* play, Gfx* gfx, u8* customDraw, u32 location);
 
 // small crate
 RECOMP_HOOK("ObjKibako_Init")
@@ -27,10 +30,36 @@ void OnObjKibako_Init(Actor* thisx, PlayState* play) {
 RECOMP_HOOK("ObjKibako_SpawnCollectible")
 void OnObjKibako_SpawnCollectible(ObjKibako* this, PlayState* play) {
     crateSmallLocation = z64recomp_get_extended_actor_data(&this->actor, crateSmallLocationExtension);
-    if (!rando_location_is_checked(*crateSmallLocation)) {
+    if (rando_get_slotdata_u32("woodsanity") && !rando_location_is_checked(*crateSmallLocation)) {
         Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *crateSmallLocation);
         this->isDropCollected = 1;
     }
+}
+
+extern Gfx* sDisplayLists_ovl_Obj_Kibako[];
+
+RECOMP_PATCH void ObjKibako_Draw(Actor* thisx, PlayState* play) {
+    crateSmallLocation = z64recomp_get_extended_actor_data(thisx, crateSmallLocationExtension);
+    u8 customDraw;
+    
+    OPEN_DISPS(play->state.gfxCtx);
+
+    gSPDisplayList(POLY_OPA_DISP++, gSetupDLs[SETUPDL_25]);
+    gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+
+    POLY_OPA_DISP = GenericContainer_SetTextures(play, POLY_OPA_DISP, &customDraw, *crateSmallLocation);
+    if (rando_get_slotdata_u32("woodsanity") && customDraw) {
+        if (KIBAKO_BANK_INDEX(thisx) == 0) {
+            gSPDisplayList(POLY_OPA_DISP++, randoSmallCrateDangeonDL);
+        } else {
+            gSPDisplayList(POLY_OPA_DISP++, randoSmallCrateDL);
+        }
+    } else {
+        gSPDisplayList(POLY_OPA_DISP++, sDisplayLists_ovl_Obj_Kibako[KIBAKO_BANK_INDEX(thisx)]);
+    }
+
+    CLOSE_DISPS(play->state.gfxCtx);
+    // Gfx_DrawDListOpa(play, sDisplayLists_ovl_Obj_Kibako[KIBAKO_BANK_INDEX(thisx)]);
 }
 
 // big crate
@@ -44,7 +73,7 @@ RECOMP_PATCH void ObjKibako2_SpawnCollectible(ObjKibako2* this, PlayState* play)
     s32 dropItem00Id = func_800A8150(KIBAKO2_COLLECTIBLE_ID(&this->dyna.actor));
 
     crateBigLocation = z64recomp_get_extended_actor_data(&this->dyna.actor, crateBigLocationExtension);
-    if (!rando_location_is_checked(*crateBigLocation)) {
+    if (rando_get_slotdata_u32("woodsanity") && !rando_location_is_checked(*crateBigLocation)) {
         Item_RandoDropCollectible(play, &this->dyna.actor.world.pos,
             dropItem00Id | KIBAKO2_COLLECTIBLE_FLAG(&this->dyna.actor) << 8, *crateBigLocation);
         return;
@@ -54,4 +83,26 @@ RECOMP_PATCH void ObjKibako2_SpawnCollectible(ObjKibako2* this, PlayState* play)
         Item_DropCollectible(play, &this->dyna.actor.world.pos,
                              dropItem00Id | KIBAKO2_COLLECTIBLE_FLAG(&this->dyna.actor) << 8);
     }
+}
+
+extern Gfx gLargeCrateDL[];
+
+RECOMP_PATCH void ObjKibako2_Draw(Actor* thisx, PlayState* play) {
+    crateBigLocation = z64recomp_get_extended_actor_data(thisx, crateBigLocationExtension);
+    u8 customDraw;
+    
+    OPEN_DISPS(play->state.gfxCtx);
+
+    gSPDisplayList(POLY_OPA_DISP++, gSetupDLs[SETUPDL_25]);
+    gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+
+    POLY_OPA_DISP = GenericContainer_SetTextures(play, POLY_OPA_DISP, &customDraw, *crateBigLocation);
+    if (rando_get_slotdata_u32("woodsanity") && customDraw) {
+        gSPDisplayList(POLY_OPA_DISP++, randoLargeCrateDL);
+    } else {
+        gSPDisplayList(POLY_OPA_DISP++, gLargeCrateDL);
+    }
+
+    CLOSE_DISPS(play->state.gfxCtx);
+    // Gfx_DrawDListOpa(play, gLargeCrateDL);
 }

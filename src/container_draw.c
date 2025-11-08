@@ -17,8 +17,8 @@ Gfx* GenericContainer_SetTextures(PlayState* play, Gfx* gfx, u8* customDraw, u32
     
     if (rando_get_camc_enabled() == CAMC_SHOW_UNCHECKED) {
         *customDraw = CAMC_DRAW_UNCHECKED;
-        gSPSegment(gfx++, 0x09, unchecked_corner);
-        gSPSegment(gfx++, 0x0A, unchecked_side);
+        gSPSegment(gfx++, 0x09, unchecked_side);
+        gSPSegment(gfx++, 0x0A, unchecked_corner);
         return gfx;
     }
 
