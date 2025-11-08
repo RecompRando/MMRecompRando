@@ -186,7 +186,7 @@ void randoScout() {
     
     if (rando_get_slotdata_u32("soilsanity") == 0)
     {
-        removeAllScoutsWithPrefix(AP_PREFIX_POTS);
+        removeAllScoutsWithPrefix(AP_PREFIX_SOIL);
     }
     
     if (rando_get_slotdata_u32("rupeesanity") == 0)
