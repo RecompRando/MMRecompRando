@@ -208,6 +208,7 @@ void randoScout() {
     {
         removeAllScoutsWithPrefix(AP_PREFIX_SMALL_CRATES);
         removeAllScoutsWithPrefix(AP_PREFIX_BIG_CRATES);
+        removeAllScoutsWithPrefix(AP_PREFIX_BARRELS);
     }
     
     if (rando_get_slotdata_u32("realfairysanity") == 0)
