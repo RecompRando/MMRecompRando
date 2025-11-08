@@ -16,6 +16,8 @@ extern u64 pot_useful_side[];
 extern u64 pot_useful_top[];
 extern u64 pot_filler_side[];
 extern u64 pot_filler_top[];
+extern u64 pot_unchecked_side[];
+extern u64 pot_unchecked_top[];
 extern u64 pot_bosskey_side[];
 extern u64 pot_bosskey_top[];
 extern u64 pot_fairy_side[];

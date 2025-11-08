@@ -133,6 +133,13 @@ void GenericPot_DrawRando(PlayState* play, u32 location, u8 potType) {
         drawOriginal = false;
     }
 
+    // override textures when "show unchecked" is enabled
+    if (rando_get_camc_enabled() == CAMC_SHOW_UNCHECKED) {
+        pot_side_tex = pot_unchecked_side;
+        pot_top_tex = pot_unchecked_top;
+        drawOriginal = false;
+    }
+
     if (drawOriginal) {
         Gfx_DrawDListOpa(play, sPotTypeData[potType].modelDL);
         return;
