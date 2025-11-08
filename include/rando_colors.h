@@ -5,7 +5,7 @@
 #include "global.h"
 
 extern Color_RGB8 rainbowColor;
-extern Color_RGB8 yellowColor;
+extern Color_RGB8 goldColor;
 
 extern Color_RGB8 randoUsefulColor;
 extern Color_RGB8 randoFillerColor;
