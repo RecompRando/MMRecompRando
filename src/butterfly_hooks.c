@@ -5,9 +5,10 @@
 
 #include "apcommon.h"
 #include "actor_helpers.h"
+#include "rando_colors.h"
+#include "models/custom_butterflies.h"
 
 #define FAIRY_LIMB_MAX 0x7
-#define BUTTERFLY_LIMB_MAX 0x8
 #include "overlays/actors/ovl_En_Elf/z_en_elf.h"
 #include "overlays/actors/ovl_En_Butte/z_en_butte.h"
 
@@ -27,6 +28,10 @@ void func_8091CF64(EnButte* this);
 
 void EnElf_RandoDraw(Actor* thisx, PlayState* play);
 
+u16 butterflyTex[1024];
+u16 originalButterflyTex[1024];
+extern u64 gameplay_field_keep_Tex_001F30[];
+
 RECOMP_HOOK("EnButte_Init")
 void OnEnButte_Init(Actor* thisx, PlayState* play) {
     EnButte* this = ((EnButte*)thisx);
@@ -41,6 +46,10 @@ void OnEnButte_Init(Actor* thisx, PlayState* play) {
 
     butterflyLocation = z64recomp_get_extended_actor_data(thisx, butterflyLocationExtension);
     *butterflyLocation = LOCATION_FAIRY_BUTTERFLY;
+
+    // grab textures
+    Lib_MemCpy(originalButterflyTex, SEGMENTED_TO_K0(gameplay_field_keep_Tex_001F30), sizeof(originalButterflyTex));
+    RGBA16toIA16_Texture(originalButterflyTex, butterflyTex, ARRAY_COUNT(originalButterflyTex), GRAYSCALE_MAX);
 }
 
 RECOMP_PATCH void func_8091CFB4(EnButte* this, PlayState* play) {
@@ -86,5 +95,44 @@ void EnButte_NotHorribleButterflies() {
                (Math3D_XZDistanceSquared(player->meleeWeaponInfo[0].tip.x, player->meleeWeaponInfo[0].tip.z,
                                          this->actor.world.pos.x, this->actor.world.pos.z) < SQ(240.0f))) {
         func_8091CF64(this);
+    }
+}
+
+void func_8091C178(EnButte* this, PlayState* play);
+
+s32 EnButte_OverrideLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot, Actor* thisx) {
+    butterflyLocation = z64recomp_get_extended_actor_data(thisx, butterflyLocationExtension);
+    Color_RGB8 color;
+
+    if (get_rando_color(&color, *butterflyLocation) && rando_get_slotdata_u32("realfairysanity")) {
+        OPEN_DISPS(play->state.gfxCtx);
+
+        gDPSetPrimColor(POLY_OPA_DISP++, 0, 0x01, color.r, color.g, color.b, 255);
+
+        CLOSE_DISPS(play->state.gfxCtx);
+        
+        if (limbIndex == BUTTERFLY_LIMB_04) {
+            *dList = randoButterflyLimb04DL;
+        }
+
+        if (limbIndex == BUTTERFLY_LIMB_07) {
+            *dList = randoButterflyLimb07DL;
+        }
+    }
+
+    return false;
+}
+
+RECOMP_PATCH void EnButte_Draw(Actor* thisx, PlayState* play) {
+    EnButte* this = ((EnButte*)thisx);
+
+    if (this->unk_250 != 0) {
+        Gfx_SetupDL25_Opa(play->state.gfxCtx);
+        SkelAnime_DrawOpa(play, this->skelAnime.skeleton, this->skelAnime.jointTable, EnButte_OverrideLimbDraw, NULL, thisx);
+        // SkelAnime_DrawOpa(play, this->skelAnime.skeleton, this->skelAnime.jointTable, NULL, NULL, NULL);
+    }
+
+    if ((BUTTERFLY_GET_1(&this->actor) == BUTTERFLY_1) && (this->actionFunc == func_8091CFB4)) {
+        func_8091C178(this, play);
     }
 }
