@@ -36,9 +36,26 @@ ifeq ($(OS),Windows_NT)
 CC      = ./bin/clang
 LD      = ./bin/ld.lld
 
+ifeq ($(MSYSTEM),MINGW64)
+
 define make_folder
 	bash -c "mkdir -p $@"
 endef
+
+clean:
+	bash -c "rm -rf $(BUILD_DIR) $(OUTPUT_NAME)"
+
+else
+
+define make_folder
+	mkdir $(subst /,\,$(1))
+endef
+
+clean:
+	del /s /q /f /a $(BUILD_DIR)
+	del /s /q /f /a $(OUTPUT_NAME)
+
+endif
 
 $(OUTPUT_NAME)/$(OUTPUT_NAME_W_VER).dll: build/mod_recompiled.c
 ifeq ($(MANIFEST),)
@@ -55,7 +72,7 @@ offline: $(OUTPUT_NAME)/$(OUTPUT_NAME_W_VER).dll
 else
 
 define make_folder
-	mkdir -p $@
+	mkdir -p $(1)
 endef
 
 ifeq ($(shell uname),Darwin)
@@ -86,6 +103,9 @@ endlib:
 
 offline: $(OUTPUT_NAME)/$(OUTPUT_NAME_W_VER)$(LIB_SUFFIX)
 
+clean:
+	bash -c "rm -rf $(BUILD_DIR) $(OUTPUT_NAME)"
+
 endif
 
 
@@ -103,9 +123,6 @@ $(BUILD_DIR) $(BUILD_DIRS):
 
 $(C_OBJS): $(BUILD_DIR)/%.o : %.c | $(BUILD_DIRS)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $< -MMD -MF $(@:.o=.d) -c -o $@
-
-clean:
-	bash -c "rm -rf $(BUILD_DIR) $(OUTPUT_NAME)"
 
 -include $(C_DEPS)
 
