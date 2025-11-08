@@ -1217,11 +1217,9 @@ void GetItem_DrawStrayFairy(PlayState* play, s16 drawId) {
     static bool initialized = false;
     static SkelAnime skelAnime;
     static u32 lastUpdate = 0;
-    static s16 lastScene; // rough fix for skelAnime unloading
     
-    if (!initialized || lastScene != play->sceneId) {
+    if (!initialized || (lastUpdate != (play->state.frames - 1))) {
         initialized = true;
-        lastScene = play->sceneId;
         SkelAnime_InitFlex(play, &skelAnime, &gStrayFairySkel, &gStrayFairyFlyingAnim, NULL, NULL, 0xA);
     }
 
