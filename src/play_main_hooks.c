@@ -182,6 +182,7 @@ void randoScout() {
     {
         removeAllScoutsWithPrefix(AP_PREFIX_ROCKS);
         removeAllScoutsWithPrefix(AP_PREFIX_BOULDERS);
+        removeAllScoutsWithPrefix(AP_PREFIX_MURE_ROCKS);
     }
     
     if (rando_get_slotdata_u32("soilsanity") == 0)
