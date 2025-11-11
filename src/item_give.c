@@ -667,6 +667,10 @@ GetItemEntry sGetItemTable_ap[] = {
     GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_SUTARU, GID_UTILITY_SOUL_GENERIC, 0x71, 0, 0),
     // GI_ABSURD_GENERIC
     GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_SUTARU, GID_ABSURD_SOUL_GENERIC, 0x71, 0, 0),
+    // GI_OOT_ITEM
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_OCARINA, GID_OOT_ITEM, 0x77, 0, 0),
+    // GI_WW_ITEM
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_MELODY, GID_WW_ITEM, 0x77, 0, 0),
 };
 
 bool isAP(s16 gi) {
@@ -674,6 +678,8 @@ bool isAP(s16 gi) {
         case GI_AP_FILLER:
         case GI_AP_USEFUL:
         case GI_AP_PROG:
+        case GI_OOT_ITEM:
+        case GI_WW_ITEM:
         case GI_BAG_BOMBCHU:
             return true;
     }

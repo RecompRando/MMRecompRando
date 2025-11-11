@@ -21,6 +21,8 @@ RECOMP_IMPORT("*", int recomp_set_h_and_d_no_sword_fix(bool new_val));
 
 RECOMP_IMPORT(".", int rando_get_starting_heart_locations());
 RECOMP_IMPORT(".", int rando_get_tunic_color());
+RECOMP_IMPORT(".", bool rando_get_game_is_oot(u32 player_id));
+RECOMP_IMPORT(".", bool rando_get_game_is_ww(u32 player_id));
 
 RECOMP_IMPORT("mm_recomp_better_double_sot", void dsot_set_skip_dsot_cutscene(bool new_val));
 
@@ -778,6 +780,17 @@ u32 rando_get_item_id(u32 location)
         }
     }
     
+    // TODO: make this work
+    // u32 sending_player = rando_get_sending_player(location);
+
+    // if (rando_get_game_is_oot(sending_player)) {
+    //     return GI_OOT_ITEM;
+    // }
+    
+    // if (rando_get_game_is_ww(sending_player)) {
+    //     return GI_WW_ITEM;
+    // }
+
     switch (rando_get_location_type(location)) {
         case RANDO_ITEM_CLASS_PROGRESSION:
         case RANDO_ITEM_CLASS_TRAP:

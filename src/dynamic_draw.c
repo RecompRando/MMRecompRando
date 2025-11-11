@@ -16,6 +16,7 @@
 #include "rupoor.h"
 
 #include "models/frog.h" // temp
+#include "models/wind_waker.h" // temp
 
 // ty neirn
 #define SEGMENTED_TO_GLOBAL_PTR(obj, segmentedPtr) ((void *)((uintptr_t)obj + SEGMENT_OFFSET(segmentedPtr)))
@@ -799,6 +800,13 @@ RECOMP_PATCH void GetItem_Draw(PlayState* play, s16 drawId) {
             return;
         case GID_ABSURD_SOUL_GENERIC:
             GetItem_DrawSoulAbsurd(play, drawId);
+            return;
+        // temp
+        case GID_OOT_ITEM:
+            GetItem_DrawOpa0DL(play, frog); // temp
+            return;
+        case GID_WW_ITEM:
+            GetItem_DrawOpa0DL(play, wind_waker);
             return;
     }
     sDrawItemTable_new[drawId].drawFunc(play, drawId);
