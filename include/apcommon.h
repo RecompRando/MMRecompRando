@@ -26,6 +26,8 @@
 // this enum MUST match sGetItemTable_ap in item_give.c
 typedef enum {
     GI_OFFSET = GI_MAX,
+    // junk fix
+    GI_RECOVERY_HEART_RANDO,
     // dungeon items
     GI_KEY_BOSS_WOODFALL,
     GI_KEY_SMALL_WOODFALL,

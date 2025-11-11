@@ -651,6 +651,11 @@ u32 rando_get_item_id(u32 location)
                 return MIN(GI_WALLET_ADULT + rando_has_item(GI_WALLET_ADULT), GI_WALLET_GIANT);
             }
             
+            else if (gi == GI_RECOVERY_HEART)
+            {
+                return GI_RECOVERY_HEART_RANDO;
+            }
+            
             return gi;
         }
         switch (item & 0xFF0000)
