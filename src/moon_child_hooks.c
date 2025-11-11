@@ -3,37 +3,10 @@
 
 #include "apcommon.h"
 
-struct EnJs;
-
-typedef void (*EnJsActionFunc)(struct EnJs*, PlayState*);
-
-#define ENJS_GET_TYPE(thisx) ((thisx)->params & 0xF)
-
 #define MOONCHILD_LIMB_MAX 0x12
+#include "overlays/actors/ovl_En_Js/z_en_js.h"
 
-typedef struct EnJs {
-    /* 0x000 */ Actor actor;
-    /* 0x144 */ SkelAnime skelAnime;
-    /* 0x188 */ ColliderCylinder collider;
-    /* 0x1D4 */ Vec3s jointTable[MOONCHILD_LIMB_MAX];
-    /* 0x240 */ Vec3s morphTable[MOONCHILD_LIMB_MAX];
-    /* 0x2AC */ Path* path;
-    /* 0x2B0 */ s32 unk_2B0;
-    /* 0x2B4 */ f32 unk_2B4;
-    /* 0x2B8 */ u16 unk_2B8;
-    /* 0x2BA */ s16 maskType;
-    /* 0x2BC */ s16 unk_2BC;
-    /* 0x2BE */ s16 csIdList[2];
-    /* 0x2C2 */ s16 csIdIndex;
-    /* 0x2C4 */ EnJsActionFunc actionFunc;
-} EnJs; // size = 0x2C8
-
-bool rando_met_majora_condition() {
-    return ((CHECK_QUEST_ITEM(QUEST_REMAINS_ODOLWA) > 0) +
-            (CHECK_QUEST_ITEM(QUEST_REMAINS_GOHT) > 0) +
-            (CHECK_QUEST_ITEM(QUEST_REMAINS_GYORG) > 0) +
-            (CHECK_QUEST_ITEM(QUEST_REMAINS_TWINMOLD) > 0)) >= rando_get_majora_remains_required();
-}
+bool rando_met_majora_condition();
 
 extern AnimationHeader gMoonChildStandingAnim;
 extern AnimationHeader gMoonChildGettingUpAnim;

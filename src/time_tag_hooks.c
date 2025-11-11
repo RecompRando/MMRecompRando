@@ -85,12 +85,7 @@ void EnTimeTag_KickOut_Transition(EnTimeTag* this, PlayState* play);
 void EnTimeTag_KickOut_WaitForTrigger(EnTimeTag* this, PlayState* play);
 void EnTimeTag_KickOut_WaitForTime(EnTimeTag* this, PlayState* play);
 
-bool rando_met_moon_condition() {
-    return ((CHECK_QUEST_ITEM(QUEST_REMAINS_ODOLWA) > 0) +
-            (CHECK_QUEST_ITEM(QUEST_REMAINS_GOHT) > 0) +
-            (CHECK_QUEST_ITEM(QUEST_REMAINS_GYORG) > 0) +
-            (CHECK_QUEST_ITEM(QUEST_REMAINS_TWINMOLD) > 0)) >= rando_get_moon_remains_required();
-}
+bool rando_met_moon_condition();
 
 RECOMP_PATCH void EnTimeTag_RooftopOath_Wait(EnTimeTag* this, PlayState* play) {
     Actor* thisx = &this->actor;
