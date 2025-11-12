@@ -19,16 +19,39 @@ bool rando_met_masks_condition(u32 required_amount) {
             maskCount++;
         }
     }
-    
     return maskCount >= required_amount;
+}
+bool rando_met_star_fox_condition(u32 required_amount) {
+    u8 starfoxMaskCount = 0;
+    
+    // Check the 5 Star Fox masks
+    if (gSaveContext.save.saveInfo.inventory.items[SLOT_MASK_KEATON] != ITEM_NONE) {
+        starfoxMaskCount++;
+    }
+    if (gSaveContext.save.saveInfo.inventory.items[SLOT_MASK_BREMEN] != ITEM_NONE) {
+        starfoxMaskCount++;
+    }
+    if (gSaveContext.save.saveInfo.inventory.items[SLOT_MASK_BUNNY] != ITEM_NONE) {
+        starfoxMaskCount++;
+    }
+    if (gSaveContext.save.saveInfo.inventory.items[SLOT_MASK_SCENTS] != ITEM_NONE) {
+        starfoxMaskCount++;
+    }
+    if (gSaveContext.save.saveInfo.inventory.items[SLOT_MASK_DON_GERO] != ITEM_NONE) {
+        starfoxMaskCount++;
+    }
+    
+    return starfoxMaskCount >= required_amount;
 }
 
 bool rando_met_moon_condition() {
     return rando_met_remains_condition(rando_get_moon_remains_required()) &&
-           rando_met_masks_condition(rando_get_slotdata_u32("moon_masks_required"));
+           rando_met_masks_condition(rando_get_slotdata_u32("moon_masks_required")) &&
+           rando_met_star_fox_condition(rando_get_slotdata_u32("moon_star_fox"));
 }
 
 bool rando_met_majora_condition() {
     return rando_met_remains_condition(rando_get_majora_remains_required()) &&
-           rando_met_masks_condition(rando_get_slotdata_u32("majora_masks_required"));
+           rando_met_masks_condition(rando_get_slotdata_u32("majora_masks_required")) &&
+           rando_met_star_fox_condition(rando_get_slotdata_u32("majora_star_fox"));
 }
