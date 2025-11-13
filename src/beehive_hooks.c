@@ -9,7 +9,7 @@
 #include "actor_helpers.h"
 
 #define LOCATION_SKULL_TOKEN (0x060000 | (play->sceneId << 8) | OBJCOMB_GET_1F(&this->actor))
-#define LOCATION_BEEHIVE (AP_PREFIX_BEEHIVES | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+#define LOCATION_BEEHIVE (AP_PREFIX_BEEHIVES | (sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
 
 ActorExtensionId beehiveLocationExtension;
@@ -117,7 +117,15 @@ extern u16 gBeehiveTex[];
 RECOMP_HOOK("ObjComb_Init")
 void OnObjComb_Init(Actor* thisx, PlayState* play) {
     beehiveLocation = z64recomp_get_extended_actor_data(thisx, beehiveLocationExtension);
+    s16 sceneId = play->sceneId;
+    
+    // handle grottos
+    if (sceneId == SCENE_KAKUSIANA) {
+        sceneId = getCurrentGrotto(play);
+    }
+
     *beehiveLocation = LOCATION_BEEHIVE;
+    
     // grab texture for camc
     Lib_MemCpy(originalBeehiveTex, SEGMENTED_TO_K0(gBeehiveTex), sizeof(originalBeehiveTex));
     RGBA16toIA16_Texture(originalBeehiveTex, grayBeehiveTex, ARRAY_COUNT(originalBeehiveTex), GRAYSCALE_OOTMM);
