@@ -40,6 +40,21 @@ void freestanding_item_replacement() {
                 u32* item00Location;
                 item00Location = z64recomp_get_extended_actor_data(actor, item00LocationExtension);
                 *item00Location = LOCATION_RUPEE;
+                
+                // account for blank items
+                switch (LOCATION_RUPEE) {
+                    // istt dexihand
+                    case 0x171833:
+                        *item00Location = 0x171811;
+                        break;
+                    case 0x171834:
+                        *item00Location = 0x171812;
+                        break;
+                    case 0x171830:
+                        *item00Location = 0x171810;
+                        break;
+                }
+                
                 actor->params = ITEM00_APITEM;
                 actor->draw = Item_RandoCollectibleDraw;
                 ((EnItem00*)actor)->getItemId = rando_get_item_id(LOCATION_RUPEE);
