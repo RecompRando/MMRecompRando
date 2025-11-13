@@ -30,6 +30,11 @@ Vec3f palmTreeItemPos[] = { // i didn't feel like doing this programmatically lm
     {25.0f, 0.0f, -43.3f},
 };
 
+// special case to prevent draw on invisible tree
+bool ObjYasi_OnTurtleInGBT(u32 location) {
+    return location == 0x2A49D0 || location == 0x2A49D1;
+}
+
 RECOMP_PATCH void ObjYasi_Draw(Actor* thisx, PlayState* play) {
     ObjYasi* this = (ObjYasi*)thisx;
 
@@ -47,7 +52,8 @@ RECOMP_PATCH void ObjYasi_Draw(Actor* thisx, PlayState* play) {
     Matrix_Scale(0.1f, 0.1f, 0.1f, MTXMODE_APPLY);
 
     bool* dropped = z64recomp_get_extended_actor_data(thisx, palmTreeDropExtension);
-    if (!rando_location_is_checked(LOCATION_PALM_TREE) && !(*dropped) && rando_get_camc_enabled()) {
+    if (!rando_location_is_checked(LOCATION_PALM_TREE) && !(*dropped) \
+            && !ObjYasi_OnTurtleInGBT(LOCATION_PALM_TREE) && rando_get_camc_enabled()) {
         Gfx_DrawDListOpa(play, randoPalmTreeDL);
         
         u32 getItemId = rando_get_item_id(LOCATION_PALM_TREE);
