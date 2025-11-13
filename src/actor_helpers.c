@@ -37,6 +37,7 @@ void registerActorExtensions() {
     // snowTreeDropExtension = z64recomp_extend_actor(ACTOR_EN_SNOWWD, sizeof(bool));
     woodTreeDropExtension = z64recomp_extend_actor(ACTOR_EN_WOOD02, sizeof(bool));
     bigTreeDropExtension = z64recomp_extend_actor(ACTOR_OBJ_TREE, sizeof(bool));
+    signLocationExtension = z64recomp_extend_actor(ACTOR_EN_KANBAN, sizeof(u32));
     signDropExtension = z64recomp_extend_actor(ACTOR_EN_KANBAN, sizeof(bool));
 }
 
