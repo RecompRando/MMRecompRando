@@ -28,8 +28,8 @@ void func_8091CF64(EnButte* this);
 
 void EnElf_RandoDraw(Actor* thisx, PlayState* play);
 
-u16 butterflyTex[1024];
-u16 originalButterflyTex[1024];
+u16 butterflyTex[2048];
+u16 originalButterflyTex[2048];
 extern u64 gameplay_field_keep_Tex_001F30[];
 
 RECOMP_HOOK("EnButte_Init")
