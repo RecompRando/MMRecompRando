@@ -44,6 +44,19 @@ bool rando_met_star_fox_condition(u32 required_amount) {
     return starfoxMaskCount >= required_amount;
 }
 
+bool rando_met_owl_condition(u32 required_amount) {
+    u8 owlCount = 0;
+    
+    // Count all activated owl statues
+    for (int i = 0; i < 16; i++) {
+        if ((gSaveContext.save.saveInfo.playerData.owlActivationFlags >> i) & 1) {
+            owlCount++;
+        }
+    }
+    
+    return owlCount >= required_amount;
+}
+
 bool rando_met_moon_condition() {
     return rando_met_remains_condition(rando_get_moon_remains_required()) &&
            rando_met_masks_condition(rando_get_slotdata_u32("moon_masks_required")) &&
@@ -59,6 +72,8 @@ bool rando_met_majora_condition() {
 bool rando_met_all_goal() {
     return rando_met_remains_condition(4) &&
             rando_met_masks_condition(24) &&
+            // owl statues
+            rando_met_owl_condition(10) &&
             // all heart pieces/containers
             gSaveContext.save.saveInfo.playerData.healthCapacity >= 0x140 && // make sure this is right
             // stray fairies
@@ -67,6 +82,8 @@ bool rando_met_all_goal() {
             gSaveContext.save.saveInfo.inventory.strayFairies[2] == 15 &&
             gSaveContext.save.saveInfo.inventory.strayFairies[3] == 15 &&
             gSaveContext.save.saveInfo.inventory.strayFairies[3] == 15 &&
+
+            // scarecrows
             // skulltulas
             Inventory_GetSkullTokenCount(SCENE_KINSTA1) == 30 &&
             Inventory_GetSkullTokenCount(SCENE_KINDAN2) == 30;
