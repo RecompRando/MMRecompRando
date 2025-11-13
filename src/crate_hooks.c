@@ -67,6 +67,13 @@ RECOMP_HOOK("ObjKibako2_Init")
 void OnObjKibako2_Init(Actor* thisx, PlayState* play) {
     crateBigLocation = z64recomp_get_extended_actor_data(thisx, crateBigLocationExtension);
     *crateBigLocation = LOCATION_CRATE_BIG;
+
+    // replace known stray fairy location
+    switch (LOCATION_CRATE_BIG) {
+        case 0x272110:
+            *crateBigLocation = 0x01211E;
+            break;
+    }
 }
 
 RECOMP_PATCH void ObjKibako2_SpawnCollectible(ObjKibako2* this, PlayState* play) {

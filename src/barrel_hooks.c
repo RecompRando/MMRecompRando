@@ -17,6 +17,16 @@ RECOMP_HOOK("ObjTaru_Init")
 void OnObjTaru_Init(Actor* thisx, PlayState* play) {
     barrelLocation = z64recomp_get_extended_actor_data(thisx, barrelLocationExtension);
     *barrelLocation = LOCATION_BARREL;
+
+    // replace known stray fairy locations
+    switch (LOCATION_BARREL) {
+        case 0x224900:
+            *barrelLocation = 0x01491C;
+            break;
+        case 0x2249A0:
+            *barrelLocation = 0x01491A;
+            break;
+    }
 }
 
 RECOMP_PATCH void func_80B9BC64(ObjTaru* this, PlayState* play) {
