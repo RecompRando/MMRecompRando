@@ -89,6 +89,13 @@ RECOMP_PATCH void EnGirlA_Draw(Actor* thisx, PlayState* play) {
                 case GI_ROOM_KEY:
                     Matrix_RotateYS(DEG_TO_BINANG(90), MTXMODE_APPLY);
                     break;
+                case GI_FROG_BLUE:
+                case GI_FROG_CYAN:
+                case GI_FROG_PINK:
+                case GI_FROG_WHITE:
+                case GI_FROG_YELLOW:
+                    Matrix_RotateYS(DEG_TO_BINANG(-90), MTXMODE_APPLY);
+                    break;
                 default:
                     break;
             }
