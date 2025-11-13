@@ -8,7 +8,7 @@
 
 #include "overlays/actors/ovl_En_Kusa2/z_en_kusa2.h"
 
-#define LOCATION_KEATON_GRASS (AP_PREFIX_GRASS_KEATON | (play->sceneId << 8) | curGrass)
+#define LOCATION_KEATON_GRASS (AP_PREFIX_GRASS_KEATON | (play->sceneId << 8) | randoGetLoadedActorNumInSameRoom(play, thisx))
 #define LOCATION_KEATON_GRASS_INCREMENTAL (AP_PREFIX_GRASS_KEATON | (play->sceneId << 8) | kusa2->unk_1BC)
 
 EnKusa2* keatonGrass;
@@ -19,17 +19,8 @@ void grab_grass_texture();
 
 RECOMP_HOOK("EnKusa2_Init")
 void OnEnKusa2_Init(Actor* thisx, PlayState* play) {
-    EnKusa2* this = (EnKusa2*)thisx;
-
-    static u8 curGrass;
-
-    if (!ENKUSA2_GET_1(&this->actor)) { // spawner
-        curGrass = 0;
-    } else {
-        keatonGrassLocation = z64recomp_get_extended_actor_data(thisx, keatonGrassLocationExtension);
-        *keatonGrassLocation = LOCATION_KEATON_GRASS;
-        curGrass++;
-    }
+    keatonGrassLocation = z64recomp_get_extended_actor_data(thisx, keatonGrassLocationExtension);
+    *keatonGrassLocation = LOCATION_KEATON_GRASS;
 }
 
 RECOMP_HOOK("func_80A5D7A4")
