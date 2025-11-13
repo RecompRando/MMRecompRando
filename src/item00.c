@@ -885,17 +885,15 @@ void EnItem00_RandoGive(EnItem00* this, PlayState* play, s32 getItemId, u32 loca
         } else {
             Audio_PlaySfx(NA_SE_SY_GET_ITEM);
         }
-        // TODO: have notification for junk/useful ap items
-        // note: this works, but the image doesn't
-        // if (isAP(rando_get_item_id(location))) {
-        //     char item_name[33];
-        //     char player_name[36];
-        //     ItemId item_id = (locationType == 0) ? ITEM_AP_FILLER : ITEM_AP_USEFUL;
-        //     item_id = ITEM_AP_PROG;
-        //     rando_get_location_item_name(location, item_name);
-        //     rando_get_location_item_player(location, player_name);
-        //     randoEmitSendNotification(item_name, player_name, item_id, locationType);
-        // }
+        
+        if (isAP(rando_get_item_id(location))) {
+            char item_name[33];
+            char player_name[36];
+            ItemId item_id = (locationType == RANDO_ITEM_CLASS_JUNK) ? ITEM_AP_FILLER : ITEM_AP_USEFUL;
+            rando_get_location_item_name(location, item_name);
+            rando_get_location_item_player(location, player_name);
+            randoEmitSendNotification(item_name, player_name, item_id, locationType);
+        }
     }
 
     this->actor.parent = &player->actor;
