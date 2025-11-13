@@ -810,6 +810,8 @@ u32 rando_get_item_id(u32 location)
 
 RECOMP_DECLARE_EVENT(rando_on_start());
 
+bool rando_met_all_goal();
+
 RECOMP_CALLBACK("*", recomp_on_play_main)
 void update_rando(PlayState* play) {
     u32 new_items_size;
@@ -1013,6 +1015,14 @@ void update_rando(PlayState* play) {
                 Interface_StartMoonCrash(play);
             }
             rando_reset_death_link_pending();
+        }
+
+        // check for 100% condition to give majora soul (gigarando)
+        // TODO add checks for the rest of the conditions
+        if (rando_met_all_goal() && !rando_location_is_checked_async(AP_ITEM_ID_SOUL_BOSS_MAJORA)) {
+            Player* player = GET_PLAYER(play);
+            Actor_OfferGetItemHook(player->tatlActor, play, rando_get_item_id(AP_ITEM_ID_SOUL_BOSS_MAJORA), AP_ITEM_ID_SOUL_BOSS_MAJORA, 100.0f, 100.0f, true, true);
+            // rando_complete_goal();
         }
     }
 }

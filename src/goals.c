@@ -3,7 +3,6 @@
 
 #include "apcommon.h"
 
-
 bool rando_met_remains_condition(u32 required_amount) {
     return ((CHECK_QUEST_ITEM(QUEST_REMAINS_ODOLWA) > 0) +
             (CHECK_QUEST_ITEM(QUEST_REMAINS_GOHT) > 0) +
@@ -21,6 +20,7 @@ bool rando_met_masks_condition(u32 required_amount) {
     }
     return maskCount >= required_amount;
 }
+
 bool rando_met_star_fox_condition(u32 required_amount) {
     u8 starfoxMaskCount = 0;
     
@@ -54,4 +54,20 @@ bool rando_met_majora_condition() {
     return rando_met_remains_condition(rando_get_majora_remains_required()) &&
            rando_met_masks_condition(rando_get_slotdata_u32("majora_masks_required")) &&
            rando_met_star_fox_condition(rando_get_slotdata_u32("majora_star_fox"));
+}
+
+bool rando_met_all_goal() {
+    return rando_met_remains_condition(4) &&
+            rando_met_masks_condition(24) &&
+            // all heart pieces/containers
+            gSaveContext.save.saveInfo.playerData.healthCapacity >= 0x140 && // make sure this is right
+            // stray fairies
+            gSaveContext.save.saveInfo.inventory.strayFairies[0] == 15 &&
+            gSaveContext.save.saveInfo.inventory.strayFairies[1] == 15 &&
+            gSaveContext.save.saveInfo.inventory.strayFairies[2] == 15 &&
+            gSaveContext.save.saveInfo.inventory.strayFairies[3] == 15 &&
+            gSaveContext.save.saveInfo.inventory.strayFairies[3] == 15 &&
+            // skulltulas
+            Inventory_GetSkullTokenCount(SCENE_KINSTA1) == 30 &&
+            Inventory_GetSkullTokenCount(SCENE_KINDAN2) == 30;
 }
