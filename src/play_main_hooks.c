@@ -264,6 +264,11 @@ void randoScout() {
         removeAllScoutsWithPrefix(AP_PREFIX_FLOWERS);
     }
     
+    if (rando_get_slotdata_u32("signsanity") == 0)
+    {
+        removeAllScoutsWithPrefix(AP_PREFIX_SIGNS);
+    }
+    
     rando_send_queued_scouts(0);
 }
 

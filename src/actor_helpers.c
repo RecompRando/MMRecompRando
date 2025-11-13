@@ -37,6 +37,7 @@ void registerActorExtensions() {
     // snowTreeDropExtension = z64recomp_extend_actor(ACTOR_EN_SNOWWD, sizeof(bool));
     woodTreeDropExtension = z64recomp_extend_actor(ACTOR_EN_WOOD02, sizeof(bool));
     bigTreeDropExtension = z64recomp_extend_actor(ACTOR_OBJ_TREE, sizeof(bool));
+    signDropExtension = z64recomp_extend_actor(ACTOR_EN_KANBAN, sizeof(bool));
 }
 
 s32 randoGetLoadedActorNumInSameRoom(PlayState* play, Actor* actorIn) {
@@ -421,7 +422,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
     
     switch (actor->id) {
         case ACTOR_OBJ_KEPN_KOYA: //Gorman Racetrack Buildings
-        // case ACTOR_BOSS_01:
+        case ACTOR_BOSS_01:
         // case ACTOR_EN_PAMETFROG:
         // case ACTOR_EN_KAME:
             // recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
