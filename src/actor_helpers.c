@@ -408,6 +408,18 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 return;
             }
             break;
+        case ACTOR_OBJ_KEPN_KOYA: //Gorman Stables
+            if (rando_get_slotdata_u32("absurd_souls")) {
+                if (actor->params & 0x80) {
+                    return;
+                }
+                // *should = rando_has_item(0x0E0000 | actor->id);
+                if (rando_has_item(0x0E0000 | actor->id)) {
+                    *should = false;
+                }
+                return;
+            }
+            break;
     }
     switch (actor->id) {
         case ACTOR_EN_PST:    // Postboxes
@@ -422,8 +434,6 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
     }
     
     switch (actor->id) {
-        case ACTOR_OBJ_KEPN_KOYA: //Gorman Racetrack Buildings
-        case ACTOR_BOSS_01:
         // case ACTOR_EN_PAMETFROG:
         // case ACTOR_EN_KAME:
             // recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
