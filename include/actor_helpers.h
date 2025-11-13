@@ -30,6 +30,7 @@ extern ActorExtensionId palmTreeDropExtension;
 // extern ActorExtensionId snowTreeDropExtension;
 extern ActorExtensionId woodTreeDropExtension;
 extern ActorExtensionId bigTreeDropExtension;
+extern ActorExtensionId signDropExtension;
 
 s32 randoGetLoadedActorNumInSameRoom(PlayState* play, Actor* actorIn);
 s32 randoGetLoadedActorNumInSameRoomExtra(PlayState* play, Actor* actorIn, s16 extraId);

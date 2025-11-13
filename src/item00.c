@@ -872,7 +872,7 @@ void EnItem00_RandoGive(EnItem00* this, PlayState* play, s32 getItemId, u32 loca
     this->unk152 = 35;
 
     u32 locationType = rando_get_location_type(location);
-    if (locationType != 0 && locationType != 2) {
+    if (locationType != RANDO_ITEM_CLASS_JUNK && locationType != RANDO_ITEM_CLASS_USEFUL) {
         player->actor.freezeTimer = 10;
         player->stateFlags1 |= PLAYER_STATE1_20000000;
 
@@ -880,18 +880,20 @@ void EnItem00_RandoGive(EnItem00* this, PlayState* play, s32 getItemId, u32 loca
         Audio_PlayFanfare(NA_BGM_GET_ITEM | 0x900);
         CutsceneManager_Queue(CS_ID_GLOBAL_TALK);
     } else {
-        Audio_PlayFanfare(NA_BGM_GET_SMALL_ITEM | 0x900);
-        // TODO: have notification for junk/useful ap items
-        // note: this works, but the image doesn't
-        // if (isAP(rando_get_item_id(location))) {
-        //     char item_name[33];
-        //     char player_name[36];
-        //     ItemId item_id = (locationType == 0) ? ITEM_AP_FILLER : ITEM_AP_USEFUL;
-        //     item_id = ITEM_AP_PROG;
-        //     rando_get_location_item_name(location, item_name);
-        //     rando_get_location_item_player(location, player_name);
-        //     randoEmitSendNotification(item_name, player_name, item_id, locationType);
-        // }
+        if (locationType == RANDO_ITEM_CLASS_USEFUL) {
+            Audio_PlayFanfare(NA_BGM_GET_SMALL_ITEM | 0x900);
+        } else {
+            Audio_PlaySfx(NA_SE_SY_GET_ITEM);
+        }
+        
+        if (isAP(rando_get_item_id(location))) {
+            char item_name[33];
+            char player_name[36];
+            ItemId item_id = (locationType == RANDO_ITEM_CLASS_JUNK) ? ITEM_AP_FILLER : ITEM_AP_USEFUL;
+            rando_get_location_item_name(location, item_name);
+            rando_get_location_item_player(location, player_name);
+            randoEmitSendNotification(item_name, player_name, item_id, locationType);
+        }
     }
 
     this->actor.parent = &player->actor;

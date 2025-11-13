@@ -198,10 +198,13 @@ RecompuiTextureHandle notification_get_item_image(const u8 item) {
         // use custom image
         case ITEM_AP_PROG:
             item_texture_handle = recompui_create_texture_image_bytes(ap_logo_prog_png, ap_logo_prog_png_end - ap_logo_prog_png);
+            break;
         case ITEM_AP_USEFUL:
             item_texture_handle = recompui_create_texture_image_bytes(ap_logo_png, ap_logo_png_end - ap_logo_png);
+            break;
         case ITEM_AP_FILLER:
             item_texture_handle = recompui_create_texture_image_bytes(ap_logo_junk_png, ap_logo_junk_png_end - ap_logo_junk_png);
+            break;
         // use rom textures
         default:
             // icon_item_24 items
