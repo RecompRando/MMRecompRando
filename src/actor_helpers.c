@@ -420,6 +420,29 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 return;
             }
             break;
+        case ACTOR_OBJ_TSUBO: //Pots
+        case ACTOR_EN_TUBO_TRAP:
+        case ACTOR_OBJ_FLOWERPOT:
+            if (!rando_get_slotdata_u32("absurd_souls")) {
+                // *should = rando_has_item(0x0E0000 | ACTOR_OBJ_TSUBO);
+                if (!rando_has_item(0x0E0000 | ACTOR_OBJ_TSUBO)) {
+                    *should = false;
+                }
+                return;
+            }
+            break;
+        case ACTOR_EN_ISHI: //Rocks
+            if (rando_get_slotdata_u32("absurd_souls")) {
+                if (actor->params & 0x80) {
+                    return;
+                }
+                // *should = rando_has_item(0x0E0000 | actor->id);
+                if (!rando_has_item(0x0E0000 | actor->id)) {
+                    *should = false;
+                }
+                return;
+            }
+            break;
     }
     switch (actor->id) {
         case ACTOR_EN_PST:    // Postboxes
