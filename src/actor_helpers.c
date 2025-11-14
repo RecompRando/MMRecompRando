@@ -246,7 +246,16 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 }
                 return;
             }
-            
+            break;
+        case ACTOR_EN_SYATEKI_MAN: // Archery Guy
+        case ACTOR_EN_SYATEKI_OKUTA:
+            if (rando_get_slotdata_u32("npc_souls")) {
+                // *should = rando_has_item(0x0C0000 | ACTOR_EN_SYATEKI_MAN);
+                if (!rando_has_item(0x0C0000 | ACTOR_EN_SYATEKI_MAN)) {
+                    *should = false;
+                }
+                return;
+            }
             break;
         case ACTOR_EN_AKINDONUTS: // Business Scrub Soul
         case ACTOR_EN_SELLNUTS:
@@ -350,8 +359,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_ELFGRP: // Great Fairy Soul
         case ACTOR_BG_DY_YOSEIZO:
             if (rando_get_slotdata_u32("npc_souls")) {
-                // *should = rando_has_item(0x0C0000 | ACTOR_EN_ELFGRP);
-                if (!rando_has_item(0x0C0000 | ACTOR_EN_ELFGRP)) {
+                // *should = rando_has_item(0x0C0000 | ACTOR_BG_DY_YOSEIZO);
+                if (!rando_has_item(0x0C0000 | ACTOR_BG_DY_YOSEIZO)) {
                     *should = false;
                 }
                 return;
