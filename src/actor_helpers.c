@@ -423,7 +423,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_OBJ_TSUBO: //Pots
         case ACTOR_EN_TUBO_TRAP:
         case ACTOR_OBJ_FLOWERPOT:
-            if (!rando_get_slotdata_u32("absurd_souls")) {
+            if (rando_get_slotdata_u32("absurd_souls")) {
                 // *should = rando_has_item(0x0E0000 | ACTOR_OBJ_TSUBO);
                 if (!rando_has_item(0x0E0000 | ACTOR_OBJ_TSUBO)) {
                     *should = false;
@@ -456,12 +456,12 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             break;
     }
     
-    switch (actor->id) {
-        // case ACTOR_EN_PAMETFROG:
-        // case ACTOR_EN_KAME:
-            // recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
-            *should = false;
-            break;
-    }
-    // recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
+    // switch (actor->id) {
+    //     // case ACTOR_EN_PAMETFROG:
+    //     // case ACTOR_EN_KAME:
+    //         // recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
+    //         *should = false;
+    //         break;
+    // }
+    // // recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
 }
