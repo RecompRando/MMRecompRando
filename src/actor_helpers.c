@@ -371,6 +371,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_GAKUFU:
         case ACTOR_OBJ_ETCETERA: // Deku Flowers
         case ACTOR_DOOR_ANA: // Grottos
+        case ACTOR_EN_ISHI: // Rocks
+        case ACTOR_EN_KANBAN: // Signs
             if (rando_get_slotdata_u32("absurd_souls")) {
                 // *should = rando_has_item(0x0E0000 | actor->id);
                 if (!rando_has_item(0x0E0000 | actor->id)) {
@@ -437,15 +439,6 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 return;
             }
             break;
-        case ACTOR_EN_ISHI: //Rocks
-            if (rando_get_slotdata_u32("absurd_souls")) {
-                // *should = rando_has_item(0x0E0000 | actor->id);
-                if (!rando_has_item(0x0E0000 | actor->id)) {
-                    *should = false;
-                }
-                return;
-            }
-            break;
     }
     switch (actor->id) {
         case ACTOR_EN_PST:    // Postboxes
@@ -460,7 +453,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
     }
     
     // switch (actor->id) {
-    //     // case ACTOR_EN_PAMETFROG:
+    //     case ACTOR_EN_KANBAN:
     //     // case ACTOR_EN_KAME:
     //         // recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
     //         *should = false;
