@@ -45,6 +45,21 @@ void EnKanban_Init(Actor* thisx, PlayState* play) {
         case 0x314: // mountain village
             signId = (play->sceneId == SCENE_10YUKIYAMANOMURA && randoGetLoadedActorNumInSameRoom(play, thisx) == 2);
             break;
+        case 0x30C: // swamp spring water
+            switch (play->sceneId) {
+                case SCENE_KINSTA1: // swamp spider house
+                    signId = 1;
+                    break;
+                case SCENE_KAKUSIANA: // bean daddy (grotto)
+                    signId = 2;
+                    break;
+                case SCENE_20SICHITAI:
+                case SCENE_20SICHITAI2:
+                default:
+                    signId = 0;
+                    break;
+            }
+            break;
         default:
             break;
     }
