@@ -298,6 +298,7 @@ RECOMP_IMPORT(".", u32 rando_get_sending_player(u32 items_i));
 RECOMP_IMPORT(".", void rando_get_item_name_from_id(u32 item_id, char* out_str));
 RECOMP_IMPORT(".", void rando_get_sending_player_name(u32 items_i, char* out_str));
 RECOMP_IMPORT(".", void rando_get_location_item_player(u32 location_id, char* out_str));
+RECOMP_IMPORT(".", int rando_get_location_item_player_id(u32 location_id));
 RECOMP_IMPORT(".", void rando_get_location_item_name(u32 location_id, char* out_str));
 RECOMP_IMPORT(".", u32 rando_get_last_location_sent());
 RECOMP_IMPORT(".", u32 rando_get_seed_name(char* seed_name_out, u32 buffer_size));

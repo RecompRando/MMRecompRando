@@ -175,7 +175,7 @@ bool rando_met_all_goal() {
             // all heart pieces/containers
             gSaveContext.save.saveInfo.playerData.healthCapacity >= 0x140 &&
             // stray fairies
-            gSaveContext.save.saveInfo.inventory.strayFairies[0] == 15 &&
+            gSaveContext.save.saveInfo.inventory.strayFairies[0] == 1 &&
             gSaveContext.save.saveInfo.inventory.strayFairies[1] == 15 &&
             gSaveContext.save.saveInfo.inventory.strayFairies[2] == 15 &&
             gSaveContext.save.saveInfo.inventory.strayFairies[3] == 15 &&

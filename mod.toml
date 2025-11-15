@@ -80,6 +80,7 @@ native_libraries = [
                                     "rando_get_location_type",
                                     "rando_get_location_has_local_item",
                                     "rando_get_item_at_location",
+                                    "rando_get_location_item_player_id",
                                     "rando_broadcast_location_hint",
                                     "rando_send_location",
                                     "rando_complete_goal",

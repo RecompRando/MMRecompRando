@@ -21,6 +21,8 @@
 // ty neirn
 #define SEGMENTED_TO_GLOBAL_PTR(obj, segmentedPtr) ((void *)((uintptr_t)obj + SEGMENT_OFFSET(segmentedPtr)))
 
+void GetItem_DrawRemoteOcarina(PlayState* play);
+void GetItem_DrawRemoteWind(PlayState* play);
 void GetItem_DrawBombchu(PlayState* play, s16 drawId);
 void GetItem_DrawPoes(PlayState* play, s16 drawId);
 void GetItem_DrawFairyBottle(PlayState* play, s16 drawId);
@@ -803,10 +805,12 @@ RECOMP_PATCH void GetItem_Draw(PlayState* play, s16 drawId) {
             return;
         // temp
         case GID_OOT_ITEM:
-            GetItem_DrawOpa0DL(play, frog); // temp
+            ObjLoad(play, 0x06, OBJECT_GI_OCARINA);
+            GetItem_DrawRemoteOcarina(play);
+            ObjUnload(play, 0x06, OBJECT_GI_OCARINA);
             return;
         case GID_WW_ITEM:
-            GetItem_DrawOpa0DL(play, wind_waker);
+            GetItem_DrawRemoteWind(play);
             return;
     }
     sDrawItemTable_new[drawId].drawFunc(play, drawId);
@@ -825,6 +829,57 @@ void GetItem_DrawDynamic(PlayState* play, void* objectSegment, s16 drawId) {
     GetItem_Draw(play, drawId);
 
     gSegments[6] = prevSegment;
+
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
+void GetItem_DrawRemoteOcarina(PlayState* play) {
+    s32 pad;
+
+    OPEN_DISPS(play->state.gfxCtx);
+
+    Gfx_SetupDL25_Opa(play->state.gfxCtx);
+
+    gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+    gSPDisplayList(POLY_OPA_DISP++, sDrawItemTable_new[GID_OCARINA].drawResources[0]);
+
+    Gfx_SetupDL25_Xlu(play->state.gfxCtx);
+
+    gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+    gSPDisplayList(POLY_XLU_DISP++, sDrawItemTable_new[GID_OCARINA].drawResources[1]);
+
+    //~ Matrix_RotateYS((s16) recomp_get_config_double("logo_r"), MTXMODE_APPLY);
+    Matrix_Translate(0.0f, 30.0f, 30.0f, MTXMODE_APPLY);
+    Matrix_Scale(0.4f, 0.4f, 0.4f, MTXMODE_APPLY);
+
+    Gfx_SetupDL25_Opa(play->state.gfxCtx);
+    Matrix_Scale(0.0375f, 0.0375f, 0.0375f, MTXMODE_APPLY);
+
+    gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+    gSPDisplayList(POLY_OPA_DISP++, sDrawItemTable_new[GID_APLOGO_PROG].drawResources[0]);
+
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
+void GetItem_DrawRemoteWind(PlayState* play) {
+    s32 pad;
+
+    OPEN_DISPS(play->state.gfxCtx);
+
+    Gfx_SetupDL25_Opa(play->state.gfxCtx);
+
+    gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+    gSPDisplayList(POLY_OPA_DISP++, wind_waker);
+
+    //~ Matrix_RotateYS((s16) recomp_get_config_double("logo_r"), MTXMODE_APPLY);
+    Matrix_Translate(0.0f, 30.0f, 30.0f, MTXMODE_APPLY);
+    Matrix_Scale(0.4f, 0.4f, 0.4f, MTXMODE_APPLY);
+
+    Gfx_SetupDL25_Opa(play->state.gfxCtx);
+    Matrix_Scale(0.0375f, 0.0375f, 0.0375f, MTXMODE_APPLY);
+
+    gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+    gSPDisplayList(POLY_OPA_DISP++, sDrawItemTable_new[GID_APLOGO_PROG].drawResources[0]);
 
     CLOSE_DISPS(play->state.gfxCtx);
 }

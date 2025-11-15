@@ -785,16 +785,16 @@ u32 rando_get_item_id(u32 location)
         }
     }
     
-    // TODO: make this work
-    // u32 sending_player = rando_get_sending_player(location);
+    // TODO: make this not work
+    u32 receiving_player = rando_get_location_item_player_id(location);
 
-    // if (rando_get_game_is_oot(sending_player)) {
-    //     return GI_OOT_ITEM;
-    // }
+    if (rando_get_game_is_oot(receiving_player)) {
+        return GI_OOT_ITEM;
+    }
     
-    // if (rando_get_game_is_ww(sending_player)) {
-    //     return GI_WW_ITEM;
-    // }
+    if (rando_get_game_is_ww(receiving_player)) {
+        return GI_WW_ITEM;
+    }
 
     switch (rando_get_location_type(location)) {
         case RANDO_ITEM_CLASS_PROGRESSION:

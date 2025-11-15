@@ -27,7 +27,7 @@ RECOMP_HOOK("EnFall_Init")
 void EnFall_RandoInit(Actor* thisx, PlayState* play) {
     EnFall* this = THIS;
 
-    fallTrueGI = rando_get_item_id(LOCATION_MOON_ALL_MASK_TRADE);
+    fallTrueGI = GI_FROG_WHITE;
     fallObjectSegment = ZeldaArena_Malloc(0x2000);
     fallObjectStatic = false;
     fallObjectLoading = false;
@@ -35,7 +35,7 @@ void EnFall_RandoInit(Actor* thisx, PlayState* play) {
 }
 
 void EnFall_WaitForObject(EnFall* this, PlayState* play) {
-    s16 getItemId = rando_get_item_id(LOCATION_MOON_ALL_MASK_TRADE);
+    s16 getItemId = GI_FROG_WHITE;
     s16 objectSlot = Object_GetSlot(&play->objectCtx, getObjectId(getItemId));
 
     if (isAP(getItemId)) {
@@ -70,7 +70,7 @@ RECOMP_PATCH void EnFall_Update(Actor* thisx, PlayState* play) {
 }
 
 void EnFall_RandoDraw(EnFall* this, PlayState* play) {
-    s16 getItemId = rando_get_item_id(LOCATION_MOON_ALL_MASK_TRADE);
+    s16 getItemId = GI_FROG_WHITE;
 
     Matrix_Translate(this->actor.world.pos.x + 500.0f, this->actor.world.pos.y - 6000.0f, this->actor.world.pos.z -3000.0f, MTXMODE_APPLY);
     Matrix_Scale(200.0f, 200.0f, 200.0f, MTXMODE_APPLY);
