@@ -101,3 +101,15 @@ size = 0x1410
 symbols = [
     { name = "sDisplayLists_ovl_Obj_Kibako", vram = 0x809273E8 },
 ]
+
+[[section]]
+name = "..ovl_En_Kanban"
+rom = 0x00DC7720
+vram = 0x80954960
+size = 0x3760
+
+symbols = [
+    { name = "sPartFlags", vram = 0x8095732C },
+    { name = "sDisplayLists_ovl_En_Kanban", vram = 0x80957550 },
+    { name = "sCutAngles", vram = 0x80957D7C },
+]
