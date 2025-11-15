@@ -419,9 +419,6 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             break;
         case ACTOR_OBJ_KEPN_KOYA: //Gorman Stables
             if (rando_get_slotdata_u32("absurd_souls")) {
-                if (actor->params & 0x80) {
-                    return;
-                }
                 // *should = rando_has_item(0x0E0000 | actor->id);
                 if (rando_has_item(0x0E0000 | actor->id)) {
                     *should = false;
@@ -442,9 +439,6 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             break;
         case ACTOR_EN_ISHI: //Rocks
             if (rando_get_slotdata_u32("absurd_souls")) {
-                if (actor->params & 0x80) {
-                    return;
-                }
                 // *should = rando_has_item(0x0E0000 | actor->id);
                 if (!rando_has_item(0x0E0000 | actor->id)) {
                     *should = false;
