@@ -361,7 +361,7 @@ void ObjGrassCarry_DrawRando(Actor* this, PlayState* play) {
     Gfx_SetupDL25_Opa(play->state.gfxCtx);
     gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
     
-    POLY_OPA_DISP = GenericGrass_DrawRandoColored(play, gObjGrass_D_809AA9F0, POLY_OPA_DISP, grassElem->alpha, LOCATION_GRASS(grassElem));
+    POLY_OPA_DISP = GenericGrass_DrawRandoColored(play, gKusaBushType1DL, POLY_OPA_DISP, 255, LOCATION_GRASS(grassElem));
 
     CLOSE_DISPS(play->state.gfxCtx);
 }
