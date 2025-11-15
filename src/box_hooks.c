@@ -207,7 +207,9 @@ RECOMP_PATCH void EnBox_Init(Actor* thisx, PlayState* play) {
     this->dyna.bgId = DynaPoly_SetBgActor(play, &play->colCtx.dyna, &this->dyna.actor, colHeader);
     this->movementFlags = 0;
 
-    if (rando_get_camc_enabled()) {
+    if (!rando_get_camc_enabled()) {
+        this->type = vanillaType;
+    } else {
         u32 chestType = rando_get_location_type(LOCATION_ENBOX);
         if (LOCATION_ENBOX == 0x061700) {
             chestType = rando_get_location_type(LOCATION_ENBOX_CHEST_GAME);
@@ -221,8 +223,6 @@ RECOMP_PATCH void EnBox_Init(Actor* thisx, PlayState* play) {
                 this->type = ENBOX_TYPE_BIG;
                 break;
         }
-    } else {
-        this->type = vanillaType;
     }
 
     this->iceSmokeTimer = 0;
