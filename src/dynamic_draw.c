@@ -1014,7 +1014,7 @@ void GetItem_DrawSkullTokenGeneric(PlayState* play, TokenType type) {
             flameColor = gGiSwampFlameColor;
             break;
         case TOKEN_OCEAN:
-            flameColor = gGiSwampFlameColor;
+            flameColor = gGiOceanFlameColor;
             break;
         case TOKEN_SOUL_BOSS:
             flameColor = gGiSoulBossFlameColor;
