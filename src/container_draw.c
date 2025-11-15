@@ -10,7 +10,7 @@
 #include "models/container_textures.h"
 
 Gfx* GenericContainer_SetTextures(PlayState* play, Gfx* gfx, u8* customDraw, u32 location) {
-    if (!rando_get_camc_enabled()) {
+    if (rando_location_is_checked_async(location) || !rando_get_camc_enabled()) {
         *customDraw = CAMC_DRAW_DISABLED;
         return gfx;
     }
