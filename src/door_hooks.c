@@ -7,7 +7,7 @@
 
 RECOMP_HOOK("DoorShutter_SetupDoor")
 void OnDoorShutter_SetupDoor(DoorShutter* this, PlayState* play) {
-    if (play->sceneId == SCENE_OPENINGDAN) {
+    if (play->sceneId == SCENE_OPENINGDAN || play->sceneId == SCENE_IKNINSIDE) {
         this->doorType = 0;
     }
 }
