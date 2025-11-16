@@ -43,6 +43,7 @@ bool rando_met_star_fox_condition(u32 required_amount) {
     
     return starfoxMaskCount >= required_amount;
 }
+
 bool rando_met_scarecrow_condition(u32 required_amount) {
     u8 scarecrowCount = 0;
     
@@ -72,20 +73,13 @@ bool rando_met_scarecrow_condition(u32 required_amount) {
     
     return scarecrowCount >= required_amount;
 }
+
 bool rando_met_frog_condition(u32 required_amount) {
     u8 frogCount = 0;
-    
-    // All frog IDs from APworld
-    static const u32 frogLocations[] = {
-        0,  // Yellow Frog (0xFF0000)
-        1,  // Blue Frog (0xFF0001)
-        2,  // Pink Frog (0xFF0002)
-        3,  // Cyan Frog (0xFF0003)
-        4,  // White Frog (0xFF0004)
-    };
-    
-    for (int i = 0; i < ARRAY_COUNT(frogLocations); i++) {
-        if (rando_has_item(frogLocations[i])) {
+
+    // frogs are ids 0xFF0000 - 0xFF0004
+    for (int i = 0; i < 5; i++) {
+        if (rando_has_item(AP_PREFIX_FROGS | i)) {
             frogCount++;
         }
     }
@@ -167,20 +161,19 @@ bool rando_met_majora_condition() {
 bool rando_met_all_goal() {
     return  (rando_get_slotdata_u32("completion_goal")) &&
             rando_met_remains_condition(4) &&           // All 4 remains
+            rando_met_items_condition(30) &&            // All items
             rando_met_masks_condition(24) &&            // All 24 masks
             rando_met_owl_condition(10) &&              // All 10 owls
             rando_met_scarecrow_condition(14) &&        // All 14 scarecrows
             rando_met_frog_condition(5) &&              // All 5 frogs
-            rando_met_items_condition(31) &&            // All items (adjust number as needed)
             // all heart pieces/containers
             gSaveContext.save.saveInfo.playerData.healthCapacity >= 0x140 &&
             // stray fairies
-            gSaveContext.save.saveInfo.inventory.strayFairies[0] == 15 &&
-            gSaveContext.save.saveInfo.inventory.strayFairies[1] == 15 &&
-            gSaveContext.save.saveInfo.inventory.strayFairies[2] == 15 &&
-            gSaveContext.save.saveInfo.inventory.strayFairies[3] == 15 &&
-            // gSaveContext.save.saveInfo.inventory.strayFairies[4] == 1 &&
+            gSaveContext.save.saveInfo.inventory.strayFairies[0] >= 15 &&
+            gSaveContext.save.saveInfo.inventory.strayFairies[1] >= 15 &&
+            gSaveContext.save.saveInfo.inventory.strayFairies[2] >= 15 &&
+            gSaveContext.save.saveInfo.inventory.strayFairies[3] >= 15 &&
             // skulltulas
-            Inventory_GetSkullTokenCount(SCENE_KINSTA1) == 30 &&
-            Inventory_GetSkullTokenCount(SCENE_KINDAN2) == 30;
+            Inventory_GetSkullTokenCount(SCENE_KINSTA1) >= 30 &&
+            Inventory_GetSkullTokenCount(SCENE_KINDAN2) >= 30;
 }
