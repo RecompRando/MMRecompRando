@@ -110,9 +110,8 @@ void Sram_SetInitialWeekEvents(void) {
     }
 
     // restore chateau romani state after cycle reset
-    if (drankChateau && rando_get_permanent_chateau_romani_enabled()) {
+    if (rando_has_item_async(0x020000) == 2 && drankChateau && rando_get_permanent_chateau_romani_enabled()) {
         SET_WEEKEVENTREG(WEEKEVENTREG_DRANK_CHATEAU_ROMANI);
-        drankChateau = false;
     }
 }
 
@@ -338,7 +337,7 @@ RECOMP_PATCH void Sram_SaveEndOfCycle(PlayState* play) {
     }
 
     // persistent flags
-    drankChateau = CHECK_WEEKEVENTREG(WEEKEVENTREG_DRANK_CHATEAU_ROMANI);
+    drankChateau = CHECK_WEEKEVENTREG(WEEKEVENTREG_DRANK_CHATEAU_ROMANI) || drankChateau;
     spawnedTurtle = CHECK_WEEKEVENTREG(WEEKEVENTREG_53_20);
 
     for (i = 0; i < ARRAY_COUNT(sPersistentCycleWeekEventRegs); i++) {
