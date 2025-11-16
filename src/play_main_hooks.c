@@ -722,13 +722,13 @@ u32 rando_get_item_id(u32 location)
                 switch (item & 0xFF)
                 {
                     case ITEM_KEY_BOSS:
-                        return (GI_MAX + (((item >> 8) & 0xF) * 4) + 1);
+                        return (GI_KEY_BOSS_WOODFALL + (((item >> 8) & 0xF) * 4));
                     case ITEM_KEY_SMALL:
-                        return (GI_MAX + (((item >> 8) & 0xF) * 4) + 2);
+                        return (GI_KEY_SMALL_WOODFALL + (((item >> 8) & 0xF) * 4));
                     case ITEM_DUNGEON_MAP:
-                        return (GI_MAX + (((item >> 8) & 0xF) * 4) + 3);
+                        return (GI_MAP_WOODFALL + (((item >> 8) & 0xF) * 4));
                     case ITEM_COMPASS:
-                        return (GI_MAX + (((item >> 8) & 0xF) * 4) + 4);
+                        return (GI_COMPASS_WOODFALL + (((item >> 8) & 0xF) * 4));
                 }
                 return GI_NONE;
             case 0xFF0000:
