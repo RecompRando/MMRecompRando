@@ -1348,7 +1348,7 @@ void GetItem_DrawScarecrow(PlayState* play, s16 drawId) {
     static u32 lastUpdate = 0;
 
     if (ObjLoad(play, 0x06, OBJECT_KA)) {
-        if (!initialized) {
+        if (!initialized || (lastUpdate != (play->state.frames - 1))) {
             initialized = true;
             SkelAnime_InitFlex(play, &skelAnime, &object_ka_Skel_0065B0, &object_ka_Anim_000214, NULL, NULL, 0);
         }
