@@ -272,7 +272,7 @@ void onPlayer_Update(Player* this, PlayState* play) {
 // sets rColor based on item/location type, returns false to draw original
 bool get_rando_color(Color_RGB8* rColor, u32 location) {
     // show default DL if camc is off or location was checked
-    if (!rando_get_camc_enabled() || rando_location_is_checked(location)) {
+    if (!rando_get_camc_enabled() || rando_location_is_checked(location) || !rando_location_exists(location)) {
         return false;
     }
 

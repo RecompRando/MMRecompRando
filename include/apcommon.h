@@ -317,6 +317,7 @@ RECOMP_IMPORT(".", void rando_queue_scout(u32 location));
 RECOMP_IMPORT(".", void rando_queue_scouts_all());
 RECOMP_IMPORT(".", void rando_remove_queued_scout(u32 location));
 RECOMP_IMPORT(".", void rando_send_queued_scouts(int hint));
+RECOMP_IMPORT(".", bool rando_location_exists(u32 location_id));
 
 // WEEKEVENTREG_17_80: we have given the Moon's Tear to the scrub
 // WEEKEVENTREG_74_80: the Moon's Tear has fallen

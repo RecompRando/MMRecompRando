@@ -120,7 +120,8 @@ native_libraries = [
                                     "rando_remove_queued_scout",
                                     "rando_send_queued_scouts",
                                     "rando_get_game_is_oot",
-                                    "rando_get_game_is_ww"] }
+                                    "rando_get_game_is_ww",
+                                    "rando_location_exists"] }
 ]
 
 # Inputs to the mod tool.
