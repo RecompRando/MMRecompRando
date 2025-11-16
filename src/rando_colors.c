@@ -105,6 +105,16 @@ void hsv_to_rgb(float h, float s, float v, Color_RGB8* out) {
     out->b = b * 255;
 }
 
+RECOMP_CALLBACK("*", recomp_on_play_main)
+void cycle_rainbow() {
+    static float hue = 0.0f;
+    hue += 5.0;
+    if (hue >= 360.0f) {
+        hue -= 360.0f;
+    }
+    hsv_to_rgb(hue, 1.0f, 1.0f, &rainbowColor);
+}
+
 // sets rColor based on item/location type, returns false to draw original
 bool get_rando_color(Color_RGB8* rColor, u32 location) {
     // show default DL if camc is off or location was checked
