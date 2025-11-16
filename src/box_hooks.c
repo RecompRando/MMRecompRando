@@ -207,7 +207,7 @@ RECOMP_PATCH void EnBox_Init(Actor* thisx, PlayState* play) {
     this->dyna.bgId = DynaPoly_SetBgActor(play, &play->colCtx.dyna, &this->dyna.actor, colHeader);
     this->movementFlags = 0;
 
-    if (!rando_get_camc_enabled()) {
+    if (rando_get_camc_enabled() != CAMC_ENABLED) {
         this->type = vanillaType;
     } else {
         u32 chestType = rando_get_location_type(LOCATION_ENBOX);

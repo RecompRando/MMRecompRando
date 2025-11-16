@@ -789,11 +789,31 @@ u32 rando_get_item_id(u32 location)
     u32 receiving_player = rando_get_location_item_player_id(location);
 
     if (rando_get_game_is_oot(receiving_player)) {
-        return GI_OOT_ITEM;
+        switch (rando_get_location_type(location))
+        {
+            case RANDO_ITEM_CLASS_PROGRESSION:
+            case RANDO_ITEM_CLASS_TRAP:
+                return GI_OOT_ITEM_PROG;
+            case RANDO_ITEM_CLASS_USEFUL:
+                return GI_OOT_ITEM_USEFUL;
+            case RANDO_ITEM_CLASS_JUNK:
+            default:
+                return GI_OOT_ITEM_FILLER;
+        }
     }
     
     if (rando_get_game_is_ww(receiving_player)) {
-        return GI_WW_ITEM;
+        switch (rando_get_location_type(location))
+        {
+            case RANDO_ITEM_CLASS_PROGRESSION:
+            case RANDO_ITEM_CLASS_TRAP:
+                return GI_WW_ITEM_PROG;
+            case RANDO_ITEM_CLASS_USEFUL:
+                return GI_WW_ITEM_USEFUL;
+            case RANDO_ITEM_CLASS_JUNK:
+            default:
+                return GI_WW_ITEM_FILLER;
+        }
     }
 
     switch (rando_get_location_type(location)) {

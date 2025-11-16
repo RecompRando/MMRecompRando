@@ -83,8 +83,12 @@ typedef enum {
     GI_UTILITY_GENERIC,
     GI_ABSURD_GENERIC,
     // custom oot/ww items
-    GI_OOT_ITEM,
-    GI_WW_ITEM,
+    GI_OOT_ITEM_FILLER,
+    GI_OOT_ITEM_USEFUL,
+    GI_OOT_ITEM_PROG,
+    GI_WW_ITEM_FILLER,
+    GI_WW_ITEM_USEFUL,
+    GI_WW_ITEM_PROG,
     // end
     GI_EXTENDED_MAX,
 } ExtendedGITable;
@@ -159,8 +163,12 @@ typedef enum {
     GID_UTILITY_SOUL_GENERIC,
     GID_ABSURD_SOUL_GENERIC,
     // custom oot/ww items
-    GID_OOT_ITEM,
-    GID_WW_ITEM,
+    GID_OOT_ITEM_FILLER,
+    GID_OOT_ITEM_USEFUL,
+    GID_OOT_ITEM_PROG,
+    GID_WW_ITEM_FILLER,
+    GID_WW_ITEM_USEFUL,
+    GID_WW_ITEM_PROG,
     // end
     GID_EXTENDED_MAX,
 } ExtendedGIDTable;

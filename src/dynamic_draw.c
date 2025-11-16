@@ -21,8 +21,8 @@
 // ty neirn
 #define SEGMENTED_TO_GLOBAL_PTR(obj, segmentedPtr) ((void *)((uintptr_t)obj + SEGMENT_OFFSET(segmentedPtr)))
 
-void GetItem_DrawRemoteOcarina(PlayState* play);
-void GetItem_DrawRemoteWind(PlayState* play);
+void GetItem_DrawRemoteOcarina(PlayState* play, RandoItemClassification item_type);
+void GetItem_DrawRemoteWind(PlayState* play, RandoItemClassification item_type);
 void GetItem_DrawBombchu(PlayState* play, s16 drawId);
 void GetItem_DrawPoes(PlayState* play, s16 drawId);
 void GetItem_DrawFairyBottle(PlayState* play, s16 drawId);
@@ -804,13 +804,29 @@ RECOMP_PATCH void GetItem_Draw(PlayState* play, s16 drawId) {
             GetItem_DrawSoulAbsurd(play, drawId);
             return;
         // temp
-        case GID_OOT_ITEM:
+        case GID_OOT_ITEM_FILLER:
             ObjLoad(play, 0x06, OBJECT_GI_OCARINA);
-            GetItem_DrawRemoteOcarina(play);
+            GetItem_DrawRemoteOcarina(play, RANDO_ITEM_CLASS_JUNK);
             ObjUnload(play, 0x06, OBJECT_GI_OCARINA);
             return;
-        case GID_WW_ITEM:
-            GetItem_DrawRemoteWind(play);
+        case GID_OOT_ITEM_USEFUL:
+            ObjLoad(play, 0x06, OBJECT_GI_OCARINA);
+            GetItem_DrawRemoteOcarina(play, RANDO_ITEM_CLASS_USEFUL);
+            ObjUnload(play, 0x06, OBJECT_GI_OCARINA);
+            return;
+        case GID_OOT_ITEM_PROG:
+            ObjLoad(play, 0x06, OBJECT_GI_OCARINA);
+            GetItem_DrawRemoteOcarina(play, RANDO_ITEM_CLASS_PROGRESSION);
+            ObjUnload(play, 0x06, OBJECT_GI_OCARINA);
+            return;
+        case GID_WW_ITEM_FILLER:
+            GetItem_DrawRemoteWind(play, RANDO_ITEM_CLASS_JUNK);
+            return;
+        case GID_WW_ITEM_USEFUL:
+            GetItem_DrawRemoteWind(play, RANDO_ITEM_CLASS_USEFUL);
+            return;
+        case GID_WW_ITEM_PROG:
+            GetItem_DrawRemoteWind(play, RANDO_ITEM_CLASS_PROGRESSION);
             return;
     }
     sDrawItemTable_new[drawId].drawFunc(play, drawId);
@@ -833,7 +849,7 @@ void GetItem_DrawDynamic(PlayState* play, void* objectSegment, s16 drawId) {
     CLOSE_DISPS(play->state.gfxCtx);
 }
 
-void GetItem_DrawRemoteOcarina(PlayState* play) {
+void GetItem_DrawRemoteOcarina(PlayState* play, RandoItemClassification item_type) {
     s32 pad;
 
     OPEN_DISPS(play->state.gfxCtx);
@@ -853,15 +869,30 @@ void GetItem_DrawRemoteOcarina(PlayState* play) {
     Matrix_Scale(0.4f, 0.4f, 0.4f, MTXMODE_APPLY);
 
     Gfx_SetupDL25_Opa(play->state.gfxCtx);
-    Matrix_Scale(0.0375f, 0.0375f, 0.0375f, MTXMODE_APPLY);
 
-    gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
-    gSPDisplayList(POLY_OPA_DISP++, sDrawItemTable_new[GID_APLOGO_PROG].drawResources[0]);
+    switch (item_type) {
+        case RANDO_ITEM_CLASS_JUNK:
+            Matrix_Scale(0.15f, 0.15f, 0.15f, MTXMODE_APPLY);
+            gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+            gSPDisplayList(POLY_OPA_DISP++, sDrawItemTable_new[GID_APLOGO_FILLER].drawResources[0]);
+            break;
+        case RANDO_ITEM_CLASS_USEFUL:
+            Matrix_Scale(0.0375f, 0.0375f, 0.0375f, MTXMODE_APPLY);
+            gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+            gSPDisplayList(POLY_OPA_DISP++, sDrawItemTable_new[GID_APLOGO_USEFUL].drawResources[0]);
+            break;
+        case RANDO_ITEM_CLASS_PROGRESSION:
+        default:
+            Matrix_Scale(0.0375f, 0.0375f, 0.0375f, MTXMODE_APPLY);
+            gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+            gSPDisplayList(POLY_OPA_DISP++, sDrawItemTable_new[GID_APLOGO_PROG].drawResources[0]);
+            break;
+    }
 
     CLOSE_DISPS(play->state.gfxCtx);
 }
 
-void GetItem_DrawRemoteWind(PlayState* play) {
+void GetItem_DrawRemoteWind(PlayState* play, RandoItemClassification item_type) {
     s32 pad;
 
     OPEN_DISPS(play->state.gfxCtx);
@@ -876,10 +907,25 @@ void GetItem_DrawRemoteWind(PlayState* play) {
     Matrix_Scale(0.4f, 0.4f, 0.4f, MTXMODE_APPLY);
 
     Gfx_SetupDL25_Opa(play->state.gfxCtx);
-    Matrix_Scale(0.0375f, 0.0375f, 0.0375f, MTXMODE_APPLY);
 
-    gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
-    gSPDisplayList(POLY_OPA_DISP++, sDrawItemTable_new[GID_APLOGO_PROG].drawResources[0]);
+    switch (item_type) {
+        case RANDO_ITEM_CLASS_JUNK:
+            Matrix_Scale(0.15f, 0.15f, 0.15f, MTXMODE_APPLY);
+            gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+            gSPDisplayList(POLY_OPA_DISP++, sDrawItemTable_new[GID_APLOGO_FILLER].drawResources[0]);
+            break;
+        case RANDO_ITEM_CLASS_USEFUL:
+            Matrix_Scale(0.0375f, 0.0375f, 0.0375f, MTXMODE_APPLY);
+            gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+            gSPDisplayList(POLY_OPA_DISP++, sDrawItemTable_new[GID_APLOGO_USEFUL].drawResources[0]);
+            break;
+        case RANDO_ITEM_CLASS_PROGRESSION:
+        default:
+            Matrix_Scale(0.0375f, 0.0375f, 0.0375f, MTXMODE_APPLY);
+            gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+            gSPDisplayList(POLY_OPA_DISP++, sDrawItemTable_new[GID_APLOGO_PROG].drawResources[0]);
+            break;
+    }
 
     CLOSE_DISPS(play->state.gfxCtx);
 }
