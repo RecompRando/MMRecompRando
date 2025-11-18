@@ -105,7 +105,8 @@ void FreezeActors(UpdateActor_Params* params) {
     if (CutsceneManager_GetCurrentCsId() == CS_ID_GLOBAL_TALK) {
         if (actor->id == ACTOR_OBJ_BEAN ||          // magic bean plant
             actor->id == ACTOR_EN_KUSA2 ||          // keaton grass
-            actor->id == ACTOR_OBJ_LUPYGAMELIFT) {  // deku playground elevator
+            actor->id == ACTOR_OBJ_LUPYGAMELIFT ||  // deku playground elevator
+            actor->id == ACTOR_EN_DNO) {            // deku butler
             // PLAYER_STATE1_20000000 is used when grabbing items
             params->canFreezeCategory |= PLAYER_STATE1_20000000 & player->stateFlags1;
         }
