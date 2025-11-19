@@ -35,8 +35,18 @@ def message():
             return 1
         elif "FROG" in message:
             return 2
-        elif "glorp" in message:
+        elif "CDown" in message:
             return 3
-        elif "majinD" in message:
+        elif "CLeft" in message:
             return 4
+        elif "CRight" in message:
+            return 5
+        elif "CUp" in message:
+            return 6
+        elif "AButt" in message:
+            return 7
+        elif "glorp" in message:
+            return 8
+        elif "majinD" in message:
+            return 9
     return 0

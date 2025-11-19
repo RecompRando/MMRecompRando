@@ -867,9 +867,19 @@ void update_rando(PlayState* play) {
     } else if (moon == 2) {
         moonLiveGI = GI_FROG_WHITE;
     } else if (moon == 3) {
+        moonLiveGI = GI_BUTTON_C_DOWN;
+    } else if (moon == 4) {
+        moonLiveGI = GI_BUTTON_C_LEFT;
+    } else if (moon == 5) {
+        moonLiveGI = GI_BUTTON_C_RIGHT;
+    } else if (moon == 6) {
+        moonLiveGI = GI_BUTTON_C_UP;
+    } else if (moon == 7) {
+        moonLiveGI = GI_BUTTON_A;
+    } else if (moon == 8) {
         moonLiveGI = GI_IMAGE_ITEM;
         moonImage = glorp;
-    } else if (moon == 4) {
+    } else if (moon == 9) {
         moonLiveGI = GI_IMAGE_ITEM;
         moonImage = majinD;
     }

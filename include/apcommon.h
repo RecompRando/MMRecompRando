@@ -89,6 +89,12 @@ typedef enum {
     GI_WW_ITEM_FILLER,
     GI_WW_ITEM_USEFUL,
     GI_WW_ITEM_PROG,
+    // buttons
+    GI_BUTTON_C_DOWN,
+    GI_BUTTON_C_LEFT,
+    GI_BUTTON_C_RIGHT,
+    GI_BUTTON_C_UP,
+    GI_BUTTON_A,
     // custom image fake item
     GI_IMAGE_ITEM,
     // end
@@ -171,6 +177,12 @@ typedef enum {
     GID_WW_ITEM_FILLER,
     GID_WW_ITEM_USEFUL,
     GID_WW_ITEM_PROG,
+    // buttons
+    GID_BUTTON_C_DOWN,
+    GID_BUTTON_C_LEFT,
+    GID_BUTTON_C_RIGHT,
+    GID_BUTTON_C_UP,
+    GID_BUTTON_A,
     // custom image fake item
     GID_IMAGE_ITEM,
     // end

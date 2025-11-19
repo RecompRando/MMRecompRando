@@ -19,6 +19,12 @@
 #include "models/wind_waker.h" // temp
 #include "models/imageDL.h"
 
+#include "models/cButtonDown.h"
+#include "models/cButtonLeft.h"
+#include "models/cButtonRight.h"
+#include "models/cButtonUp.h"
+#include "models/aButton.h"
+
 // ty neirn
 #define SEGMENTED_TO_GLOBAL_PTR(obj, segmentedPtr) ((void *)((uintptr_t)obj + SEGMENT_OFFSET(segmentedPtr)))
 
@@ -829,6 +835,21 @@ RECOMP_PATCH void GetItem_Draw(PlayState* play, s16 drawId) {
             return;
         case GID_WW_ITEM_PROG:
             GetItem_DrawRemoteWind(play, RANDO_ITEM_CLASS_PROGRESSION);
+            return;
+        case GID_BUTTON_C_DOWN:
+            GetItem_DrawOpa0DL(play, cButtonDown);
+            return;
+        case GID_BUTTON_C_LEFT:
+            GetItem_DrawOpa0DL(play, cButtonLeft);
+            return;
+        case GID_BUTTON_C_RIGHT:
+            GetItem_DrawOpa0DL(play, cButtonRight);
+            return;
+        case GID_BUTTON_C_UP:
+            GetItem_DrawOpa0DL(play, cButtonUp);
+            return;
+        case GID_BUTTON_A:
+            GetItem_DrawOpa0DL(play, aButton);
             return;
         case GID_IMAGE_ITEM:
             GetItem_DrawImage(play);
