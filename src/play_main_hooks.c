@@ -6,12 +6,16 @@
 #include "apcommon.h"
 #include "yaml_generation.h"
 
+#include "repy_api.h"
+
 #include "../mm-decomp/src/overlays/actors/ovl_En_GirlA/z_en_girla.h"
 
 #define LOCATION_INVENTORY_SWORD GI_SWORD_KOKIRI
 #define LOCATION_INVENTORY_SHIELD GI_SHIELD_HERO
 
 #define C_TO_PARAMS(c) (c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF
+
+PRE_INIT_ADD_NRM_TO_MODULE_PATH;
 
 RECOMP_IMPORT("*", int recomp_set_moon_crash_resets_save(bool new_val));
 RECOMP_IMPORT("*", int recomp_set_fd_anywhere(bool new_val));
@@ -32,6 +36,13 @@ void registerActorExtensions();
 
 PlayState* gPlay;
 
+REPY_Handle chat_module;
+
+void run_py()
+{
+    chat_module = REPY_ImportModule("moon_chat");
+}
+
 RECOMP_CALLBACK("*", recomp_on_init)
 void init_rando()
 {
@@ -51,6 +62,8 @@ void init_rando()
     randoCreateSoloMenu();
     randoCreateYamlConfigMenu();
     randoCreateAPConnectMenu();
+
+    run_py();
 
     randoCreateNotificationContainer();
 }
@@ -832,6 +845,8 @@ RECOMP_DECLARE_EVENT(rando_on_start());
 
 bool rando_met_all_goal();
 
+s16 moonLiveGI = GI_FROG_WHITE;
+
 RECOMP_CALLBACK("*", recomp_on_play_main)
 void update_rando(PlayState* play) {
     u32 new_items_size;
@@ -841,6 +856,15 @@ void update_rando(PlayState* play) {
     gPlay = play;
 
     notificationUpdateCycle();
+
+    REPY_Handle moon_handle = REPY_CallAttrCStrReturn(chat_module, "message", 0, 0);
+    s32 moon = REPY_CastS32(moon_handle);
+
+    if (moon == 1) {
+        moonLiveGI = GI_SCARECROW;
+    } else if (moon == 2) {
+        moonLiveGI = GI_FROG_WHITE;
+    }
 
     if (saveOpened) {
         new_items_size = rando_get_items_size();

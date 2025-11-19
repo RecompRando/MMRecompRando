@@ -37,7 +37,8 @@ minimum_recomp_version = "1.2.1"
 dependencies = [
     "owls_never_quit:1.0.0",
     "mm_recomp_better_double_sot:0.0.1",
-    "mm_recomp_colors:0.5.0"
+    "mm_recomp_colors:0.5.0",
+    "MM_RecompExternalPython_API:1.0.0"
 ]
 
 # Optional dependency mods. This has the same format as `dependencies`, but the game will still start if dependencies in this
@@ -138,7 +139,7 @@ func_reference_syms_file = "Zelda64RecompSyms/mm.us.rev1.syms.toml"
 data_reference_syms_files = [ "Zelda64RecompSyms/mm.us.rev1.datasyms.toml", "Zelda64RecompSyms/mm.us.rev1.datasyms_static.toml", "rando_syms.toml" ]
 
 # Additional files to include in the mod.
-additional_files = [ "thumb.dds" ]
+additional_files = [ "thumb.dds", "src/moon_chat.py" ]
 
 [[manifest.config_options]]
 id = "notification_position"

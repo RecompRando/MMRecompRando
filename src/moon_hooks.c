@@ -16,6 +16,7 @@
 #define LOCATION_MOON_ALL_MASK_TRADE 0x00007B
 
 s16 fallTrueGI;
+extern s16 moonLiveGI;
 
 static bool fallObjectStatic;
 static bool fallObjectLoading;
@@ -27,7 +28,7 @@ RECOMP_HOOK("EnFall_Init")
 void EnFall_RandoInit(Actor* thisx, PlayState* play) {
     EnFall* this = THIS;
 
-    fallTrueGI = GI_FROG_WHITE;
+    fallTrueGI = moonLiveGI;
     fallObjectSegment = ZeldaArena_Malloc(0x2000);
     fallObjectStatic = false;
     fallObjectLoading = false;
@@ -35,7 +36,7 @@ void EnFall_RandoInit(Actor* thisx, PlayState* play) {
 }
 
 void EnFall_WaitForObject(EnFall* this, PlayState* play) {
-    s16 getItemId = GI_FROG_WHITE;
+    s16 getItemId = moonLiveGI;
     s16 objectSlot = Object_GetSlot(&play->objectCtx, getObjectId(getItemId));
 
     if (isAP(getItemId)) {
@@ -58,6 +59,20 @@ void EnFall_WaitForObject(EnFall* this, PlayState* play) {
     }
 }
 
+void EnFall_LoadObjectFast(EnFall* this, PlayState* play) {
+    fallTrueGI = moonLiveGI;
+
+    if (isAP(fallTrueGI)) {
+        fallObjectStatic = true;
+        fallObjectLoaded = true;
+        return;
+    }
+
+    loadObject(play, &fallObjectSegment, &fallObjectLoadQueue, getObjectId(fallTrueGI));
+    osRecvMesg(&fallObjectLoadQueue, NULL, OS_MESG_BLOCK);
+    fallObjectLoaded = true;
+}
+
 RECOMP_PATCH void EnFall_Update(Actor* thisx, PlayState* play) {
     EnFall* this = THIS;
 
@@ -70,7 +85,7 @@ RECOMP_PATCH void EnFall_Update(Actor* thisx, PlayState* play) {
 }
 
 void EnFall_RandoDraw(EnFall* this, PlayState* play) {
-    s16 getItemId = GI_FROG_WHITE;
+    s16 getItemId = moonLiveGI;
 
     Matrix_Translate(this->actor.world.pos.x + 500.0f, this->actor.world.pos.y - 6000.0f, this->actor.world.pos.z -3000.0f, MTXMODE_APPLY);
     Matrix_Scale(200.0f, 200.0f, 200.0f, MTXMODE_APPLY);
@@ -97,11 +112,7 @@ void EnFall_RandoDraw(EnFall* this, PlayState* play) {
 
     if (fallObjectLoaded) {
         if (fallTrueGI != getItemId) {
-            fallObjectLoading = false;
-            fallObjectLoaded = false;
-            fallObjectStatic = false;
-            fallTrueGI = getItemId;
-            return;
+            EnFall_LoadObjectFast(this, play);
         }
         if (fallObjectStatic) {
             GetItem_Draw(play, getGid(getItemId));
