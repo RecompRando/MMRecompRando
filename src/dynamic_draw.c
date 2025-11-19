@@ -17,10 +17,12 @@
 
 #include "models/frog.h" // temp
 #include "models/wind_waker.h" // temp
+#include "models/imageDL.h"
 
 // ty neirn
 #define SEGMENTED_TO_GLOBAL_PTR(obj, segmentedPtr) ((void *)((uintptr_t)obj + SEGMENT_OFFSET(segmentedPtr)))
 
+void GetItem_DrawImage(PlayState* play);
 void GetItem_DrawRemoteOcarina(PlayState* play, RandoItemClassification item_type);
 void GetItem_DrawRemoteWind(PlayState* play, RandoItemClassification item_type);
 void GetItem_DrawBombchu(PlayState* play, s16 drawId);
@@ -828,6 +830,9 @@ RECOMP_PATCH void GetItem_Draw(PlayState* play, s16 drawId) {
         case GID_WW_ITEM_PROG:
             GetItem_DrawRemoteWind(play, RANDO_ITEM_CLASS_PROGRESSION);
             return;
+        case GID_IMAGE_ITEM:
+            GetItem_DrawImage(play);
+            return;
     }
     sDrawItemTable_new[drawId].drawFunc(play, drawId);
 }
@@ -926,6 +931,20 @@ void GetItem_DrawRemoteWind(PlayState* play, RandoItemClassification item_type) 
             gSPDisplayList(POLY_OPA_DISP++, sDrawItemTable_new[GID_APLOGO_PROG].drawResources[0]);
             break;
     }
+
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
+extern u64* moonImage;
+
+void GetItem_DrawImage(PlayState* play) {
+    OPEN_DISPS(play->state.gfxCtx);
+
+    Gfx_SetupDL25_Opa(play->state.gfxCtx);
+
+    gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+    gSPSegment(POLY_OPA_DISP++, 0x08, moonImage);
+    gSPDisplayList(POLY_OPA_DISP++, imageDL);
 
     CLOSE_DISPS(play->state.gfxCtx);
 }

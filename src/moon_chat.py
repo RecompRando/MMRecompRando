@@ -35,4 +35,8 @@ def message():
             return 1
         elif "FROG" in message:
             return 2
+        elif "glorp" in message:
+            return 3
+        elif "majinD" in message:
+            return 4
     return 0

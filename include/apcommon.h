@@ -89,6 +89,8 @@ typedef enum {
     GI_WW_ITEM_FILLER,
     GI_WW_ITEM_USEFUL,
     GI_WW_ITEM_PROG,
+    // custom image fake item
+    GI_IMAGE_ITEM,
     // end
     GI_EXTENDED_MAX,
 } ExtendedGITable;
@@ -169,6 +171,8 @@ typedef enum {
     GID_WW_ITEM_FILLER,
     GID_WW_ITEM_USEFUL,
     GID_WW_ITEM_PROG,
+    // custom image fake item
+    GID_IMAGE_ITEM,
     // end
     GID_EXTENDED_MAX,
 } ExtendedGIDTable;

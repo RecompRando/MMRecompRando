@@ -846,6 +846,8 @@ RECOMP_DECLARE_EVENT(rando_on_start());
 bool rando_met_all_goal();
 
 s16 moonLiveGI = GI_FROG_WHITE;
+#include "models/images.h"
+u64* moonImage = glorp;
 
 RECOMP_CALLBACK("*", recomp_on_play_main)
 void update_rando(PlayState* play) {
@@ -864,6 +866,12 @@ void update_rando(PlayState* play) {
         moonLiveGI = GI_SCARECROW;
     } else if (moon == 2) {
         moonLiveGI = GI_FROG_WHITE;
+    } else if (moon == 3) {
+        moonLiveGI = GI_IMAGE_ITEM;
+        moonImage = glorp;
+    } else if (moon == 4) {
+        moonLiveGI = GI_IMAGE_ITEM;
+        moonImage = majinD;
     }
 
     if (saveOpened) {
