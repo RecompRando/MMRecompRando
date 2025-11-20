@@ -859,6 +859,7 @@ void update_rando(PlayState* play) {
 
     if (!init_py) {
         run_py();
+        init_py = true;
     }
 
     notificationUpdateCycle();
