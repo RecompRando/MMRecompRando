@@ -862,26 +862,40 @@ void update_rando(PlayState* play) {
     REPY_Handle moon_handle = REPY_CallAttrCStrReturn(chat_module, "message", 0, 0);
     s32 moon = REPY_CastS32(moon_handle);
 
-    if (moon == 1) {
-        moonLiveGI = GI_SCARECROW;
-    } else if (moon == 2) {
-        moonLiveGI = GI_FROG_WHITE;
-    } else if (moon == 3) {
-        moonLiveGI = GI_BUTTON_C_DOWN;
-    } else if (moon == 4) {
-        moonLiveGI = GI_BUTTON_C_LEFT;
-    } else if (moon == 5) {
-        moonLiveGI = GI_BUTTON_C_RIGHT;
-    } else if (moon == 6) {
-        moonLiveGI = GI_BUTTON_C_UP;
-    } else if (moon == 7) {
-        moonLiveGI = GI_BUTTON_A;
-    } else if (moon == 8) {
-        moonLiveGI = GI_IMAGE_ITEM;
-        moonImage = glorp;
-    } else if (moon == 9) {
-        moonLiveGI = GI_IMAGE_ITEM;
-        moonImage = majinD;
+    switch (moon) {
+        case 1:
+            moonLiveGI = GI_SCARECROW;
+            break;
+        case 2:
+            moonLiveGI = GI_FROG_WHITE;
+            break;
+        case 3:
+            moonLiveGI = GI_BUTTON_C_DOWN;
+            break;
+        case 4:
+            moonLiveGI = GI_BUTTON_C_LEFT;
+            break;
+        case 5:
+            moonLiveGI = GI_BUTTON_C_RIGHT;
+            break;
+        case 6:
+            moonLiveGI = GI_BUTTON_C_UP;
+            break;
+        case 7:
+            moonLiveGI = GI_BUTTON_A;
+            break;
+        case 8:
+            moonLiveGI = GI_IMAGE_ITEM;
+            moonImage = glorp;
+            break;
+        case 9:
+            moonLiveGI = GI_IMAGE_ITEM;
+            moonImage = majinD;
+            break;
+        case 10:
+            moonLiveGI = GI_IMAGE_ITEM;
+            moonImage = rocketmess;
+            break;
     }
 
     if (saveOpened) {

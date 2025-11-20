@@ -49,4 +49,6 @@ def message():
             return 8
         elif "majinD" in message:
             return 9
+        elif "rocketmess" in message:
+            return 10
     return 0
