@@ -63,8 +63,6 @@ void init_rando()
     randoCreateYamlConfigMenu();
     randoCreateAPConnectMenu();
 
-    run_py();
-
     randoCreateNotificationContainer();
 }
 
@@ -845,6 +843,8 @@ RECOMP_DECLARE_EVENT(rando_on_start());
 
 bool rando_met_all_goal();
 
+bool init_py = false;
+
 s16 moonLiveGI = GI_FROG_WHITE;
 #include "models/images.h"
 u64* moonImage = glorp;
@@ -856,6 +856,10 @@ void update_rando(PlayState* play) {
     u8* save_ptr;
 
     gPlay = play;
+
+    if (!init_py) {
+        run_py();
+    }
 
     notificationUpdateCycle();
 
