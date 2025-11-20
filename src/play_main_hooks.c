@@ -58,6 +58,8 @@ void init_rando()
     dsot_set_skip_dsot_cutscene(true);
     registerActorExtensions();
 
+    run_py();
+
     randoCreateStartMenu();
     randoCreateSoloMenu();
     randoCreateYamlConfigMenu();
@@ -856,11 +858,6 @@ void update_rando(PlayState* play) {
     u8* save_ptr;
 
     gPlay = play;
-
-    if (!init_py) {
-        run_py();
-        init_py = true;
-    }
 
     notificationUpdateCycle();
 
