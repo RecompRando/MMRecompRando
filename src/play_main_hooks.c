@@ -268,7 +268,12 @@ void randoScout() {
     {
         removeAllScoutsWithPrefix(AP_PREFIX_SIGNS);
     }
-    
+
+    if (rando_get_slotdata_u32("completion_goal") == 0)
+    {
+        rando_remove_queued_scout(0x0B012F);
+    }
+
     rando_send_queued_scouts(0);
 }
 
