@@ -63,7 +63,14 @@ void OnEnSnowwd_Idle(EnSnowwd* this, PlayState* play) {
             pos = thisx->world.pos;
             pos.y += 200.0f;
 
-            Item_RandoDropCollectible(play, &pos, SNOWWD_GET_DROP_TABLE(&this->actor) * DROP_TABLE_SIZE, LOCATION_SNOW_TREE);
+            Actor* item = Item_RandoDropCollectible(play, &pos, SNOWWD_GET_DROP_TABLE(&this->actor) * DROP_TABLE_SIZE, LOCATION_SNOW_TREE);
+            
+            // path to snowhead tree
+            if (LOCATION_SNOW_TREE == 0x2B5B03) {
+                // set item to be sent a random angle between -120 degrees and 30 degrees so it doesn't fall
+                item->world.rot.y = DEG_TO_BINANG(Rand_ZeroFloat(150.0f) - 120.0f);
+            }
+
             SNOWWD_DROPPED_COLLECTIBLE(&this->actor) = true;
         }
     }
