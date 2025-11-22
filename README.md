@@ -25,8 +25,14 @@ This randomizer is still under development in the beta phase but is considered s
 1. Launch the game with the randomizer mod enabled.
 2. Select `Solo` in the randomizer menu.
 3. Create a new session and choose which settings you'd like.
-    - Details about these settings are currently not available through the mod only, you will have to look at the [multiworld's example YAML](https://github.com/RecompRando/Archipelago-MM/blob/master/worlds/mm_recomp/EXAMPLE_YAML.yaml) for more information on what each setting does.
+    - Details about these settings are currently not available through the mod only, you will have to look at the [multiworld's example YAML](https://github.com/RecompRando/MMRecompRando/releases/download/v0.9.5/EXAMPLE_YAML.yaml) for more information on what each setting does.
 4. Hit `Generate` and select your seed.
+
+### Multiworld Setup
+1. Launch the game with the randomizer mod enabled.
+2. Select `Multiworld` in the randomizer menu.
+3. Input your Server Address, Player/Slot Name, and optionally a Password.
+4. Hit `Connect`.
 5. Profit.
 
 ### Multiworld Archipelago Setup
@@ -44,11 +50,11 @@ Don't worry, your vanilla saves are intact. When playing this mod, a per-session
 
 ### I got Letter to Kafei and now I can't use the Pendant of Memories! Is it just gone?
 
-Try moving your cursor to the Letter to Kafei and pressing the N64's L button. That should cycle through all quest items in that slot. That's true for the Moon's Tear item slot and the Room Key item slot as well.
+Try moving your cursor to the Letter to Kafei and pressing the N64's L or A button. That should cycle through all quest items in that slot. That's true for the Moon's Tear item slot and the Room Key item slot as well.
 
 ### I opened a chest/got a check and it always shows a grey Archipelago item, what's wrong with you?
 
-The phantom AP item means the check is not yet implemented. Please use a text client or Seto's/G4M3RL1F3's amazing poptracker pack from step 5 to see checks that you can definitely get (though some implemented checks may be missing until the tracker is updated).
+The phantom AP item means either something went wrong with your connection or the check is not yet implemented. Please use a text client or Seto's/G4M3RL1F3's amazing poptracker pack from step 5 to see checks that you can definitely get (though some implemented checks may be missing until the tracker is updated).
 
 If you picked up a phantom on a check that should be implemented, you can open an issue on this repo letting us know!
 
