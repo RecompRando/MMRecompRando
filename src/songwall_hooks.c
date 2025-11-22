@@ -8,8 +8,8 @@
 #include "overlays/actors/ovl_En_Gakufu/z_en_gakufu.h"
 
 // these share a location prefix with wonder items, but they won't collide so we're fine
-#define LOCATION_SONGWALL(index, i) (0x150000 | (index << 4) | i)
-#define LOCATION_SONGWALL_HOUR(hour, i) (0x150000 | (hour << 4) | i)
+#define LOCATION_SONGWALL(index, i) (AP_PREFIX_SONGWALL | (index << 4) | i)
+#define LOCATION_SONGWALL_HOUR(hour, i) (AP_PREFIX_SONGWALL | (hour << 4) | i)
 
 extern Vec3f sRewardDropsSpawnTerminaFieldPos;
 extern u8 sRewardDropsIndex[];

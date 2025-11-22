@@ -195,9 +195,7 @@ void randoScout() {
     if (rando_get_slotdata_u32("rupeesanity") == 0)
     {
         removeAllScoutsWithPrefix(AP_PREFIX_FREESTANDING);
-        for (int j = 0; j <= 0xFF; j++) {
-            rando_remove_queued_scout(0x150000 | j);
-        }
+        removeAllScoutsWithPrefix(AP_PREFIX_SONGWALL);
     }
     
     if (rando_get_slotdata_u32("invisisanity") == 0)
