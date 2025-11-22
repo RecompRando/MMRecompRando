@@ -50,3 +50,16 @@ void AfterEnRuppecrow_SpawnRupee() {
         rupee->actionFunc = Item_RandoCollectibleActionFunc;
     }
 }
+
+// prevent rupee crow dropped items from despawning
+RECOMP_PATCH void EnRuppecrow_UpdateRupees(EnRuppecrow* this) {
+    // EnItem00* rupee;
+    // s16 rupeeIndex;
+
+    // for (rupeeIndex = 0; rupeeIndex < ENRUPPECROW_RUPEE_COUNT; rupeeIndex++) {
+    //     rupee = this->rupees[rupeeIndex];
+    //     if ((rupee != NULL) && (rupee->unk152 == 0)) {
+    //         Actor_Kill(&rupee->actor);
+    //     }
+    // }
+}

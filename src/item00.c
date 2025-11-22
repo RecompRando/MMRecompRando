@@ -778,14 +778,6 @@ RECOMP_PATCH void func_800A6780(EnItem00* this, PlayState* play) {
 
 // @ap custom item00 below
 
-bool Item_RandoCollectibleShouldBlink(EnItem00* this) {
-    item00Location = z64recomp_get_extended_actor_data(&this->actor, item00LocationExtension);
-    if ((*item00Location & 0xFFFF00) == 0x17FF00) { // rupee crow drops
-        return true;
-    }
-    return false;
-}
-
 // could technically be used for heart pieces as well
 void Item_RandoCollectibleDraw(Actor* thisx, PlayState* play) {
     EnItem00* this = THIS;
@@ -793,10 +785,6 @@ void Item_RandoCollectibleDraw(Actor* thisx, PlayState* play) {
     item00Location = z64recomp_get_extended_actor_data(thisx, item00LocationExtension);
     this->getItemId = rando_get_item_id(*item00Location);
     u16 objectId = getObjectId(this->getItemId);
-
-    if (Item_RandoCollectibleShouldBlink(this) && (this->unk14E & this->unk150)) {
-        return;
-    }
 
     Matrix_Scale(20.0f, 20.0f, 20.0f, MTXMODE_APPLY);
     if (isAP(this->getItemId)) {
