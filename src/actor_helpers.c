@@ -131,6 +131,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0B0000 | actor->id);
                 if (!rando_has_item(0x0B0000 | actor->id)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -145,6 +146,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0A0000 | actor->id);
                 if (!rando_has_item(0x0A0000 | actor->id)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -210,6 +212,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0C0000 | actor->id);
                 if (!rando_has_item(0x0C0000 | actor->id)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -223,6 +226,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0C0000 | actor->id);
                 if (!rando_has_item(0x0C0000 | actor->id)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -235,6 +239,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0C0000 | ACTOR_EN_DT);
                 if (!rando_has_item(0x0C0000 | ACTOR_EN_DT)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -245,6 +250,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0C0000 | ACTOR_EN_SSH);
                 if (!rando_has_item(0x0C0000 | ACTOR_EN_SSH)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -255,6 +261,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0C0000 | ACTOR_EN_SYATEKI_MAN);
                 if (!rando_has_item(0x0C0000 | ACTOR_EN_SYATEKI_MAN)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -266,6 +273,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0C0000 | ACTOR_EN_AKINDONUTS);
                 if (!rando_has_item(0x0C0000 | ACTOR_EN_AKINDONUTS)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -279,6 +287,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0C0000 | ACTOR_EN_BOMJIMA);
                 if (!rando_has_item(0x0C0000 | ACTOR_EN_BOMJIMA)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -289,6 +298,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0C0000 | ACTOR_EN_TOTO);
                 if (!rando_has_item(0x0C0000 | ACTOR_EN_TOTO)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -299,6 +309,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0C0000 | ACTOR_EN_AOB_01);
                 if (!rando_has_item(0x0C0000 | ACTOR_EN_AOB_01)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -313,6 +324,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0C0000 | ACTOR_EN_MA_YTS);
                 if (!rando_has_item(0x0C0000 | ACTOR_EN_MA_YTS)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -323,6 +335,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0C0000 | ACTOR_EN_KGY);
                 if (!rando_has_item(0x0C0000 | ACTOR_EN_KGY)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -333,6 +346,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0C0000 | ACTOR_EN_TSN);
                 if (!rando_has_item(0x0C0000 | ACTOR_EN_TSN)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -344,6 +358,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0C0000 | ACTOR_EN_SKB);
                 if (!rando_has_item(0x0C0000 | ACTOR_EN_SKB)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -354,6 +369,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0C0000 | ACTOR_EN_TALK_GIBUD);
                 if (!rando_has_item(0x0C0000 | ACTOR_EN_TALK_GIBUD)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -364,6 +380,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0C0000 | ACTOR_BG_DY_YOSEIZO);
                 if (!rando_has_item(0x0C0000 | ACTOR_BG_DY_YOSEIZO)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -379,6 +396,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0E0000 | actor->id);
                 if (!rando_has_item(0x0E0000 | actor->id)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -391,6 +409,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0E0000 | ACTOR_EN_WOOD2);
                 if (!rando_has_item(0x0E0000 | ACTOR_EN_WOOD02)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -404,6 +423,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0E0000 | ACTOR_EN_WOOD2);
                 if (!rando_has_item(0x0E0000 | ACTOR_OBJ_GRASS)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -417,6 +437,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0E0000 | actor->id);
                 if (!rando_has_item(0x0E0000 | actor->id)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -426,6 +447,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0E0000 | actor->id);
                 if (rando_has_item(0x0E0000 | actor->id)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -437,6 +459,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0E0000 | ACTOR_OBJ_TSUBO);
                 if (!rando_has_item(0x0E0000 | ACTOR_OBJ_TSUBO)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -448,6 +471,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 // *should = rando_has_item(0x0D0000 | actor->id);
                 if (!rando_has_item(0x0D0000 | actor->id)) {
                     *should = false;
+                    actor->destroy = NULL;
                 }
                 return;
             }
@@ -459,6 +483,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
     //     // case ACTOR_EN_KAME:
     //         // recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
     //         *should = false;
+    //                 actor->destroy = NULL;
     //         break;
     // }
     // // recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
