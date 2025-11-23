@@ -4,6 +4,7 @@
 #include "apcommon.h"
 
 #define LOCATION_STONE_SOLDIER GI_MASK_STONE
+#define NOTEBOOK_EVENT_RECEIVED_STONE_MASK 0x35
 
 #define SOLDIER_LIMB_MAX 0x11
 
@@ -81,10 +82,11 @@ typedef enum {
     /* 3 */ EN_STONE_BOTTLE_BLUE_POTION
 } EnStoneHeishiBottle;
 
+// Forward declarations
 s32 Actor_ProcessTalkRequest(Actor* actor, GameState* gameState);
-
 void func_80BC9D28(EnStoneheishi* this, PlayState* play);
 void func_80BC9E50(EnStoneheishi* this, PlayState* play);
+void Message_BombersNotebookQueueEvent(PlayState* play, u8 event);
 
 RECOMP_PATCH void EnStoneheishi_GiveItemReward(EnStoneheishi* this, PlayState* play) {
     Message_CloseTextbox(play);
@@ -107,6 +109,12 @@ RECOMP_PATCH void func_80BC9D28(EnStoneheishi* this, PlayState* play) {
         this->textIdIndex++;
         this->actor.textId = sEnStoneHeishiTextIds[this->textIdIndex];
         SET_WEEKEVENTREG(WEEKEVENTREG_41_40);
+        
+        // @ap Queue notebook event only if the location has been checked (item was received)
+        if (rando_location_is_checked(LOCATION_STONE_SOLDIER)) {
+            Message_BombersNotebookQueueEvent(play, NOTEBOOK_EVENT_RECEIVED_STONE_MASK);
+        }
+        
         Actor_ProcessTalkRequest(&this->actor, &play->state);
         Actor_OfferTalkExchange(&this->actor, play, 400.0f, 400.0f, PLAYER_IA_MINUS1);
         this->actionFunc = func_80BC9E50;

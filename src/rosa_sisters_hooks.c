@@ -1,6 +1,8 @@
 #include "modding.h"
 #include "global.h"
 
+#include "apcommon.h"
+
 // from assets/objects/object_rz/object_rz.h
 typedef enum ObjectRzLimb {
     /* 0x00 */ OBJECT_RZ_LIMB_NONE,
@@ -28,13 +30,15 @@ typedef enum ObjectRzLimb {
     /* 0x16 */ OBJECT_RZ_LIMB_MAX
 } ObjectRzLimb;
 
-
 // from overlays/actors/ovl_En_Rz/z_en_rz.h
 #define EN_RZ_GET_SISTER(thisx) ((thisx)->params & 0x8000)
 #define EN_RZ_GET_TYPE(thisx) ((thisx)->params & 0xF)
 #define EN_RZ_GET_PATH_INDEX(thisx) (((thisx)->params & 0x7E00) >> 9)
 
 #define EN_RZ_PATH_INDEX_NONE 0x3F
+
+#define LOCATION_ROSA_SISTERS_HP 0x7027B
+#define NOTEBOOK_EVENT_RECEIVED_ROSA_SISTERS_HP 0x27
 
 typedef enum {
     /* 0 */ EN_RZ_JUDO, // in red
@@ -74,9 +78,16 @@ typedef struct EnRz {
     /* 0x430 */ EnRzActionFunc actionFunc;
 } EnRz; // size = 0x434
 
-// patches
+// Forward declaration
+void Message_BombersNotebookQueueEvent(PlayState* play, u8 event);
 
+// patches
 RECOMP_PATCH s32 func_80BFBFAC(EnRz* this, PlayState* play) {
+    // @ap Queue notebook event only if the heart piece location has been checked
+    if (rando_location_is_checked(LOCATION_ROSA_SISTERS_HP)) {
+        Message_BombersNotebookQueueEvent(play, NOTEBOOK_EVENT_RECEIVED_ROSA_SISTERS_HP);
+    }
+    
     Message_StartTextbox(play, 0x1000, NULL);
     Message_CloseTextbox(play);
     return true;

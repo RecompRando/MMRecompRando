@@ -13,6 +13,9 @@ typedef void (*EnHsActionFunc)(struct EnHs*, PlayState*);
 
 #define HS_TYPE_UNK1 1
 
+// Notebook event ID for "Received Bunny Hood"
+#define NOTEBOOK_EVENT_RECEIVED_BUNNY_HOOD 0x2E
+
 // params mystery: Vanilla Grog is 0xFE01
 //   0xFE00 space is never checked in Grog code
 //   at the same time, type UNK1 is only checked directly with params == 1, no &F
@@ -35,10 +38,15 @@ typedef struct EnHs {
     /* 0x394 */ EnHsActionFunc actionFunc;
 } EnHs; // size = 0x398
 
+// Forward declarations
 void func_8095345C(EnHs* this, PlayState* play);
+void Message_BombersNotebookQueueEvent(PlayState* play, u8 event);
 
 RECOMP_PATCH void func_80953098(EnHs* this, PlayState* play) {
     if (Actor_HasParent(&this->actor, play)) {
+        // @ap Queue the notebook event when the item is obtained
+        Message_BombersNotebookQueueEvent(play, NOTEBOOK_EVENT_RECEIVED_BUNNY_HOOD);
+        
         this->actor.parent = NULL;
         this->actionFunc = func_8095345C;
         this->actor.flags |= ACTOR_FLAG_10000;
