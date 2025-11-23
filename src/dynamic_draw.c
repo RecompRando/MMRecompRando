@@ -1348,7 +1348,7 @@ void GetItem_DrawScarecrow(PlayState* play, s16 drawId) {
     static u32 lastUpdate = 0;
 
     if (ObjLoad(play, 0x06, OBJECT_KA)) {
-        if (!initialized || (lastUpdate != (play->state.frames - 1))) {
+        if (!initialized || ((lastUpdate != (play->state.frames - 1)) && (lastUpdate != play->state.frames))) {
             initialized = true;
             SkelAnime_InitFlex(play, &skelAnime, &object_ka_Skel_0065B0, &object_ka_Anim_000214, NULL, NULL, 0);
         }
@@ -1408,7 +1408,7 @@ void GetItem_DrawStrayFairy(PlayState* play, s16 drawId) {
     static SkelAnime skelAnime;
     static u32 lastUpdate = 0;
     
-    if (!initialized || (lastUpdate != (play->state.frames - 1))) {
+    if (!initialized || ((lastUpdate != (play->state.frames - 1)) && (lastUpdate != play->state.frames))) {
         initialized = true;
         SkelAnime_InitFlex(play, &skelAnime, &gStrayFairySkel, &gStrayFairyFlyingAnim, NULL, NULL, 0xA);
     }
