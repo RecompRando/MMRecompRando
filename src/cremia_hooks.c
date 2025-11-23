@@ -4,6 +4,8 @@
 #include "apcommon.h"
 
 #define CREMIA_LIMB_MAX 0x16
+// Notebook event ID for "Escorted Cremia"
+#define NOTEBOOK_EVENT_ESCORTED_CREMIA 0x1F
 
 struct EnMaYto;
 
@@ -39,7 +41,6 @@ typedef enum {
     /* 4 */ MA_YTO_TYPE_4  // HugCutscene? Doesn't seem to work properly in-game
 } EnMaYtoType;
 
-// Forward declarations
 void EnMaYto_SetupDefaultWait(EnMaYto *this);
 void EnMaYto_SetupDinnerWait(EnMaYto *this);
 void EnMaYto_SetupBarnWait(EnMaYto *this);
@@ -47,9 +48,6 @@ void EnMaYto_SetupAfterMilkRunInit(EnMaYto *this);
 void EnMaYto_SetupBeginWarmFuzzyFeelingCs(EnMaYto *this);
 void EnMaYto_SetupWarmFuzzyFeelingCs(EnMaYto *this);
 void Message_BombersNotebookQueueEvent(PlayState* play, u8 event);
-
-// Notebook event ID for "Escorted Cremia"
-#define NOTEBOOK_EVENT_ESCORTED_CREMIA 0x1F
 
 // @ap cremia always hugs after escort
 void EnMaYto_PostMilkRunGiveRandoReward(EnMaYto* this, PlayState* play) {
