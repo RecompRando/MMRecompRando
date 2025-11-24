@@ -39,6 +39,9 @@ void registerActorExtensions() {
     bigTreeDropExtension = z64recomp_extend_actor(ACTOR_OBJ_TREE, sizeof(bool));
     signLocationExtension = z64recomp_extend_actor(ACTOR_EN_KANBAN, sizeof(u32));
     signDropExtension = z64recomp_extend_actor(ACTOR_EN_KANBAN, sizeof(bool));
+    webLocationExtension = z64recomp_extend_actor(ACTOR_BG_SPDWEB, sizeof(u32));
+    webTentLocationExtension = z64recomp_extend_actor(ACTOR_OBJ_SPIDERTENT, sizeof(u32));
+    webTentDropExtension = z64recomp_extend_actor(ACTOR_OBJ_SPIDERTENT, sizeof(bool));
 }
 
 s32 randoGetLoadedActorNumInSameRoom(PlayState* play, Actor* actorIn) {

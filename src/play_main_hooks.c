@@ -266,6 +266,11 @@ void randoScout() {
         removeAllScoutsWithPrefix(AP_PREFIX_TREE_TREES);
     }
     
+    if (rando_get_slotdata_u32("websanity") == 0)
+    {
+        removeAllScoutsWithPrefix(AP_PREFIX_WEBS);
+    }
+    
     if (rando_get_slotdata_u32("flowersanity") == 0)
     {
         removeAllScoutsWithPrefix(AP_PREFIX_FLOWERS);

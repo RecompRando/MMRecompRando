@@ -1,0 +1,136 @@
+#include "modding.h"
+#include "global.h"
+#include "recomputils.h"
+#include "z64recomp_api.h"
+
+#include "apcommon.h"
+#include "actor_helpers.h"
+#include "rando_colors.h"
+#include "models/custom_webs.h"
+
+#include "overlays/actors/ovl_Bg_Spdweb/z_bg_spdweb.h"
+#include "overlays/actors/ovl_Obj_Spidertent/z_obj_spidertent.h"
+
+#define LOCATION_WEB (AP_PREFIX_WEBS | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+                            | randoGetLoadedActorNumInSameRoom(play, &this->dyna.actor))
+
+ActorExtensionId webLocationExtension;
+ActorExtensionId webTentLocationExtension;
+ActorExtensionId webTentDropExtension;
+
+RECOMP_HOOK("BgSpdweb_Init")
+void OnBgSpdweb_Init(Actor* thisx, PlayState* play) {
+    BgSpdweb* this = ((BgSpdweb*)thisx);
+    u32* location = z64recomp_get_extended_actor_data(thisx, webLocationExtension);
+    *location = LOCATION_WEB;
+}
+
+RECOMP_HOOK("func_809CE234")
+void BgSpdweb_Drop1(BgSpdweb* this, PlayState* play) {
+    u32* location = z64recomp_get_extended_actor_data(&this->dyna.actor, webLocationExtension);
+    if (this->unk_162 == 1 && rando_get_slotdata_u32("websanity")) {
+        Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, *location);
+        Audio_PlaySfx(NA_SE_SY_TRE_BOX_APPEAR);
+    }
+}
+
+RECOMP_HOOK("func_809CE830")
+void BgSpdweb_Drop2(BgSpdweb* this, PlayState* play) {
+    u32* location = z64recomp_get_extended_actor_data(&this->dyna.actor, webLocationExtension);
+    if (this->unk_162 == 1 && rando_get_slotdata_u32("websanity")) {
+        Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, *location);
+        Audio_PlaySfx(NA_SE_SY_TRE_BOX_APPEAR);
+    }
+}
+
+RECOMP_PATCH void BgSpdweb_Draw(Actor* thisx, PlayState* play) {
+    u32* location = z64recomp_get_extended_actor_data(thisx, webLocationExtension);
+
+    OPEN_DISPS(play->state.gfxCtx);
+
+    gSPDisplayList(POLY_XLU_DISP++, gSetupDLs[SETUPDL_25]);
+    gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+
+    Color_RGB8 color = {255, 255, 255};
+    get_rando_color(&color, *location);
+    gDPSetPrimColor(POLY_XLU_DISP++, 0, 0xFF, color.r, color.g, color.b, 255);
+
+    if (thisx->params == BGSPDWEB_FF_1) {
+        gSPDisplayList(POLY_XLU_DISP++, randoSpiderWeb1);
+    } else {
+        Matrix_Translate(0.0f, (thisx->home.pos.y - thisx->world.pos.y) * 10.0f, 0.0f, MTXMODE_APPLY);
+        Matrix_Scale(1.0f, ((thisx->home.pos.y - thisx->world.pos.y) + 10.0f) * 0.1f, 1.0f, MTXMODE_APPLY);
+
+        gSPDisplayList(POLY_XLU_DISP++, randoSpiderWeb2);
+    }
+
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
+// tent
+RECOMP_HOOK("ObjSpidertent_Init")
+void OnObjSpidertent_Init(Actor* thisx, PlayState* play) {
+    ObjSpidertent* this = ((ObjSpidertent*)thisx);
+    u32* location = z64recomp_get_extended_actor_data(thisx, webTentLocationExtension);
+    *location = LOCATION_WEB;
+    bool* dropped = z64recomp_get_extended_actor_data(thisx, webTentDropExtension);
+    *dropped = false;
+}
+
+// this function does spawn it a bit early (setup burn func)
+RECOMP_HOOK("func_80B30AD4")
+void ObjSpidertent_DropOnSetupBurn(ObjSpidertent* this) {
+    if (!rando_get_slotdata_u32("websanity")) return;
+
+    PlayState* play = gPlay;
+    u32* location = z64recomp_get_extended_actor_data(&this->dyna.actor, webTentLocationExtension);
+
+    Actor* item = Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, *location);
+    item->velocity.y = 0.0f;
+
+    Audio_PlaySfx(NA_SE_SY_TRE_BOX_APPEAR);
+    // unused for now but move this to a better web drop spot
+    bool* dropped = z64recomp_get_extended_actor_data(&this->dyna.actor, webTentDropExtension);
+    *dropped = true;
+}
+
+typedef struct {
+    /* 0x00 */ Gfx* unk_00;
+    /* 0x04 */ CollisionHeader* unk_04;
+    /* 0x08 */ ColliderTrisInit* unk_08;
+    /* 0x0C */ f32 unk_0C;
+    /* 0x10 */ f32 unk_10;
+    /* 0x14 */ f32 unk_14;
+    /* 0x18 */ f32 unk_18;
+    /* 0x1C */ f32 unk_1C;
+    /* 0x20 */ f32 unk_20;
+    /* 0x24 */ f32 unk_24;
+} ObjSpidertentStruct; // size = 0x28
+
+extern ObjSpidertentStruct D_80B31350[];
+
+RECOMP_PATCH void ObjSpidertent_Draw(Actor* thisx, PlayState* play) {
+    ObjSpidertent* this = ((ObjSpidertent*)thisx);
+    s32 params = OBJSPIDERTENT_GET_1(&this->dyna.actor);
+    s32 temp_f18 = this->unk_3C5 * (29.0f / 51);
+    Gfx* gfx;
+
+    u32* location = z64recomp_get_extended_actor_data(thisx, webTentLocationExtension);
+
+    OPEN_DISPS(play->state.gfxCtx);
+
+    gfx = POLY_XLU_DISP;
+
+    gSPDisplayList(gfx++, gSetupDLs[SETUPDL_25]);
+    gSPMatrix(gfx++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+
+    Color_RGB8 color = {this->unk_3C2, this->unk_3C3, this->unk_3C4};
+    get_rando_color(&color, *location);
+    
+    // gDPSetPrimColor(gfx++, 0, 0xFF, this->unk_3C2, this->unk_3C3, this->unk_3C4, temp_f18);
+    gDPSetPrimColor(gfx++, 0, 0xFF, color.r, color.g, color.b, temp_f18);
+    gSPDisplayList(gfx++, D_80B31350[params].unk_00);
+
+    POLY_XLU_DISP = gfx;
+    CLOSE_DISPS(play->state.gfxCtx);
+}
