@@ -87,7 +87,16 @@ void EnKakasi_IdleRisenCheckForOcarina(EnKakasi* this, PlayState* play) {
 
 RECOMP_PATCH void EnKakasi_SetupRiseOutOfGround(EnKakasi* this, PlayState* play) {
     // force other mods to conform to my vision of scarecrowsanity
-    if (rando_get_slotdata_u32("scarecrowsanity")) return;
+    if (rando_get_slotdata_u32("scarecrowsanity")) {
+        if (!rando_location_is_checked(LOCATION_SCARECROW)) {
+            recomp_printf("scarecrow location: 0x%06X\n", LOCATION_SCARECROW);
+            savedEnKakasiActionFunc = EnKakasi_IdleUnderground;
+            this->actionFunc = EnKakasi_GiveRandoItem;
+        } else {
+            this->actionFunc = EnKakasi_IdleUnderground;
+        }
+        return;
+    }
 
     s32 csIdIndex;
 
