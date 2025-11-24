@@ -159,6 +159,12 @@ void randoScout() {
     if (rando_get_slotdata_u32("intro_checks") == 0)
     {
         rando_remove_queued_scout(0x061A00);
+        // ignore intro grass
+        for (int j = 0; j <= 0xFF; j++) {
+            rando_remove_queued_scout(AP_PREFIX_GRASS_KEATON | (SCENE_OPENINGDAN << 8) | j);
+            rando_remove_queued_scout(AP_PREFIX_GRASS_KEATON | (SCENE_LOST_WOODS << 8) | j);
+            rando_remove_queued_scout(AP_PREFIX_MURE_GRASS | (SCENE_LOST_WOODS << 8) | j);
+        }
     }
     
     if (rando_get_slotdata_u32("grasssanity") == 0)
