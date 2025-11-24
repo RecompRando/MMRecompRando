@@ -84,3 +84,28 @@ void EnKakasi_IdleRisenCheckForOcarina(EnKakasi* this, PlayState* play) {
         this->actionFunc = EnKakasi_GiveRandoItem;
     }
 }
+
+RECOMP_PATCH void EnKakasi_SetupRiseOutOfGround(EnKakasi* this, PlayState* play) {
+    // force other mods to conform to my vision of scarecrowsanity
+    if (rando_get_slotdata_u32("scarecrowsanity")) return;
+
+    s32 csIdIndex;
+
+    csIdIndex = 0;
+    if (this->aboveGroundStatus == ENKAKASI_ABOVE_GROUND_TYPE) {
+        csIdIndex = 1;
+    }
+
+    if (CutsceneManager_GetCurrentCsId() == CS_ID_GLOBAL_TALK) {
+        CutsceneManager_Stop(CS_ID_GLOBAL_TALK);
+        CutsceneManager_Queue(this->csIdList[csIdIndex]);
+    } else if (!CutsceneManager_IsNext(this->csIdList[csIdIndex])) {
+        CutsceneManager_Queue(this->csIdList[csIdIndex]);
+    } else {
+        CutsceneManager_StartWithPlayerCs(this->csIdList[csIdIndex], &this->picto.actor);
+        Actor_PlaySfx(&this->picto.actor, NA_SE_EN_AKINDONUTS_HIDE);
+        this->picto.actor.draw = EnKakasi_Draw;
+        this->unkState196 = 6;
+        this->actionFunc = EnKakasi_RisingOutOfGround;
+    }
+}
