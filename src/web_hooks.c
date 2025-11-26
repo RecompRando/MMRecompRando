@@ -32,7 +32,7 @@ void OnBgSpdweb_Init(Actor* thisx, PlayState* play) {
 RECOMP_HOOK("func_809CE234")
 void BgSpdweb_Drop1(BgSpdweb* this, PlayState* play) {
     u32* location = z64recomp_get_extended_actor_data(&this->dyna.actor, webLocationExtension);
-    if (this->unk_162 == 1 && rando_get_slotdata_u32("websanity")) {
+    if (this->unk_162 == 1 && rando_get_slotdata_u32("websanity") && !rando_location_is_checked(*location)) {
         Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, *location);
         Audio_PlaySfx(NA_SE_SY_TRE_BOX_APPEAR);
     }
@@ -41,7 +41,7 @@ void BgSpdweb_Drop1(BgSpdweb* this, PlayState* play) {
 RECOMP_HOOK("func_809CE830")
 void BgSpdweb_Drop2(BgSpdweb* this, PlayState* play) {
     u32* location = z64recomp_get_extended_actor_data(&this->dyna.actor, webLocationExtension);
-    if (this->unk_162 == 1 && rando_get_slotdata_u32("websanity")) {
+    if (this->unk_162 == 1 && rando_get_slotdata_u32("websanity") && !rando_location_is_checked(*location)) {
         Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, *location);
         Audio_PlaySfx(NA_SE_SY_TRE_BOX_APPEAR);
     }
@@ -85,16 +85,16 @@ void OnObjSpidertent_Init(Actor* thisx, PlayState* play) {
 // this function does spawn it a bit early (setup burn func)
 RECOMP_HOOK("func_80B30AD4")
 void ObjSpidertent_DropOnSetupBurn(ObjSpidertent* this) {
-    if (!rando_get_slotdata_u32("websanity")) return;
-
     PlayState* play = gPlay;
     u32* location = z64recomp_get_extended_actor_data(&this->dyna.actor, webTentLocationExtension);
+
+    if (!rando_get_slotdata_u32("websanity") || rando_location_is_checked(*location)) return;
 
     Actor* item = Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, *location);
     item->velocity.y = 0.0f;
 
     // Set default angle from config
-    item->world.rot.y = DEG_TO_BINANG(recomp_get_config_double("item_angle"));
+    // item->world.rot.y = DEG_TO_BINANG(recomp_get_config_double("item_angle"));
 
     // Override angle/position for specific problematic locations
     switch (*location) {
@@ -144,8 +144,7 @@ void ObjSpidertent_DropOnSetupBurn(ObjSpidertent* this) {
             break;
             
         case 0x2E2951: // Boat Room Ceiling Web
-            item->world.rot.y = DEG_TO_BINANG(-120.0f);
-            // This webs position is a bit weird as it drops the item above. It works but its unique. 
+            item->world.pos.y -= 40.0f; // Start lower out of ceiling
             break;
 
         // Ocean Spider House - Coloured Mask Room (Room 3)
@@ -158,7 +157,7 @@ void ObjSpidertent_DropOnSetupBurn(ObjSpidertent* this) {
             break;
 
         default:
-            // Keep the config angle (already set above)
+            // Keep the full random range of angles (or debug config angle) and original position
             break;
     }
 
