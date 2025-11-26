@@ -105,7 +105,7 @@ void Sram_SetInitialWeekEvents(void) {
     SET_WEEKEVENTREG(WEEKEVENTREG_14_02);
 
     // skip having to rewatch the great bay turtle cutscene
-    if(spawnedTurtle) {
+    if(spawnedTurtle && !rando_get_slotdata_u32("treesanity")) {
         SET_WEEKEVENTREG(WEEKEVENTREG_53_20);
     }
 
