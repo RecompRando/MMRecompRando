@@ -331,7 +331,7 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         case 0x3545:
             msg = slow_dog_msg;
             break;
-        case 0x3550:
+        case 0x2778:
             msg = moon_weak_msg;
             break;
         case 0x3C:

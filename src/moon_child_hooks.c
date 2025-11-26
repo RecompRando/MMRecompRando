@@ -43,7 +43,7 @@ RECOMP_PATCH void func_8096A38C(EnJs* this, PlayState* play) {
                             case 0:
                                 // @rando send player back to first day if they don't meet the victory condition
                                 if (!rando_met_majora_condition()) {
-                                    Message_ContinueTextbox(play, 0x3550);
+                                    Message_ContinueTextbox(play, 0x2778);
                                     Animation_MorphToPlayOnce(&this->skelAnime, &gMoonChildGettingUpAnim, -5.0f);
                                     this->unk_2B8 |= 0x10;
                                     break;
@@ -83,7 +83,7 @@ RECOMP_PATCH void func_8096A38C(EnJs* this, PlayState* play) {
                             case 0:
                                 // @rando send player back to first day if they don't meet the victory condition
                                 if (rando_location_is_checked(GI_MASK_FIERCE_DEITY) && !rando_met_majora_condition()) {
-                                    Message_ContinueTextbox(play, 0x3550);
+                                    Message_ContinueTextbox(play, 0x2778);
                                     Animation_MorphToPlayOnce(&this->skelAnime, &gMoonChildGettingUpAnim, -5.0f);
                                     this->unk_2B8 |= 0x10;
                                     break;
@@ -103,7 +103,7 @@ RECOMP_PATCH void func_8096A38C(EnJs* this, PlayState* play) {
                         break;
 
                     // @rando send player back to first day if they don't meet the victory condition
-                    case 0x3550:
+                    case 0x2778:
                         switch (play->msgCtx.choiceIndex) {
                             case 0:
                                 Message_CloseTextbox(play);
@@ -187,7 +187,7 @@ void EnJs_PreventFightAfterFDOffer(EnJs* this, PlayState* play) {
     if (Actor_ProcessTalkRequest(&this->actor, &play->state)) {
         this->actor.flags &= ~ACTOR_FLAG_10000;
         this->actionFunc = func_8096A38C;
-        Message_StartTextbox(play, 0x3550, &this->actor);
+        Message_StartTextbox(play, 0x2778, &this->actor);
     } else {
         Actor_OfferTalkExchange(&this->actor, play, 1000.0f, 1000.0f, PLAYER_IA_MINUS1);
     }
