@@ -12,7 +12,9 @@
 #include "overlays/actors/ovl_Obj_Spidertent/z_obj_spidertent.h"
 
 #define LOCATION_WEB (AP_PREFIX_WEBS | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
-                            | randoGetLoadedActorNumInSameRoom(play, &this->dyna.actor))
+                            | randoGetLoadedActorNumInSameRoomExtra(play, &this->dyna.actor, ACTOR_OBJ_SPIDERTENT))
+#define LOCATION_WEB_TENT (AP_PREFIX_WEBS | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+                            | randoGetLoadedActorNumInSameRoomExtra(play, &this->dyna.actor, ACTOR_BG_SPDWEB))
 
 ActorExtensionId webLocationExtension;
 ActorExtensionId webTentLocationExtension;
@@ -75,6 +77,7 @@ void OnObjSpidertent_Init(Actor* thisx, PlayState* play) {
     *location = LOCATION_WEB;
     bool* dropped = z64recomp_get_extended_actor_data(thisx, webTentDropExtension);
     *dropped = false;
+    // Flags_UnsetSwitch(play, OBJSPIDERTENT_GET_SWITCH_FLAG(&this->dyna.actor));
 }
 
 // this function does spawn it a bit early (setup burn func)
@@ -87,6 +90,21 @@ void ObjSpidertent_DropOnSetupBurn(ObjSpidertent* this) {
 
     Actor* item = Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, *location);
     item->velocity.y = 0.0f;
+
+    // recomp_printf("dropped item 0x%06X\n", *location);
+    // recomp_printf("item rot %f\n", BINANG_TO_DEG(item->world.rot.y));
+
+    // prevent item from falling in impossible location
+    switch (*location) {
+        case 0x2E2813: // door on upper osh
+            // set item to be sent a random angle between 0 degrees and 180 degrees
+            item->world.rot.y = DEG_TO_BINANG(Rand_ZeroFloat(180.0f));
+            break;
+        case 0x2E2814:
+            // set item to be sent at 0 degrees
+            item->world.rot.y = DEG_TO_BINANG(0.0f);
+            break;
+    }
 
     Audio_PlaySfx(NA_SE_SY_TRE_BOX_APPEAR);
     // unused for now but move this to a better web drop spot
