@@ -3,6 +3,18 @@
 
 #include "apcommon.h"
 
+/**
+ * Define the missing gBombersNotebookWeekEventFlags array.
+ * This maps each Bomber's Notebook event to its corresponding completion flag.
+ */
+#define DEFINE_EVENT(_enum, _icon, _colorFlag, _description, _completedMessage, completedFlag) completedFlag,
+
+u16 gBombersNotebookWeekEventFlags[] = {
+#include "tables/bombers_notebook/event_table.h"
+};
+
+#undef DEFINE_EVENT
+
 struct EnBomBowlMan;
 
 typedef void (*EnBomBowlManActionFunc)(struct EnBomBowlMan*, PlayState*);

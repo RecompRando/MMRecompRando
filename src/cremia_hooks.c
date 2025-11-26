@@ -4,8 +4,6 @@
 #include "apcommon.h"
 
 #define CREMIA_LIMB_MAX 0x16
-// Notebook event ID for "Escorted Cremia"
-#define NOTEBOOK_EVENT_ESCORTED_CREMIA 0x1F
 
 struct EnMaYto;
 
@@ -41,20 +39,18 @@ typedef enum {
     /* 4 */ MA_YTO_TYPE_4  // HugCutscene? Doesn't seem to work properly in-game
 } EnMaYtoType;
 
+
 void EnMaYto_SetupDefaultWait(EnMaYto *this);
 void EnMaYto_SetupDinnerWait(EnMaYto *this);
 void EnMaYto_SetupBarnWait(EnMaYto *this);
 void EnMaYto_SetupAfterMilkRunInit(EnMaYto *this);
 void EnMaYto_SetupBeginWarmFuzzyFeelingCs(EnMaYto *this);
 void EnMaYto_SetupWarmFuzzyFeelingCs(EnMaYto *this);
-void Message_BombersNotebookQueueEvent(PlayState* play, u8 event);
 
 // @ap cremia always hugs after escort
 void EnMaYto_PostMilkRunGiveRandoReward(EnMaYto* this, PlayState* play) {
     if (Actor_HasParent(&this->actor, play)) {
-        // @ap Queue the notebook event when the item is obtained
-        Message_BombersNotebookQueueEvent(play, NOTEBOOK_EVENT_ESCORTED_CREMIA);
-        EnMaYto_SetupBeginWarmFuzzyFeelingCs(this);
+		EnMaYto_SetupBeginWarmFuzzyFeelingCs(this);
     } else {
         Actor_OfferGetItem(&this->actor, play, GI_MASK_ROMANI, 500.0f, 100.0f);
         this->unk310 = 1;
@@ -78,6 +74,13 @@ RECOMP_PATCH void EnMaYto_ChooseAction(EnMaYto* this, PlayState* play) {
 
         case MA_YTO_TYPE_AFTERMILKRUN:
             this->unk310 = 0;
+            // if ((INV_CONTENT(ITEM_MASK_ROMANI) == ITEM_MASK_ROMANI) &&
+            //     CHECK_WEEKEVENTREG(WEEKEVENTREG_ESCORTED_CREMIA) && (Rand_Next() & 0x80)) {
+            //     EnMaYto_SetupBeginWarmFuzzyFeelingCs(this);
+            // } else {
+            //     EnMaYto_SetupAfterMilkRunInit(this);
+            // }
+            // EnMaYto_PostMilkRunGiveRandoReward(this, play);
             this->actionFunc = EnMaYto_PostMilkRunGiveRandoReward;
             break;
 

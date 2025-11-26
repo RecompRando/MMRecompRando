@@ -9,9 +9,6 @@
 
 #define THIS ((EnYb*)thisx)
 
-// Notebook event ID for "Received Kamaro's Mask"
-#define NOTEBOOK_EVENT_RECEIVED_KAMAROS_MASK 0x34
-
 struct EnYb;
 
 typedef void (*EnYbActionFunc)(struct EnYb*, PlayState*);
@@ -34,10 +31,10 @@ typedef struct EnYb {
     /* 0x420 */ EnYbActionFunc actionFunc;
 } EnYb; // size = 0x424
 
-// Forward declarations
 void EnYb_Idle(EnYb* this, PlayState* play);
 void EnYb_TeachingDanceFinish(EnYb* this, PlayState* play);
 void EnYb_SetupLeaving(EnYb* this, PlayState* play);
+
 void EnYb_UpdateAnimation(EnYb* this, PlayState* play);
 void EnYb_FinishTeachingCutscene(EnYb* this);
 void EnYb_Disappear(EnYb* this, PlayState* play);
@@ -45,12 +42,13 @@ void EnYb_ReceiveMask(EnYb* this, PlayState* play);
 void EnYb_Talk(EnYb* this, PlayState* play);
 void EnYb_TeachingDance(EnYb* this, PlayState* play);
 void EnYb_WaitForMidnight(EnYb* this, PlayState* play);
+
 void EnYb_ActorShadowFunc(Actor* thisx, Lights* mapper, PlayState* play);
 void EnYb_ChangeAnim(PlayState* play, EnYb* this, s16 animIndex, u8 animMode, f32 morphFrames);
 s32 EnYb_CanTalk(EnYb* this, PlayState* play);
+
 void func_80BFA2FC(PlayState* play);
 void EnYb_EnableProximityMusic(EnYb* this);
-void Message_BombersNotebookQueueEvent(PlayState* play, u8 event);
 
 RECOMP_PATCH void EnYb_Talk(EnYb* this, PlayState* play) {
     Math_SmoothStepToS(&this->actor.shape.rot.y, this->actor.yawTowardsPlayer, 2, 0x1000, 0x200);
@@ -66,15 +64,18 @@ RECOMP_PATCH void EnYb_Talk(EnYb* this, PlayState* play) {
                 break;
 
             case 0x147C: // Spread my dance across the world
-                if (rando_location_is_checked(0x000089)) {
+                /*if (Player_GetMask(play) == PLAYER_MASK_KAMARO) {
+                    Message_CloseTextbox(play);
+                    this->actionFunc = EnYb_Idle;
+
+                } else if (INV_CONTENT(ITEM_MASK_KAMARO) == ITEM_MASK_KAMARO) {
+                } else */if (rando_location_is_checked(0x000089)) {
                     Message_ContinueTextbox(play, 0x147D); // I am counting on you
                     func_80BFA2FC(play);
 
                 } else {
                     Message_CloseTextbox(play);
                     this->actionFunc = EnYb_ReceiveMask;
-                    // @ap Queue the notebook event when about to receive the mask
-                    Message_BombersNotebookQueueEvent(play, NOTEBOOK_EVENT_RECEIVED_KAMAROS_MASK);
                     EnYb_ReceiveMask(this, play);
                 }
                 break;
