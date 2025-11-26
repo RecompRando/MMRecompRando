@@ -93,28 +93,80 @@ void ObjSpidertent_DropOnSetupBurn(ObjSpidertent* this) {
     Actor* item = Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, *location);
     item->velocity.y = 0.0f;
 
-    // item->world.rot.y = DEG_TO_BINANG(recomp_get_config_double("item_angle"));
-    // recomp_printf("dropped item 0x%06X\n", *location);
-    // recomp_printf("item rot %f\n", BINANG_TO_DEG(item->world.rot.y));
+    // Set default angle from config
+    item->world.rot.y = DEG_TO_BINANG(recomp_get_config_double("item_angle"));
 
-    // prevent item from falling in impossible location
+    // Override angle/position for specific problematic locations
     switch (*location) {
-        case 0x2E2813: // door on upper osh
-            // set item to be sent a random angle between 0 degrees and 180 degrees
-            item->world.rot.y = DEG_TO_BINANG(Rand_ZeroFloat(180.0f));
+        // Ocean Spider House - Main Room (Room 1)
+        case 0x2E2910: // Web Above Door 1st Floor Door
+            item->world.rot.y = DEG_TO_BINANG(-170.0f);
             break;
-        case 0x2E2814:
-            // set item to be sent at 0 degrees
-            item->world.rot.y = DEG_TO_BINANG(0.0f);
+            
+        case 0x2E2911: // Web 1st Floor Near Staircase
+            item->world.rot.y = DEG_TO_BINANG(Rand_ZeroFloat(60.0f) + 60.0f); // 60-120 degree range (safe zone)
+            item->velocity.y = 6.0f; // Pop up
+            break;
+            
+        case 0x2E2912: // Web Basement Covering Door
+            item->world.pos.y += 30.0f; // Start higher up out of door frame
+            item->world.rot.y = DEG_TO_BINANG(Rand_ZeroFloat(60.0f) + 60.0f); // 60-120 degree range (safe zone)
+            item->velocity.y = 6.0f; // Pop up
+            break;
+            
+        case 0x2E2913: // Library Web (tested - use safe angle)
+            item->world.pos.y += 30.0f; // Start higher up out of door frame
+            item->world.rot.y = DEG_TO_BINANG(Rand_ZeroFloat(60.0f) + 60.0f); // 60-120 degree range (safe zone)
+            item->velocity.y = 6.0f; // Pop up
+            break;
+
+        case 0x2E2914: // Web Basement Covering Hole
+            item->world.pos.y += 40.0f; // Start higher up out of hole
+            item->world.rot.y = DEG_TO_BINANG(Rand_ZeroFloat(60.0f) + 60.0f); // 60-120 degree range (safe zone)
+            item->velocity.y = 6.0f; // Pop up
+            break;
+            
+        case 0x2E2915: // Web Over 1st Floor Pot
+            item->world.rot.y = DEG_TO_BINANG(-170.0f);
+            break;
+            
+        case 0x2E2916: // Web Basement Covering Crates
+            item->world.rot.y = DEG_TO_BINANG(90.0f);
+            break;
+            
+        case 0x2E2917: // Web Basement Near Staircase
+            item->world.rot.y = DEG_TO_BINANG(-170.0f);
+            break;
+
+        // Ocean Spider House - Boat Room
+        case 0x2E2950: // Boat Room Covering Crate
+            item->world.rot.y = DEG_TO_BINANG(90.0f);
+            break;
+            
+        case 0x2E2951: // Boat Room Ceiling Web
+            item->world.rot.y = DEG_TO_BINANG(-120.0f);
+            // This webs position is a bit weird as it drops the item above. It works but its unique. 
+            break;
+
+        // Ocean Spider House - Coloured Mask Room (Room 3)
+        case 0x2E2830: // Coloured Mask Ceiling Web (1)
+            item->world.rot.y = DEG_TO_BINANG(90.0f);
+            break;
+            
+        case 0x2E2930: // Coloured Mask Ceiling Web (2)
+            item->world.rot.y = DEG_TO_BINANG(90.0f);
+            break;
+
+        default:
+            // Keep the config angle (already set above)
             break;
     }
 
     Audio_PlaySfx(NA_SE_SY_TRE_BOX_APPEAR);
-    // unused for now but move this to a better web drop spot
+    
     bool* dropped = z64recomp_get_extended_actor_data(&this->dyna.actor, webTentDropExtension);
     *dropped = true;
 }
-
 typedef struct {
     /* 0x00 */ Gfx* unk_00;
     /* 0x04 */ CollisionHeader* unk_04;
