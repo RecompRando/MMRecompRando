@@ -27,6 +27,16 @@ u32* potFlyingLocation;
 ActorExtensionId potFlowerLocationExtension;
 u32* potFlowerLocation;
 
+bool ObjTsubo_IsZoraPotGame(Actor* actor, PlayState* play) {
+    // ignore if not in zora cape
+    if (play->sceneId != SCENE_31MISAKI) return false;
+
+    // rough positioning check
+    if (actor->world.pos.x > 2000.0f || actor->world.pos.x < 0.0f) return false;
+
+    return true;
+}
+
 // Normal Pots (including green pots)
 RECOMP_HOOK("ObjTsubo_Init")
 void OnObjTsubo_Init(Actor* thisx, PlayState* play) {
@@ -52,6 +62,33 @@ void OnObjTsubo_Init(Actor* thisx, PlayState* play) {
             *potLocation = (0x010000 | (play->sceneId << 8) | OBJ_TSUBO_PFE00(thisx));
             break;
     }
+
+    // because new pot actors are spawned in for this game, it messes with our existing systems
+    // these pots have to be locationally encoded (as seen below)
+    // but new pots will show as being unchecked/dupe drops
+    if (ObjTsubo_IsZoraPotGame(thisx, play)) {
+        u8 potNum = 0;
+        // using world x position to identify each pot
+        switch ((s32)thisx->world.pos.x) {
+            case 1232:
+                potNum = 1;
+                break;
+            case 1376:
+                potNum = 2;
+                break;
+            case 1347:
+                potNum = 3;
+                break;
+            case 1469:
+                potNum = 4;
+                break;
+            case 1391:
+                potNum = 5;
+                break;
+        }
+        // we pretend these pots are in room 1
+        *potLocation = (AP_PREFIX_POTS | (play->sceneId << 8) | 0x10 | potNum);
+    }
 }
 
 RECOMP_PATCH void func_8092762C(ObjTsubo* this, PlayState* play) {
@@ -76,7 +113,13 @@ RECOMP_PATCH void func_80927690(ObjTsubo* this, PlayState* play) {
         itemDrop = func_800A8150(OBJ_TSUBO_P003F(&this->actor));
         // recomp_printf("pot location 0x%06X\n", *potLocation);
         // recomp_printf("drop 0x%02X 0x%02X\n", OBJ_TSUBO_PFE00(&this->actor), itemDrop);
-        Item_RandoDropCollectible(play, &this->actor.world.pos, (OBJ_TSUBO_PFE00(&this->actor) << 8) | itemDrop, *potLocation);
+        Actor* item = Item_RandoDropCollectible(play, &this->actor.world.pos, (OBJ_TSUBO_PFE00(&this->actor) << 8) | itemDrop, *potLocation);
+
+        if (ObjTsubo_IsZoraPotGame(&this->actor, play)) {
+            // make these items fly higher so they don't get stuck in the respawning pots
+            item->velocity.y = 10.0f;
+        }
+
         this->unk_197 = true;
         *potDropped = true;
     }
