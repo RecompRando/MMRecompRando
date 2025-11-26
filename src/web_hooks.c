@@ -76,10 +76,10 @@ RECOMP_HOOK("ObjSpidertent_Init")
 void OnObjSpidertent_Init(Actor* thisx, PlayState* play) {
     ObjSpidertent* this = ((ObjSpidertent*)thisx);
     u32* location = z64recomp_get_extended_actor_data(thisx, webTentLocationExtension);
-    *location = LOCATION_WEB;
+    *location = LOCATION_WEB_TENT;
     bool* dropped = z64recomp_get_extended_actor_data(thisx, webTentDropExtension);
     *dropped = false;
-    Flags_UnsetSwitch(play, OBJSPIDERTENT_GET_SWITCH_FLAG(&this->dyna.actor));
+    // Flags_UnsetSwitch(play, OBJSPIDERTENT_GET_SWITCH_FLAG(&this->dyna.actor));
 }
 
 // this function does spawn it a bit early (setup burn func)
@@ -93,21 +93,21 @@ void ObjSpidertent_DropOnSetupBurn(ObjSpidertent* this) {
     Actor* item = Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, *location);
     item->velocity.y = 0.0f;
 
-    item->world.rot.y = DEG_TO_BINANG(recomp_get_config_double("item_angle"));
+    // item->world.rot.y = DEG_TO_BINANG(recomp_get_config_double("item_angle"));
     // recomp_printf("dropped item 0x%06X\n", *location);
     // recomp_printf("item rot %f\n", BINANG_TO_DEG(item->world.rot.y));
 
     // prevent item from falling in impossible location
-    // switch (*location) {
-    //     case 0x2E2813: // door on upper osh
-    //         // set item to be sent a random angle between 0 degrees and 180 degrees
-    //         item->world.rot.y = DEG_TO_BINANG(Rand_ZeroFloat(180.0f));
-    //         break;
-    //     case 0x2E2814:
-    //         // set item to be sent at 0 degrees
-    //         item->world.rot.y = DEG_TO_BINANG(0.0f);
-    //         break;
-    // }
+    switch (*location) {
+        case 0x2E2813: // door on upper osh
+            // set item to be sent a random angle between 0 degrees and 180 degrees
+            item->world.rot.y = DEG_TO_BINANG(Rand_ZeroFloat(180.0f));
+            break;
+        case 0x2E2814:
+            // set item to be sent at 0 degrees
+            item->world.rot.y = DEG_TO_BINANG(0.0f);
+            break;
+    }
 
     Audio_PlaySfx(NA_SE_SY_TRE_BOX_APPEAR);
     // unused for now but move this to a better web drop spot
