@@ -46,6 +46,7 @@ void EnScRuppe_RandoIdle(EnScRuppe* this, PlayState* play) {
         Actor_PlaySfx(&this->actor, NA_SE_SY_GET_RUPY);
         // Rupees_ChangeBy(sRupeeInfo[this->ruppeIndex].amount);
         Message_StartTextbox(play, getTextId(rando_get_item_id(LOCATION_SCOPECROW_RUPEE)), NULL);
+        rando_send_location(LOCATION_SCOPECROW_RUPEE);
         recomp_printf("scopecrow location: 0x%06X\n", LOCATION_SCOPECROW_RUPEE);
         this->actionFunc = func_80BD6B18;
     }
