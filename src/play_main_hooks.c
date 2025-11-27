@@ -478,6 +478,21 @@ s8 giToItemId[GI_MAX] = {
     0x31
 };
 
+// @rando don't make time go faster when you don't have ocarina
+// I couldn't think of a better place to put this lol
+u8 oldOcarinaSlotItem;
+
+RECOMP_HOOK("Scene_CommandTimeSettings")
+void FixOcarinalessTimeSpeed(PlayState* play, SceneCmd* cmd) {
+    oldOcarinaSlotItem = gSaveContext.save.saveInfo.inventory.items[SLOT_OCARINA];
+    gSaveContext.save.saveInfo.inventory.items[SLOT_OCARINA] = ITEM_OCARINA_OF_TIME;
+}
+
+RECOMP_HOOK_RETURN("Scene_CommandTimeSettings")
+void ResetOcarinalessTimeSpeed() {
+    gSaveContext.save.saveInfo.inventory.items[SLOT_OCARINA] = oldOcarinaSlotItem;
+}
+
 void Play_KillPlayer() {
     gSaveContext.save.saveInfo.playerData.health = 0;
 }
