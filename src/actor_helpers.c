@@ -11,6 +11,7 @@ void registerActorExtensions() {
     mureIndexExtension = z64recomp_extend_actor(ACTOR_OBJ_MURE, sizeof(u32));
     mure2IndexExtension = z64recomp_extend_actor(ACTOR_OBJ_MURE2, sizeof(u32));
     kusaGrassLocationExtension = z64recomp_extend_actor(ACTOR_EN_KUSA, sizeof(u32));
+    kusaGrassDropExtension = z64recomp_extend_actor(ACTOR_EN_KUSA, sizeof(bool));
     keatonGrassLocationExtension = z64recomp_extend_actor(ACTOR_EN_KUSA2, sizeof(u32));
     potLocationExtension = z64recomp_extend_actor(ACTOR_OBJ_TSUBO, sizeof(u32));
     potDroppedExtension = z64recomp_extend_actor(ACTOR_OBJ_TSUBO, sizeof(bool));

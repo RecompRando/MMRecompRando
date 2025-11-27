@@ -132,6 +132,7 @@ void EnKusa_DrawGrassRando(Actor* thisx, PlayState* play) {
     EnKusa* this = ((EnKusa*)thisx);
 
     u32* kusaLocation = z64recomp_get_extended_actor_data(thisx, kusaGrassLocationExtension);
+    bool* kusaDropped = z64recomp_get_extended_actor_data(&this->actor, kusaGrassDropExtension);
 
     if (this->isCut) {
         Gfx_DrawDListOpa(play, gKusaStumpDL);
@@ -148,7 +149,11 @@ void EnKusa_DrawGrassRando(Actor* thisx, PlayState* play) {
         Gfx_SetupDL25_Opa(play->state.gfxCtx);
         gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
         
-        POLY_OPA_DISP = GenericGrass_DrawRandoColored(play, gKusaSproutDL, POLY_OPA_DISP, 255, *kusaLocation);
+        if (!(*kusaDropped)) {
+            POLY_OPA_DISP = GenericGrass_DrawRandoColored(play, gKusaSproutDL, POLY_OPA_DISP, 255, *kusaLocation);
+        } else {
+            gSPDisplayList(POLY_OPA_DISP++, gKusaSproutDL);
+        }
 
         CLOSE_DISPS(play->state.gfxCtx);
     }

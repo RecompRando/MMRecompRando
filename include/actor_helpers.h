@@ -4,6 +4,7 @@ extern ActorExtensionId item00LocationExtension;
 extern ActorExtensionId mureIndexExtension;
 extern ActorExtensionId mure2IndexExtension;
 extern ActorExtensionId kusaGrassLocationExtension;
+extern ActorExtensionId kusaGrassDropExtension;
 extern ActorExtensionId keatonGrassLocationExtension;
 extern ActorExtensionId potLocationExtension;
 extern ActorExtensionId potDroppedExtension;
