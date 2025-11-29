@@ -8,6 +8,9 @@ This randomizer is still under development in the beta phase but is considered s
 
 ## Setup
 
+> [!IMPORTANT]
+> To install mods (including MMRecompRando), drag and drop the downloaded mod zip onto the Zelda64Recomp window before you press "Start Game" and the game will handle extracting and installing the mods for you.
+
 ### Mod Installation
 1. Download the latest [Visual Studio C++ Redist](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-microsoft-visual-c-redistributable-version).
 2. Download [Zelda64Recomp](https://github.com/Zelda64Recomp/Zelda64Recomp/releases/latest).
