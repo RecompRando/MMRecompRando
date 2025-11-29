@@ -281,6 +281,11 @@ void randoScout() {
         removeAllScoutsWithPrefix(AP_PREFIX_SIGNS);
     }
 
+    if (rando_get_slotdata_u32("oneoffs") == 0)
+    {
+    removeAllScoutsWithPrefix(AP_PREFIX_ONEOFFS);
+    }
+
     if (rando_get_slotdata_u32("completion_goal") == 0)
     {
         rando_remove_queued_scout(0x0B012F);
