@@ -9,9 +9,9 @@
 #include "overlays/actors/ovl_Obj_Snowball/z_obj_snowball.h"
 #include "overlays/actors/ovl_Obj_Snowball2/z_obj_snowball2.h"
 
-#define LOCATION_SNOWBALL (0x210000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+#define LOCATION_SNOWBALL (AP_PREFIX_SNOWBALLS | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoomExtra(play, thisx, ACTOR_OBJ_SNOWBALL))
-#define LOCATION_SNOWBALL_BIG (0x210000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+#define LOCATION_SNOWBALL_BIG (AP_PREFIX_SNOWBALLS | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoomExtra(play, thisx, ACTOR_OBJ_SNOWBALL2))
 
 ActorExtensionId snowballLocationExtension;
