@@ -11,22 +11,19 @@
 
 RECOMP_HOOK("func_80C0A458")
 void BgAstrBombwall_DropRandoItem(BgAstrBombwall* this, PlayState* play) {
-    u32 location = LOCATION_BOMBWALL;
-    if (rando_get_slotdata_u32("oneoffs") && !rando_location_is_checked(location)) {
-        Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, location);
+    if (rando_get_slotdata_u32("oneoffs") && !rando_location_is_checked(LOCATION_BOMBWALL)) {
+        Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, LOCATION_BOMBWALL);
     }
 }
 
 // BgHakaBombwall - Beneath the Grave Bombable Wall
 #include "overlays/actors/ovl_Bg_Haka_Bombwall/z_bg_haka_bombwall.h"
 
-RECOMP_HOOK("BgHakaBombwall_PlayCutscene")
-void BgHakaBombwall_DropRandoItem(BgHakaBombwall* this, PlayState* play) {
-    if (CutsceneManager_IsNext(this->dyna.actor.csId)) {
-        u32 location = LOCATION_BOMBWALL;
-        if (rando_get_slotdata_u32("oneoffs") && !rando_location_is_checked(location)) {
-            Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, location);
-        }
+RECOMP_HOOK("BgHakaBombwall_SetupPlayCutscene")
+void BgHakaBombwall_DropRandoItem(BgHakaBombwall* this) {
+    PlayState* play = gPlay;
+    if (rando_get_slotdata_u32("oneoffs") && !rando_location_is_checked(LOCATION_BOMBWALL)) {
+        Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, LOCATION_BOMBWALL);
     }
 }
 
@@ -36,9 +33,8 @@ void BgHakaBombwall_DropRandoItem(BgHakaBombwall* this, PlayState* play) {
 RECOMP_HOOK("func_80ABCD98")
 void BgHakuginBombwall_DropRandoItem(BgHakuginBombwall* this, PlayState* play) {
     if (CutsceneManager_IsNext(this->dyna.actor.csId)) {
-        u32 location = LOCATION_BOMBWALL;
-        if (rando_get_slotdata_u32("oneoffs") && !rando_location_is_checked(location)) {
-            Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, location);
+        if (rando_get_slotdata_u32("oneoffs") && !rando_location_is_checked(LOCATION_BOMBWALL)) {
+            Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, LOCATION_BOMBWALL);
         }
     }
 }
@@ -46,26 +42,22 @@ void BgHakuginBombwall_DropRandoItem(BgHakuginBombwall* this, PlayState* play) {
 // BgIkanaBombwall - Stone Tower Temple Bombable Wall/Floor
 #include "overlays/actors/ovl_Bg_Ikana_Bombwall/z_bg_ikana_bombwall.h"
 
-RECOMP_HOOK("func_80BD503C")
-void BgIkanaBombwall_DropRandoItem(BgIkanaBombwall* this, PlayState* play) {
-    if (CutsceneManager_IsNext(this->dyna.actor.csId)) {
-        u32 location = LOCATION_BOMBWALL;
-        if (rando_get_slotdata_u32("oneoffs") && !rando_location_is_checked(location)) {
-            Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, location);
-        }
+RECOMP_HOOK("func_80BD4FF8")
+void BgIkanaBombwall_DropRandoItem(BgIkanaBombwall* this) {
+    PlayState* play = gPlay;
+    if (rando_get_slotdata_u32("oneoffs") && !rando_location_is_checked(LOCATION_BOMBWALL)) {
+        Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, LOCATION_BOMBWALL);
     }
 }
 
 // BgKin2Bombwall - Ocean Spider House Bombable Wall
 #include "overlays/actors/ovl_Bg_Kin2_Bombwall/z_bg_kin2_bombwall.h"
 
-RECOMP_HOOK("BgKin2Bombwall_PlayCutscene")
-void BgKin2Bombwall_DropRandoItem(BgKin2Bombwall* this, PlayState* play) {
-    if (CutsceneManager_IsNext(this->dyna.actor.csId)) {
-        u32 location = LOCATION_BOMBWALL;
-        if (rando_get_slotdata_u32("oneoffs") && !rando_location_is_checked(location)) {
-            Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, location);
-        }
+RECOMP_HOOK("BgKin2Bombwall_SetupPlayCutscene")
+void BgKin2Bombwall_DropRandoItem(BgKin2Bombwall* this) {
+    PlayState* play = gPlay;
+    if (rando_get_slotdata_u32("oneoffs") && !rando_location_is_checked(LOCATION_BOMBWALL)) {
+        Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, LOCATION_BOMBWALL);
     }
 }
 
@@ -74,8 +66,7 @@ void BgKin2Bombwall_DropRandoItem(BgKin2Bombwall* this, PlayState* play) {
 
 RECOMP_HOOK("func_80C188C4")
 void BgLastBwall_DropRandoItem(BgLastBwall* this, PlayState* play) {
-    u32 location = LOCATION_BOMBWALL;
-    if (rando_get_slotdata_u32("oneoffs") && !rando_location_is_checked(location)) {
-        Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, location);
+    if (rando_get_slotdata_u32("oneoffs") && !rando_location_is_checked(LOCATION_BOMBWALL)) {
+        Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, LOCATION_BOMBWALL);
     }
 }
