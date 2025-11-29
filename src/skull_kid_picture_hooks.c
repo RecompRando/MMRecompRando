@@ -2,13 +2,17 @@
 #include "global.h"
 
 #include "apcommon.h"
-
+#include "actor_helpers.h"
+                            
 #define BG_KIN2_PICTURE_SKULLTULA_COLLECTED(thisx) (((thisx)->params >> 5) & 1)
 #define BG_KIN2_PICTURE_GET_3FC(thisx) ((u8)(((thisx & 0x3FC)) >> 2))
 #define BG_KIN2_PICTURE_SKULLTULA_SPAWN_PARAM(thisx) ((((thisx)->params & 0x1F) << 2) | 0xFF03)
 
 #define LOCATION_SKULL_TOKEN (0x060000 | (play->sceneId << 8) | ((skulltulaParams >> 2) & 0x1F))
 
+#define LOCATION_PAINTING (AP_PREFIX_ONEOFFS | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
+                            | randoGetLoadedActorNumInSameRoom(play, &this->dyna.actor))
+                            
 struct BgKin2Picture;
 
 typedef void (*BgKin2PictureActionFunc)(struct BgKin2Picture*, PlayState*);
@@ -40,4 +44,13 @@ RECOMP_PATCH bool BgKin2Picture_IsSkulltulaCollected(PlayState* play, s32 skullt
     }
 
     return (flag >= 0) && Flags_GetTreasure(play, flag);
+}
+
+RECOMP_HOOK("BgKin2Picture_SetupFall")
+void BgKin2Picture_SetupFall_Hook(BgKin2Picture* this) {
+    PlayState* play = gPlay;
+    
+    if (rando_get_slotdata_u32("oneoffs") && !rando_location_is_checked(LOCATION_PAINTING)) {
+        Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, LOCATION_PAINTING);
+    }
 }
