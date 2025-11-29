@@ -1,0 +1,8 @@
+extern Vtx unchecked_arrow_unchecked_arrow_mesh_layer_Opaque_vtx_cull[8];
+extern Vtx unchecked_arrow_unchecked_arrow_mesh_layer_Opaque_vtx_0[3];
+extern Gfx unchecked_arrow_unchecked_arrow_mesh_layer_Opaque_tri_0[];
+extern Vtx unchecked_arrow_unchecked_arrow_mesh_layer_Opaque_vtx_1[4];
+extern Gfx unchecked_arrow_unchecked_arrow_mesh_layer_Opaque_tri_1[];
+extern Gfx mat_unchecked_arrow_arrow_layerOpaque[];
+extern Gfx mat_unchecked_arrow_image_layerOpaque[];
+extern Gfx unchecked_arrow[];

@@ -118,3 +118,66 @@ RECOMP_PATCH void EnKakasi_SetupRiseOutOfGround(EnKakasi* this, PlayState* play)
         this->actionFunc = EnKakasi_RisingOutOfGround;
     }
 }
+
+// unchecked location draw code
+#include "unchecked_arrow.h"
+
+void EnKakasi_DrawUncheckedArrow(Actor* thisx, PlayState* play) {
+    EnKakasi* this = ((EnKakasi*)thisx);
+
+    if (!rando_get_slotdata_u32("scarecrowsanity") || rando_location_is_checked(LOCATION_SCARECROW)) return;
+
+    Vec3f pos = this->picto.actor.world.pos;
+    pos.y += 10.0f;
+
+    Draw_UncheckedArrow(play, pos, 0.0125f, LOCATION_SCARECROW, ARROW_SCARECROW);
+}
+
+ActorFunc oldScarecrowDraw;
+
+RECOMP_HOOK("EnKakasi_Update")
+void EnKakasi_FakeDraw(Actor* thisx, PlayState* play) {
+    EnKakasi* this = ((EnKakasi*)thisx);
+    savedEnKakasi = this;
+
+    if (!rando_get_slotdata_u32("scarecrowsanity") || rando_location_is_checked(LOCATION_SCARECROW)) {
+        return;
+    }
+
+    oldScarecrowDraw = this->picto.actor.draw;
+
+    if (this->picto.actor.draw == NULL || this->picto.actor.draw == EnKakasi_DrawUncheckedArrow) {
+        this->picto.actor.draw = NULL;
+    }
+}
+
+RECOMP_HOOK_RETURN("EnKakasi_Update")
+void EnKakasi_RealDraw() {
+    EnKakasi* this = savedEnKakasi;
+    PlayState* play = gPlay;
+
+    if (!rando_get_slotdata_u32("scarecrowsanity") || rando_location_is_checked(LOCATION_SCARECROW)) {
+        return;
+    }
+
+    if (oldScarecrowDraw == NULL || oldScarecrowDraw == EnKakasi_DrawUncheckedArrow) {
+        this->picto.actor.draw = EnKakasi_DrawUncheckedArrow;
+    }
+}
+
+RECOMP_HOOK("EnKakasi_Draw")
+void EnKakasi_SetupAddArrowToDraw(Actor* thisx, PlayState* play) {
+    savedEnKakasi = ((EnKakasi*)thisx);
+}
+
+RECOMP_HOOK_RETURN("EnKakasi_Draw")
+void EnKakasi_AddArrowToDraw() {
+    EnKakasi* this = savedEnKakasi;
+    PlayState* play = gPlay;
+
+    if (!rando_get_slotdata_u32("scarecrowsanity") || rando_location_is_checked(LOCATION_SCARECROW)) return;
+
+    Vec3f pos = this->picto.actor.world.pos;
+    pos.y += 80.0f;
+    Draw_UncheckedArrow(play, pos, 0.0125f, LOCATION_SCARECROW, ARROW_SCARECROW);
+}

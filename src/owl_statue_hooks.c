@@ -132,3 +132,24 @@ RECOMP_PATCH s32 ObjWarpstone_ClosedIdle(ObjWarpstone* this, PlayState* play) {
         return false;
     }
 }
+
+// unchecked location draw code
+#include "unchecked_arrow.h"
+
+RECOMP_HOOK("ObjWarpstone_Draw")
+void ObjWarpstone_SetupDrawUnchecked(Actor* thisx, PlayState* play2) {
+    sObjWarpstone = ((ObjWarpstone*)thisx);;
+}
+
+RECOMP_HOOK_RETURN("ObjWarpstone_Draw")
+void ObjWarpstone_DrawUnchecked() {
+    ObjWarpstone* this = sObjWarpstone;
+    
+    if (!rando_get_slotdata_u32("owlsanity") || rando_location_is_checked(LOCATION_OWL_STATUE)) return;
+
+    Vec3f pos = this->dyna.actor.world.pos;
+    pos.y += 60.0f;
+    UncheckedArrowType type = (this->modelIndex == SEK_MODEL_OPENED) ? ARROW_OWL_OPEN : ARROW_OWL_CLOSED;
+    
+    Draw_UncheckedArrow(gPlay, pos, 0.01f, LOCATION_OWL_STATUE, type);
+}
