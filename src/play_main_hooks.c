@@ -817,6 +817,8 @@ u32 rando_get_item_id(u32 location)
                 return GI_NPC_GENERIC;
             case AP_ITEM_PREFIX_SOUL_UTILITY:
                 return GI_UTILITY_GENERIC;
+            case AP_ITEM_PREFIX_SOUL_ENEMY:
+                return GI_ENEMY_GENERIC;
             case AP_ITEM_PREFIX_SOUL_ABSURD:
                 return GI_ABSURD_GENERIC;
         }

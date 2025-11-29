@@ -67,6 +67,7 @@ void GetItem_DrawSoulBoss(PlayState* play, s16 drawId);
 void GetItem_DrawSoulMisc(PlayState* play, s16 drawId);
 void GetItem_DrawSoulNPC(PlayState* play, s16 drawId);
 void GetItem_DrawSoulUtility(PlayState* play, s16 drawId);
+void GetItem_DrawSoulEnemy(PlayState* play, s16 drawId);
 void GetItem_DrawSoulAbsurd(PlayState* play, s16 drawId);
 
 extern Gfx gGiEmptyBottleCorkDL[];
@@ -799,6 +800,9 @@ RECOMP_PATCH void GetItem_Draw(PlayState* play, s16 drawId) {
             return;
         case GID_UTILITY_SOUL_GENERIC:
             GetItem_DrawSoulUtility(play, drawId);
+            return;
+        case GID_ENEMY_SOUL_GENERIC:
+            GetItem_DrawSoulEnemy(play, drawId);
             return;
         case GID_ABSURD_SOUL_GENERIC:
             GetItem_DrawSoulAbsurd(play, drawId);
@@ -1586,6 +1590,15 @@ void GetItem_DrawSoulUtility(PlayState* play, s16 drawId) {
         GetItem_DrawSkullTokenGeneric(play, TOKEN_SOUL_UTILITY);
     }
 }
+
+void GetItem_DrawSoulEnemy(PlayState* play, s16 drawId) {
+    if (recomp_get_config_u32("show_soul_model")) {
+        GetItem_DrawSkullTokenGeneric(play, TOKEN_SOUL_ENEMY);
+    } else {
+        GetItem_DrawSkullTokenGeneric(play, TOKEN_SOUL_ENEMY);
+    }
+}
+
 void GetItem_DrawSoulAbsurd(PlayState* play, s16 drawId) {
     if (recomp_get_config_u32("show_soul_model")) {
         GetItem_DrawSkullTokenGeneric(play, TOKEN_SOUL_ABSURD);

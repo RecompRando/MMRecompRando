@@ -122,7 +122,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
     if(actor == NULL) return;
     if(gSaveContext.gameMode != GAMEMODE_NORMAL) return;
 
-    // recomp_printf("actor id: 0x%02X 0x%06X %d\n", actor->id, 0x0B0000 | actor->id, rando_has_item(0x0B0000 | actor->id));
+    // recomp_printf("actor id: 0x%02X 0x%06X %d\n", actor->id, AP_ITEM_PREFIX_SOUL_BOSS | actor->id, rando_has_item(AP_ITEM_PREFIX_SOUL_BOSS | actor->id));
     switch (actor->id) {
         case ACTOR_BOSS_01: // odolwa
         case ACTOR_BOSS_HAKUGIN: // goht
@@ -132,8 +132,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             if (rando_get_slotdata_u32("boss_souls")) {
                 if (actor->id == ACTOR_BOSS_07 &&
                     (rando_get_slotdata_u32("boss_souls") != 2 || rando_get_slotdata_u32("completion_goal"))) return;
-                // *should = rando_has_item(0x0B0000 | actor->id);
-                if (!rando_has_item(0x0B0000 | actor->id)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_BOSS | actor->id);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_BOSS | actor->id)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -147,8 +147,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_KITAN:
         case ACTOR_EN_BUTTE:
             if (rando_get_slotdata_u32("misc_souls")) {
-                // *should = rando_has_item(0x0A0000 | actor->id);
-                if (!rando_has_item(0x0A0000 | actor->id)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_MISC | actor->id);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_MISC | actor->id)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -213,8 +213,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_GEG: // Hungry Goron
         case ACTOR_EN_JS: //Moon Kids
             if (rando_get_slotdata_u32("npc_souls")) {
-                // *should = rando_has_item(0x0C0000 | actor->id);
-                if (!rando_has_item(0x0C0000 | actor->id)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | actor->id);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | actor->id)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -227,8 +227,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 if (justDied) {
                     return;
                 }
-                // *should = rando_has_item(0x0C0000 | actor->id);
-                if (!rando_has_item(0x0C0000 | actor->id)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | actor->id);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | actor->id)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -240,8 +240,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_BAISEN:
         case ACTOR_EN_HEISHI: 
             if (rando_get_slotdata_u32("npc_souls")) {
-                // *should = rando_has_item(0x0C0000 | ACTOR_EN_DT);
-                if (!rando_has_item(0x0C0000 | ACTOR_EN_DT)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_DT);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_DT)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -251,8 +251,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_SSH: // Spider Man
         case ACTOR_EN_STH:
             if (rando_get_slotdata_u32("npc_souls")) {
-                // *should = rando_has_item(0x0C0000 | ACTOR_EN_SSH);
-                if (!rando_has_item(0x0C0000 | ACTOR_EN_SSH)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_SSH);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_SSH)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -262,8 +262,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_SYATEKI_MAN: // Archery Guy
         case ACTOR_EN_SYATEKI_OKUTA:
             if (rando_get_slotdata_u32("npc_souls")) {
-                // *should = rando_has_item(0x0C0000 | ACTOR_EN_SYATEKI_MAN);
-                if (!rando_has_item(0x0C0000 | ACTOR_EN_SYATEKI_MAN)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_SYATEKI_MAN);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_SYATEKI_MAN)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -274,8 +274,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_SELLNUTS:
         case ACTOR_EN_SCOPENUTS:
             if (rando_get_slotdata_u32("npc_souls")) {
-                // *should = rando_has_item(0x0C0000 | ACTOR_EN_AKINDONUTS);
-                if (!rando_has_item(0x0C0000 | ACTOR_EN_AKINDONUTS)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_AKINDONUTS);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_AKINDONUTS)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -288,8 +288,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_BOMJIMB:
         case ACTOR_EN_BOMBAL:
             if (rando_get_slotdata_u32("npc_souls")) {
-                // *should = rando_has_item(0x0C0000 | ACTOR_EN_BOMJIMA);
-                if (!rando_has_item(0x0C0000 | ACTOR_EN_BOMJIMA)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_BOMJIMA);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_BOMJIMA)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -299,8 +299,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_TOTO: //Toto and Gorman (To prevent Gorman Softlock)
         case ACTOR_EN_GM:
             if (rando_get_slotdata_u32("npc_souls")) {
-                // *should = rando_has_item(0x0C0000 | ACTOR_EN_TOTO);
-                if (!rando_has_item(0x0C0000 | ACTOR_EN_TOTO)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_TOTO);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_TOTO)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -310,8 +310,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_AOB_01: //Doggy Race Lady
         case ACTOR_EN_DG: //Dogs
             if (rando_get_slotdata_u32("npc_souls")) {
-                // *should = rando_has_item(0x0C0000 | ACTOR_EN_AOB_01);
-                if (!rando_has_item(0x0C0000 | ACTOR_EN_AOB_01)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_AOB_01);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_AOB_01)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -325,8 +325,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_OBJ_DINNER: //(I wonder what's for dinner?)
         case ACTOR_OBJ_UM: // Cremia Escort Milk Bottles
             if (rando_get_slotdata_u32("npc_souls")) {
-                // *should = rando_has_item(0x0C0000 | ACTOR_EN_MA_YTS);
-                if (!rando_has_item(0x0C0000 | ACTOR_EN_MA_YTS)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_MA_YTS);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_MA_YTS)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -336,8 +336,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_KGY: //Smithy
         case ACTOR_EN_KBT:
             if (rando_get_slotdata_u32("npc_souls")) {
-                // *should = rando_has_item(0x0C0000 | ACTOR_EN_KGY);
-                if (!rando_has_item(0x0C0000 | ACTOR_EN_KGY)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_KGY);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_KGY)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -347,8 +347,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_JGAME_TSN: //Fisherman
         case ACTOR_EN_TSN:
             if (rando_get_slotdata_u32("npc_souls")) {
-                // *should = rando_has_item(0x0C0000 | ACTOR_EN_TSN);
-                if (!rando_has_item(0x0C0000 | ACTOR_EN_TSN)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_TSN);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_TSN)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -359,8 +359,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_RAIL_SKB: 
         case ACTOR_EN_HINT_SKB: // Graveyard and OSH Stalchildren
             if (rando_get_slotdata_u32("npc_souls")) {
-                // *should = rando_has_item(0x0C0000 | ACTOR_EN_SKB);
-                if (!rando_has_item(0x0C0000 | ACTOR_EN_SKB)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_SKB);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_SKB)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -370,8 +370,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_RAILGIBUD: //Gibdo Soul
         case ACTOR_EN_TALK_GIBUD:
             if (rando_get_slotdata_u32("npc_souls")) {
-                // *should = rando_has_item(0x0C0000 | ACTOR_EN_TALK_GIBUD);
-                if (!rando_has_item(0x0C0000 | ACTOR_EN_TALK_GIBUD)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_TALK_GIBUD);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_EN_TALK_GIBUD)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -381,8 +381,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_ELFGRP: // Great Fairy Soul
         case ACTOR_BG_DY_YOSEIZO:
             if (rando_get_slotdata_u32("npc_souls")) {
-                // *should = rando_has_item(0x0C0000 | ACTOR_BG_DY_YOSEIZO);
-                if (!rando_has_item(0x0C0000 | ACTOR_BG_DY_YOSEIZO)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_BG_DY_YOSEIZO);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_NPC | ACTOR_BG_DY_YOSEIZO)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -397,8 +397,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_ISHI: // Rocks
         case ACTOR_EN_KANBAN: // Signs
             if (rando_get_slotdata_u32("absurd_souls")) {
-                // *should = rando_has_item(0x0E0000 | actor->id);
-                if (!rando_has_item(0x0E0000 | actor->id)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_ABSURD | actor->id);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_ABSURD | actor->id)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -410,8 +410,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_OBJ_TREE:
         case ACTOR_OBJ_YASI:
             if (rando_get_slotdata_u32("absurd_souls")) {
-                // *should = rando_has_item(0x0E0000 | ACTOR_EN_WOOD2);
-                if (!rando_has_item(0x0E0000 | ACTOR_EN_WOOD02)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_ABSURD | ACTOR_EN_WOOD2);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_ABSURD | ACTOR_EN_WOOD02)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -424,8 +424,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_KUSA:
         case ACTOR_EN_KUSA2:
             if (rando_get_slotdata_u32("absurd_souls")) {
-                // *should = rando_has_item(0x0E0000 | ACTOR_EN_WOOD2);
-                if (!rando_has_item(0x0E0000 | ACTOR_OBJ_GRASS)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_ABSURD | ACTOR_EN_WOOD2);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_ABSURD | ACTOR_OBJ_GRASS)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -438,8 +438,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
                 if (actor->params & 0x80) {
                     return;
                 }
-                // *should = rando_has_item(0x0E0000 | actor->id);
-                if (!rando_has_item(0x0E0000 | actor->id)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_ABSURD | actor->id);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_ABSURD | actor->id)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -448,8 +448,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             break;
         case ACTOR_OBJ_KEPN_KOYA: //Gorman Stables
             if (rando_get_slotdata_u32("absurd_souls")) {
-                // *should = rando_has_item(0x0E0000 | actor->id);
-                if (rando_has_item(0x0E0000 | actor->id)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_ABSURD | actor->id);
+                if (rando_has_item(AP_ITEM_PREFIX_SOUL_ABSURD | actor->id)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -460,8 +460,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_TUBO_TRAP:
         case ACTOR_OBJ_FLOWERPOT:
             if (rando_get_slotdata_u32("absurd_souls")) {
-                // *should = rando_has_item(0x0E0000 | ACTOR_OBJ_TSUBO);
-                if (!rando_has_item(0x0E0000 | ACTOR_OBJ_TSUBO)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_ABSURD | ACTOR_OBJ_TSUBO);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_ABSURD | ACTOR_OBJ_TSUBO)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -472,8 +472,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
     switch (actor->id) {
         case ACTOR_EN_PST:    // Postboxes
             if (rando_get_slotdata_u32("utility_souls")) {
-                // *should = rando_has_item(0x0D0000 | actor->id);
-                if (!rando_has_item(0x0D0000 | actor->id)) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_UTILITY | actor->id);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_UTILITY | actor->id)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
@@ -485,10 +485,10 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
     // switch (actor->id) {
     //     case ACTOR_EN_KANBAN:
     //     // case ACTOR_EN_KAME:
-    //         // recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
+    //         // recomp_printf("actor soul id: 0x%06X\n", AP_ITEM_PREFIX_SOUL_NPC | actor->id);
     //         *should = false;
     //                 actor->destroy = NULL;
     //         break;
     // }
-    // // recomp_printf("actor soul id: 0x%06X\n", 0x0C0000 | actor->id);
+    // // recomp_printf("actor soul id: 0x%06X\n", AP_ITEM_PREFIX_SOUL_NPC | actor->id);
 }
