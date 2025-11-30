@@ -60,6 +60,7 @@ void OnDoorShutter_SetupDoor(DoorShutter* this, PlayState* play) {
                     break;
                 // Gekko & Snapper Miniboss Room
                 case 8:
+                    // only unlock entrance door
                     if (randoGetLoadedActorNumInSameRoom(play, &this->slidingDoor.dyna.actor) == 0) {
                         if (!rando_has_item(AP_ITEM_ID_SOUL_MINIBOSS_GEKKO)) {
                             savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
@@ -114,6 +115,7 @@ RECOMP_PATCH void func_80ACAD88(BgOpenShutter* this, PlayState* play) {
         Player* player = GET_PLAYER(play);
 
         doorDirection = func_80ACABA8(this, play);
+        // if (doorDirection > 0) {
         if (doorDirection != 0) {
             player->doorType = PLAYER_DOORTYPE_SLIDING;
             player->doorDirection = doorDirection;
