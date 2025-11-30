@@ -10,7 +10,7 @@
 #include "overlays/actors/ovl_Obj_Swprize/z_obj_swprize.h"
 
 // ignore how mashed together this is
-#define LOCATION_SOFT_SOIL (AP_PREFIX_SOIL | (play->sceneId << 8) | (OBJ_SWPRIZE_GET_SWITCH_FLAG(&this->actor) + play->roomCtx.curRoom.num) << 4)
+#define LOCATION_SOFT_SOIL (AP_PREFIX_SOIL | (play->sceneId << 8) | ((OBJ_SWPRIZE_GET_SWITCH_FLAG(&this->actor) + play->roomCtx.curRoom.num) << 4))
 
 // @ap preplant magic beans when receiving the item
 RECOMP_HOOK("ObjBean_Init")
@@ -56,7 +56,7 @@ RECOMP_PATCH void func_80C253D0(ObjSwprize* this, PlayState* play) {
             }
         }
     } else {
-        if (rando_get_slotdata_u32("soilsanity") && !rando_location_is_checked(LOCATION_SOFT_SOIL)) {
+        if (rando_get_slotdata_u32("soilsanity") && !rando_location_is_checked(LOCATION_SOFT_SOIL | 3)) {
             collectible = Item_RandoDropCollectible(play, &thisx->world.pos, ITEM00_APITEM, LOCATION_SOFT_SOIL | 3);
         } else {
             collectible = Item_DropCollectible(play, &thisx->world.pos, temp_s0);
