@@ -481,6 +481,53 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             }
             break;
     }
+    switch (actor->id) {
+        case ACTOR_EN_PAMETFROG: // Gekko
+        case ACTOR_EN_BIGPAMET:
+            if (rando_get_slotdata_u32("enemy_souls")) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_ENEMY| ACTOR_EN_PAMETFROG);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_ENEMY | ACTOR_EN_PAMETFROG)) {
+                    *should = false;
+                    actor->destroy = NULL;
+                }
+                return;
+            }
+            break;
+    }
+    switch (actor->id) {
+        case ACTOR_EN_WF:    // Wolfos & White Wolfos
+        case ACTOR_EN_CROW:  // Guay
+        case ACTOR_EN_SLIME: // ChuChus
+        case ACTOR_EN_PR:    // Giant Bonefish
+        case ACTOR_EN_GRASSHOPPER: // Dragonflies
+        case ACTOR_EN_MKK:   // Black and White Boes
+        case ACTOR_EN_DINOFOS: // Dinolfos
+        case ACTOR_EN_KAME:  // Snappers
+        case ACTOR_EN_ST:     // Hanging Skulltulas
+            if (rando_get_slotdata_u32("enemy_souls")) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_ENEMY| actor->id);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_ENEMY | actor->id)) {
+                    *should = false;
+                    actor->destroy = NULL;
+                }
+                return;
+            }
+            break;
+    }
+    switch (actor->id) {
+        case ACTOR_EN_DEKUBABA: // Dekubaba
+        case ACTOR_EN_KAREBABA: // Wilted/Minibaba
+        case ACTOR_BOSS_05:  // Bio Baba
+            if (rando_get_slotdata_u32("enemy_souls")) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_ENEMY| ACTOR_EN_DEKUBABA);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_ENEMY | ACTOR_EN_DEKUBABA)) {
+                    *should = false;
+                    actor->destroy = NULL;
+                }
+                return;
+            }
+            break;
+    }
     
     // switch (actor->id) {
     //     case ACTOR_EN_KANBAN:

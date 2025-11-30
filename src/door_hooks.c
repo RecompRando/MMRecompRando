@@ -37,11 +37,31 @@ void OnDoorShutter_SetupDoor(DoorShutter* this, PlayState* play) {
         // Woodfall Temple
         case SCENE_MITURIN:
             switch (play->roomCtx.curRoom.num) {
+                // Dragonflies Chest Room
+                case 4:
+                    if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_DRAGONFLIES)) {
+                        savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                        Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                    }
+                    break;
+                // Snapper Chest Room
+                case 6:
+                    if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_SNAPPERS)) {
+                        savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                        Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                    }
+                    break;
+                // Dinolfos Chest Room
+                case 7:
+                    if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_DINOLFOS)) {
+                        savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                        Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                    }
+                    break;
                 // Gekko & Snapper Miniboss Room
                 case 8:
-                    // only unlock entrance door
                     if (randoGetLoadedActorNumInSameRoom(play, &this->slidingDoor.dyna.actor) == 0) {
-                        if (!rando_has_item(AP_ITEM_ID_SOUL_MINIBOSS_SNAPPER)) {
+                        if (!rando_has_item(AP_ITEM_ID_SOUL_MINIBOSS_GEKKO)) {
                             savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
                             Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
                         }
@@ -94,7 +114,6 @@ RECOMP_PATCH void func_80ACAD88(BgOpenShutter* this, PlayState* play) {
         Player* player = GET_PLAYER(play);
 
         doorDirection = func_80ACABA8(this, play);
-        // if (doorDirection > 0) {
         if (doorDirection != 0) {
             player->doorType = PLAYER_DOORTYPE_SLIDING;
             player->doorDirection = doorDirection;
