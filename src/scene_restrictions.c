@@ -93,7 +93,7 @@ RECOMP_PATCH void Interface_SetSceneRestrictions(PlayState* play) {
         i++;
     } while (sRestrictionFlags[i].scene != RESTRICTIONS_TABLE_END);
 
-    // Enable Song of Soaring on moon scenes for randomizer
+    // Enable Song of Soaring on moon scenes and others
     switch (currentScene) {
         case SCENE_LAST_DEKU:   // 0x2A - Moon Deku Trial
         case SCENE_LAST_GORON:  // 0x3F - Moon Goron Trial
@@ -101,6 +101,15 @@ RECOMP_PATCH void Interface_SetSceneRestrictions(PlayState* play) {
         case SCENE_LAST_LINK:   // 0x66 - Moon Link Trial
         case SCENE_SOUGEN:      // 0x67 - The Moon (field with tree)
         case SCENE_LAST_BS:     // 0x0B - Majora's Lair
+        case SCENE_OMOYA:       // 0x10 - Romani Ranch Barn
+        case SCENE_TENMON_DAI:  // 0x29 - Astral Observatory
+        case SCENE_OPENINGDAN:  // 0x1A - Before Clock Town
+        case SCENE_DEKUTES:     // 0x1E - Deku Playground
+        case SCENE_IKNINSIDE:   // 0x56 - Igos Lair
+        case SCENE_LOST_WOODS:  //0x65 - Lost Woods Intro
+        
+
+
             interfaceCtx->restrictions.songOfSoaring = 0;
             break;
     }
