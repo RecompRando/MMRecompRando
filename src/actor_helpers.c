@@ -512,6 +512,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_BIGSLIME:    // GBT Jelly Gekko Miniboss
         case ACTOR_BOSS_04:        // Wart
         case ACTOR_EN_IK:          // Iron Knuckle
+        case ACTOR_EN_BAT:         // Bad Bats
+        case ACTOR_EN_FIREFLY:     // Keese
         case ACTOR_EN_JSO2:        // Garo Master
         case ACTOR_EN_JSO:         // Garo 
         case ACTOR_EN_KNIGHT:      // Igos
