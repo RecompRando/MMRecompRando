@@ -508,9 +508,14 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_FZ:          // Freezard
         case ACTOR_EN_WIZ:         // Wizrobe 
         case ACTOR_EN_RAT:         // Real Bombchu
+        case ACTOR_EN_PEEHAT:      // Peehat
+        case ACTOR_EN_DODONGO:     // Dodongos
+        case ACTOR_EN_NEO_REEBA:   // Leevers
+        case ACTOR_EN_SNOWMAN:     // Eenos
         case ACTOR_EN_KAIZOKU:     // Coloured Pirate Minibosses
         case ACTOR_EN_BIGSLIME:    // GBT Jelly Gekko Miniboss
         case ACTOR_BOSS_04:        // Wart
+        case ACTOR_EN_OKUTA:       // Octoroks
         case ACTOR_EN_IK:          // Iron Knuckle
         case ACTOR_EN_BAT:         // Bad Bats
         case ACTOR_EN_FIREFLY:     // Keese
