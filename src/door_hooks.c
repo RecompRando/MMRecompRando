@@ -17,12 +17,10 @@ void OnDoorShutter_SetupDoor(DoorShutter* this, PlayState* play) {
     sDoorShutter = this;
     savedDoorClearFlag = true;
 
-    // set locked door in before clock town to always be open
     if (play->sceneId == SCENE_OPENINGDAN) {
         this->doorType = 0;
     }
 
-    // always unlock the door out of igos's room
     if (play->sceneId == SCENE_IKNINSIDE) {
         savedIgosSeqId = AudioSeq_GetActiveSeqId(SEQ_PLAYER_BGM_MAIN);
         savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
@@ -32,37 +30,226 @@ void OnDoorShutter_SetupDoor(DoorShutter* this, PlayState* play) {
 
     if (!rando_get_slotdata_u32("enemy_souls")) return;
 
-    // unlock doors when you don't have an enemy's soul
     switch (play->sceneId) {
         // Woodfall Temple
         case SCENE_MITURIN:
             switch (play->roomCtx.curRoom.num) {
-                // Dragonflies Chest Room
                 case 4:
                     if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_DRAGONFLIES)) {
                         savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
                         Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
                     }
                     break;
-                // Snapper Chest Room
                 case 6:
                     if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_SNAPPERS)) {
                         savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
                         Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
                     }
                     break;
-                // Dinolfos Chest Room
                 case 7:
                     if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_DINOLFOS)) {
                         savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
                         Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
                     }
                     break;
-                // Gekko & Snapper Miniboss Room
                 case 8:
-                    // only unlock entrance door
                     if (randoGetLoadedActorNumInSameRoom(play, &this->slidingDoor.dyna.actor) == 0) {
                         if (!rando_has_item(AP_ITEM_ID_SOUL_MINIBOSS_GEKKO)) {
+                            savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                            Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                        }
+                    }
+                    break;
+            }
+            break;
+        // Snowhead Temple
+        case SCENE_HAKUGIN:
+            switch (play->roomCtx.curRoom.num) {
+                case 6:
+                    if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_WIZROBE)) {
+                        savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                        Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                    }
+                    break;
+                case 12:
+                    if (randoGetLoadedActorNumInSameRoom(play, &this->slidingDoor.dyna.actor) == 0) {
+                        if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_WIZROBE)) {
+                            savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                            Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                        }
+                    }
+                    break;
+            }
+            break;
+        // Pirate's Fortress Interior
+        case SCENE_PIRATE:
+            switch (play->roomCtx.curRoom.num) {
+                case 0:
+                    if (randoGetLoadedActorNumInSameRoom(play, &this->slidingDoor.dyna.actor) == 0) {
+                        if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_PIRATE)) {
+                            savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                            Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                        }
+                    }
+                    break;
+                case 1:
+                    if (randoGetLoadedActorNumInSameRoom(play, &this->slidingDoor.dyna.actor) == 0) {
+                        if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_PIRATE)) {
+                            savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                            Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                        }
+                    }
+                    break;
+            }
+            break;
+        // Great Bay Temple
+        case SCENE_SEA:
+            switch (play->roomCtx.curRoom.num) {
+                case 5:
+                    if (randoGetLoadedActorNumInSameRoom(play, &this->slidingDoor.dyna.actor) == 0) {
+                        if (!rando_has_item(AP_ITEM_ID_SOUL_MINIBOSS_JELLY)) {
+                            savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                            Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                        }
+                    }
+                    break;
+                case 7:
+                    if (!rando_has_item(AP_ITEM_ID_SOUL_MINIBOSS_WART)) {
+                        savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                        Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                    }
+                    break;
+            }
+            break;
+        // Beneath Graveyard
+        case SCENE_HAKASHITA:
+            switch (play->roomCtx.curRoom.num) {
+                case 2:
+                    if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_KNUCKLE)) {
+                        savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                        Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                    }
+                    break;
+                case 4:
+                    if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_KNUCKLE)) {
+                        savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                        Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                    }
+                    break;
+            }
+            break;
+        // Secret Shrine
+        case SCENE_RANDOM:
+            switch (play->roomCtx.curRoom.num) {
+                case 2:
+                    if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_DINOLFOS)) {
+                        savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                        Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                    }
+                    break;
+                case 3:
+                    if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_WIZROBE)) {
+                        savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                        Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                    }
+                    break;
+                case 4:
+                    if (!rando_has_item(AP_ITEM_ID_SOUL_MINIBOSS_WART)) {
+                        savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                        Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                    }
+                    break;
+                case 5:
+                    if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_GAROMASTER)) {
+                        savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                        Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                    }
+                    break;
+            }
+            break;
+        // Ikana Castle
+        case SCENE_CASTLE:
+            switch (play->roomCtx.curRoom.num) {
+                case 5:
+                    if (randoGetLoadedActorNumInSameRoom(play, &this->slidingDoor.dyna.actor) == 0) {
+                        if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_WIZROBE)) {
+                            savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                            Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                        }
+                    }
+                    break;
+            }
+            break;
+        // Stone Tower Temple
+        case SCENE_INISIE_N:
+            switch (play->roomCtx.curRoom.num) {
+                case 10:
+                    if (randoGetLoadedActorNumInSameRoom(play, &this->slidingDoor.dyna.actor) == 0) {
+                        if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_GAROMASTER)) {
+                            savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                            Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                    }
+                }
+                    break;
+                case 1:
+                    if (randoGetLoadedActorNumInSameRoom(play, &this->slidingDoor.dyna.actor) == 0) {
+                        if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_EYEGORE)) {
+                            savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                            Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                    }
+                }
+                    break;
+            }
+            break;
+        // Inverted Stone Tower Temple
+        case SCENE_INISIE_R:
+            switch (play->roomCtx.curRoom.num) {
+                case 4:
+                    if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_WIZROBE)) {
+                        savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                        Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                    }
+                    break;
+                case 11:
+                    if (randoGetLoadedActorNumInSameRoom(play, &this->slidingDoor.dyna.actor) == 0) {
+                        if (!rando_has_item(AP_ITEM_ID_SOUL_MINIBOSS_GOMESS)) {
+                            savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                            Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                    }
+                }
+                    break;
+                case 1:
+                    if (randoGetLoadedActorNumInSameRoom(play, &this->slidingDoor.dyna.actor) == 0) {
+                        if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_EYEGORE)) {
+                            savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                            Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                    }
+                }
+                    break;
+            }
+            break;
+        // Moon Link Trial
+        case SCENE_LAST_LINK:
+            switch (play->roomCtx.curRoom.num) {
+                case 1:
+                    if (randoGetLoadedActorNumInSameRoom(play, &this->slidingDoor.dyna.actor) == 0) {
+                        if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_DINOLFOS)) {
+                            savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                            Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                        }
+                    }
+                    break;
+                case 2:
+                    if (randoGetLoadedActorNumInSameRoom(play, &this->slidingDoor.dyna.actor) == 0) {
+                        if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_GAROMASTER)) {
+                            savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                            Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                        }
+                    }
+                    break;
+                case 3:
+                    if (randoGetLoadedActorNumInSameRoom(play, &this->slidingDoor.dyna.actor) == 0) {
+                        if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_KNUCKLE)) {
                             savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
                             Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
                         }
@@ -80,7 +267,6 @@ void AfterDoorShutter_SetupDoor() {
     DoorShutter* this = sDoorShutter;
     PlayState* play = gPlay;
 
-    // unset room flag if the room hasn't actually been cleared
     if (!savedDoorClearFlag) {
         Flags_UnsetClear(play, this->slidingDoor.dyna.actor.room);
     }
@@ -88,7 +274,6 @@ void AfterDoorShutter_SetupDoor() {
 
 RECOMP_HOOK("Player_Door_Sliding")
 void FixIgosBGM(PlayState* play, Player* this, Actor* door) {
-    // reset bgm when leaving igos's room
     if (play->sceneId == SCENE_IKNINSIDE && this->doorDirection == 1) {
         play->envCtx.lightSettingOverride = 0;
         SEQCMD_PLAY_SEQUENCE(SEQ_PLAYER_BGM_MAIN, 20, NA_BGM_IKANA_CASTLE + SEQ_FLAG_ASYNC);
@@ -98,7 +283,6 @@ void FixIgosBGM(PlayState* play, Player* this, Actor* door) {
 void func_80ACAE5C(BgOpenShutter* this, PlayState* play);
 s8 func_80ACABA8(BgOpenShutter* this, PlayState* play);
 
-// allow opening door to be openable
 RECOMP_PATCH void func_80ACAD88(BgOpenShutter* this, PlayState* play) {
     s32 doorDirection;
 
@@ -115,7 +299,6 @@ RECOMP_PATCH void func_80ACAD88(BgOpenShutter* this, PlayState* play) {
         Player* player = GET_PLAYER(play);
 
         doorDirection = func_80ACABA8(this, play);
-        // if (doorDirection > 0) {
         if (doorDirection != 0) {
             player->doorType = PLAYER_DOORTYPE_SLIDING;
             player->doorDirection = doorDirection;

@@ -495,15 +495,31 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             break;
     }
     switch (actor->id) {
-        case ACTOR_EN_WF:    // Wolfos & White Wolfos
-        case ACTOR_EN_CROW:  // Guay
-        case ACTOR_EN_SLIME: // ChuChus
-        case ACTOR_EN_PR:    // Giant Bonefish
+        case ACTOR_EN_WF:          // Wolfos & White Wolfos
+        case ACTOR_EN_CROW:        // Guay
+        case ACTOR_EN_SLIME:       // ChuChus
+        case ACTOR_EN_PR:          // Giant Bonefish
         case ACTOR_EN_GRASSHOPPER: // Dragonflies
-        case ACTOR_EN_MKK:   // Black and White Boes
-        case ACTOR_EN_DINOFOS: // Dinolfos
-        case ACTOR_EN_KAME:  // Snappers
-        case ACTOR_EN_ST:     // Hanging Skulltulas
+        case ACTOR_EN_MKK:         // Black and White Boes
+        case ACTOR_EN_DINOFOS:     // Dinolfos
+        case ACTOR_EN_KAME:        // Snappers
+        case ACTOR_EN_ST:          // Hanging Skulltulas
+        case ACTOR_EN_RAF:         // Carnivorous Lilypads
+        case ACTOR_EN_FZ:          // Freezard
+        case ACTOR_EN_WIZ:         // Wizrobe 
+        case ACTOR_EN_RAT:         // Real Bombchu
+        case ACTOR_EN_KAIZOKU:     // Coloured Pirate Minibosses
+        case ACTOR_EN_BIGSLIME:    // GBT Jelly Gekko Miniboss
+        case ACTOR_BOSS_04:        // Wart
+        case ACTOR_EN_IK:          // Iron Knuckle
+        case ACTOR_EN_JSO2:        // Garo Master
+        case ACTOR_EN_JSO:         // Garo 
+        case ACTOR_EN_KNIGHT:      // Igos
+        case ACTOR_EN_DEATH:       // Gomess
+        case ACTOR_EN_EGOL:        // Eyegore
+        case ACTOR_EN_AM:          // Armos
+        case ACTOR_EN_FAMOS:       // Death Armos Statues
+        case ACTOR_EN_RD:          // Redead
             if (rando_get_slotdata_u32("enemy_souls")) {
                 // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_ENEMY| actor->id);
                 if (!rando_has_item(AP_ITEM_PREFIX_SOUL_ENEMY | actor->id)) {
@@ -521,6 +537,19 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             if (rando_get_slotdata_u32("enemy_souls")) {
                 // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_ENEMY| ACTOR_EN_DEKUBABA);
                 if (!rando_has_item(AP_ITEM_PREFIX_SOUL_ENEMY | ACTOR_EN_DEKUBABA)) {
+                    *should = false;
+                    actor->destroy = NULL;
+                }
+                return;
+            }
+            break;
+    }
+    switch (actor->id) {
+        case ACTOR_EN_GE2:         // Purple Pirate Guards
+        case ACTOR_EN_GE1:         // White Pirate Guards
+            if (rando_get_slotdata_u32("enemy_souls")) {
+                // *should = rando_has_item(AP_ITEM_PREFIX_SOUL_ENEMY| ACTOR_EN_GE2);
+                if (!rando_has_item(AP_ITEM_PREFIX_SOUL_ENEMY | ACTOR_EN_GE2)) {
                     *should = false;
                     actor->destroy = NULL;
                 }
