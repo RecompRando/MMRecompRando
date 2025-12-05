@@ -565,6 +565,19 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             break;
     }
     
+    // always kill tatl messages
+    switch (actor->id) {
+        case ACTOR_ELF_MSG:
+        case ACTOR_ELF_MSG2:
+        case ACTOR_ELF_MSG3:
+        case ACTOR_ELF_MSG4:
+        case ACTOR_ELF_MSG5:
+        case ACTOR_ELF_MSG6:
+            *should = false;
+            actor->destroy = NULL;
+            break;
+    }
+    
     // switch (actor->id) {
     //     case ACTOR_EN_KANBAN:
     //     // case ACTOR_EN_KAME:
@@ -574,4 +587,26 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
     //         break;
     // }
     // // recomp_printf("actor soul id: 0x%06X\n", AP_ITEM_PREFIX_SOUL_NPC | actor->id);
+}
+
+// this is likely temporary as we'd want to PR most if not all of these (unless its a rando only issue)
+RECOMP_IMPORT("mm_recomp_better_double_sot", void dsot_set_blacklist_true(void));
+
+// we want to add any "breakable" objects here that would respawn otherwise
+// also do not add anything that would change on different days
+RECOMP_CALLBACK("mm_recomp_better_double_sot", dsot_on_blacklist_check)
+void dsot_set_rando_actor_blacklists(s16 actor_id) {
+    switch (actor_id) {
+        case ACTOR_EN_ITEM00: // items shouldn't despawn/respawn when the day is changed
+        // grass
+        case ACTOR_EN_KUSA:
+        case ACTOR_EN_KUSA2:
+        case ACTOR_OBJ_GRASS:
+        case ACTOR_OBJ_GRASS_UNIT:
+        case ACTOR_OBJ_GRASS_CARRY:
+        // crates
+        case ACTOR_OBJ_KIBAKO:
+        case ACTOR_OBJ_KIBAKO2:
+            dsot_set_blacklist_true();
+    }
 }

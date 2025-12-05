@@ -36,7 +36,7 @@ minimum_recomp_version = "1.2.1"
 # Dependency mods. Each entry is the mod's ID and then an optional minimum version of the dependency mod.
 dependencies = [
     "owls_never_quit:1.0.0",
-    "mm_recomp_better_double_sot:0.0.1",
+    "mm_recomp_better_double_sot:1.0.1",
     "mm_recomp_colors:0.5.0"
 ]
 
@@ -165,3 +165,35 @@ description = "Sets whether or not Soul items display as their in-game model or 
 type = "Enum"
 options = [ "Disabled", "Enabled" ]
 default = "Enabled"
+
+[[manifest.config_options]]
+id = "skip_time"
+name = "(DEBUG) Skip Time by Pressing L"
+description = "Enable/Disable time being skipped when pressing L to the following options."
+type = "Enum"
+options = [ "Disabled", "Enabled" ]
+default = "Enabled"
+
+[[manifest.config_options]]
+id = "time_day"
+name = "(DEBUG) Time Day"
+description = "The day that time will be skipped to when pressing L."
+type = "Number"
+min = 0
+max = 7
+step = 1
+precision = 1
+percent = false
+default = 1
+
+[[manifest.config_options]]
+id = "time_hour"
+name = "(DEBUG) Time Hour"
+description = "The hour that time will be skipped to when pressing L."
+type = "Number"
+min = 0
+max = 23
+step = 1
+precision = 1
+percent = false
+default = 12
