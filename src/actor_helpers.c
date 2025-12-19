@@ -498,6 +498,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_WF:          // Wolfos & White Wolfos
         case ACTOR_EN_CROW:        // Guay
         case ACTOR_EN_SLIME:       // ChuChus
+        case ACTOR_EN_THIEFBIRD:   // Takkuri
         case ACTOR_EN_PR:          // Giant Bonefish
         case ACTOR_EN_GRASSHOPPER: // Dragonflies
         case ACTOR_EN_MKK:         // Black and White Boes
@@ -512,6 +513,7 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_DODONGO:     // Dodongos
         case ACTOR_EN_NEO_REEBA:   // Leevers
         case ACTOR_EN_SNOWMAN:     // Eenos
+        case ACTOR_EN_TITE:        // Tektite
         case ACTOR_EN_KAIZOKU:     // Coloured Pirate Minibosses
         case ACTOR_EN_BIGSLIME:    // GBT Jelly Gekko Miniboss
         case ACTOR_BOSS_04:        // Wart

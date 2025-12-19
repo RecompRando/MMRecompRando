@@ -191,6 +191,14 @@ void OnDoorShutter_SetupDoor(DoorShutter* this, PlayState* play) {
                     }
                 }
                     break;
+                case 8:
+                    if (randoGetLoadedActorNumInSameRoom(play, &this->slidingDoor.dyna.actor) == 0) {
+                        if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_ARMOS)) {
+                            savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                            Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                    }
+                }
+                    break;
                 case 1:
                     if (randoGetLoadedActorNumInSameRoom(play, &this->slidingDoor.dyna.actor) == 0) {
                         if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_EYEGORE)) {
@@ -205,14 +213,24 @@ void OnDoorShutter_SetupDoor(DoorShutter* this, PlayState* play) {
         case SCENE_INISIE_R:
             switch (play->roomCtx.curRoom.num) {
                 case 4:
-                    if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_WIZROBE)) {
-                        savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
-                        Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                    if (randoGetLoadedActorNumInSameRoom(play, &this->slidingDoor.dyna.actor) == 0) {
+                        if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_WIZROBE)) {
+                            savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                            Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
                     }
+                }
                     break;
                 case 11:
                     if (randoGetLoadedActorNumInSameRoom(play, &this->slidingDoor.dyna.actor) == 0) {
                         if (!rando_has_item(AP_ITEM_ID_SOUL_MINIBOSS_GOMESS)) {
+                            savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
+                            Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
+                    }
+                }
+                    break;
+                case 10:
+                    if (randoGetLoadedActorNumInSameRoom(play, &this->slidingDoor.dyna.actor) == 0) {
+                        if (!rando_has_item(AP_ITEM_ID_SOUL_ENEMY_GAROMASTER)) {
                             savedDoorClearFlag = Flags_GetClear(play, this->slidingDoor.dyna.actor.room);
                             Flags_SetClear(play, this->slidingDoor.dyna.actor.room);
                     }
