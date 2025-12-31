@@ -566,18 +566,30 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
             }
             break;
     }
-    
-    // always kill tatl messages
-    switch (actor->id) {
-        case ACTOR_ELF_MSG:
-        case ACTOR_ELF_MSG2:
-        case ACTOR_ELF_MSG3:
-        case ACTOR_ELF_MSG4:
-        case ACTOR_ELF_MSG5:
-        case ACTOR_ELF_MSG6:
-            *should = false;
-            actor->destroy = NULL;
-            break;
+
+    // prevent chests from spawning when you don't have their accompanying enemy soul
+    if (actor->id == ACTOR_EN_BOX && rando_get_slotdata_u32("enemy_souls")) {
+        switch (play->sceneId) {
+            // grottos
+            case SCENE_KAKUSIANA:
+                recomp_printf("box room num %d\n", play->roomCtx.curRoom.num);
+                switch (play->roomCtx.curRoom.num) {
+                    case 7: // dodongo grotto
+                        if (!rando_has_item(AP_ITEM_PREFIX_SOUL_ENEMY | ACTOR_EN_DODONGO)) {
+                            *should = false;
+                            actor->destroy = NULL;
+                        }
+                        return;
+                    case 13: // peahat grotto
+                        if (!rando_has_item(AP_ITEM_PREFIX_SOUL_ENEMY | ACTOR_EN_PEEHAT)) {
+                            *should = false;
+                            actor->destroy = NULL;
+                        }
+                        return;
+                }
+            default:
+                break;
+        }
     }
     
     // switch (actor->id) {
