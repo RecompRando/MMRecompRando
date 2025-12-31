@@ -175,6 +175,14 @@ options = [ "Disabled", "Enabled" ]
 default = "Disabled"
 
 [[manifest.config_options]]
+id = "torchsanity"
+name = "(DEBUG) Torchsanity"
+description = "Enable/Disable Torchsanity."
+type = "Enum"
+options = [ "Disabled", "Enabled", "Snuffsanity" ]
+default = "Disabled"
+
+[[manifest.config_options]]
 id = "skip_time"
 name = "(DEBUG) Skip Time by Pressing L"
 description = "Enable/Disable time being skipped when pressing L to the following options."
