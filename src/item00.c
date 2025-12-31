@@ -875,7 +875,7 @@ void EnItem00_RandoGive(EnItem00* this, PlayState* play, s32 getItemId, u32 loca
         }
         
         if (isAP(rando_get_item_id(location))) {
-            char item_name[33];
+            char item_name[64];
             char player_name[36];
             ItemId item_id = (locationType == RANDO_ITEM_CLASS_JUNK) ? ITEM_AP_FILLER : ITEM_AP_USEFUL;
             rando_get_location_item_name(location, item_name);

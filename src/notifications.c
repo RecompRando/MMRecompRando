@@ -326,6 +326,8 @@ RecompuiColor* notification_get_item_classification_color(RandoItemClassificatio
 }
 
 void randoEmitRecieveNotification(const char* item_name, const char* from_name, const ItemId item, RandoItemClassification item_class) {
+    return; // Disabled because they crash all the damn time.
+
     const float max_text_width = NOTIFICATION_WIDTH - IMG_SIZE - (NOTIFICATION_PADDING * 3);
 
     recompui_open_context(notif_context);
@@ -360,6 +362,8 @@ void randoEmitRecieveNotification(const char* item_name, const char* from_name, 
 }
 
 void randoEmitSendNotification(const char* item_name, const char* to_name, const ItemId item, RandoItemClassification item_class) {
+    return; // Disabled because they crash all the damn time.
+
     const float max_text_width = NOTIFICATION_WIDTH - IMG_SIZE - (NOTIFICATION_PADDING * 3);
 
     recompui_open_context(notif_context);
@@ -394,6 +398,8 @@ void randoEmitSendNotification(const char* item_name, const char* to_name, const
 }
 
 void randoEmitNormalNotification(const char* notif_text) {
+    return; // Disabled because they crash all the damn time.
+
     recompui_open_context(notif_context);
 
     RecompuiResource notification = create_basic_notification_element();
@@ -406,6 +412,8 @@ void randoEmitNormalNotification(const char* notif_text) {
 }
 
 void randoEmitErrorNotification(const char* error_text) {
+    return; // Disabled because they crash all the damn time.
+
     recompui_open_context(notif_context);
 
     RecompuiResource notification = create_basic_notification_element();
