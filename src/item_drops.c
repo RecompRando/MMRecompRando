@@ -3,6 +3,10 @@
 
 #include "apcommon.h"
 
+#include "actor_helpers.h"
+#define LOCATION_ENEMY_DROP(actor) (0x1000000 + (actor->id << 16) + (play->sceneId << 8) + (play->roomCtx.curRoom.num << 4) \
+                            + randoGetLoadedActorNumInSameRoom(play, actor))
+
 #define FAIRY_PARAMS(type, boolParam, collectibleFlag) (((type) /* & 0xF */) | (((boolParam) & 0x1) << 8) | ((((collectibleFlag) & 0x7F) << 9) & 0xFE00))
 
 typedef enum {
@@ -338,6 +342,11 @@ RECOMP_PATCH void Item_DropCollectibleRandom(PlayState* play, Actor* fromActor, 
     s16 dropTableIndex = Rand_ZeroOne() * 16.0f;
     s16 param8000 = params & 0x8000;
     u8 dropFlag;
+
+    if (fromActor != NULL && !rando_location_is_checked(LOCATION_ENEMY_DROP(fromActor))) {
+        Item_RandoDropCollectible(play, &fromActor->world.pos, ITEM00_APITEM, LOCATION_ENEMY_DROP(fromActor));
+        return;
+    }
 
     params &= 0x1F0;
 
