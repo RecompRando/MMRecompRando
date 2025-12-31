@@ -1,5 +1,7 @@
 #include "modding.h"
 #include "global.h"
+#include "recompconfig.h"
+#include "recomputils.h"
 
 #include "apcommon.h"
 
