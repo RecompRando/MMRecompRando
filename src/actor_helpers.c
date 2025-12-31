@@ -592,23 +592,13 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
 }
 
 // this is likely temporary as we'd want to PR most if not all of these (unless its a rando only issue)
-RECOMP_IMPORT("mm_recomp_better_double_sot", void dsot_set_blacklist_true(void));
+RECOMP_IMPORT("mm_recomp_better_double_sot", void dsot_set_whitelist_true(void));
 
-// we want to add any "breakable" objects here that would respawn otherwise
-// also do not add anything that would change on different days
-RECOMP_CALLBACK("mm_recomp_better_double_sot", dsot_on_blacklist_check)
-void dsot_set_rando_actor_blacklists(s16 actor_id) {
-    switch (actor_id) {
-        case ACTOR_EN_ITEM00: // items shouldn't despawn/respawn when the day is changed
-        // grass
-        case ACTOR_EN_KUSA:
-        case ACTOR_EN_KUSA2:
-        case ACTOR_OBJ_GRASS:
-        case ACTOR_OBJ_GRASS_UNIT:
-        case ACTOR_OBJ_GRASS_CARRY:
-        // crates
-        case ACTOR_OBJ_KIBAKO:
-        case ACTOR_OBJ_KIBAKO2:
-            dsot_set_blacklist_true();
-    }
+// anything that should actually respawn on time changes should go in here
+RECOMP_CALLBACK("mm_recomp_better_double_sot", dsot_on_whitelist_check)
+void dsot_set_rando_actor_whitelists(s16 actor_id) {
+    // switch (actor_id) {
+    //     case ACTOR:
+    //         dsot_set_whitelist_true();
+    // }
 }

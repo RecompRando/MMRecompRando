@@ -172,7 +172,7 @@ name = "(DEBUG) Skip Time by Pressing L"
 description = "Enable/Disable time being skipped when pressing L to the following options."
 type = "Enum"
 options = [ "Disabled", "Enabled" ]
-default = "Enabled"
+default = "Disabled"
 
 [[manifest.config_options]]
 id = "time_day"
