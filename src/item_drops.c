@@ -343,7 +343,7 @@ RECOMP_PATCH void Item_DropCollectibleRandom(PlayState* play, Actor* fromActor, 
     s16 param8000 = params & 0x8000;
     u8 dropFlag;
 
-    if (fromActor != NULL && !rando_location_is_checked(LOCATION_ENEMY_DROP(fromActor))) {
+    if (recomp_get_config_u32("enemy_drops") && fromActor != NULL && !rando_location_is_checked(LOCATION_ENEMY_DROP(fromActor))) {
         Item_RandoDropCollectible(play, &fromActor->world.pos, ITEM00_APITEM, LOCATION_ENEMY_DROP(fromActor));
         return;
     }

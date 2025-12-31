@@ -167,6 +167,14 @@ options = [ "Disabled", "Enabled" ]
 default = "Enabled"
 
 [[manifest.config_options]]
+id = "enemy_drops"
+name = "(DEBUG) Replace Enemy Drops"
+description = "Enable/Disable random drops from being randomized."
+type = "Enum"
+options = [ "Disabled", "Enabled" ]
+default = "Disabled"
+
+[[manifest.config_options]]
 id = "skip_time"
 name = "(DEBUG) Skip Time by Pressing L"
 description = "Enable/Disable time being skipped when pressing L to the following options."
