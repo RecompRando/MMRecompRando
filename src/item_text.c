@@ -4,6 +4,11 @@
 
 #include "z64snap.h"
 
+#define TINGLE_LOCATION_BASE 0xB4
+#define SCRUB_LOCATION_BASE 0x090100
+#define MILK_BAR_LOCATION_MILK 0x090100 | GI_MILK
+#define MILK_BAR_LOCATION_CHATEAU GI_CHATEAU
+
 void Message_OpenText(PlayState* play, u16 textId);
 
 RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
@@ -107,8 +112,56 @@ static unsigned char fast_dog_msg[128] = "\x0a\x0a\x0a\x0a\x0a\x0a.\x0a.\x0a.\x0
 static unsigned char fool_msg[128] = "You are a\x01 FOOL!\xbf";
 
 static unsigned char shop_msg[128];
+static unsigned char tingle_msg[512];
 
 static unsigned char moon_weak_msg[128] = "...But you are not strong enough...\x11\x13\x13\x12Shall...I send you back?\x02\x11\x11\xc2Yes\x11No\xbf";
+
+static unsigned char tingle_msg[512];
+static unsigned char scrub_msg[256];
+static unsigned char milkbar_msg[512];
+
+#define TINGLE_LOCATION_BASE 0xB4
+#define SCRUB_LOCATION_BASE 0x090100
+
+static s16 sTingleMapOptions[6][2] = {
+    { 0, 1 }, // CLOCK_TOWN: offers Clock Town, Woodfall
+    { 1, 2 }, // WOODFALL: offers Woodfall, Snowhead
+    { 2, 3 }, // SNOWHEAD: offers Snowhead, Romani Ranch
+    { 3, 4 }, // ROMANI_RANCH: offers Romani Ranch, Great Bay
+    { 4, 5 }, // GREAT_BAY: offers Great Bay, Stone Tower
+    { 5, 0 }, // STONE_TOWER: offers Stone Tower, Clock Town
+};
+
+static s16 sScrubGI[4] = {
+    GI_MAGIC_BEANS,    // 0 - Swamp (10 rupees)
+    GI_BOMB_BAG_40,    // 1 - Goron (200 rupees)
+    GI_POTION_GREEN,   // 2 - Zora (40 rupees)
+    GI_POTION_BLUE,    // 3 - Ikana (100 rupees)
+};
+
+static s16 sScrubPrices[4] = {
+    10,
+    200,
+    40,
+    100,
+};
+
+static u8 sold_prefix[] = "\x07SOLD - ";
+static u8 rupees_str[] = " Rupees";
+static u8 no_thanks_str[] = "No thanks";
+static u8 nothing_str[] = "Nothing";
+static u8 yes_str[] = "Yes";
+static u8 no_str[] = "No";
+
+u8 getItemColor(u32 location) {
+    switch (rando_get_location_type(location)) {
+        case 1:  return 0x05;  // progression - purple
+        case 2:  return 0x03;  // useful - blue
+        case 3:  return 0x08;  // trap - orange
+        case 0:
+        default: return 0x07;  // filler - grey
+    }
+}
 
 void Message_FindMessage(PlayState* play, u16 textId);
 
@@ -222,7 +275,7 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         DmaMgr_SendRequest0(&font->msgBuf, (uintptr_t) &SEGMENT_ROM_START(message_data_static)[font->messageStart],
                             font->messageEnd);
     }
-
+    
     msgCtx->choiceNum = 0;
     msgCtx->textUnskippable = false;
     msgCtx->textboxEndType = TEXTBOX_ENDTYPE_00;
@@ -375,6 +428,368 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         font->msgBuf.schar[0] = 0x06;
         font->msgBuf.schar[1] = 0x71;
     }
+
+// Tingle map purchase menus (0x1D11-0x1D16)
+    if (textId >= 0x1D11 && textId <= 0x1D16) {
+        u8 locationMapId = textId - 0x1D11;
+        u32 location1 = TINGLE_LOCATION_BASE + sTingleMapOptions[locationMapId][0];
+        u32 location2 = TINGLE_LOCATION_BASE + sTingleMapOptions[locationMapId][1];
+        bool sold1 = rando_location_is_checked(location1);
+        bool sold2 = rando_location_is_checked(location2);
+
+        char item1_str[67], item2_str[67];
+        char player1_str[36], player2_str[36];
+        rando_get_location_item_name(location1, item1_str);
+        rando_get_location_item_name(location2, item2_str);
+        rando_get_location_item_player(location1, player1_str);
+        rando_get_location_item_player(location2, player2_str);
+        sanitizeRandoText(item1_str);
+        sanitizeRandoText(item2_str);
+        sanitizeRandoText(player1_str);
+        sanitizeRandoText(player2_str);
+
+        s16 price1 = 20;
+        s16 price2 = 40;
+        s16 gi1 = rando_get_item_id(location1);
+        s16 gi2 = rando_get_item_id(location2);
+
+        msgCtx->unk1206C = price1;
+        msgCtx->unk12070 = price2;
+
+        font->msgBuf.schar[0] = 0x06;
+        font->msgBuf.schar[1] = 0x01;
+        font->msgBuf.schar[2] = 0xFE;
+        font->msgBuf.schar[3] = 0xFF;
+        font->msgBuf.schar[4] = 0xFF;
+        font->msgBuf.schar[5] = 0x00;
+        font->msgBuf.schar[6] = 0x14;
+        font->msgBuf.schar[7] = 0x00;
+        font->msgBuf.schar[8] = 0x28;
+        font->msgBuf.schar[9] = 0xFF;
+        font->msgBuf.schar[10] = 0xFF;
+
+        u16 msg_i = 11;
+
+        font->msgBuf.schar[msg_i++] = 0x02;
+        font->msgBuf.schar[msg_i++] = 0xC3;
+
+        if (sold1) {
+            for (i = 0; sold_prefix[i] != 0; i++) {
+                font->msgBuf.schar[msg_i++] = sold_prefix[i];
+            }
+        } else {
+            font->msgBuf.schar[msg_i++] = getItemColor(location1);
+        }
+
+        for (i = 0; item1_str[i] != 0; i++) {
+            font->msgBuf.schar[msg_i++] = item1_str[i];
+        }
+
+        if (!sold1) {
+            font->msgBuf.schar[msg_i++] = 0x00;
+            font->msgBuf.schar[msg_i++] = ':';
+            font->msgBuf.schar[msg_i++] = ' ';
+            font->msgBuf.schar[msg_i++] = 0x01;
+
+            if (price1 >= 10) {
+                font->msgBuf.schar[msg_i++] = (price1 / 10) + 0x30;
+            }
+            font->msgBuf.schar[msg_i++] = (price1 % 10) + 0x30;
+
+            for (i = 0; rupees_str[i] != 0; i++) {
+                font->msgBuf.schar[msg_i++] = rupees_str[i];
+            }
+
+            if (gi1 == GI_AP_PROG || gi1 == GI_AP_USEFUL || gi1 == GI_AP_FILLER) {
+                font->msgBuf.schar[msg_i++] = 0x00;
+                font->msgBuf.schar[msg_i++] = ' ';
+                font->msgBuf.schar[msg_i++] = '(';
+                for (i = 0; player1_str[i] != 0; i++) {
+                    font->msgBuf.schar[msg_i++] = player1_str[i];
+                }
+                font->msgBuf.schar[msg_i++] = ')';
+            }
+        }
+
+        font->msgBuf.schar[msg_i++] = 0x11;
+        font->msgBuf.schar[msg_i++] = 0x02;
+
+        if (sold2) {
+            for (i = 0; sold_prefix[i] != 0; i++) {
+                font->msgBuf.schar[msg_i++] = sold_prefix[i];
+            }
+        } else {
+            font->msgBuf.schar[msg_i++] = getItemColor(location2);
+        }
+
+        for (i = 0; item2_str[i] != 0; i++) {
+            font->msgBuf.schar[msg_i++] = item2_str[i];
+        }
+
+        if (!sold2) {
+            font->msgBuf.schar[msg_i++] = 0x00;
+            font->msgBuf.schar[msg_i++] = ':';
+            font->msgBuf.schar[msg_i++] = ' ';
+            font->msgBuf.schar[msg_i++] = 0x01;
+
+            if (price2 >= 10) {
+                font->msgBuf.schar[msg_i++] = (price2 / 10) + 0x30;
+            }
+            font->msgBuf.schar[msg_i++] = (price2 % 10) + 0x30;
+
+            for (i = 0; rupees_str[i] != 0; i++) {
+                font->msgBuf.schar[msg_i++] = rupees_str[i];
+            }
+
+            if (gi2 == GI_AP_PROG || gi2 == GI_AP_USEFUL || gi2 == GI_AP_FILLER) {
+                font->msgBuf.schar[msg_i++] = 0x00;
+                font->msgBuf.schar[msg_i++] = ' ';
+                font->msgBuf.schar[msg_i++] = '(';
+                for (i = 0; player2_str[i] != 0; i++) {
+                    font->msgBuf.schar[msg_i++] = player2_str[i];
+                }
+                font->msgBuf.schar[msg_i++] = ')';
+            }
+        }
+
+        font->msgBuf.schar[msg_i++] = 0x11;
+        font->msgBuf.schar[msg_i++] = 0x02;
+
+        for (i = 0; no_thanks_str[i] != 0; i++) {
+            font->msgBuf.schar[msg_i++] = no_thanks_str[i];
+        }
+
+        font->msgBuf.schar[msg_i++] = 0xBF;
+    }
+
+    // Business Scrubs (0x15EA)
+    if (textId == 0x15EA && rando_scrubs_enabled()) {
+        Actor* talkActor = msgCtx->talkActor;
+        if (talkActor != NULL && talkActor->id == ACTOR_EN_AKINDONUTS) {
+            s32 scrubType = talkActor->params & 3;
+            u32 location = SCRUB_LOCATION_BASE | sScrubGI[scrubType];
+            s16 scrub_price = sScrubPrices[scrubType];
+            bool sold = rando_location_is_checked(location);
+
+            char item_str[67];
+            char player_str[36];
+            rando_get_location_item_name(location, item_str);
+            rando_get_location_item_player(location, player_str);
+            sanitizeRandoText(item_str);
+            sanitizeRandoText(player_str);
+
+            s16 gi_item = rando_get_item_id(location);
+
+            font->msgBuf.schar[0] = 0x06;
+            font->msgBuf.schar[1] = 0x01;
+            font->msgBuf.schar[2] = 0xFE;
+            font->msgBuf.schar[3] = 0xFF;
+            font->msgBuf.schar[4] = 0xFF;
+            font->msgBuf.schar[5] = 0xFF;
+            font->msgBuf.schar[6] = 0xFF;
+            font->msgBuf.schar[7] = 0xFF;
+            font->msgBuf.schar[8] = 0xFF;
+            font->msgBuf.schar[9] = 0xFF;
+            font->msgBuf.schar[10] = 0xFF;
+
+            u16 msg_i = 11;
+
+            if (sold) {
+                for (i = 0; sold_prefix[i] != 0; i++) {
+                    font->msgBuf.schar[msg_i++] = sold_prefix[i];
+                }
+            } else {
+                font->msgBuf.schar[msg_i++] = getItemColor(location);
+            }
+
+            for (i = 0; item_str[i] != 0; i++) {
+                font->msgBuf.schar[msg_i++] = item_str[i];
+            }
+
+            if (!sold) {
+                font->msgBuf.schar[msg_i++] = 0x00;
+                font->msgBuf.schar[msg_i++] = ':';
+                font->msgBuf.schar[msg_i++] = ' ';
+                font->msgBuf.schar[msg_i++] = 0x01;
+
+                if (scrub_price >= 100) {
+                    font->msgBuf.schar[msg_i++] = (scrub_price / 100) + 0x30;
+                }
+                if (scrub_price >= 10) {
+                    font->msgBuf.schar[msg_i++] = ((scrub_price % 100) / 10) + 0x30;
+                }
+                font->msgBuf.schar[msg_i++] = (scrub_price % 10) + 0x30;
+
+                for (i = 0; rupees_str[i] != 0; i++) {
+                    font->msgBuf.schar[msg_i++] = rupees_str[i];
+                }
+
+                if (gi_item == GI_AP_PROG || gi_item == GI_AP_USEFUL || gi_item == GI_AP_FILLER) {
+                    font->msgBuf.schar[msg_i++] = 0x00;
+                    font->msgBuf.schar[msg_i++] = ' ';
+                    font->msgBuf.schar[msg_i++] = '(';
+                    for (i = 0; player_str[i] != 0; i++) {
+                        font->msgBuf.schar[msg_i++] = player_str[i];
+                    }
+                    font->msgBuf.schar[msg_i++] = ')';
+                }
+            }
+
+            font->msgBuf.schar[msg_i++] = 0x11;
+            font->msgBuf.schar[msg_i++] = 0x11;
+            font->msgBuf.schar[msg_i++] = 0x02;
+            font->msgBuf.schar[msg_i++] = 0xC2;
+
+            for (i = 0; yes_str[i] != 0; i++) {
+                font->msgBuf.schar[msg_i++] = yes_str[i];
+            }
+
+            font->msgBuf.schar[msg_i++] = 0x11;
+
+            for (i = 0; no_str[i] != 0; i++) {
+                font->msgBuf.schar[msg_i++] = no_str[i];
+            }
+
+            font->msgBuf.schar[msg_i++] = 0xBF;
+        }
+    }
+
+    // Milk Bar (0x2B0B)
+    if (textId == 0x2B0B && rando_shopsanity_enabled()) {
+        u32 location1 = 0x26392;  // (ACTOR_EN_TAB << 8) | GI_MILK
+        u32 location2 = 0x91;     // GI_CHATEAU
+        bool sold1 = rando_location_is_checked(location1);
+        bool sold2 = rando_location_is_checked(location2);
+
+        char item1_str[67], item2_str[67];
+        char player1_str[36], player2_str[36];
+        rando_get_location_item_name(location1, item1_str);
+        rando_get_location_item_name(location2, item2_str);
+        rando_get_location_item_player(location1, player1_str);
+        rando_get_location_item_player(location2, player2_str);
+        sanitizeRandoText(item1_str);
+        sanitizeRandoText(item2_str);
+        sanitizeRandoText(player1_str);
+        sanitizeRandoText(player2_str);
+
+        s16 price1 = 20;
+        s16 price2 = 200;
+        s16 gi1 = rando_get_item_id(location1);
+        s16 gi2 = rando_get_item_id(location2);
+
+        msgCtx->unk1206C = price1;
+        msgCtx->unk12070 = price2;
+
+        font->msgBuf.schar[0] = 0x06;
+        font->msgBuf.schar[1] = 0x01;
+        font->msgBuf.schar[2] = 0xFE;
+        font->msgBuf.schar[3] = 0xFF;
+        font->msgBuf.schar[4] = 0xFF;
+        font->msgBuf.schar[5] = 0x00;
+        font->msgBuf.schar[6] = 0x14;
+        font->msgBuf.schar[7] = 0x00;
+        font->msgBuf.schar[8] = 0xC8;
+        font->msgBuf.schar[9] = 0xFF;
+        font->msgBuf.schar[10] = 0xFF;
+
+        u16 msg_i = 11;
+
+        font->msgBuf.schar[msg_i++] = 0x02;
+        font->msgBuf.schar[msg_i++] = 0xC3;
+
+        if (sold1) {
+            for (i = 0; sold_prefix[i] != 0; i++) {
+                font->msgBuf.schar[msg_i++] = sold_prefix[i];
+            }
+        } else {
+            font->msgBuf.schar[msg_i++] = getItemColor(location1);
+        }
+
+        for (i = 0; item1_str[i] != 0; i++) {
+            font->msgBuf.schar[msg_i++] = item1_str[i];
+        }
+
+        if (!sold1) {
+            font->msgBuf.schar[msg_i++] = 0x00;
+            font->msgBuf.schar[msg_i++] = ':';
+            font->msgBuf.schar[msg_i++] = ' ';
+            font->msgBuf.schar[msg_i++] = 0x01;
+
+            if (price1 >= 10) {
+                font->msgBuf.schar[msg_i++] = (price1 / 10) + 0x30;
+            }
+            font->msgBuf.schar[msg_i++] = (price1 % 10) + 0x30;
+
+            for (i = 0; rupees_str[i] != 0; i++) {
+                font->msgBuf.schar[msg_i++] = rupees_str[i];
+            }
+
+            if (gi1 == GI_AP_PROG || gi1 == GI_AP_USEFUL || gi1 == GI_AP_FILLER) {
+                font->msgBuf.schar[msg_i++] = 0x00;
+                font->msgBuf.schar[msg_i++] = ' ';
+                font->msgBuf.schar[msg_i++] = '(';
+                for (i = 0; player1_str[i] != 0; i++) {
+                    font->msgBuf.schar[msg_i++] = player1_str[i];
+                }
+                font->msgBuf.schar[msg_i++] = ')';
+            }
+        }
+
+        font->msgBuf.schar[msg_i++] = 0x11;
+        font->msgBuf.schar[msg_i++] = 0x02;
+
+        if (sold2) {
+            for (i = 0; sold_prefix[i] != 0; i++) {
+                font->msgBuf.schar[msg_i++] = sold_prefix[i];
+            }
+        } else {
+            font->msgBuf.schar[msg_i++] = getItemColor(location2);
+        }
+
+        for (i = 0; item2_str[i] != 0; i++) {
+            font->msgBuf.schar[msg_i++] = item2_str[i];
+        }
+
+        if (!sold2) {
+            font->msgBuf.schar[msg_i++] = 0x00;
+            font->msgBuf.schar[msg_i++] = ':';
+            font->msgBuf.schar[msg_i++] = ' ';
+            font->msgBuf.schar[msg_i++] = 0x01;
+
+            if (price2 >= 100) {
+                font->msgBuf.schar[msg_i++] = (price2 / 100) + 0x30;
+            }
+            if (price2 >= 10) {
+                font->msgBuf.schar[msg_i++] = ((price2 % 100) / 10) + 0x30;
+            }
+            font->msgBuf.schar[msg_i++] = (price2 % 10) + 0x30;
+
+            for (i = 0; rupees_str[i] != 0; i++) {
+                font->msgBuf.schar[msg_i++] = rupees_str[i];
+            }
+
+            if (gi2 == GI_AP_PROG || gi2 == GI_AP_USEFUL || gi2 == GI_AP_FILLER) {
+                font->msgBuf.schar[msg_i++] = 0x00;
+                font->msgBuf.schar[msg_i++] = ' ';
+                font->msgBuf.schar[msg_i++] = '(';
+                for (i = 0; player2_str[i] != 0; i++) {
+                    font->msgBuf.schar[msg_i++] = player2_str[i];
+                }
+                font->msgBuf.schar[msg_i++] = ')';
+            }
+        }
+
+        font->msgBuf.schar[msg_i++] = 0x11;
+        font->msgBuf.schar[msg_i++] = 0x02;
+
+        for (i = 0; nothing_str[i] != 0; i++) {
+            font->msgBuf.schar[msg_i++] = nothing_str[i];
+        }
+
+        font->msgBuf.schar[msg_i++] = 0xBF;
+    }
+    
+    // Potion Shop
     if ((textId & 0xFF00) == 0x3600 || (textId & 0xFF00) == 0x3700 || (textId == 0x0880 && rando_shopsanity_enabled() && !rando_location_is_checked_async(0x090002))) {
         msg = shop_msg;
         font->msgBuf.schar[0] = 0x06;
