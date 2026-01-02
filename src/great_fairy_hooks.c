@@ -168,6 +168,11 @@ RECOMP_PATCH void EnElfgrp_Init(Actor* thisx, PlayState* play) {
 
 void EnElfgrp_OfferLoop(EnElfgrp* this, PlayState* play) {
     s32 type = ENELFGRP_GET_TYPE(&this->actor);
+    if (rando_great_fairy_rewards_disabled())
+    {
+        return;
+    }
+    
     bool hasFairies = type == ENELFGRP_TYPE_MAGIC ? rando_has_item(0x01007F) : rando_has_item(0x010000 | (type - 1)) >= rando_get_slotdata_u32("required_stray_fairies");
 
     if (hasFairies && !rando_location_is_checked(LOCATION_GREAT_FAIRY)) {

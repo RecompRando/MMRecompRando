@@ -389,6 +389,12 @@ static EnumOptionValue rando_skullsanity_options[] = {
     { "ignore", NULL },
 };
 
+static EnumOptionValue rando_shuffle_great_fairy_rewards_options[] ={
+    { "vanilla", NULL },
+    { "anything", NULL },
+    { "ignore", NULL},
+};
+
 static EnumOptionValue rando_shopsanity_options[] = {
     { "vanilla", NULL },
     { "enabled", NULL },
@@ -498,7 +504,7 @@ void randoCreateYamlConfigMenu() {
     randoCreateBoolPropOption(&yaml_config_menu, "shuffle_spiderhouse_reward", "Shuffle Spiderhouse Rewards:", false);
     randoCreateIntSliderOption(&yaml_config_menu, "required_skull_tokens", "Required Skulltula Tokens:", 0, 30, 1, 30);
     randoCreateRadioOption(&yaml_config_menu, "skullsanity", "Skull-Sanity Mode:", rando_skullsanity_options, ARRAY_COUNT(rando_skullsanity_options), RANDO_SKULLSANITY_VANILLA);
-    randoCreateBoolPropOption(&yaml_config_menu, "shuffle_great_fairy_rewards", "Shuffle Great Fairy Rewards:", false);
+    randoCreateRadioOption(&yaml_config_menu, "shuffle_great_fairy_rewards", "Shuffle Great Fairy Rewards:", rando_shuffle_great_fairy_rewards_options, ARRAY_COUNT(rando_shuffle_great_fairy_rewards_options), RANDO_SHUFFLE_GREAT_FAIRY_REWARDS_VANILLA);
     randoCreateIntSliderOption(&yaml_config_menu, "required_stray_fairies", "Required Stray Fairies:", 0, 15, 1, 15);
     randoCreateBoolPropOption(&yaml_config_menu, "fairysanity", "Fairy-Sanity:", false);
     randoCreateRadioOption(&yaml_config_menu, "shop_prices", "Shop Prices:", shop_prices_options, ARRAY_COUNT(shop_prices_options), RANDO_SHOP_PRICES_VANILLA);
