@@ -64,6 +64,7 @@ If you picked up a phantom on a check that should be implemented, you can open a
 ## Known Issues
 
 - Kotake sometimes does not show the price of her shopsanity item in the second dialogue.
+- When using mod version 0.9.5, the game will crash when connecting to a seed generated on version 0.9.4 or below. Until this is properly addressed, a temporary solution is to downgrade the mod to [0.9.4](https://github.com/RecompRando/MMRecompRando/releases/tag/v0.9.4).
 
 ## Credit for additional mods included
 
