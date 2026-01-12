@@ -86,12 +86,6 @@ typedef enum {
 } RandoSkullSanity;
 
 typedef enum {
-    RANDO_SHUFFLE_GREAT_FAIRY_REWARDS_VANILLA = 0,
-    RANDO_SHUFFLE_GREAT_FAIRY_REWARDS_ENABLED = 1,
-    RANDO_SHUFFLE_GREAT_FAIRY_REWARDS_ADVANCED = 2
-} RandoShuffleGreatFairyRewards;
-
-typedef enum {
     RANDO_SHOP_PRICES_VANILLA = 0,
     RANDO_SHOP_PRICES_FREE = 1,
     RANDO_SHOP_PRICES_CHEAP = 2,

@@ -168,7 +168,7 @@ RECOMP_PATCH void EnElfgrp_Init(Actor* thisx, PlayState* play) {
 
 void EnElfgrp_OfferLoop(EnElfgrp* this, PlayState* play) {
     s32 type = ENELFGRP_GET_TYPE(&this->actor);
-    if (rando_great_fairy_rewards_disabled())
+    if (rando_get_slotdata_u32("shuffle_great_fairy_rewards") == 0)
     {
         return;
     }
