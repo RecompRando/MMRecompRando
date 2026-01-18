@@ -15,11 +15,6 @@ u32* mureIndex;
 ActorExtensionId mure2IndexExtension;
 u32* mure2Index;
 
-extern ActorExtensionId kusaGrassLocationExtension;
-extern u32* kusaLocation;
-extern ActorExtensionId rockLocationExtension;
-extern u32* rockLocation;
-
 u32 EnKusa_CreateLocation(PlayState* play, Actor* actor);
 
 // probably not the best way to do this
@@ -42,6 +37,7 @@ RECOMP_HOOK_RETURN("ObjMure_SpawnActors")
 void AfterObjMure_SpawnActors() {
     ObjMure* this = sObjMure;
     PlayState* play = gPlay;
+    u32* kusaLocation;
 
     if (this->svNum != 0 && this->svNum != 1) {
         return;
@@ -55,7 +51,7 @@ void AfterObjMure_SpawnActors() {
             continue;
         }
         if (this->children[i]->id == ACTOR_EN_KUSA) {
-            kusaLocation = z64recomp_get_extended_actor_data(this->children[i], kusaGrassLocationExtension);
+            kusaLocation = z64recomp_get_extended_actor_data(this->children[i], actorLocationExtension);
             *kusaLocation = LOCATION_MURE(i);
         }
     }
@@ -115,6 +111,7 @@ void AfterObjMure2_SpawnChildren() {
     PlayState* play = gPlay;
     Mure2ChildType childType = OBJ_MURE2_GET_CHILD_TYPE(&this->actor);
     mure2Index = z64recomp_get_extended_actor_data(&this->actor, mure2IndexExtension);
+    u32* location;
 
     for (s32 i = 0; i < sChildCounts[childType]; i++) {
         if (this->actors[i] == NULL) {
@@ -123,12 +120,12 @@ void AfterObjMure2_SpawnChildren() {
         switch (childType) {
             case OBJMURE2_CHILDTYPE_BUSH_RING:
             case OBJMURE2_CHILDTYPE_BUSH_SCATTERED:
-                kusaLocation = z64recomp_get_extended_actor_data(this->actors[i], kusaGrassLocationExtension);
-                *kusaLocation = LOCATION_MURE2(i);
+                location = z64recomp_get_extended_actor_data(this->actors[i], actorLocationExtension);
+                *location = LOCATION_MURE2(i);
                 break;
             case OBJMURE2_CHILDTYPE_ROCK_RING:
-                rockLocation = z64recomp_get_extended_actor_data(this->actors[i], rockLocationExtension);
-                *rockLocation = LOCATION_MURE2_ROCK(i);
+                location = z64recomp_get_extended_actor_data(this->actors[i], actorLocationExtension);
+                *location = LOCATION_MURE2_ROCK(i);
                 break;
             default:
                 break;

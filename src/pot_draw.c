@@ -12,15 +12,6 @@
 #include "overlays/actors/ovl_En_Tubo_Trap/z_en_tubo_trap.h"
 #include "overlays/actors/ovl_Obj_Flowerpot/z_obj_flowerpot.h"
 
-extern ActorExtensionId potLocationExtension;
-extern u32* potLocation;
-extern ActorExtensionId potDroppedExtension;
-extern bool* potDropped;
-extern ActorExtensionId potFlyingLocationExtension;
-extern u32* potFlyingLocation;
-extern ActorExtensionId potFlowerLocationExtension;
-extern u32* potFlowerLocation;
-
 typedef struct {
     /* 0x00 */ s16 objectId;
     /* 0x04 */ f32 scale;
@@ -176,8 +167,8 @@ RECOMP_PATCH void ObjTsubo_Draw(Actor* thisx, PlayState* play2) {
     PlayState* play = (PlayState*)play2;
     ObjTsubo* this = ((ObjTsubo*)thisx);
 
-    potLocation = z64recomp_get_extended_actor_data(&this->actor, potLocationExtension);
-    potDropped = z64recomp_get_extended_actor_data(&this->actor, potDroppedExtension);
+    u32* potLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
+    bool* potDropped = z64recomp_get_extended_actor_data(&this->actor, actorDroppedExtension);
 
     // if (!rando_get_slotdata_u32("potsanity") || (rando_location_is_checked(*potLocation) && !(*potDropped)) ||
     //     (OBJ_TSUBO_PFE00(thisx) && ((func_800A8150(OBJ_TSUBO_P003F(thisx)) != ITEM00_FLEXIBLE)) && !rando_get_slotdata_u32("fairysanity"))) { // stray fairies
@@ -191,14 +182,14 @@ RECOMP_PATCH void ObjTsubo_Draw(Actor* thisx, PlayState* play2) {
 
 // flying pot
 RECOMP_PATCH void EnTuboTrap_Draw(Actor* thisx, PlayState* play) {
-    potFlyingLocation = z64recomp_get_extended_actor_data(thisx, potFlyingLocationExtension);
+    u32* potLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     
-    if (!rando_get_slotdata_u32("potsanity") || rando_location_is_checked(*potFlyingLocation) || !rando_get_camc_enabled()) {
+    if (!rando_get_slotdata_u32("potsanity") || rando_location_is_checked(*potLocation) || !rando_get_camc_enabled()) {
         Gfx_DrawDListOpa(play, gameplay_dangeon_keep_DL_017EA0);
         return;
     }
 
-    GenericPot_DrawRando(play, *potFlyingLocation, 0);
+    GenericPot_DrawRando(play, *potLocation, 0);
 }
 
 // flower pot
@@ -248,8 +239,8 @@ RECOMP_PATCH void ObjFlowerpot_Draw(Actor* thisx, PlayState* play) {
         }
 
         Color_RGB8 color;
-        potFlowerLocation = z64recomp_get_extended_actor_data(&this->actor, potFlowerLocationExtension);
-        if (rando_get_slotdata_u32("potsanity") && !rando_location_is_checked(*potFlowerLocation) && get_rando_color(&color, *potFlowerLocation)) {
+        u32* potLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
+        if (rando_get_slotdata_u32("potsanity") && !rando_location_is_checked(*potLocation) && get_rando_color(&color, *potLocation)) {
             gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, color.r, color.g, color.b, 255);
             gSPDisplayList(POLY_OPA_DISP++, randoFlowerPotLeavesDL);
         } else {

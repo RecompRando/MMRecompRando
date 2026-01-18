@@ -15,11 +15,6 @@
 #define LOCATION_FAIRY_BUTTERFLY (AP_PREFIX_BUTTERFLIES | (sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                                     | randoGetLoadedActorNumInSameRoom(play, thisx))
 
-ActorExtensionId butterflyLocationExtension;
-u32* butterflyLocation;
-extern ActorExtensionId fairyLocationExtension;
-extern u32* fairyLocation;
-
 EnButte* sEnButte;
 
 void func_8091C140(void);
@@ -44,7 +39,7 @@ void OnEnButte_Init(Actor* thisx, PlayState* play) {
         sceneId = getCurrentGrotto(play);
     }
 
-    butterflyLocation = z64recomp_get_extended_actor_data(thisx, butterflyLocationExtension);
+    u32* butterflyLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     *butterflyLocation = LOCATION_FAIRY_BUTTERFLY;
 
     // grab textures
@@ -56,6 +51,9 @@ RECOMP_PATCH void func_8091CFB4(EnButte* this, PlayState* play) {
     Actor* fairy;
     SkelAnime_Update(&this->skelAnime);
     func_8091C140();
+    
+    u32* butterflyLocation;
+    u32* fairyLocation;
 
     if (this->unk_24C == 5) {
         SoundSource_PlaySfxAtFixedWorldPos(play, &this->actor.world.pos, 60, NA_SE_EV_BUTTERFRY_TO_FAIRY);
@@ -64,9 +62,9 @@ RECOMP_PATCH void func_8091CFB4(EnButte* this, PlayState* play) {
                     this->actor.focus.pos.z, 0, this->actor.shape.rot.y, 0, FAIRY_PARAMS(FAIRY_TYPE_2, false, 0));
         this->unk_250 = 0;
         
-        butterflyLocation = z64recomp_get_extended_actor_data(&this->actor, butterflyLocationExtension);
+        butterflyLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
         if (rando_get_slotdata_u32("realfairysanity") && !rando_location_is_checked(*butterflyLocation)) {
-            fairyLocation = z64recomp_get_extended_actor_data(fairy, fairyLocationExtension);
+            fairyLocation = z64recomp_get_extended_actor_data(fairy, actorLocationExtension);
             *fairyLocation = *butterflyLocation;
             fairy->draw = EnElf_RandoDraw;
         }
@@ -101,7 +99,7 @@ void EnButte_NotHorribleButterflies() {
 void func_8091C178(EnButte* this, PlayState* play);
 
 s32 EnButte_OverrideLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3s* rot, Actor* thisx) {
-    butterflyLocation = z64recomp_get_extended_actor_data(thisx, butterflyLocationExtension);
+    u32* butterflyLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     Color_RGB8 color;
 
     if (get_rando_color(&color, *butterflyLocation) && rando_get_slotdata_u32("realfairysanity")) {

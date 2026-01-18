@@ -19,12 +19,8 @@
 
 #define DISPLAY_TIME (2 * 20)
 
-ActorExtensionId wonderHitLocationExtension;
-u32* wonderHitLocation;
 ActorExtensionId wonderHitTimerExtension;
 u32* wonderHitTimer;
-ActorExtensionId wonderRupeeLocationExtension;
-u32* wonderRupeeLocation;
 
 static Vec3f sEffectVelocity = { 0.0f, 0.1f, 0.0f };
 static Vec3f sEffectAccel = { 0.0f, 0.01f, 0.0f };
@@ -35,7 +31,7 @@ static Color_RGBA8 sEffectEnvColor = { 255, 255, 255, 255 };
 // Hit Tag (Invisible hitbox that can spawn rupees)
 RECOMP_HOOK("EnHitTag_Init")
 void OnEnHitTag_Init(Actor* thisx, PlayState* play) {
-    wonderHitLocation = z64recomp_get_extended_actor_data(thisx, wonderHitLocationExtension);
+    u32* wonderHitLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     *wonderHitLocation = LOCATION_WONDER_HIT;
     wonderHitTimer = z64recomp_get_extended_actor_data(thisx, wonderHitTimerExtension);
     *wonderHitTimer = 0;
@@ -48,7 +44,7 @@ void OnEnHitTag_Update(Actor* thisx, PlayState* play) {
     Color_RGB8 color = { 255, 255, 127 };
     bool shouldShow = false;
 
-    wonderHitLocation = z64recomp_get_extended_actor_data(thisx, wonderHitLocationExtension);
+    u32* wonderHitLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     wonderHitTimer = z64recomp_get_extended_actor_data(thisx, wonderHitTimerExtension);
 
     if (!rando_get_slotdata_u32("hitsanity")) return;
@@ -97,7 +93,7 @@ RECOMP_PATCH void EnHitTag_WaitForHit(EnHitTag* this, PlayState* play) {
     Vec3f dropLocation;
     s32 i;
 
-    wonderHitLocation = z64recomp_get_extended_actor_data(&this->actor, wonderHitLocationExtension);
+    u32* wonderHitLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
 
     if (this->collider.base.acFlags & AC_HIT) {
         Audio_PlaySfx(NA_SE_SY_GET_RUPY);
@@ -122,14 +118,14 @@ RECOMP_PATCH void EnHitTag_WaitForHit(EnHitTag* this, PlayState* play) {
 // Invisible Rupees
 RECOMP_HOOK("EnInvisibleRuppe_Init")
 void OnEnInvisibleRuppe_Init(Actor* thisx, PlayState* play) {
-    wonderRupeeLocation = z64recomp_get_extended_actor_data(thisx, wonderRupeeLocationExtension);
+    u32* wonderRupeeLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     *wonderRupeeLocation = LOCATION_WONDER_RUPEE;
 }
 
 RECOMP_HOOK("EnInvisibleRuppe_Update")
 void OnEnInvisibleRuppe_Update(Actor* thisx, PlayState* play) {
     Vec3f pos;
-    wonderRupeeLocation = z64recomp_get_extended_actor_data(thisx, wonderRupeeLocationExtension);
+    u32* wonderRupeeLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     Color_RGB8 color = { 127, 255, 255 };
 
     if (!rando_get_slotdata_u32("invisisanity") || rando_location_is_checked_async(*wonderRupeeLocation)) return;
@@ -154,7 +150,7 @@ void EnItem00_RandoTextAndFreeze(EnItem00* this, PlayState* play);
 RECOMP_PATCH void func_80C2590C(EnInvisibleRuppe* this, PlayState* play) {
     Actor* item;
     if (this->collider.base.ocFlags1 & OC1_HIT) {
-        wonderRupeeLocation = z64recomp_get_extended_actor_data(&this->actor, wonderRupeeLocationExtension);
+        u32* wonderRupeeLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
         if (rando_get_slotdata_u32("invisisanity") && !rando_location_is_checked(*wonderRupeeLocation)) {
             item = Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *wonderRupeeLocation);
             ((EnItem00*)item)->actionFunc = EnItem00_RandoTextAndFreeze;

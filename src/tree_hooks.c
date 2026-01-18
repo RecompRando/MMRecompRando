@@ -19,18 +19,13 @@
 #define LOCATION_THIC_TREE (AP_PREFIX_TREE_TREES | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, &this->dyna.actor))
 
-ActorExtensionId palmTreeDropExtension;
-// ActorExtensionId snowTreeDropExtension; // already handled by actor
-ActorExtensionId woodTreeDropExtension;
-ActorExtensionId bigTreeDropExtension;
-
 // palm trees
 RECOMP_HOOK("ObjYasi_Update")
 void OnObjYasi_Update(Actor* thisx, PlayState* play) {
     ObjYasi* this = (ObjYasi*)thisx;
     Vec3f dropPos;
 
-    bool* dropped = z64recomp_get_extended_actor_data(thisx, palmTreeDropExtension);
+    bool* dropped = z64recomp_get_extended_actor_data(thisx, actorDroppedExtension);
 
     if (this->dyna.actor.home.rot.z != 0 && rando_get_slotdata_u32("treesanity") && !rando_location_is_checked(LOCATION_PALM_TREE) && !(*dropped)) {
         // if (CAN_DROP_NUT(thisx)) {
@@ -86,7 +81,7 @@ u16 EnWood02_GetIDHash(EnWood02* this) {
 
 RECOMP_HOOK("func_808C4458")
 void EnWood02_DropRandoItem(EnWood02* this, PlayState* play, Vec3f* dropsSpawnPt, u16 arg3) {
-    bool* dropped = z64recomp_get_extended_actor_data(&this->actor, woodTreeDropExtension);
+    bool* dropped = z64recomp_get_extended_actor_data(&this->actor, actorDroppedExtension);
     recomp_printf("draw type %d\n", this->drawType);
     
     // no idea how this is meant to work, could be simplified further with better understanding
@@ -112,7 +107,7 @@ void EnWood02_DropRandoItem(EnWood02* this, PlayState* play, Vec3f* dropsSpawnPt
 RECOMP_HOOK("ObjTree_SetupSway")
 void OnObjTree_SetupSway(ObjTree* this) {
     PlayState* play = gPlay;
-    bool* dropped = z64recomp_get_extended_actor_data(&this->dyna.actor, bigTreeDropExtension);
+    bool* dropped = z64recomp_get_extended_actor_data(&this->dyna.actor, actorDroppedExtension);
 
     if (rando_get_slotdata_u32("treesanity") && !rando_location_is_checked(LOCATION_THIC_TREE) && !(*dropped)) {
         Vec3f dropPos;

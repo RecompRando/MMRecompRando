@@ -12,14 +12,12 @@
 #define LOCATION_KEATON_GRASS_INCREMENTAL (AP_PREFIX_GRASS_KEATON | (play->sceneId << 8) | kusa2->unk_1BC)
 
 EnKusa2* keatonGrass;
-ActorExtensionId keatonGrassLocationExtension;
-u32* keatonGrassLocation;
 
 void grab_grass_texture();
 
 RECOMP_HOOK("EnKusa2_Init")
 void OnEnKusa2_Init(Actor* thisx, PlayState* play) {
-    keatonGrassLocation = z64recomp_get_extended_actor_data(thisx, keatonGrassLocationExtension);
+    u32* keatonGrassLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     *keatonGrassLocation = LOCATION_KEATON_GRASS;
 }
 
@@ -36,12 +34,13 @@ RECOMP_PATCH void func_80A5BD14(EnKusa2* this, PlayState* play, s32 arg2) {
     };
     EnKusa2* kusa2 = this->unk_1C0;
 
+    u32* keatonGrassLocation;
     if (kusa2 != NULL) {
         if (kusa2->unk_1BC > 8) {
             kusa2->unk_1BC = 8;
         }
 
-        keatonGrassLocation = z64recomp_get_extended_actor_data(&this->actor, keatonGrassLocationExtension);
+        keatonGrassLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
         u32 currentGrassLocation = *keatonGrassLocation;
         // if (incremental_keaton_grass_option) { // TODO: make an option
         //     currentGrassLocation = LOCATION_KEATON_GRASS_INCREMENTAL;

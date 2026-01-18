@@ -11,9 +11,6 @@
 
 #define LOCATION_SIGN (AP_PREFIX_SIGNS | (signId << 12) | this->actor.textId)
 
-ActorExtensionId signLocationExtension;
-ActorExtensionId signDropExtension;
-
 u16 signFrontTex[1024];
 u16 signSideTex[1024];
 u16 signPostTex[1024];
@@ -26,7 +23,7 @@ RECOMP_HOOK("EnKanban_Init")
 void EnKanban_Init(Actor* thisx, PlayState* play) {
     EnKanban* this = ((EnKanban*)thisx);
 
-    bool* dropped = z64recomp_get_extended_actor_data(thisx, signDropExtension);
+    bool* dropped = z64recomp_get_extended_actor_data(thisx, actorDroppedExtension);
     *dropped = false;
 
     if (this->actor.params != ENKANBAN_PIECE) {
@@ -74,7 +71,7 @@ void EnKanban_Init(Actor* thisx, PlayState* play) {
             break;
     }
 
-    u32* location = z64recomp_get_extended_actor_data(thisx, signLocationExtension);
+    u32* location = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     *location = LOCATION_SIGN;
 
     // if (this->actor.params != ENKANBAN_PIECE) {
@@ -93,8 +90,8 @@ void EnKanban_Init(Actor* thisx, PlayState* play) {
 RECOMP_HOOK("EnKanban_Update")
 void EnKanban_DropItem(Actor* thisx, PlayState* play) {
     EnKanban* this = ((EnKanban*)thisx);
-    u32* location = z64recomp_get_extended_actor_data(thisx, signLocationExtension);
-    bool* dropped = z64recomp_get_extended_actor_data(thisx, signDropExtension);
+    u32* location = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
+    bool* dropped = z64recomp_get_extended_actor_data(thisx, actorDroppedExtension);
 
     if (this->actionState == ENKANBAN_SIGN) {
         if ((this->invincibilityTimer == 0) && (this->collider.base.acFlags & AC_HIT)) {
@@ -127,8 +124,8 @@ RECOMP_PATCH void EnKanban_Draw(Actor* thisx, PlayState* play) {
     Player* player = GET_PLAYER(play);
     u8* shadowTex = GRAPH_ALLOC(play->state.gfxCtx, ARRAY_COUNT(sShadowTexFlags));
 
-    u32* location = z64recomp_get_extended_actor_data(thisx, signLocationExtension);
-    bool* dropped = z64recomp_get_extended_actor_data(thisx, signDropExtension);
+    u32* location = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
+    bool* dropped = z64recomp_get_extended_actor_data(thisx, actorDroppedExtension);
 
     OPEN_DISPS(play->state.gfxCtx);
 

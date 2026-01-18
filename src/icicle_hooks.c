@@ -10,16 +10,11 @@
 #define LOCATION_ICICLE (AP_PREFIX_ICICLES | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
 
-ActorExtensionId icicleLocationExtension;
-u32* icicleLocation;
-ActorExtensionId icicleDroppedExtension;
-bool* icicleDropped;
-
 RECOMP_HOOK("BgIcicle_Init")
 void OnBgIcicle_Init(Actor* thisx, PlayState* play) {
-    icicleLocation = z64recomp_get_extended_actor_data(thisx, icicleLocationExtension);
+    u32* icicleLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     *icicleLocation = LOCATION_ICICLE;
-    icicleDropped = z64recomp_get_extended_actor_data(thisx, icicleDroppedExtension);
+    bool* icicleDropped = z64recomp_get_extended_actor_data(thisx, actorDroppedExtension);
     *icicleDropped = false;
 }
 
@@ -28,8 +23,8 @@ void BgIcicle_Break(BgIcicle* this, PlayState* play, f32 arg2);
 
 RECOMP_PATCH void BgIcicle_UpdateAttacked(BgIcicle* this, PlayState* play) {
     s32 dropItem00Id;
-    icicleLocation = z64recomp_get_extended_actor_data(&this->dyna.actor, icicleLocationExtension);
-    icicleDropped = z64recomp_get_extended_actor_data(&this->dyna.actor, icicleDroppedExtension);
+    u32* icicleLocation = z64recomp_get_extended_actor_data(&this->dyna.actor, actorLocationExtension);
+    bool* icicleDropped = z64recomp_get_extended_actor_data(&this->dyna.actor, actorDroppedExtension);
 
     if (this->collider.base.acFlags & AC_HIT) {
         this->collider.base.acFlags &= ~AC_HIT;
@@ -74,6 +69,8 @@ RECOMP_PATCH void BgIcicle_UpdateAttacked(BgIcicle* this, PlayState* play) {
 
 RECOMP_HOOK("BgIcicle_Fall")
 void OnBgIcicle_Fall(BgIcicle* this, PlayState* play) {
+    u32* icicleLocation = z64recomp_get_extended_actor_data(&this->dyna.actor, actorLocationExtension);
+    bool* icicleDropped = z64recomp_get_extended_actor_data(&this->dyna.actor, actorDroppedExtension);
     if ((this->collider.base.atFlags & AT_HIT) || (this->dyna.actor.bgCheckFlags & BGCHECKFLAG_GROUND)) {
         if (rando_get_slotdata_u32("iciclesanity") && !rando_location_is_checked(*icicleLocation)) {
             Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, (this->unk_161 << 8), *icicleLocation);
@@ -106,8 +103,8 @@ Gfx randoIcicleDL[] = {
 RECOMP_PATCH void BgIcicle_Draw(Actor* thisx, PlayState* play) {
     Color_RGB8 color = {255, 255, 255};
     BgIcicle* this = ((BgIcicle*)thisx);
-    icicleLocation = z64recomp_get_extended_actor_data(&this->dyna.actor, icicleLocationExtension);
-    icicleDropped = z64recomp_get_extended_actor_data(thisx, icicleDroppedExtension);
+    u32* icicleLocation = z64recomp_get_extended_actor_data(&this->dyna.actor, actorLocationExtension);
+    bool* icicleDropped = z64recomp_get_extended_actor_data(thisx, actorDroppedExtension);
     
     if (rando_get_slotdata_u32("iciclesanity") && !rando_location_is_checked(*icicleLocation) && !*icicleDropped) {
         get_rando_color(&color, *icicleLocation);

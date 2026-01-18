@@ -13,23 +13,18 @@
 #define LOCATION_CRATE_BIG (AP_PREFIX_BIG_CRATES | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
 
-ActorExtensionId crateSmallLocationExtension;
-u32* crateSmallLocation;
-ActorExtensionId crateBigLocationExtension;
-u32* crateBigLocation;
-
 Gfx* GenericContainer_SetTextures(PlayState* play, Gfx* gfx, u8* customDraw, u32 location);
 
 // small crate
 RECOMP_HOOK("ObjKibako_Init")
 void OnObjKibako_Init(Actor* thisx, PlayState* play) {
-    crateSmallLocation = z64recomp_get_extended_actor_data(thisx, crateSmallLocationExtension);
+    u32* crateSmallLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     *crateSmallLocation = LOCATION_CRATE_SMALL;
 }
 
 RECOMP_HOOK("ObjKibako_SpawnCollectible")
 void OnObjKibako_SpawnCollectible(ObjKibako* this, PlayState* play) {
-    crateSmallLocation = z64recomp_get_extended_actor_data(&this->actor, crateSmallLocationExtension);
+    u32* crateSmallLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
     if (rando_get_slotdata_u32("woodsanity") && !rando_location_is_checked(*crateSmallLocation)) {
         Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *crateSmallLocation);
         this->isDropCollected = 1;
@@ -39,7 +34,7 @@ void OnObjKibako_SpawnCollectible(ObjKibako* this, PlayState* play) {
 extern Gfx* sDisplayLists_ovl_Obj_Kibako[];
 
 RECOMP_PATCH void ObjKibako_Draw(Actor* thisx, PlayState* play) {
-    crateSmallLocation = z64recomp_get_extended_actor_data(thisx, crateSmallLocationExtension);
+    u32* crateSmallLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     u8 customDraw;
     
     OPEN_DISPS(play->state.gfxCtx);
@@ -65,7 +60,7 @@ RECOMP_PATCH void ObjKibako_Draw(Actor* thisx, PlayState* play) {
 // big crate
 RECOMP_HOOK("ObjKibako2_Init")
 void OnObjKibako2_Init(Actor* thisx, PlayState* play) {
-    crateBigLocation = z64recomp_get_extended_actor_data(thisx, crateBigLocationExtension);
+    u32* crateBigLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     *crateBigLocation = LOCATION_CRATE_BIG;
 
     // replace known stray fairy location
@@ -79,7 +74,7 @@ void OnObjKibako2_Init(Actor* thisx, PlayState* play) {
 RECOMP_PATCH void ObjKibako2_SpawnCollectible(ObjKibako2* this, PlayState* play) {
     s32 dropItem00Id = func_800A8150(KIBAKO2_COLLECTIBLE_ID(&this->dyna.actor));
 
-    crateBigLocation = z64recomp_get_extended_actor_data(&this->dyna.actor, crateBigLocationExtension);
+    u32* crateBigLocation = z64recomp_get_extended_actor_data(&this->dyna.actor, actorLocationExtension);
     if (rando_get_slotdata_u32("woodsanity") && !rando_location_is_checked(*crateBigLocation)) {
         Item_RandoDropCollectible(play, &this->dyna.actor.world.pos,
             dropItem00Id | KIBAKO2_COLLECTIBLE_FLAG(&this->dyna.actor) << 8, *crateBigLocation);
@@ -95,7 +90,7 @@ RECOMP_PATCH void ObjKibako2_SpawnCollectible(ObjKibako2* this, PlayState* play)
 extern Gfx gLargeCrateDL[];
 
 RECOMP_PATCH void ObjKibako2_Draw(Actor* thisx, PlayState* play) {
-    crateBigLocation = z64recomp_get_extended_actor_data(thisx, crateBigLocationExtension);
+    u32* crateBigLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     u8 customDraw;
     
     OPEN_DISPS(play->state.gfxCtx);

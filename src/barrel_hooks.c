@@ -10,12 +10,9 @@
 #define LOCATION_BARREL (AP_PREFIX_BARRELS | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
 
-ActorExtensionId barrelLocationExtension;
-u32* barrelLocation;
-
 RECOMP_HOOK("ObjTaru_Init")
 void OnObjTaru_Init(Actor* thisx, PlayState* play) {
-    barrelLocation = z64recomp_get_extended_actor_data(thisx, barrelLocationExtension);
+    u32* barrelLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     *barrelLocation = LOCATION_BARREL;
 
     // replace known stray fairy locations
@@ -32,7 +29,7 @@ void OnObjTaru_Init(Actor* thisx, PlayState* play) {
 RECOMP_PATCH void func_80B9BC64(ObjTaru* this, PlayState* play) {
     s32 item = func_800A8150(OBJ_TARU_GET_3F(&this->dyna.actor));
 
-    barrelLocation = z64recomp_get_extended_actor_data(&this->dyna.actor, barrelLocationExtension);
+    u32* barrelLocation = z64recomp_get_extended_actor_data(&this->dyna.actor, actorLocationExtension);
     if (rando_get_slotdata_u32("woodsanity") && !rando_location_is_checked(*barrelLocation)) {
         Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, (OBJ_TARU_GET_7F00(&this->dyna.actor) << 8) | item, *barrelLocation);
         return;
@@ -46,7 +43,7 @@ RECOMP_PATCH void func_80B9BC64(ObjTaru* this, PlayState* play) {
 // pirate's fortress barricades?
 RECOMP_HOOK("func_80B9B9C8")
 void ObjTaru_DropBarricadeItem(ObjTaru* this, PlayState* play) {
-    barrelLocation = z64recomp_get_extended_actor_data(&this->dyna.actor, barrelLocationExtension);
+    u32* barrelLocation = z64recomp_get_extended_actor_data(&this->dyna.actor, actorLocationExtension);
     if (rando_get_slotdata_u32("woodsanity") && !rando_location_is_checked(*barrelLocation)) {
         Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, *barrelLocation);
     }
@@ -58,7 +55,7 @@ extern Gfx gObjTaruBarrelDL[];
 Gfx* GenericContainer_SetTextures(PlayState* play, Gfx* gfx, u8* customDraw, u32 location);
 
 RECOMP_PATCH void ObjTaru_Draw(Actor* thisx, PlayState* play) {
-    barrelLocation = z64recomp_get_extended_actor_data(thisx, barrelLocationExtension);
+    u32* barrelLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     u8 customDraw;
     
     OPEN_DISPS(play->state.gfxCtx);

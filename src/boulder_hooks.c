@@ -14,15 +14,10 @@
 #define LOCATION_BOULDER2 (AP_PREFIX_BOULDERS | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                         | randoGetLoadedActorNumInSameRoomExtra(play, thisx, ACTOR_OBJ_BOMBIWA))
 
-ActorExtensionId boulderLocationExtension;
-u32* boulderLocation;
-ActorExtensionId boulder2LocationExtension;
-u32* boulder2Location;
-
 // normal boulders
 RECOMP_HOOK("ObjBombiwa_Init")
 void OnObjBombiwa_Init(Actor* thisx, PlayState* play) {
-    boulderLocation = z64recomp_get_extended_actor_data(thisx, boulderLocationExtension);
+    u32* boulderLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     *boulderLocation = LOCATION_BOULDER;
 }
 
@@ -37,9 +32,10 @@ RECOMP_HOOK_RETURN("func_80939EF4")
 void AfterObjBombiwa_CheckBroken() {
     ObjBombiwa* this = sObjBombiwa;
     PlayState* play = gPlay;
+    u32* boulderLocation;
 
     if (Flags_GetSwitch(play, OBJBOMBIWA_GET_SWITCH_FLAG(&this->actor))) {
-        boulderLocation = z64recomp_get_extended_actor_data(&this->actor, boulderLocationExtension);
+        boulderLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
         if (rando_get_slotdata_u32("rocksanity") && !rando_location_is_checked(*boulderLocation)) {
             Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *boulderLocation);
         }
@@ -49,13 +45,13 @@ void AfterObjBombiwa_CheckBroken() {
 // bronze boulders
 RECOMP_HOOK("ObjHamishi_Init")
 void OnObjHamishi_Init(Actor* thisx, PlayState* play) {
-    boulder2Location = z64recomp_get_extended_actor_data(thisx, boulder2LocationExtension);
+    u32* boulder2Location = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     *boulder2Location = LOCATION_BOULDER2;
 }
 
 RECOMP_HOOK("func_809A10F4")
 void ObjHamishi_Broken(ObjHamishi* this, PlayState* play) {
-    boulder2Location = z64recomp_get_extended_actor_data(&this->actor, boulder2LocationExtension);
+    u32* boulder2Location = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
     if (rando_get_slotdata_u32("rocksanity") && !rando_location_is_checked(*boulder2Location)) {
         Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *boulder2Location);
     }

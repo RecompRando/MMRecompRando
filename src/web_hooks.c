@@ -18,20 +18,16 @@
 #define LOCATION_WEB_TENT (AP_PREFIX_WEBS | ((play->sceneId + 1) << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, &this->dyna.actor))
 
-ActorExtensionId webLocationExtension;
-ActorExtensionId webTentLocationExtension;
-ActorExtensionId webTentDropExtension;
-
 RECOMP_HOOK("BgSpdweb_Init")
 void OnBgSpdweb_Init(Actor* thisx, PlayState* play) {
     BgSpdweb* this = ((BgSpdweb*)thisx);
-    u32* location = z64recomp_get_extended_actor_data(thisx, webLocationExtension);
+    u32* location = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     *location = LOCATION_WEB;
 }
 
 RECOMP_HOOK("func_809CE234")
 void BgSpdweb_Drop1(BgSpdweb* this, PlayState* play) {
-    u32* location = z64recomp_get_extended_actor_data(&this->dyna.actor, webLocationExtension);
+    u32* location = z64recomp_get_extended_actor_data(&this->dyna.actor, actorLocationExtension);
     if (this->unk_162 == 1 && rando_get_slotdata_u32("websanity") && !rando_location_is_checked(*location)) {
         Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, *location);
         Audio_PlaySfx(NA_SE_SY_TRE_BOX_APPEAR);
@@ -40,7 +36,7 @@ void BgSpdweb_Drop1(BgSpdweb* this, PlayState* play) {
 
 RECOMP_HOOK("func_809CE830")
 void BgSpdweb_Drop2(BgSpdweb* this, PlayState* play) {
-    u32* location = z64recomp_get_extended_actor_data(&this->dyna.actor, webLocationExtension);
+    u32* location = z64recomp_get_extended_actor_data(&this->dyna.actor, actorLocationExtension);
     if (this->unk_162 == 1 && rando_get_slotdata_u32("websanity") && !rando_location_is_checked(*location)) {
         Item_RandoDropCollectible(play, &this->dyna.actor.world.pos, ITEM00_APITEM, *location);
         Audio_PlaySfx(NA_SE_SY_TRE_BOX_APPEAR);
@@ -48,7 +44,7 @@ void BgSpdweb_Drop2(BgSpdweb* this, PlayState* play) {
 }
 
 RECOMP_PATCH void BgSpdweb_Draw(Actor* thisx, PlayState* play) {
-    u32* location = z64recomp_get_extended_actor_data(thisx, webLocationExtension);
+    u32* location = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
 
     OPEN_DISPS(play->state.gfxCtx);
 
@@ -75,9 +71,9 @@ RECOMP_PATCH void BgSpdweb_Draw(Actor* thisx, PlayState* play) {
 RECOMP_HOOK("ObjSpidertent_Init")
 void OnObjSpidertent_Init(Actor* thisx, PlayState* play) {
     ObjSpidertent* this = ((ObjSpidertent*)thisx);
-    u32* location = z64recomp_get_extended_actor_data(thisx, webTentLocationExtension);
+    u32* location = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     *location = LOCATION_WEB_TENT;
-    bool* dropped = z64recomp_get_extended_actor_data(thisx, webTentDropExtension);
+    bool* dropped = z64recomp_get_extended_actor_data(thisx, actorDroppedExtension);
     *dropped = false;
     // Flags_UnsetSwitch(play, OBJSPIDERTENT_GET_SWITCH_FLAG(&this->dyna.actor));
 }
@@ -86,7 +82,7 @@ void OnObjSpidertent_Init(Actor* thisx, PlayState* play) {
 RECOMP_HOOK("func_80B30AD4")
 void ObjSpidertent_DropOnSetupBurn(ObjSpidertent* this) {
     PlayState* play = gPlay;
-    u32* location = z64recomp_get_extended_actor_data(&this->dyna.actor, webTentLocationExtension);
+    u32* location = z64recomp_get_extended_actor_data(&this->dyna.actor, actorLocationExtension);
 
     if (!rando_get_slotdata_u32("websanity") || rando_location_is_checked(*location)) return;
 
@@ -163,7 +159,7 @@ void ObjSpidertent_DropOnSetupBurn(ObjSpidertent* this) {
 
     Audio_PlaySfx(NA_SE_SY_TRE_BOX_APPEAR);
     
-    bool* dropped = z64recomp_get_extended_actor_data(&this->dyna.actor, webTentDropExtension);
+    bool* dropped = z64recomp_get_extended_actor_data(&this->dyna.actor, actorDroppedExtension);
     *dropped = true;
 }
 typedef struct {
@@ -187,7 +183,7 @@ RECOMP_PATCH void ObjSpidertent_Draw(Actor* thisx, PlayState* play) {
     s32 temp_f18 = this->unk_3C5 * (29.0f / 51);
     Gfx* gfx;
 
-    u32* location = z64recomp_get_extended_actor_data(thisx, webTentLocationExtension);
+    u32* location = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
 
     OPEN_DISPS(play->state.gfxCtx);
 

@@ -12,9 +12,6 @@
 #define LOCATION_BEEHIVE (AP_PREFIX_BEEHIVES | (sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
 
-ActorExtensionId beehiveLocationExtension;
-u32* beehiveLocation;
-
 bool func_8098CE40(ObjComb* this, PlayState* play);
 void func_8098CEAC(ObjComb* this, PlayState* play);
 void func_8098DA74(ObjComb* this, PlayState* play);
@@ -116,7 +113,7 @@ extern u16 gBeehiveTex[];
 
 RECOMP_HOOK("ObjComb_Init")
 void OnObjComb_Init(Actor* thisx, PlayState* play) {
-    beehiveLocation = z64recomp_get_extended_actor_data(thisx, beehiveLocationExtension);
+    u32* beehiveLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     s16 sceneId = play->sceneId;
     
     // handle grottos
@@ -133,7 +130,7 @@ void OnObjComb_Init(Actor* thisx, PlayState* play) {
 
 RECOMP_HOOK("func_8098D8C8")
 void ObjComb_SpawnItemWithBees(ObjComb* this, PlayState* play) {
-    beehiveLocation = z64recomp_get_extended_actor_data(&this->actor, beehiveLocationExtension);
+    u32* beehiveLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
     if (rando_get_slotdata_u32("hivesanity") && !rando_location_is_checked(*beehiveLocation)) {
         Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *beehiveLocation);
         return;
@@ -143,7 +140,7 @@ void ObjComb_SpawnItemWithBees(ObjComb* this, PlayState* play) {
 RECOMP_PATCH void func_8098D870(ObjComb* this, PlayState* play) {
     s32 temp_v0 = func_800A8150(OBJCOMB_GET_3F(&this->actor));
 
-    beehiveLocation = z64recomp_get_extended_actor_data(&this->actor, beehiveLocationExtension);
+    u32* beehiveLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
     if (rando_get_slotdata_u32("hivesanity") && temp_v0 != ITEM00_HEART_PIECE && !rando_location_is_checked(*beehiveLocation)) {
         Item_RandoDropCollectible(play, &this->actor.world.pos, ((OBJCOMB_GET_7F00(&this->actor)) << 8) | temp_v0, *beehiveLocation);
         return;
@@ -162,7 +159,7 @@ RECOMP_PATCH void ObjComb_Draw(Actor* thisx, PlayState* play) {
     
     s32 itemDrop = func_800A8150(OBJCOMB_GET_3F(&this->actor));
     s32 combType = OBJCOMB_GET_8000(&this->actor) | OBJCOMB_GET_80(&this->actor);
-    beehiveLocation = z64recomp_get_extended_actor_data(&this->actor, beehiveLocationExtension);
+    u32* beehiveLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
 
     OPEN_DISPS(play->state.gfxCtx);
 

@@ -1,41 +1,11 @@
 #include "z64recomp_api.h"
 
-extern ActorExtensionId item00LocationExtension;
+extern ActorExtensionId actorLocationExtension;
+extern ActorExtensionId actorDroppedExtension;
+
 extern ActorExtensionId mureIndexExtension;
 extern ActorExtensionId mure2IndexExtension;
-extern ActorExtensionId kusaGrassLocationExtension;
-extern ActorExtensionId kusaGrassDropExtension;
-extern ActorExtensionId keatonGrassLocationExtension;
-extern ActorExtensionId potLocationExtension;
-extern ActorExtensionId potDroppedExtension;
-extern ActorExtensionId potFlyingLocationExtension;
-extern ActorExtensionId potFlowerLocationExtension;
-extern ActorExtensionId wonderHitLocationExtension;
 extern ActorExtensionId wonderHitTimerExtension;
-extern ActorExtensionId wonderRupeeLocationExtension;
-extern ActorExtensionId rockLocationExtension;
-extern ActorExtensionId boulderLocationExtension;
-extern ActorExtensionId boulder2LocationExtension;
-extern ActorExtensionId snowballLocationExtension;
-extern ActorExtensionId bigSnowballLocationExtension;
-extern ActorExtensionId gamelupyLocationExtension;
-extern ActorExtensionId crateSmallLocationExtension;
-extern ActorExtensionId crateBigLocationExtension;
-extern ActorExtensionId barrelLocationExtension;
-extern ActorExtensionId icicleLocationExtension;
-extern ActorExtensionId icicleDroppedExtension;
-extern ActorExtensionId beehiveLocationExtension;
-extern ActorExtensionId fairyLocationExtension;
-extern ActorExtensionId butterflyLocationExtension;
-extern ActorExtensionId palmTreeDropExtension;
-// extern ActorExtensionId snowTreeDropExtension;
-extern ActorExtensionId woodTreeDropExtension;
-extern ActorExtensionId bigTreeDropExtension;
-extern ActorExtensionId signLocationExtension;
-extern ActorExtensionId signDropExtension;
-extern ActorExtensionId webLocationExtension;
-extern ActorExtensionId webTentLocationExtension;
-extern ActorExtensionId webTentDropExtension;
 
 s32 randoGetLoadedActorNumInSameRoom(PlayState* play, Actor* actorIn);
 s32 randoGetLoadedActorNumInSameRoomExtra(PlayState* play, Actor* actorIn, s16 extraId);

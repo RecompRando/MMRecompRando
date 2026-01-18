@@ -16,11 +16,6 @@
 #define LOCATION_BOULDER2 (AP_PREFIX_BOULDERS | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                         | randoGetLoadedActorNumInSameRoomExtra(play, thisx, ACTOR_OBJ_BOMBIWA))
 
-extern ActorExtensionId boulderLocationExtension;
-extern u32* boulderLocation;
-extern ActorExtensionId boulder2LocationExtension;
-extern u32* boulder2Location;
-
 // normal boulders
 // need to figure out how to handle CI textures for actual normal boulder (maybe just change the TLUT lol)
 u16 tallBombiwaTex[1024];
@@ -45,7 +40,7 @@ RECOMP_PATCH void func_8093A418(Actor* thisx, PlayState* play) {
     ObjBombiwa* this = ((ObjBombiwa*)thisx);
     f32 sp28;
 
-    boulderLocation = z64recomp_get_extended_actor_data(&this->actor, boulderLocationExtension);
+    u32* boulderLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
 
     Color_RGB8 color;
 
@@ -100,7 +95,7 @@ RECOMP_PATCH void func_8093A608(Actor* thisx, PlayState* play) {
     s32 i;
     ObjBombiwaStruct* ptr;
 
-    boulderLocation = z64recomp_get_extended_actor_data(&this->actor, boulderLocationExtension);
+    u32* boulderLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
 
     Color_RGB8 color;
 
@@ -166,7 +161,7 @@ extern Gfx gameplay_field_keep_DL_0061E8[];
 
 RECOMP_PATCH void ObjHamishi_Draw(Actor* thisx, PlayState* play) {
     ObjHamishi* this = ((ObjHamishi*)thisx);
-    boulder2Location = z64recomp_get_extended_actor_data(&this->actor, boulder2LocationExtension);
+    u32* boulder2Location = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
 
     Color_RGB8 color = {255, 170, 130};
     get_rando_color(&color, *boulder2Location);

@@ -51,7 +51,7 @@ RECOMP_PATCH void ObjYasi_Draw(Actor* thisx, PlayState* play) {
 
     Matrix_Scale(0.1f, 0.1f, 0.1f, MTXMODE_APPLY);
 
-    bool* dropped = z64recomp_get_extended_actor_data(thisx, palmTreeDropExtension);
+    bool* dropped = z64recomp_get_extended_actor_data(thisx, actorDroppedExtension);
     if (!rando_location_is_checked(LOCATION_PALM_TREE) && !(*dropped) \
             && !ObjYasi_OnTurtleInGBT(LOCATION_PALM_TREE) && rando_get_camc_enabled()) {
         Gfx_DrawDListOpa(play, randoPalmTreeDL);
@@ -189,7 +189,7 @@ RECOMP_PATCH void EnWood02_Draw(Actor* thisx, PlayState* play) {
     }
 
     Color_RGB8 color;
-    bool* dropped = z64recomp_get_extended_actor_data(&this->actor, woodTreeDropExtension);
+    bool* dropped = z64recomp_get_extended_actor_data(&this->actor, actorDroppedExtension);
     if (rando_get_slotdata_u32("treesanity") && !(*dropped) && get_rando_color(&color, LOCATION_WOOD_TREE)) {
         woodBodyDLs = woodBodyRandoDLs;
         woodLeavesDLs = woodLeavesRandoDLs;
@@ -245,7 +245,7 @@ RECOMP_PATCH void ObjTree_Draw(Actor* thisx, PlayState* play) {
     s16 xRot = (f32)thisx->shape.rot.x;
     s16 zRot = (f32)thisx->shape.rot.z;
 
-    bool* dropped = z64recomp_get_extended_actor_data(&this->dyna.actor, bigTreeDropExtension);
+    bool* dropped = z64recomp_get_extended_actor_data(&this->dyna.actor, actorDroppedExtension);
 
     OPEN_DISPS(play->state.gfxCtx);
 

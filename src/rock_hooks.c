@@ -11,16 +11,13 @@
 #define LOCATION_ROCK (AP_PREFIX_ROCKS | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                         | randoGetLoadedActorNumInSameRoom(play, actor))
 
-ActorExtensionId rockLocationExtension;
-u32* rockLocation;
-
 // TODO: add these to symbols
 static s16 D_8095F76C[] = { -1, 1, 2, 20, 8, 0 };
 static Vec3f D_8095F778 = { 0.0f, 1.0f, 0.0f };
 
 // RECOMP_HOOK("EnIshi_Init")
 // void OnEnIshi_Init(Actor* thisx, PlayState* play) {
-//     rockLocation = z64recomp_get_extended_actor_data(thisx, rockLocationExtension);
+//     u32* rockLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
 //     *rockLocation = LOCATION_ROCK;
 // }
 
@@ -33,16 +30,17 @@ void add_rock_and_boulder_locations() {
     }
 
     PlayState* play = gPlay;
+    u32* rockLocation;
 
     // rocks/silver boulders (?)
     if (actor->id == ACTOR_EN_ISHI) {
-        rockLocation = z64recomp_get_extended_actor_data(actor, rockLocationExtension);
+        rockLocation = z64recomp_get_extended_actor_data(actor, actorLocationExtension);
         *rockLocation = LOCATION_ROCK;
     }
 }
 
 RECOMP_PATCH void func_8095DF90(EnIshi* this, PlayState* play) {
-    rockLocation = z64recomp_get_extended_actor_data(&this->actor, rockLocationExtension);
+    u32* rockLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
     if (rando_get_slotdata_u32("rocksanity") && !rando_location_is_checked(*rockLocation)) {
         Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *rockLocation);
         return;
@@ -62,9 +60,11 @@ RECOMP_PATCH void func_8095DFF0(EnIshi* this, PlayState* play) {
     f32 sp2C;
     f32 temp_f2;
     s16 temp_v1_2;
+    
+    u32* rockLocation;
 
     if (temp >= 0) {
-        rockLocation = z64recomp_get_extended_actor_data(&this->actor, rockLocationExtension);
+        rockLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
         if (rando_get_slotdata_u32("rocksanity") && !rando_location_is_checked(*rockLocation)) {
             sp3C = Item_RandoDropCollectible(play, &this->actor.world.pos, temp | (ENISHI_GET_FLAG(&this->actor) << 8), *rockLocation);
         } else {

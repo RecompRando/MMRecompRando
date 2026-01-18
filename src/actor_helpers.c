@@ -6,43 +6,16 @@
 #include "actor_helpers.h"
 #include "apcommon.h"
 
+ActorExtensionId actorLocationExtension;
+ActorExtensionId actorDroppedExtension;
+
 void registerActorExtensions() {
-    item00LocationExtension = z64recomp_extend_actor(ACTOR_EN_ITEM00, sizeof(u32));
+    actorLocationExtension = z64recomp_extend_actor_all(sizeof(u32));
+    actorDroppedExtension = z64recomp_extend_actor_all(sizeof(u32));
+    
     mureIndexExtension = z64recomp_extend_actor(ACTOR_OBJ_MURE, sizeof(u32));
     mure2IndexExtension = z64recomp_extend_actor(ACTOR_OBJ_MURE2, sizeof(u32));
-    kusaGrassLocationExtension = z64recomp_extend_actor(ACTOR_EN_KUSA, sizeof(u32));
-    kusaGrassDropExtension = z64recomp_extend_actor(ACTOR_EN_KUSA, sizeof(bool));
-    keatonGrassLocationExtension = z64recomp_extend_actor(ACTOR_EN_KUSA2, sizeof(u32));
-    potLocationExtension = z64recomp_extend_actor(ACTOR_OBJ_TSUBO, sizeof(u32));
-    potDroppedExtension = z64recomp_extend_actor(ACTOR_OBJ_TSUBO, sizeof(bool));
-    potFlyingLocationExtension = z64recomp_extend_actor(ACTOR_EN_TUBO_TRAP, sizeof(u32));
-    potFlowerLocationExtension = z64recomp_extend_actor(ACTOR_OBJ_FLOWERPOT, sizeof(u32));
-    wonderHitLocationExtension = z64recomp_extend_actor(ACTOR_EN_HIT_TAG, sizeof(u32));
     wonderHitTimerExtension = z64recomp_extend_actor(ACTOR_EN_HIT_TAG, sizeof(u32));
-    wonderRupeeLocationExtension = z64recomp_extend_actor(ACTOR_EN_INVISIBLE_RUPPE, sizeof(u32));
-    rockLocationExtension = z64recomp_extend_actor(ACTOR_EN_ISHI, sizeof(u32));
-    boulderLocationExtension = z64recomp_extend_actor(ACTOR_OBJ_BOMBIWA, sizeof(u32));
-    boulder2LocationExtension = z64recomp_extend_actor(ACTOR_OBJ_HAMISHI, sizeof(u32));
-    snowballLocationExtension = z64recomp_extend_actor(ACTOR_OBJ_SNOWBALL2, sizeof(u32));
-    bigSnowballLocationExtension = z64recomp_extend_actor(ACTOR_OBJ_SNOWBALL, sizeof(u32));
-    gamelupyLocationExtension = z64recomp_extend_actor(ACTOR_EN_GAMELUPY, sizeof(u32));
-    crateSmallLocationExtension = z64recomp_extend_actor(ACTOR_OBJ_KIBAKO, sizeof(u32));
-    crateBigLocationExtension = z64recomp_extend_actor(ACTOR_OBJ_KIBAKO2, sizeof(u32));
-    barrelLocationExtension = z64recomp_extend_actor(ACTOR_OBJ_TARU, sizeof(u32));
-    icicleLocationExtension = z64recomp_extend_actor(ACTOR_BG_ICICLE, sizeof(u32));
-    icicleDroppedExtension = z64recomp_extend_actor(ACTOR_BG_ICICLE, sizeof(bool));
-    beehiveLocationExtension = z64recomp_extend_actor(ACTOR_OBJ_COMB, sizeof(u32));
-    fairyLocationExtension = z64recomp_extend_actor(ACTOR_EN_ELF, sizeof(u32));
-    butterflyLocationExtension = z64recomp_extend_actor(ACTOR_EN_BUTTE, sizeof(u32));
-    palmTreeDropExtension = z64recomp_extend_actor(ACTOR_OBJ_YASI, sizeof(bool));
-    // snowTreeDropExtension = z64recomp_extend_actor(ACTOR_EN_SNOWWD, sizeof(bool));
-    woodTreeDropExtension = z64recomp_extend_actor(ACTOR_EN_WOOD02, sizeof(bool));
-    bigTreeDropExtension = z64recomp_extend_actor(ACTOR_OBJ_TREE, sizeof(bool));
-    signLocationExtension = z64recomp_extend_actor(ACTOR_EN_KANBAN, sizeof(u32));
-    signDropExtension = z64recomp_extend_actor(ACTOR_EN_KANBAN, sizeof(bool));
-    webLocationExtension = z64recomp_extend_actor(ACTOR_BG_SPDWEB, sizeof(u32));
-    webTentLocationExtension = z64recomp_extend_actor(ACTOR_OBJ_SPIDERTENT, sizeof(u32));
-    webTentDropExtension = z64recomp_extend_actor(ACTOR_OBJ_SPIDERTENT, sizeof(bool));
 }
 
 s32 randoGetLoadedActorNumInSameRoom(PlayState* play, Actor* actorIn) {

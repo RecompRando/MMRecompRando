@@ -36,7 +36,7 @@ void AfterEnRuppecrow_SpawnRupee() {
     EnItem00* rupee = this->rupees[rupeeIndex];
 
     u32* item00Location;
-    item00Location = z64recomp_get_extended_actor_data(&rupee->actor, item00LocationExtension);
+    item00Location = z64recomp_get_extended_actor_data(&rupee->actor, actorLocationExtension);
     *item00Location = LOCATION_RUPEE_CROW(rupeeIndex);
 
     if (EnRuppecrow_CanSpawnBlueRupees(play) && (rupeeIndex % 5) == 4 && rupeeIndex != 19) {

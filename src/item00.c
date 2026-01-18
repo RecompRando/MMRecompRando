@@ -26,9 +26,6 @@ static bool objectLoaded;
 static OSMesgQueue objectLoadQueue;
 static void* objectSegment;
 
-ActorExtensionId item00LocationExtension;
-u32* item00Location;
-
 void func_800A640C(EnItem00* this, PlayState* play);
 void func_800A6A40(EnItem00* this, PlayState* play);
 
@@ -340,6 +337,8 @@ RECOMP_PATCH void EnItem00_Update(Actor* thisx, PlayState* play) {
     s32 params;
     u8 sceneId = (play->sceneId == 0x00) ? 0x45 : play->sceneId;
 
+    u32* item00Location;
+
     if (this->unk152 > 0) {
         this->unk152--;
     }
@@ -501,7 +500,7 @@ RECOMP_PATCH void EnItem00_Update(Actor* thisx, PlayState* play) {
             break;
 
         case ITEM00_APITEM:
-            item00Location = z64recomp_get_extended_actor_data(&this->actor, item00LocationExtension);
+            item00Location = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
             getItemId = rando_get_item_id(*item00Location);
             break;
 
@@ -517,7 +516,7 @@ RECOMP_PATCH void EnItem00_Update(Actor* thisx, PlayState* play) {
                     location = LOCATION_HEART_PIECE;
                     break;
                 case ITEM00_APITEM:
-                    item00Location = z64recomp_get_extended_actor_data(&this->actor, item00LocationExtension);
+                    item00Location = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
                     location = *item00Location;
                     break;
                 default:
@@ -560,7 +559,7 @@ RECOMP_PATCH void EnItem00_Update(Actor* thisx, PlayState* play) {
             return;
         case ITEM00_APITEM:
             if (Actor_HasParent(&this->actor, play)) {
-                item00Location = z64recomp_get_extended_actor_data(&this->actor, item00LocationExtension);
+                item00Location = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
                 // recomp_printf("Item00 location: 0x%06X\n", *item00Location);
                 // Actor_Kill(thisx);
             }
@@ -782,7 +781,7 @@ RECOMP_PATCH void func_800A6780(EnItem00* this, PlayState* play) {
 void Item_RandoCollectibleDraw(Actor* thisx, PlayState* play) {
     EnItem00* this = THIS;
 
-    item00Location = z64recomp_get_extended_actor_data(thisx, item00LocationExtension);
+    u32* item00Location = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     this->getItemId = rando_get_item_id(*item00Location);
     u16 objectId = getObjectId(this->getItemId);
 
@@ -820,7 +819,7 @@ void EnItem00_RandoTextAndFreeze(EnItem00* this, PlayState* play) {
 
     EnItem00_RandoItemAboveHead(this, play);
 
-    item00Location = z64recomp_get_extended_actor_data(&this->actor, item00LocationExtension);
+    u32* item00Location = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
     u32 locationType = rando_get_location_type(*item00Location);
     if (locationType != 0 && locationType != 2) {
         player->actor.freezeTimer = 10;
@@ -966,7 +965,6 @@ void Item_RandoCollectibleActionFunc(EnItem00* this, PlayState* play) {
 #define FAIRY_PARAMS(type, boolParam, collectibleFlag) (((type) /* & 0xF */) | (((boolParam) & 0x1) << 8) | ((((collectibleFlag) & 0x7F) << 9) & 0xFE00))
 #define STRAY_FAIRY_PARAMS(flag, nonDungeonArea, type) ((((flag) & 0x7F) << 9) | (((nonDungeonArea) & 7) << 6) | ((type) & 0xF))
 
-extern u32* fairyLocation;
 void EnElf_RandoDraw(Actor* thisx, PlayState* play);
 
 Actor* Item_RandoDropCollectible(PlayState* play, Vec3f* spawnPos, u32 params, u32 location) {
@@ -991,7 +989,7 @@ Actor* Item_RandoDropCollectible(PlayState* play, Vec3f* spawnPos, u32 params, u
             if (!Flags_GetCollectible(play, (param7F00 >> 8) & 0x7F)) {
                 SoundSource_PlaySfxAtFixedWorldPos(play, spawnPos, 40, NA_SE_EV_BUTTERFRY_TO_FAIRY);
             }
-            fairyLocation = z64recomp_get_extended_actor_data(spawnedActor, fairyLocationExtension);
+            u32* fairyLocation = z64recomp_get_extended_actor_data(spawnedActor, actorLocationExtension);
             *fairyLocation = location;
             spawnedActor->draw = EnElf_RandoDraw;
         } else {
@@ -1009,7 +1007,7 @@ Actor* Item_RandoDropCollectible(PlayState* play, Vec3f* spawnPos, u32 params, u
 
     spawnedActor = Actor_Spawn(&play->actorCtx, play, ACTOR_EN_ITEM00, spawnPos->x, spawnPos->y, spawnPos->z, 0,
                                 0, 0, ITEM00_APITEM);
-    item00Location = z64recomp_get_extended_actor_data(spawnedActor, item00LocationExtension);
+    u32* item00Location = z64recomp_get_extended_actor_data(spawnedActor, actorLocationExtension);
     *item00Location = location;
 
     spawnedActor->draw = Item_RandoCollectibleDraw;

@@ -8,11 +8,6 @@
 
 #include "overlays/actors/ovl_En_Kusa/z_en_kusa.h"
 
-ActorExtensionId kusaGrassLocationExtension;
-u32* kusaLocation;
-ActorExtensionId kusaGrassDropExtension;
-bool* kusaDropped;
-
 void grab_grass_texture();
 void grab_sprout_texture();
 
@@ -34,7 +29,7 @@ u32 EnKusa_CreateLocation(PlayState* play, Actor* actor) {
 // TODO: handle the different types of grass correctly (i.e. respawning)
 // RECOMP_HOOK("EnKusa_Init")
 // void OnEnKusa_Init(Actor* thisx, PlayState* play) {
-//     kusaLocation = z64recomp_get_extended_actor_data(thisx, kusaGrassLocationExtension);
+//     u32* kusaLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
 //     *kusaLocation = EnKusa_CreateLocation(play, thisx);
 //     // recomp_printf("single grass: 0x%06X\n", *kusaLocation);
 // }
@@ -48,12 +43,14 @@ void add_grass_locations() {
     }
 
     PlayState* play = gPlay;
+    u32* kusaLocation;
+    bool* kusaDropped;
 
     if (actor->id == ACTOR_EN_KUSA) {
         u32 location = EnKusa_CreateLocation(play, actor);
-        kusaLocation = z64recomp_get_extended_actor_data(actor, kusaGrassLocationExtension);
+        kusaLocation = z64recomp_get_extended_actor_data(actor, actorLocationExtension);
         *kusaLocation = location;
-        kusaDropped = z64recomp_get_extended_actor_data(actor, kusaGrassDropExtension);
+        kusaDropped = z64recomp_get_extended_actor_data(actor, actorDroppedExtension);
         *kusaDropped = false;
     }
 }
@@ -62,8 +59,8 @@ RECOMP_PATCH void EnKusa_DropCollectible(EnKusa* this, PlayState* play) {
     s32 collectible;
     s32 collectableParams;
 
-    kusaLocation = z64recomp_get_extended_actor_data(&this->actor, kusaGrassLocationExtension);
-    kusaDropped = z64recomp_get_extended_actor_data(&this->actor, kusaGrassDropExtension);
+    u32* kusaLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
+    bool* kusaDropped = z64recomp_get_extended_actor_data(&this->actor, actorDroppedExtension);
 
     if (rando_get_slotdata_u32("grasssanity") && !rando_location_is_checked(*kusaLocation) && !(*kusaDropped)) {
         collectible = func_800A8150(KUSA_GET_PARAM_FC(&this->actor));

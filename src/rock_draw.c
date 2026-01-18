@@ -13,9 +13,6 @@
 #define LOCATION_ROCK (0x180000 | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                         | randoGetLoadedActorNumInSameRoom(play, actor))
 
-extern ActorExtensionId rockLocationExtension;
-extern u32* rockLocation;
-
 extern Gfx gameplay_field_keep_DL_0066B0[];
 extern Gfx gameplay_field_keep_DL_006760[];
 extern Gfx gameplay_field_keep_DL_0061E8[];
@@ -42,7 +39,7 @@ RECOMP_PATCH void func_8095F210(EnIshi* this, PlayState* play) {
     s32 sp28;
 
     Color_RGB8 color;
-    rockLocation = z64recomp_get_extended_actor_data(&this->actor, rockLocationExtension);
+    u32* rockLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
 
     if ((this->actor.projectedPos.z <= 1200.0f) || ((this->unk_197 & 1) && (this->actor.projectedPos.z < 1300.0f))) {
         if (!rando_get_slotdata_u32("rocksanity") || !get_rando_color(&color, *rockLocation)) {
@@ -88,7 +85,7 @@ RECOMP_PATCH void func_8095F210(EnIshi* this, PlayState* play) {
 RECOMP_PATCH void func_8095F36C(EnIshi* this, PlayState* play) {
     s32 pad;
 
-    rockLocation = z64recomp_get_extended_actor_data(&this->actor, rockLocationExtension);
+    u32* rockLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
 
     Color_RGB8 color = {255, 255, 255};
     if (rando_get_slotdata_u32("rocksanity")) {
@@ -130,7 +127,7 @@ RECOMP_PATCH void func_8095F36C(EnIshi* this, PlayState* play) {
 // EnIshi_DrawIshiObject
 RECOMP_PATCH void func_8095F654(Actor* thisx, PlayState* play) {
     Color_RGB8 color;
-    rockLocation = z64recomp_get_extended_actor_data(thisx, rockLocationExtension);
+    u32* rockLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
 
     if (!rando_get_slotdata_u32("rocksanity") || !get_rando_color(&color, *rockLocation)) {
         Gfx_DrawDListOpa(play, gSmallRockDL);
