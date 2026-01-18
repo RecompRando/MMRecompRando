@@ -90,6 +90,62 @@ void FreezeActors(UpdateActor_Params* params) {
     }
 }
 
+// @rando insert a generic location into the actor's extension
+void Actor_InitHalfDaysBit(ActorContext* actorCtx);
+void Actor_KillAllOnHalfDayChange(PlayState* play, ActorContext* actorCtx);
+Actor* Actor_SpawnEntry(ActorContext* actorCtx, ActorEntry* actorEntry, PlayState* play);
+
+#define LOCATION_ACTOR (AP_PREFIX_ENEMY_DROP + (actor->id << 16) + (play->sceneId << 8) + (play->roomCtx.curRoom.num << 4) + i) /* uses addition due to overlaps when or'ing */
+
+RECOMP_PATCH void Actor_SpawnSetupActors(PlayState* play, ActorContext* actorCtx) {
+    if (play->numSetupActors > 0) {
+        ActorEntry* actorEntry = play->setupActorList;
+        s32 prevHalfDaysBitValue = actorCtx->halfDaysBit;
+        s32 shiftedHalfDaysBit;
+        s32 actorEntryHalfDayBit;
+        s32 i;
+
+        Actor* actor;
+        u32* actorLocation;
+        bool* actorDropped;
+
+        Actor_InitHalfDaysBit(actorCtx);
+        Actor_KillAllOnHalfDayChange(play, &play->actorCtx);
+
+        // Shift to previous halfDay bit, but ignoring DAY0_NIGHT.
+        // In other words, if the current halfDay is DAY1_DAY then this logic is ignored and this variable is zero
+        shiftedHalfDaysBit = (actorCtx->halfDaysBit << 1) & (HALFDAYBIT_ALL & ~HALFDAYBIT_DAY0_NIGHT);
+
+        for (i = 0; i < play->numSetupActors; i++) {
+            actorEntryHalfDayBit = ((actorEntry->rot.x & 7) << 7) | (actorEntry->rot.z & 0x7F);
+            if (actorEntryHalfDayBit == 0) {
+                actorEntryHalfDayBit = HALFDAYBIT_ALL;
+            }
+
+            if (!(actorEntryHalfDayBit & prevHalfDaysBitValue) && (actorEntryHalfDayBit & actorCtx->halfDaysBit) &&
+                (!CHECK_EVENTINF(EVENTINF_17) || !(actorEntryHalfDayBit & shiftedHalfDaysBit) ||
+                 !(actorEntry->id & 0x800))) {
+                actor = Actor_SpawnEntry(&play->actorCtx, actorEntry, play);
+
+                // @rando assign a generic location to every valid actor
+                if (actor != NULL) {
+                    actorLocation = z64recomp_get_extended_actor_data(actor, actorLocationExtension);
+                    // ignore actors that already had a location assigned to them
+                    if (!(*actorLocation)) {
+                        *actorLocation = LOCATION_ACTOR;
+                        actorDropped = z64recomp_get_extended_actor_data(actor, actorDroppedExtension);
+                        *actorDropped = false;
+                    }
+                }
+            }
+            actorEntry++;
+        }
+
+        // Prevents re-spawning the setup actors
+        play->numSetupActors = -play->numSetupActors;
+    }
+}
+
 RECOMP_CALLBACK("*", recomp_should_actor_init)
 void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
     if(actor == NULL) return;

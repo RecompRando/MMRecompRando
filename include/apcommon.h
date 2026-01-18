@@ -211,6 +211,7 @@ typedef enum {
 #define AP_PREFIX_FLOWERS 0x3F0000
 #define AP_PREFIX_SIGNS 0x310000
 #define AP_PREFIX_TORCHES 0x320000
+#define AP_PREFIX_ENEMY_DROP 0x1000000 /* uses 7 digits rather than 6 to prevent conflicts */
 
 #define AP_ITEM_PREFIX_SOUL_MISC 0x0A0000
 #define AP_ITEM_PREFIX_SOUL_BOSS 0x0B0000
