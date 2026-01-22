@@ -104,8 +104,8 @@ static unsigned char fast_dog_msg[128] = "\x0a\x0a\x0a\x0a\x0a\x0a.\x0a.\x0a.\x0
 
 static unsigned char cursed_spider_msg_1[128] = "I have nothing to give you.\x11Go away.\xbf";
 static unsigned char cursed_spider_msg_2[128] = "Do not bother lifting the curse.\x11The mask is mine!\xbf";
-static unsigned char ssh_guy_msg_1[128] = "Thanks for saving me, I guess.\x11Unfortunately, the mask I had vanished.\x10It was making me infinitely rich! Now, I'll need\x11to go back at waving my arms somewhere...\xbf";
-static unsigned char ssh_guy_msg_2[128] = "I told you to NOT save me! That\x11mask was giving me infinite riches.\x11It's gone now.\x10\x0a\x0a\x0aNow what?\xbf";
+static unsigned char ssh_guy_msg_1[128] = "I am not giving you my mask.\x11It's mine and mine only!\xbf";
+static unsigned char ssh_guy_msg_2[128] = "Great, now my mask is gone. That\x11mask was giving me infinite riches.\x10Now what?\xbf";
 
 static unsigned char fool_msg[128] = "You are a\x01 FOOL!\xbf";
 
