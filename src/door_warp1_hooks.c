@@ -152,15 +152,15 @@ RECOMP_PATCH void func_808B8C48(DoorWarp1* this, PlayState* play) {
 
 // @rando override boss warps for entrance rando
 bool originalDungeonFlags[4];
-bool shouldOverrideDungeonWarp;
-bool shouldOverrideDungeonFlag;
+bool shouldOverrideDungeon;
 s32 curBossDungeon;
 static s32 realBossDungeon;
 
+u32 reverseERLookup(u32 placements, u32 index);
+
 RECOMP_HOOK("func_808BA10C")
 void DoorWarp1_BeforeSettingWarp(DoorWarp1* this, PlayState* play) {
-    shouldOverrideDungeonWarp = false;
-    shouldOverrideDungeonFlag = false;
+    shouldOverrideDungeon = false;
     curBossDungeon = -1;
     realBossDungeon = -1;
 
@@ -169,6 +169,8 @@ void DoorWarp1_BeforeSettingWarp(DoorWarp1* this, PlayState* play) {
     originalDungeonFlags[2] = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE);
     originalDungeonFlags[3] = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_STONE_TOWER_TEMPLE);
     
+    if (!rando_get_slotdata_u32("boss_entrance_rando")) return;
+
     if ((play->sceneId == SCENE_MITURIN_BS) || (play->sceneId == SCENE_HAKUGIN_BS) ||
         (play->sceneId == SCENE_INISIE_BS) || (play->sceneId == SCENE_SEA_BS)) {
         gDungeonBossWarpSceneId = play->sceneId;
@@ -183,12 +185,31 @@ void DoorWarp1_BeforeSettingWarp(DoorWarp1* this, PlayState* play) {
             curBossDungeon = 2;
         } else {
             curBossDungeon = -1;
+            return;
         }
 
-        if (this->unk_202 == 0 && recomp_get_config_u32("dungeon_warp_override")) { // add check for entrance rando
-            shouldOverrideDungeonWarp = true;
-            shouldOverrideDungeonFlag = true;
-            realBossDungeon = recomp_get_config_u32("dungeon_warp_override") - 1;
+        if (this->unk_202 == 0) {
+            shouldOverrideDungeon = true;
+            u32 placements = rando_get_slotdata_u32("er_placements");
+            s32 tempIndex = curBossDungeon;
+
+            // swap gbt and istt
+            if (tempIndex == 3) {
+                tempIndex = 2;
+            } else if (tempIndex == 2) {
+                tempIndex = 3;
+            }
+
+            tempIndex = reverseERLookup(placements, tempIndex);
+
+            // swap gbt and istt (again)
+            if (tempIndex == 3) {
+                realBossDungeon = 2;
+            } else if (tempIndex == 2) {
+                realBossDungeon = 3;
+            } else {
+                realBossDungeon = tempIndex;
+            }
         }
     }
 }
@@ -197,29 +218,25 @@ RECOMP_HOOK_RETURN("func_808BA10C")
 void DoorWarp1_AfterSettingWarp() {
     PlayState* play = gPlay;
 
-    if (curBossDungeon < 0) return; // invalid warp that should never occur
+    if (!shouldOverrideDungeon) return;
 
-    if (shouldOverrideDungeonFlag) {
-        // Clear the dungeon flag set by the vanilla function
-        if (!originalDungeonFlags[curBossDungeon]) {
-            switch (curBossDungeon) {
-                // case 0: // this actually should never happen, keeping it commented out just in case
-                //     CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE);
-                //     break;
-                case 1:
-                    CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_SNOWHEAD_TEMPLE);
-                    break;
-                case 3:
-                    CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE);
-                    break;
-                case 2:
-                    CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_STONE_TOWER_TEMPLE);
-                    break;
-            }
+    // Clear the dungeon flag set by the vanilla function if needed
+    if (!originalDungeonFlags[curBossDungeon]) {
+        switch (curBossDungeon) {
+            // case 0: // this actually should never happen, keeping it commented out just in case
+            //     CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE);
+            //     break;
+            case 1:
+                CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_SNOWHEAD_TEMPLE);
+                break;
+            case 3:
+                CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE);
+                break;
+            case 2:
+                CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_STONE_TOWER_TEMPLE);
+                break;
         }
     }
-
-    if (!shouldOverrideDungeonWarp) return;
 
     switch (realBossDungeon) {
         case 0:
@@ -279,6 +296,9 @@ void DoorWarp1_AfterSettingWarp() {
 // override the boss warp cutscene if needed
 RECOMP_HOOK("CutsceneCmd_Destination")
 void CutsceneCmd_OverrideDestination(PlayState* play, CutsceneContext* csCtx, CsCmdDestination* cmd) {
+    if (!rando_get_slotdata_u32("boss_entrance_rando")) return;
+
+    // no idea if this has a chance of triggering out of step from the blue warp
     if (cmd->type == CS_DESTINATION_BOSS_WARP) {
         switch (realBossDungeon) {
             case 0: // wft
