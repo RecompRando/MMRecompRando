@@ -383,6 +383,12 @@ static EnumOptionValue shop_prices_options[] = {
     { "offensive", NULL },
 };
 
+static EnumOptionValue rando_shuffle_spiderhouse_reward_options[] ={
+    { "disabled", NULL },
+    { "vanilla", NULL },
+    { "enabled", NULL},
+};
+
 static EnumOptionValue rando_skullsanity_options[] = {
     { "vanilla", NULL },
     { "anything", NULL },
@@ -501,7 +507,7 @@ void randoCreateYamlConfigMenu() {
     randoCreateRadioOption(&yaml_config_menu, "starting_hearts_are_containers_or_pieces", "Unused Starting Hearts are Distributed as:", rando_starting_hearts_type_options, ARRAY_COUNT(rando_starting_hearts_type_options), RANDO_STARTING_HEARTS_ARE_CONTAINERS);
     randoCreateRadioOption(&yaml_config_menu, "shuffle_regional_maps", "Shuffle Regional Maps:", rando_shuffle_regional_maps_options, ARRAY_COUNT(rando_shuffle_regional_maps_options), RANDO_SHUFFLE_REGIONAL_MAPS_VANILLA);
     randoCreateRadioOption(&yaml_config_menu, "shuffle_boss_remains", "Shuffle Boss Remains:", rando_shuffle_boss_remains_options, ARRAY_COUNT(rando_shuffle_boss_remains_options), RANDO_SHUFFLE_BOSS_REMAINS_VANILLA);
-    randoCreateBoolPropOption(&yaml_config_menu, "shuffle_spiderhouse_reward", "Shuffle Spiderhouse Rewards:", false);
+    randoCreateRadioOption(&yaml_config_menu, "shuffle_spiderhouse_reward", "Shuffle Spiderhouse Rewards:", rando_shuffle_spiderhouse_reward_options, ARRAY_COUNT(rando_shuffle_spiderhouse_reward_options), 0);
     randoCreateIntSliderOption(&yaml_config_menu, "required_skull_tokens", "Required Skulltula Tokens:", 0, 30, 1, 30);
     randoCreateRadioOption(&yaml_config_menu, "skullsanity", "Skull-Sanity Mode:", rando_skullsanity_options, ARRAY_COUNT(rando_skullsanity_options), RANDO_SKULLSANITY_VANILLA);
     randoCreateRadioOption(&yaml_config_menu, "shuffle_great_fairy_rewards", "Shuffle Great Fairy Rewards:", rando_shuffle_great_fairy_rewards_options, ARRAY_COUNT(rando_shuffle_great_fairy_rewards_options), 0);
