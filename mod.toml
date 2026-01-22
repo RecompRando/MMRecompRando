@@ -213,3 +213,11 @@ step = 1
 precision = 1
 percent = false
 default = 12
+
+[[manifest.config_options]]
+id = "dungeon_warp_override"
+name = "(DEBUG) Override Dungeon Boss Warps"
+description = "Alter the blue warp after defeating a boss to act as another dungeon's."
+type = "Enum"
+options = [ "Vanilla", "Woodfall", "Snowhead", "Stone Tower", "Great Bay" ]
+default = "Vanilla"

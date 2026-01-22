@@ -1,22 +1,17 @@
 #include "modding.h"
 #include "global.h"
+#include "recompconfig.h"
+#include "recomputils.h"
 
 #include "apcommon.h"
 
-RECOMP_IMPORT(".", bool rando_get_remains_allow_boss_warps_enabled());
+#include "overlays/actors/ovl_Door_Warp1/z_door_warp1.h"
 
-struct DoorWarp1;
+RECOMP_IMPORT(".", bool rando_get_remains_allow_boss_warps_enabled());
 
 #define FLAGS 0x00000000
 
 #define THIS ((DoorWarp1*)thisx)
-
-typedef void (*DoorWarp1ActionFunc)(struct DoorWarp1*, PlayState*);
-
-#define DOORWARP1_GET_FF(thisx) ((thisx)->params & 0xFF)
-#define DOORWARP1_GET_FF00_1(thisx) (((thisx)->params >> 8) & 0xFF)
-#define DOORWARP1_GET_FF00_2(thisx) ((thisx)->params & 0xFF00)
-#define DOORWARP1_GET_FF00_3(thisx) ((thisx)->params >> 8)
 
 #define LOCATION_REMAINS_ODOLWA GI_REMAINS_ODOLWA
 #define LOCATION_REMAINS_GOHT GI_REMAINS_GOHT
@@ -27,60 +22,6 @@ typedef void (*DoorWarp1ActionFunc)(struct DoorWarp1*, PlayState*);
 #define IN_BOSS_ROOM ((play->sceneId == SCENE_MITURIN_BS) || (play->sceneId == SCENE_HAKUGIN_BS) || \
                       (play->sceneId == SCENE_INISIE_BS) || (play->sceneId == SCENE_SEA_BS))
 
-typedef enum {
-    /* 0 */ ENDOORWARP1_FF_0,
-    /* 1 */ ENDOORWARP1_FF_1,
-    /* 2 */ ENDOORWARP1_FF_2,
-    /* 3 */ ENDOORWARP1_FF_3,
-    /* 4 */ ENDOORWARP1_FF_4,
-    /* 5 */ ENDOORWARP1_FF_5,
-    /* 6 */ ENDOORWARP1_FF_6
-} DoorWarp1Param;
-
-typedef struct DmHina DmHina;
-
-typedef struct DoorWarp1 {
-    /* 0x000 */ DynaPolyActor dyna;
-    /* 0x15C */ SkelAnime skelAnime;
-    /* 0x1A0 */ DmHina* unk_1A0;
-    /* 0x1A4 */ f32 unk_1A4;
-    /* 0x1A8 */ f32 unk_1A8;
-    /* 0x1AC */ f32 unk_1AC;
-    /* 0x1B0 */ f32 unk_1B0;
-    /* 0x1B4 */ f32 unk_1B4;
-    /* 0x1B8 */ f32 unk_1B8;
-    /* 0x1BC */ f32 unk_1BC;
-    /* 0x1C0 */ f32 unk_1C0;
-    /* 0x1C4 */ s16 unk_1C4;
-    /* 0x1C6 */ s16 unk_1C6;
-    /* 0x1C8 */ s16 unk_1C8;
-    /* 0x1CA */ s16 unk_1CA;
-    /* 0x1CC */ s16 unk_1CC;
-    /* 0x1CE */ s16 unk_1CE;
-    /* 0x1D0 */ u16 unk_1D0;
-    /* 0x1D2 */ s8 unk_1D2;
-    /* 0x1D3 */ u8 unk_1D3;
-    /* 0x1D4 */ u8 unk_1D4;
-    /* 0x1D8 */ DoorWarp1ActionFunc actionFunc;
-    /* 0x1DC */ LightNode* unk_1DC;
-    /* 0x1E0 */ LightInfo unk_1E0;
-    /* 0x1F0 */ LightNode* unk_1F0;
-    /* 0x1F4 */ LightInfo unk_1F4;
-    /* 0x202 */ u8 unk_202;
-    /* 0x203 */ u8 unk_203;
-    /* 0x204 */ f32 unk_204;
-    /* 0x208 */ u8 cueId;
-} DoorWarp1; // size = 0x20C
-
-static InitChainEntry sInitChain[] = {
-    ICHAIN_VEC3F_DIV1000(scale, 1000, ICHAIN_CONTINUE),
-    ICHAIN_F32(uncullZoneForward, 4000, ICHAIN_CONTINUE),
-    ICHAIN_F32(uncullZoneScale, 800, ICHAIN_CONTINUE),
-    ICHAIN_F32(uncullZoneDownward, 4000, ICHAIN_STOP),
-};
-
-s32 func_808B849C(DoorWarp1* this, PlayState* play);
-void func_808B9E94(DoorWarp1* this, PlayState* play);
 void DoorWarp1_SetupAction(DoorWarp1* this, DoorWarp1ActionFunc actionFunc);
 
 RECOMP_PATCH s32 func_808B849C(DoorWarp1* this, PlayState* play) {
@@ -131,73 +72,9 @@ RECOMP_PATCH void func_808B9BE8(DoorWarp1* this, PlayState* play) {
     }
 }
 
-extern CollisionHeader gWarpBossWarpPlatformCol;
-
-void func_808B8568(DoorWarp1* this, PlayState* play);
-void func_808B8924(DoorWarp1* this, PlayState* play);
-void func_808B8A7C(DoorWarp1* this, PlayState* play);
-void func_808B8C48(DoorWarp1* this, PlayState* play);
-void func_808B8E78(DoorWarp1* this, PlayState* play);
-
-RECOMP_PATCH void DoorWarp1_Init(Actor* thisx, PlayState* play) {
-    DoorWarp1* this = THIS;
-
-    this->unk_1CC = 0;
-    this->unk_202 = 0;
-    this->unk_203 = 0;
-    this->unk_1A0 = NULL;
-    this->unk_1C0 = 0.0f;
-    Actor_ProcessInitChain(&this->dyna.actor, sInitChain);
-    ActorShape_Init(&this->dyna.actor.shape, 0.0f, NULL, 0.0f);
-
-    this->unk_1D3 = 0;
-    this->unk_1D4 = 0;
-    this->unk_203 = 0;
-    this->unk_204 = 1.0f;
-
+RECOMP_HOOK("DoorWarp1_Init")
+void DoorWarp1_SetFlag(Actor* thisx, PlayState* play) {
     SET_WEEKEVENTREG(WEEKEVENTREG_86_80);
-
-    switch (DOORWARP1_GET_FF(&this->dyna.actor)) {
-        case ENDOORWARP1_FF_0:
-        case ENDOORWARP1_FF_1:
-        case ENDOORWARP1_FF_2:
-        case ENDOORWARP1_FF_3:
-        case ENDOORWARP1_FF_4:
-        case ENDOORWARP1_FF_5:
-            func_808B8568(this, play);
-            break;
-    }
-
-    switch (DOORWARP1_GET_FF(&this->dyna.actor)) {
-        case ENDOORWARP1_FF_0:
-            func_808B8924(this, play);
-            break;
-
-        case ENDOORWARP1_FF_1:
-            func_808B8A7C(this, play);
-            break;
-
-        case ENDOORWARP1_FF_2:
-        case ENDOORWARP1_FF_3:
-        case ENDOORWARP1_FF_4:
-        case ENDOORWARP1_FF_5:
-            this->unk_1D3 = 1;
-            DynaPolyActor_Init(&this->dyna, 0);
-            DynaPolyActor_LoadMesh(play, &this->dyna, &gWarpBossWarpPlatformCol);
-            func_808B8C48(this, play);
-            break;
-
-        case ENDOORWARP1_FF_6:
-            func_808B8E78(this, play);
-            break;
-    }
-
-    if ((play->sceneId == SCENE_MITURIN_BS) || (play->sceneId == SCENE_HAKUGIN_BS) ||
-        (play->sceneId == SCENE_INISIE_BS) || (play->sceneId == SCENE_SEA_BS)) {
-        Environment_StopTime();
-        play->interfaceCtx.restrictions.songOfTime = 1;
-        play->interfaceCtx.restrictions.songOfSoaring = 1;
-    }
 }
 
 void func_808B9E94(DoorWarp1* this, PlayState* play);
@@ -270,5 +147,152 @@ RECOMP_PATCH void func_808B8C48(DoorWarp1* this, PlayState* play) {
         DoorWarp1_SetupAction(this, func_808BAAF4);
     } else {
         DoorWarp1_SetupAction(this, func_808BABF4);
+    }
+}
+
+// @rando override boss warps for entrance rando
+bool originalDungeonFlags[4];
+bool shouldOverrideDungeonWarp;
+bool shouldOverrideDungeonFlag;
+s32 curBossDungeon;
+static s32 realBossDungeon;
+
+RECOMP_HOOK("func_808BA10C")
+void DoorWarp1_BeforeSettingWarp(DoorWarp1* this, PlayState* play) {
+    shouldOverrideDungeonWarp = false;
+    shouldOverrideDungeonFlag = false;
+    curBossDungeon = -1;
+    realBossDungeon = -1;
+
+    originalDungeonFlags[0] = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE);
+    originalDungeonFlags[1] = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_SNOWHEAD_TEMPLE);
+    originalDungeonFlags[2] = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE);
+    originalDungeonFlags[3] = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_STONE_TOWER_TEMPLE);
+    
+    if ((play->sceneId == SCENE_MITURIN_BS) || (play->sceneId == SCENE_HAKUGIN_BS) ||
+        (play->sceneId == SCENE_INISIE_BS) || (play->sceneId == SCENE_SEA_BS)) {
+        gDungeonBossWarpSceneId = play->sceneId;
+        // Confusingly, Great Bay Temple and Stone Tower have their numbers swapped around
+        if (play->sceneId == SCENE_MITURIN_BS) {
+            curBossDungeon = 0;
+        } else if (play->sceneId == SCENE_HAKUGIN_BS) {
+            curBossDungeon = 1;
+        } else if (play->sceneId == SCENE_SEA_BS) {
+            curBossDungeon = 3;
+        } else if (play->sceneId == SCENE_INISIE_BS) {
+            curBossDungeon = 2;
+        } else {
+            curBossDungeon = -1;
+        }
+
+        if (this->unk_202 == 0 && recomp_get_config_u32("dungeon_warp_override")) { // add check for entrance rando
+            shouldOverrideDungeonWarp = true;
+            shouldOverrideDungeonFlag = true;
+            realBossDungeon = recomp_get_config_u32("dungeon_warp_override") - 1;
+        }
+    }
+}
+
+RECOMP_HOOK_RETURN("func_808BA10C")
+void DoorWarp1_AfterSettingWarp() {
+    PlayState* play = gPlay;
+
+    if (curBossDungeon < 0) return; // invalid warp that should never occur
+
+    if (shouldOverrideDungeonFlag) {
+        // Clear the dungeon flag set by the vanilla function
+        if (!originalDungeonFlags[curBossDungeon]) {
+            switch (curBossDungeon) {
+                // case 0: // this actually should never happen, keeping it commented out just in case
+                //     CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE);
+                //     break;
+                case 1:
+                    CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_SNOWHEAD_TEMPLE);
+                    break;
+                case 3:
+                    CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE);
+                    break;
+                case 2:
+                    CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_STONE_TOWER_TEMPLE);
+                    break;
+            }
+        }
+    }
+
+    if (!shouldOverrideDungeonWarp) return;
+
+    switch (realBossDungeon) {
+        case 0:
+            if (CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE)) {
+                // Skips the entrance cutscene as this flag is attached to `ENTRANCE(WOODFALL_TEMPLE, 1)`
+                SET_WEEKEVENTREG(WEEKEVENTREG_ENTERED_WOODFALL_TEMPLE_PRISON);
+                play->nextEntrance = ENTRANCE(WOODFALL_TEMPLE, 1);
+                play->transitionTrigger = TRANS_TRIGGER_START;
+                play->transitionType = TRANS_TYPE_FADE_WHITE;
+                gSaveContext.nextTransitionType = TRANS_TYPE_FADE_WHITE;
+            } else {
+                play->nextEntrance = ENTRANCE(WOODFALL, 0);
+                gSaveContext.nextCutsceneIndex = 0xFFF0;
+                play->transitionTrigger = TRANS_TRIGGER_START;
+                play->transitionType = TRANS_TYPE_FADE_WHITE;
+                gSaveContext.nextTransitionType = TRANS_TYPE_FADE_WHITE;
+            }
+            break;
+
+        case 1:
+            SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_SNOWHEAD_TEMPLE);
+            play->nextEntrance = ENTRANCE(MOUNTAIN_VILLAGE_SPRING, 7);
+            gSaveContext.nextCutsceneIndex = 0xFFEF; // prevents a crash
+            play->transitionTrigger = TRANS_TRIGGER_START;
+            play->transitionType = TRANS_TYPE_FADE_WHITE;
+            gSaveContext.nextTransitionType = TRANS_TYPE_FADE_WHITE;
+            break;
+
+        case 3:
+            if (CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE)) {
+                play->nextEntrance = ENTRANCE(ZORA_CAPE, 9);
+                gSaveContext.nextCutsceneIndex = 0xFFF0;
+                play->transitionTrigger = TRANS_TRIGGER_START;
+                play->transitionType = TRANS_TYPE_FADE_WHITE;
+                gSaveContext.nextTransitionType = TRANS_TYPE_FADE_WHITE;
+            } else {
+                SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE);
+                play->nextEntrance = ENTRANCE(ZORA_CAPE, 8);
+                gSaveContext.nextCutsceneIndex = 0xFFF0;
+                play->transitionTrigger = TRANS_TRIGGER_START;
+                play->transitionType = TRANS_TYPE_FADE_WHITE;
+                gSaveContext.nextTransitionType = TRANS_TYPE_FADE_WHITE;
+            }
+            break;
+
+        case 2:
+            SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_STONE_TOWER_TEMPLE);
+            play->nextEntrance = ENTRANCE(IKANA_CANYON, 15);
+            gSaveContext.nextCutsceneIndex = 0xFFF2;
+            play->transitionTrigger = TRANS_TRIGGER_START;
+            play->transitionType = TRANS_TYPE_FADE_WHITE;
+            gSaveContext.nextTransitionType = TRANS_TYPE_FADE_WHITE;
+            break;
+    }
+}
+
+// override the boss warp cutscene if needed
+RECOMP_HOOK("CutsceneCmd_Destination")
+void CutsceneCmd_OverrideDestination(PlayState* play, CutsceneContext* csCtx, CsCmdDestination* cmd) {
+    if (cmd->type == CS_DESTINATION_BOSS_WARP) {
+        switch (realBossDungeon) {
+            case 0: // wft
+                gDungeonBossWarpSceneId = SCENE_MITURIN_BS;
+                break;
+            case 1: // sht
+                gDungeonBossWarpSceneId = SCENE_HAKUGIN_BS;
+                break;
+            case 3: // gbt
+                gDungeonBossWarpSceneId = SCENE_SEA_BS;
+                break;
+            case 2: // stt
+                gDungeonBossWarpSceneId = SCENE_INISIE_BS;
+                break;
+        }
     }
 }
