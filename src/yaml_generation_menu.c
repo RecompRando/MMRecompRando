@@ -383,10 +383,22 @@ static EnumOptionValue shop_prices_options[] = {
     { "offensive", NULL },
 };
 
+static EnumOptionValue rando_shuffle_spiderhouse_reward_options[] ={
+    { "disabled", NULL },
+    { "vanilla", NULL },
+    { "enabled", NULL},
+};
+
 static EnumOptionValue rando_skullsanity_options[] = {
     { "vanilla", NULL },
     { "anything", NULL },
     { "ignore", NULL },
+};
+
+static EnumOptionValue rando_shuffle_great_fairy_rewards_options[] ={
+    { "disabled", NULL },
+    { "vanilla", NULL },
+    { "enabled", NULL},
 };
 
 static EnumOptionValue rando_shopsanity_options[] = {
@@ -485,8 +497,8 @@ void randoCreateYamlConfigMenu() {
     yaml_config_menu.num_options = 0;
     randoCreateRadioOption(&yaml_config_menu, "accessibility", "Accessibility:", rando_accessibility_options, ARRAY_COUNT(rando_accessibility_options), RANDO_ACCESSABILITY_FULL);
     randoCreateRadioOption(&yaml_config_menu, "logic_difficulty", "Logic Difficulty:", rando_logic_difficulty_options, ARRAY_COUNT(rando_logic_difficulty_options), RANDO_LOGIC_DIFFICULTY_NORMAL);
-    randoCreateIntSliderOption(&yaml_config_menu, "moon_remains_required", "Moon Boss Remains Required:", 1, 4, 1, 4);
-    randoCreateIntSliderOption(&yaml_config_menu, "majora_remains_required", "Majora Boss Remains Required:", 1, 4, 1, 4);
+    randoCreateIntSliderOption(&yaml_config_menu, "moon_remains_required", "Moon Boss Remains Required:", 0, 4, 1, 4);
+    randoCreateIntSliderOption(&yaml_config_menu, "majora_remains_required", "Majora Boss Remains Required:", 0, 4, 1, 4);
     randoCreateBoolPropOption(&yaml_config_menu, "camc", "Chests Match Contents:", true);
     randoCreateBoolPropOption(&yaml_config_menu, "swordless", "Start Swordless:", false);
     randoCreateBoolPropOption(&yaml_config_menu, "shieldless", "Start Shieldless:", false);
@@ -495,10 +507,10 @@ void randoCreateYamlConfigMenu() {
     randoCreateRadioOption(&yaml_config_menu, "starting_hearts_are_containers_or_pieces", "Unused Starting Hearts are Distributed as:", rando_starting_hearts_type_options, ARRAY_COUNT(rando_starting_hearts_type_options), RANDO_STARTING_HEARTS_ARE_CONTAINERS);
     randoCreateRadioOption(&yaml_config_menu, "shuffle_regional_maps", "Shuffle Regional Maps:", rando_shuffle_regional_maps_options, ARRAY_COUNT(rando_shuffle_regional_maps_options), RANDO_SHUFFLE_REGIONAL_MAPS_VANILLA);
     randoCreateRadioOption(&yaml_config_menu, "shuffle_boss_remains", "Shuffle Boss Remains:", rando_shuffle_boss_remains_options, ARRAY_COUNT(rando_shuffle_boss_remains_options), RANDO_SHUFFLE_BOSS_REMAINS_VANILLA);
-    randoCreateBoolPropOption(&yaml_config_menu, "shuffle_spiderhouse_reward", "Shuffle Spiderhouse Rewards:", false);
+    randoCreateRadioOption(&yaml_config_menu, "shuffle_spiderhouse_reward", "Shuffle Spiderhouse Rewards:", rando_shuffle_spiderhouse_reward_options, ARRAY_COUNT(rando_shuffle_spiderhouse_reward_options), 0);
     randoCreateIntSliderOption(&yaml_config_menu, "required_skull_tokens", "Required Skulltula Tokens:", 0, 30, 1, 30);
     randoCreateRadioOption(&yaml_config_menu, "skullsanity", "Skull-Sanity Mode:", rando_skullsanity_options, ARRAY_COUNT(rando_skullsanity_options), RANDO_SKULLSANITY_VANILLA);
-    randoCreateBoolPropOption(&yaml_config_menu, "shuffle_great_fairy_rewards", "Shuffle Great Fairy Rewards:", false);
+    randoCreateRadioOption(&yaml_config_menu, "shuffle_great_fairy_rewards", "Shuffle Great Fairy Rewards:", rando_shuffle_great_fairy_rewards_options, ARRAY_COUNT(rando_shuffle_great_fairy_rewards_options), 0);
     randoCreateIntSliderOption(&yaml_config_menu, "required_stray_fairies", "Required Stray Fairies:", 0, 15, 1, 15);
     randoCreateBoolPropOption(&yaml_config_menu, "fairysanity", "Fairy-Sanity:", false);
     randoCreateRadioOption(&yaml_config_menu, "shop_prices", "Shop Prices:", shop_prices_options, ARRAY_COUNT(shop_prices_options), RANDO_SHOP_PRICES_VANILLA);

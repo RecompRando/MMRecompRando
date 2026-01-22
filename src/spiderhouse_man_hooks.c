@@ -65,6 +65,11 @@ void OnEnSth_Init(Actor* thisx, PlayState* play) {
 
     // fake skull token count for lower requirements
     Inventory_FakeSkullTokenCount(play->sceneId);
+
+    // If ShuffleSpiderhouseReward is disabled, set the flag that prevent giving the SSH reward
+    if ((s16) rando_get_slotdata_u32("shuffle_spiderhouse_reward") == 0) {
+        SET_WEEKEVENTREG(WEEKEVENTREG_RECEIVED_MASK_OF_TRUTH);
+    }
 }
 
 RECOMP_HOOK_RETURN("EnSth_Init")
@@ -125,7 +130,7 @@ RECOMP_PATCH void EnSth_GiveOceansideSpiderHouseReward(EnSth* this, PlayState* p
     } else {
         // this could all be moved into a hook?
         // handle all 3 day checks here as well
-        if (rando_location_is_checked(GI_WALLET_GIANT)) {
+        if (rando_location_is_checked(GI_WALLET_GIANT) || (s16) rando_get_slotdata_u32("shuffle_spiderhouse_reward") == 0) {
             STH_GI_ID(&this->actor) = GI_RUPEE_SILVER;
         } else {
             STH_GI_ID(&this->actor) = GI_WALLET_GIANT;
