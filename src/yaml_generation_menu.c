@@ -407,6 +407,12 @@ static EnumOptionValue rando_shopsanity_options[] = {
     { "advanced", NULL },
 };
 
+static EnumOptionValue treasure_chest_game_shuffle_options[] = {
+    { "disabled", NULL },
+    { "goron_only", NULL },
+    { "everything", NULL },
+};
+
 static EnumOptionValue rando_damage_multiplier_options[] = {
     { "half", NULL },
     { "normal", NULL },
@@ -521,6 +527,7 @@ void randoCreateYamlConfigMenu() {
     randoCreateBoolPropOption(&yaml_config_menu, "bosskeysanity", "Boss-Key-Sanity:", false);
     randoCreateBoolPropOption(&yaml_config_menu, "curiostity_shop_trades", "Curiosity Shop Trades:", false);
     randoCreateBoolPropOption(&yaml_config_menu, "intro_checks", "Intro Checks:", false);
+    randoCreateRadioOption(&yaml_config_menu, "shuffle_treasure_chest_game", "Treasure Chest Game Shuffle:", treasure_chest_game_shuffle_options, ARRAY_COUNT(treasure_chest_game_shuffle_options), 1);
     randoCreateBoolPropOption(&yaml_config_menu, "start_with_consumables", "Start With Consumables:", true);
     randoCreateBoolPropOption(&yaml_config_menu, "permanent_chateau_romani", "Permanent Chateau Romani:", true);
     randoCreateBoolPropOption(&yaml_config_menu, "start_with_inverted_time", "Start With Inverted Time:", true);
