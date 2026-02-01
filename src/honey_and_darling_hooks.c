@@ -60,11 +60,15 @@ typedef struct EnFu {
 void func_80963610(EnFu* this);
 
 RECOMP_PATCH void func_80963560(EnFu* this, PlayState* play) {
-    if (Actor_HasParent(&this->actor, play)) {
+    if ((s16) rando_get_slotdata_u32("shuffle_minigames") == 0) {
+        Actor_OfferGetItemHook(&this->actor, play, GI_RUPEE_PURPLE, 0, 500.0f, 100.0f, false, false);
+    } else if (Actor_HasParent(&this->actor, play)) {
         this->actor.parent = NULL;
         func_80963610(this);
     } else if ((this->unk_552 == 0x2880) && !rando_location_is_checked(LOCATION_HONEY_AND_DARLING_ALL_DAYS)) {
         Actor_OfferGetItem(&this->actor, play, GI_HEART_PIECE, 500.0f, 100.0f);
+    } else if ((s16) rando_get_slotdata_u32("shuffle_minigames") == 1) {
+        Actor_OfferGetItemHook(&this->actor, play, GI_RUPEE_PURPLE, 0, 500.0f, 100.0f, false, false);
     } else if (!rando_location_is_checked(LOCATION_HONEY_AND_DARLING_ANY_DAY)) {
         Actor_OfferGetItem(&this->actor, play, GI_RUPEE_PURPLE, 500.0f, 100.0f);
     } else {

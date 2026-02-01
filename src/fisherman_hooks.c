@@ -54,8 +54,8 @@ RECOMP_PATCH void func_80C14554(EnJgameTsn* this, PlayState* play) {
             SET_WEEKEVENTREG(WEEKEVENTREG_82_10);
         }
         func_80C145FC(this);
-    // } else if (CHECK_WEEKEVENTREG(WEEKEVENTREG_82_10)) {
-    //     Actor_OfferGetItem(&this->actor, play, GI_RUPEE_PURPLE, 500.0f, 100.0f);
+    } else if ((s16) rando_get_slotdata_u32("shuffle_minigames") != 0) {
+        Actor_OfferGetItem(&this->actor, play, GI_RUPEE_PURPLE, 500.0f, 100.0f);
     } else {
         Actor_OfferGetItem(&this->actor, play, GI_HEART_PIECE, 500.0f, 100.0f);
     }
