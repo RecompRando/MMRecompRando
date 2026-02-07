@@ -284,7 +284,8 @@ void randoScout() {
 
     if (rando_get_slotdata_u32("oneoffs") == 0)
     {
-    removeAllScoutsWithPrefix(AP_PREFIX_ONEOFFS);
+        removeAllScoutsWithPrefix(AP_PREFIX_ONEOFFS);
+        removeAllScoutsWithPrefix(0x063F00); // goron trial chest
     }
     
     if (rando_get_slotdata_u32("completion_goal") == 0)
