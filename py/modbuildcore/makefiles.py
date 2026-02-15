@@ -11,7 +11,7 @@ class MakefileJob(JobBase):
     makefile_path: Path
     extended_env: dict[str, str]
     
-    def __init__(self, makefile_path: Path, extended_env: dict[str, str], *, make_binary_path: Path = None):
+    def __init__(self, makefile_path: Path, extended_env: dict[str, str], *, make_binary_path: Path = None, make_cwd: Path = None):
         super().__init__()
         if make_binary_path is None:
             self.make_binary_path = shutil.which("make")
@@ -19,6 +19,10 @@ class MakefileJob(JobBase):
             self.make_binary_path = make_binary_path
         self.makefile_path = makefile_path
         self.extended_env = extended_env
+        self.make_cwd = make_cwd
+        
+        if self.make_cwd is None:
+            self.make_cwd = os.getcwd()
     
     def run(self, c: Context):
         print_job_header(f"Makefile Job: {self.makefile_path}")
@@ -27,5 +31,6 @@ class MakefileJob(JobBase):
         
         invoke_subprocess_run(c, True,
             [self.make_binary_path, "-f", self.makefile_path],
-            env=make_env
+            env=make_env,
+            cwd=self.make_cwd
         )

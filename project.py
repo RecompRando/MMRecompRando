@@ -125,17 +125,26 @@ def prepend_to_env_path(to_append: Path) -> str:
     return env_path
 
 # ============== Mod Toml/.nrm Building ==============
+glue_dir = root_dir.joinpath("./recomp-rando-python-glue")
 
-# Declaring the mod toml files to build. Note that we've not set up the makefile that will build the elf. We'll do that next.
-# Note that the mod toml job doesn't automatically find the RecompModTool. We'll need to pass that in ourselves.
-# ModTomlJob instances automatically register the resultant .nrm file as a mod_output_file. Therefore the .nrm will 
-# automatically be added to any build output folders or thunderstore packages that depend on this job.
-main_toml = ModToNRMJob(mod_tool_path, root_dir.joinpath("mod.toml"))
-# The mod toml file is read when the job is first created. We now have access to all the information in the toml.
+makefiles['glue'] = glue_makefile = MakefileJob(
+    glue_dir.joinpath("Makefile"),
+    # We can pass information to the makefile here, by declaring additional environmental variables for make to use.
+    # Environmental variables are automatically added to the variable namespace in a makefile.
+    # This template uses a generalized makefile that could be configured to compile multiple mods by passing
+    # different environmental variables here. It's also set up to let us pass in the compiler and linker we want to use.
+    {
+        "PATH": prepend_to_env_path([llvmmips_bin_path]),
+        "CC": str(llvmmips_bin_path.joinpath("clang")),
+        "AR": str(llvmmips_bin_path.joinpath("llvm-ar")),
+    },
+    make_cwd=glue_dir
+)
+glue_makefile.depends_on([archive_extractions["llvmmips"]])
 
 # Declaring the makefile that will build our mod's elf binary. In this template, we've declared it second so that we can pass information
 # from the mod toml to the makefile job.
-main_makefile = MakefileJob(
+makefiles['mod'] = main_makefile = MakefileJob(
     root_dir.joinpath("Makefile"),
     # We can pass information to the makefile here, by declaring additional environmental variables for make to use.
     # Environmental variables are automatically added to the variable namespace in a makefile.
@@ -145,21 +154,29 @@ main_makefile = MakefileJob(
         "PATH": prepend_to_env_path([llvmmips_bin_path]),
         "CC": str(llvmmips_bin_path.joinpath("clang")),
         "LD": str(llvmmips_bin_path.joinpath("ld.lld")),
-    }
+    },
+    make_cwd=root_dir
 )
 
 # We've set the makefile to use the MIPS-only clang and ld.lld that we downloaded and extracted (The 'llvmmips' DownloadJob and ArchiveExtractJob).
 # So, we'll mark this MakefileJob as depending on that ArchiveExtractJob. We don't need to mark it as depending on the DownloadJob,
 # since the ArchiveExtractJob already depends on the DownloadJob.
-main_makefile.depends_on([archive_extractions["llvmmips"]])
+main_makefile.depends_on([archive_extractions["llvmmips"], glue_makefile])
 
+# Declaring the mod toml files to build. 
+# Note that the mod toml job doesn't automatically find the RecompModTool. We'll need to pass that in ourselves.
+# ModTomlJob instances automatically register the resultant .nrm file as a mod_output_file. Therefore the .nrm will 
+# automatically be added to any build output folders or thunderstore packages that depend on this job.
+nrms['mod'] = main_toml = ModToNRMJob(mod_tool_path, root_dir.joinpath("mod.toml"))
+
+# The mod toml file is read when the job is first created. We now have access to all the information in the toml.
 # Our toml file depends on the makefile to produce the mod elf, so we'll declare that dependency here.
 # It also depends on the RecompModTool we extracted from 'llvmmips', so we declare that dependency too.
 main_toml.depends_on([main_makefile, archive_extractions["llvmmips"]])
 
 # Adding both jobs to their respective dicts for direct invoking.
-nrms['mod'] = main_toml
-makefiles['mod'] = main_makefile
+
+
 
 # ============== Build Output and Packaging ==============
 
@@ -238,7 +255,8 @@ thunderstore_packages['package'] = main_package
 # ============== Misc ==============
 # Here we define the files and directories that should be deleted for a clean and a distclean.
 clean_paths: list[Path] = [
-    build_dir
+    build_dir,
+    glue_dir.joinpath("build")
 ]
 
 distclean_paths: list[Path] = [
