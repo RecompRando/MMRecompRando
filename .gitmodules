@@ -4,3 +4,6 @@
 [submodule "mm-decomp"]
 	path = mm-decomp
 	url = https://github.com/zeldaret/mm
+[submodule "recomp-rando-python-glue"]
+	path = recomp-rando-python-glue
+	url = https://github.com/LT-Schmiddy/recomp-rando-python-glue
