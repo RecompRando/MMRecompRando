@@ -19,7 +19,7 @@ from modbuildcore.jobs import *
 downloads: dict[str, DownloadJob] = {}
 archive_extractions: dict[str, ArchiveExtractJob] = {}
 makefiles: dict[str, MakefileJob] = {}
-mod_tomls: dict[str, ModToNRMJob] = {}
+nrms: dict[str, ModToNRMJob] = {}
 cmake_build_groups: dict[str, dict[str, CMakeBuildJob]] = {}
 build_outputs: dict[str, BuildOutputJob] = {}
 thunderstore_packages: dict[str, ThunderstorePackageJob] = {}
@@ -89,7 +89,6 @@ def add_archive_download_and_extract(name: str, url: str, extract_dir: Path) -> 
 if platform.system() == "Windows":
     add_archive_download_and_extract(
         "llvmmips",
-        # "https://github.com/LT-Schmiddy/n64recomp-clang/releases/download/shim-prerelease-0.1.0/N64RecompAndClangEssentials-ClangVersion21.1.6-MipsOnly-Windows-AMD64.zip",
         "https://github.com/LT-Schmiddy/n64recomp-clang/releases/download/release-21.1.8/Windows-AMD64-ClangEssentialsAndN64Recomp-ClangVersion21.1.8-MipsOnly.zip",
         binaries_dir.joinpath("llvmmips_win")
     )
@@ -99,7 +98,6 @@ if platform.system() == "Windows":
 elif platform.system() == "Darwin":
     add_archive_download_and_extract(
         "llvmmips",
-        # "https://github.com/LT-Schmiddy/n64recomp-clang/releases/download/shim-prerelease-0.1.0/N64RecompAndClangEssentials-ClangVersion21.1.6-MipsOnly-Darwin-arm64.tar.xz",
         "https://github.com/LT-Schmiddy/n64recomp-clang/releases/download/release-21.1.8/Darwin-arm64-ClangEssentialsAndN64Recomp-ClangVersion21.1.8-MipsOnly.tar.xz",
         binaries_dir.joinpath("llvmmips_macos")
     )
@@ -109,7 +107,6 @@ elif platform.system() == "Darwin":
 else:
     add_archive_download_and_extract(
         "llvmmips",
-        # "https://github.com/LT-Schmiddy/n64recomp-clang/releases/download/shim-prerelease-0.1.0/N64RecompAndClangEssentials-ClangVersion21.1.6-MipsOnly-Linux-x86_64.tar.xz",
         "https://github.com/LT-Schmiddy/n64recomp-clang/releases/download/release-21.1.8/Linux-x86_64-ClangEssentialsAndN64Recomp-ClangVersion21.1.8-MipsOnly.tar.xz",
         binaries_dir.joinpath("llvmmips_linux")
     )
@@ -161,7 +158,7 @@ main_makefile.depends_on([archive_extractions["llvmmips"]])
 main_toml.depends_on([main_makefile, archive_extractions["llvmmips"]])
 
 # Adding both jobs to their respective dicts for direct invoking.
-mod_tomls['mod'] = main_toml
+nrms['mod'] = main_toml
 makefiles['mod'] = main_makefile
 
 # ============== Build Output and Packaging ==============
@@ -178,7 +175,7 @@ debug_test_dir = BuildOutputJob(root_dir.joinpath("test_env/mods"))
 
 # To include mod_output_files from other jobs in the build output, add those jobs as dependencies.
 debug_test_dir.depends_on([
-    mod_tomls['mod'],
+    nrms['mod'],
 ])
 # You can also declare additional files to include using `debug_test_dir.add_mod_output_files(...)` method.
 
@@ -223,12 +220,12 @@ main_package = ThunderstorePackageJob(
     },
     root_dir.joinpath("thunderstore_info/README.md").read_text(),
     root_dir.joinpath("thunderstore_info/CHANGELOG.md").read_text(),
-    root_dir.joinpath("thumb.png")
+    root_dir.joinpath("icon.png")
 )
 
 # To include mod_output_files from other jobs in the build output, add those jobs as dependencies.
 main_package.depends_on([
-    mod_tomls['mod']
+    nrms['mod']
 ])
 # You can also declare additional files to include using `debug_test_dir.add_mod_output_files(...)` method.
 

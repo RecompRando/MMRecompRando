@@ -16,3 +16,5 @@ runtime/
 downloads/
 binaries/
 *.pyc
+test_env/
+*.thunderstore.zip
