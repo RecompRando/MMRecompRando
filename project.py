@@ -57,6 +57,8 @@ archive_downloads_dir: Path = root_dir.joinpath("downloads")
 build_dir: Path = root_dir.joinpath("build")
 binaries_dir: Path = root_dir.joinpath("binaries")
 
+glue_dir = root_dir.joinpath("./recomp-rando-python-glue")
+
 llvmmips_bin_path: Path = None
 mod_tool_path: Path = None
 zig_dir_path: Path = None
@@ -125,7 +127,6 @@ def prepend_to_env_path(to_append: Path) -> str:
     return env_path
 
 # ============== Mod Toml/.nrm Building ==============
-glue_dir = root_dir.joinpath("./recomp-rando-python-glue")
 
 makefiles['glue'] = glue_makefile = MakefileJob(
     glue_dir.joinpath("Makefile"),
@@ -163,11 +164,31 @@ makefiles['mod'] = main_makefile = MakefileJob(
 # since the ArchiveExtractJob already depends on the DownloadJob.
 main_makefile.depends_on([archive_extractions["llvmmips"], glue_makefile])
 
+# Reading the data from glue module_files.py
+module_files_path = glue_dir.joinpath("module_files.py")
+module_files_code = compile(module_files_path.read_text(), module_files_path, "exec")
+module_files_ctx = {"__file__": str(module_files_path)}
+exec(module_files_code, globals=module_files_ctx, locals=module_files_ctx)
+include_python_files = module_files_ctx["include_python_files"]
+
+def populate_file_injection(injections: dict[Path, Path], inject_root: Path, search_dir: Path):
+    for inject_path, file_path in [(inject_root.joinpath(i), search_dir.joinpath(i)) for i in os.listdir(search_dir)]:
+        if file_path.is_file():
+            injections[inject_path] = file_path
+        elif file_path.is_dir():
+            populate_file_injection(injections, inject_path, file_path)
+
+# include single file:
+# include_python_files[Path("README.md")] = root_dir.joinpath("README.md")
+
+# Including entire directories:
+# populate_file_injection(include_python_files, Path("offline_build"), root_dir.joinpath("offline_build"))
+
 # Declaring the mod toml files to build. 
 # Note that the mod toml job doesn't automatically find the RecompModTool. We'll need to pass that in ourselves.
 # ModTomlJob instances automatically register the resultant .nrm file as a mod_output_file. Therefore the .nrm will 
 # automatically be added to any build output folders or thunderstore packages that depend on this job.
-nrms['mod'] = main_toml = ModToNRMJob(mod_tool_path, root_dir.joinpath("mod.toml"))
+nrms['mod'] = main_toml = ModToNRMJob(mod_tool_path, root_dir.joinpath("mod.toml", ), inject_files=include_python_files)
 
 # The mod toml file is read when the job is first created. We now have access to all the information in the toml.
 # Our toml file depends on the makefile to produce the mod elf, so we'll declare that dependency here.
@@ -175,7 +196,6 @@ nrms['mod'] = main_toml = ModToNRMJob(mod_tool_path, root_dir.joinpath("mod.toml
 main_toml.depends_on([main_makefile, archive_extractions["llvmmips"]])
 
 # Adding both jobs to their respective dicts for direct invoking.
-
 
 
 # ============== Build Output and Packaging ==============
