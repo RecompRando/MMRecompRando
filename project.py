@@ -188,7 +188,7 @@ def populate_file_injection(injections: dict[Path, Path], inject_root: Path, sea
 # Note that the mod toml job doesn't automatically find the RecompModTool. We'll need to pass that in ourselves.
 # ModTomlJob instances automatically register the resultant .nrm file as a mod_output_file. Therefore the .nrm will 
 # automatically be added to any build output folders or thunderstore packages that depend on this job.
-nrms['mod'] = main_toml = ModToNRMJob(mod_tool_path, root_dir.joinpath("mod.toml", ), inject_files=include_python_files)
+nrms['mod'] = main_toml = ModToNRMJob(mod_tool_path, root_dir.joinpath("mod.toml"), inject_files=include_python_files)
 
 # The mod toml file is read when the job is first created. We now have access to all the information in the toml.
 # Our toml file depends on the makefile to produce the mod elf, so we'll declare that dependency here.
