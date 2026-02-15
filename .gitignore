@@ -13,5 +13,6 @@ build/
 mm_recomp_rando/
 .vs/
 runtime/
-RecompModTool*
-OfflineModRecomp*
+downloads/
+binaries/
+*.pyc
