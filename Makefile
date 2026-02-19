@@ -14,7 +14,7 @@ CFLAGS   := $(ARCHFLAGS) $(WARNFLAGS) -D_LANGUAGE_C -nostdinc -ffunction-section
 CPPFLAGS := -DMIPS -DF3DEX_GBI_PL -DGBI_DOWHILE -I include -I include/dummy_headers \
             -I mm-decomp/include -I mm-decomp/src -I mm-decomp/extracted/n64-us -idirafter include/libc -idirafter mm-decomp/include/libc
 LDFLAGS  := -nostdlib -T $(LDSCRIPT) -Map $(BUILD_DIR)/mod.map --unresolved-symbols=ignore-all --emit-relocs -e 0 --no-nmagic -gc-sections \
-			-L ./recomp-rando-python-glue/build -lapglue
+			-L ./pyglue/build/lib -lapglue
 
 rwildcard = $(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
 getdirs = $(sort $(dir $(1)))
