@@ -57,7 +57,7 @@ archive_downloads_dir: Path = root_dir.joinpath("downloads")
 build_dir: Path = root_dir.joinpath("build")
 binaries_dir: Path = root_dir.joinpath("binaries")
 
-glue_dir = root_dir.joinpath("./recomp-rando-python-glue")
+glue_dir = root_dir.joinpath("./pyglue")
 
 llvmmips_bin_path: Path = None
 mod_tool_path: Path = None
@@ -164,12 +164,8 @@ makefiles['mod'] = main_makefile = MakefileJob(
 # since the ArchiveExtractJob already depends on the DownloadJob.
 main_makefile.depends_on([archive_extractions["llvmmips"], glue_makefile])
 
-# Reading the data from glue module_files.py
-module_files_path = glue_dir.joinpath("module_files.py")
-module_files_code = compile(module_files_path.read_text(), module_files_path, "exec")
-module_files_ctx = {"__file__": str(module_files_path)}
-exec(module_files_code, globals=module_files_ctx, locals=module_files_ctx)
-include_python_files = module_files_ctx["include_python_files"]
+from pyglue import module_files
+include_python_files = module_files.include_python_files
 
 def populate_file_injection(injections: dict[Path, Path], inject_root: Path, search_dir: Path):
     for inject_path, file_path in [(inject_root.joinpath(i), search_dir.joinpath(i)) for i in os.listdir(search_dir)]:

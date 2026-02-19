@@ -5,6 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/include",
                 "${workspaceFolder}/include/dummy_headers",
+                "${workspaceFolder}/pyglue/include",
+                "${workspaceFolder}/include/dummy_headers",
                 "${workspaceFolder}/mm-decomp/include",
                 "${workspaceFolder}/mm-decomp/src",
                 "${workspaceFolder}/mm-decomp/assets"
