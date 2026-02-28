@@ -25,7 +25,7 @@ https://github.com/RecompRando/MMRecompRando"""
 short_description = "hey game different now"
 
 # Authors of this mod.
-authors = [ "LittleCube", "ThatHypedPerson", "PixelShake92", "Muervo_", "G4M3RL1F3", "dcvz", "CelestialKitsune", "VincentsSin" ]
+authors = [ "LittleCube", "ThatHypedPerson", "PixelShake92", "Muervo_", "G4M3R L1F3", "dcvz", "CelestialKitsune", "VincentsSin" ]
 
 # ID of the target recomp game.
 game_id = "mm"
@@ -37,7 +37,8 @@ minimum_recomp_version = "1.2.0"
 dependencies = [
     "owls_never_quit:1.0.0",
     "mm_recomp_better_double_sot:0.0.1",
-    "mm_recomp_colors:0.5.0"
+    "mm_recomp_colors:0.5.0",
+    "MM_EZ_Text_Replacer_API:2.3.0"
 ]
 
 # Native libraries (e.g. DLLs) and the functions they export.

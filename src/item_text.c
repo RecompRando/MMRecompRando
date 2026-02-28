@@ -102,6 +102,17 @@ static unsigned char p_pirate_bad_msg[128] = "Keep this\x01 bad picture of a pir
 static unsigned char slow_dog_msg[128] = "Hoo-whine.\x11How can any of us win against...\x10.\x0a.\x0a." "\x03" "blue dog" "\x00" "?\xbf";
 static unsigned char fast_dog_msg[128] = "\x0a\x0a\x0a\x0a\x0a\x0a.\x0a.\x0a.\x0a\x0a\x0a\x0a\xbf";
 
+static unsigned char cursed_spider_msg_1[128] = "I have nothing to give you.\x11Go away.\xbf";
+static unsigned char cursed_spider_msg_2[128] = "Do not bother lifting the curse.\x11The mask is mine!\xbf";
+static unsigned char ssh_guy_msg_1[128] = "I am not giving you my mask.\x11It's mine and mine only!\xbf";
+static unsigned char ssh_guy_msg_2[128] = "Great, now my mask is gone. That\x11mask was giving me infinite riches.\x10Now what?\xbf";
+static unsigned char chest_game_not_goron_1[128] = "Sorry, but we only accept\x11\x01strong and burly\x00 individuals.\xbf";
+static unsigned char chest_game_human[128] = "Looks like you're collecting \x01masks\x00!\x11There's \x01one I like\x00, but I don't\x11know if you have it...\xbf";
+static unsigned char chest_game_deku[128] = "Which is unfortunate because\x11you are so cute!!!\xbf";
+static unsigned char chest_game_zora[128] = "It's too bad... You look like my type...\xbf";
+static unsigned char chest_game_disabled_1[128] = "Oh! A customer! Unfortunately,\x11we are under construction.\xbf";
+static unsigned char chest_game_disabled_2[128] = "We'll be opening\x01 after the carnival\x00.\x11It will be the best celebration!\xbf";
+
 static unsigned char fool_msg[128] = "You are a\x01 FOOL!\xbf";
 
 static unsigned char shop_msg[128];
@@ -343,6 +354,89 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         case 0x74:
             msg = fool_msg;
             break;
+        case 0x910: // Cursed Spider first dialog
+            if ((s16) rando_get_slotdata_u32("shuffle_spiderhouse_reward") == 0) {
+                msg = cursed_spider_msg_1;
+            }
+            break;
+        case 0x914: // Cursed Spider recurring dialogs
+            if ((s16) rando_get_slotdata_u32("shuffle_spiderhouse_reward") == 0) {
+                msg = cursed_spider_msg_2;
+            }
+            break;
+        case 0x91B: // Cured Spider first dialog
+            if ((s16) rando_get_slotdata_u32("shuffle_spiderhouse_reward") == 0) {
+                msg = ssh_guy_msg_1;
+            }
+            break;
+        case 0x918: // Cured Spider recurring dialog
+            if ((s16) rando_get_slotdata_u32("shuffle_spiderhouse_reward") == 0) {
+                msg = ssh_guy_msg_2;
+            }
+            break;
+        case 0x76D: // Speaking to Treasure Game lady as human
+            if ((s16) rando_get_slotdata_u32("shuffle_treasure_chest_game") == 1) {
+                msg = chest_game_not_goron_1;
+            }
+            else if ((s16) rando_get_slotdata_u32("shuffle_treasure_chest_game") == 0)
+            {
+                msg = chest_game_disabled_1;
+            }
+            break;
+        case 0x76C: // Speaking to Treasure Game lady as Deku
+            if ((s16) rando_get_slotdata_u32("shuffle_treasure_chest_game") == 1) {
+                msg = chest_game_not_goron_1;
+            }
+            else if ((s16) rando_get_slotdata_u32("shuffle_treasure_chest_game") == 0)
+            {
+                msg = chest_game_disabled_1;
+            }
+            break;
+        case 0x76E: // Speaking to Treasure Game lady as Goron
+            if ((s16) rando_get_slotdata_u32("shuffle_treasure_chest_game") == 0) {
+                msg = chest_game_disabled_1;
+            }
+            break;
+        case 0x76F: // Speaking to Treasure Game lady as Zora
+            if ((s16) rando_get_slotdata_u32("shuffle_treasure_chest_game") == 1) {
+                msg = chest_game_not_goron_1;
+            }
+            else if ((s16) rando_get_slotdata_u32("shuffle_treasure_chest_game") == 0)
+            {
+                msg = chest_game_disabled_1;
+            }
+            break;
+        case 0x771: // Accepting or refusing to pay for Treasure Game lady as human
+            if ((s16) rando_get_slotdata_u32("shuffle_treasure_chest_game") == 1) {
+               msg = chest_game_human;
+            }
+            else if ((s16) rando_get_slotdata_u32("shuffle_treasure_chest_game") == 0)
+            {
+                msg = chest_game_disabled_2;
+            }
+            break;
+        case 0x770: // Accepting or refusing to pay for Treasure Game lady as Deku
+            if ((s16) rando_get_slotdata_u32("shuffle_treasure_chest_game") == 1) {
+               msg = chest_game_deku;
+            }
+            else if ((s16) rando_get_slotdata_u32("shuffle_treasure_chest_game") == 0) {
+                msg = chest_game_disabled_2;
+            }
+            break;
+        case 0x772: // Accepting or refusing to pay for Treasure Game lady as Goron
+            if ((s16) rando_get_slotdata_u32("shuffle_treasure_chest_game") == 0) {
+                msg = chest_game_disabled_2;
+            }
+            break;
+        case 0x773: // Accepting or refusing to pay for Treasure Game lady as Zora
+            if ((s16) rando_get_slotdata_u32("shuffle_treasure_chest_game") == 1) {
+               msg = chest_game_zora;
+            }
+            else if ((s16) rando_get_slotdata_u32("shuffle_treasure_chest_game") == 0)
+            {
+                msg = chest_game_disabled_2;
+            }
+            break;
         default:
             break;
     }
@@ -363,6 +457,12 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         font->msgBuf.schar[0] = 0x06;
         font->msgBuf.schar[1] = 0x71;
     }
+    if (textId == 0x910 || textId == 0x914 || textId == 0x91B || textId == 0x918 ||
+        textId == 0x76D || textId == 0x76C || textId == 0x76E || textId == 0x76F || // Speaking to Treasure Game lady
+        textId == 0x770 || textId == 0x771 || textId == 0x772 || textId == 0x773) { // Choosing to pay for Treasure Game
+        font->msgBuf.schar[0] = 0x00;
+    }
+    
     if ((textId & 0xFF00) == 0x3600 || (textId & 0xFF00) == 0x3700 || (textId == 0x0880 && rando_shopsanity_enabled() && !rando_location_is_checked_async(0x090002))) {
         msg = shop_msg;
         font->msgBuf.schar[0] = 0x06;

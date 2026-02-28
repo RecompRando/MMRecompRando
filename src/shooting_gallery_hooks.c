@@ -160,8 +160,20 @@ RECOMP_PATCH void EnSyatekiMan_Town_SetupGiveReward(EnSyatekiMan* this, PlayStat
             extraItem = 0;
         }
     } else if (offeringItem == 0) {
-        if (this->score == 50 && !(!rando_location_is_checked(GI_QUIVER_40) && rando_location_is_checked(LOCATION_TOWN_GALLERY_PERFECT))) {
-            if (rando_location_is_checked(LOCATION_TOWN_GALLERY_PERFECT)) {
+        if ((s16) rando_get_slotdata_u32("shuffle_minigames") == 0) {
+            if (this->score == 50) {
+                Actor_OfferGetItem(&this->actor, play, GI_RUPEE_HUGE, 500.0f, 100.0f);
+            } else {
+                Actor_OfferGetItem(&this->actor, play, GI_RUPEE_PURPLE, 500.0f, 100.0f);
+            }
+        } else if (this->score == 50 && !(!rando_location_is_checked(GI_QUIVER_40) && rando_location_is_checked(LOCATION_TOWN_GALLERY_PERFECT))) {
+            if ((s16) rando_get_slotdata_u32("shuffle_minigames") == 1) {
+                Actor_OfferGetItem(&this->actor, play, GI_RUPEE_HUGE, 500.0f, 100.0f);
+                if (!rando_location_is_checked(GI_QUIVER_40)) {
+                    extraItem = GI_QUIVER_40;
+                }
+            }
+            else if (rando_location_is_checked(LOCATION_TOWN_GALLERY_PERFECT)) {
                 Actor_OfferGetItem(&this->actor, play, GI_RUPEE_HUGE, 500.0f, 100.0f);
             } else {
                 Actor_OfferGetItem(&this->actor, play, GI_HEART_PIECE, 500.0f, 100.0f);
@@ -355,10 +367,24 @@ RECOMP_PATCH void EnSyatekiMan_Swamp_SetupGiveReward(EnSyatekiMan* this, PlaySta
             extraItem = 0;
         }
     } else if (offeringItem == 0) {
+        if ((s16) rando_get_slotdata_u32("shuffle_minigames") == 0) {
+            if (this->score >= SG_SWAMP_HEART_PIECE_SCORE) {
+                Actor_OfferGetItem(&this->actor, play, GI_RUPEE_HUGE, 500.0f, 100.0f);
+            } else {
+                Actor_OfferGetItem(&this->actor, play, GI_RUPEE_RED, 500.0f, 100.0f);
+            }
+        }
         //~ if ((CUR_UPG_VALUE(UPG_QUIVER) < 3) &&
             //~ !CHECK_WEEKEVENTREG(WEEKEVENTREG_RECEIVED_SWAMP_SHOOTING_GALLERY_QUIVER_UPGRADE)) {
-        if (!rando_location_is_checked(LOCATION_SWAMP_GALLERY_PERFECT)) {
-            Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_SWAMP_GALLERY_PERFECT), LOCATION_SWAMP_GALLERY_PERFECT, 500.0f, 100.0f, true, true);
+        else if (!rando_location_is_checked(LOCATION_SWAMP_GALLERY_PERFECT)) {
+            if ((s16) rando_get_slotdata_u32("shuffle_minigames") == 1) {
+                Actor_OfferGetItem(&this->actor, play, GI_RUPEE_HUGE, 500.0f, 100.0f);
+                if (!rando_location_is_checked(GI_QUIVER_40)) {
+                    extraItem = GI_QUIVER_40;
+                }
+            } else {
+                Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_SWAMP_GALLERY_PERFECT), LOCATION_SWAMP_GALLERY_PERFECT, 500.0f, 100.0f, true, true);
+            }
             if (!rando_location_is_checked(GI_QUIVER_50)) {
                 extraItem = GI_QUIVER_50;
             }
