@@ -83,7 +83,6 @@ bool is_multiworld = false;
 void randoStart(bool multiworld) {
     rando_started = true;
     is_multiworld = multiworld;
-    rando_on_connect();
 }
 
 // Startup Menu
@@ -111,6 +110,7 @@ void RandoMenu_Main(GameState* thisx) {
         recomp_change_save_file(file_name);
 
         colors_set_human_tunic(C_TO_PARAMS(rando_get_tunic_color()));
+        rando_on_connect();
         Setup_InitImpl(this);
     }
 
