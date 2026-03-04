@@ -138,6 +138,7 @@ makefiles['glue'] = glue_makefile = MakefileJob(
         "PATH": prepend_to_env_path([llvmmips_bin_path]),
         "CC": str(llvmmips_bin_path.joinpath("clang")),
         "AR": str(llvmmips_bin_path.joinpath("llvm-ar")),
+        "LD": str(llvmmips_bin_path.joinpath("ld.lld")),
     },
     make_cwd=glue_dir
 )

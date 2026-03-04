@@ -1,0 +1,29 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Zelda Launch",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "C:/Users/Alex/ProjectZ/codenameResurrection/Zelda64Recompiled/Zelda64Recompiled.exe",
+            "args": [
+                "--show-console"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/test_env",
+            "environment": [],
+            "console": "externalTerminal"
+        },
+        {
+            "name": "modbuild.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/modbuild.py",
+            "console": "integratedTerminal"
+        },
+        
+    ]
+}
