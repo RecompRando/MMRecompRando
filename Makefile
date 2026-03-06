@@ -4,6 +4,7 @@ CC      ?= clang
 LD      ?= ld.lld
 
 TARGET  := $(BUILD_DIR)/mod.elf
+AP_LIB := pyglue/build/lib/libapglue.a
 
 LDSCRIPT := mod.ld
 ARCHFLAGS := -target mips -mips2 -mabi=32 -O2 -G0 -mno-abicalls -mno-odd-spreg -mno-check-zero-division \
@@ -29,7 +30,7 @@ BUILD_DIRS := $(call getdirs,$(ALL_OBJS))
 
 all: $(TARGET)
 
-$(TARGET): $(ALL_OBJS) $(LDSCRIPT) | $(BUILD_DIR)
+$(TARGET): $(ALL_OBJS) $(LDSCRIPT) $(AP_LIB) | $(BUILD_DIR)
 	$(LD) $(ALL_OBJS) $(LDFLAGS) -o $@
 
 $(BUILD_DIR) $(BUILD_DIRS):
