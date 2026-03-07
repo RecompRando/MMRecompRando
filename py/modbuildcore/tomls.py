@@ -3,7 +3,7 @@ from pathlib import Path
 
 from invoke import Context
 from .job_base import JobBase
-from .utils import invoke_subprocess_run, print_job_header
+from .utils import invoke_subprocess_run, print_job_header, print_fl
 from deep_dict_update import deep_dict_update
 
 class GenerateTomlJob(JobBase):
@@ -87,7 +87,9 @@ class ModToNRMJob(JobBase):
         nrm_file = zipfile.ZipFile(self.get_output_path(), 'a', compression=zipfile.ZIP_DEFLATED)
         
         for zip_path, file_path in self.inject_files.items():
-            nrm_file.writestr(str(zip_path).replace("\\", "/"), file_path.read_bytes())
+            zip_path_string = str(zip_path).replace("\\", "/")
+            print_fl(f"NRM File Injection: '{str(file_path)}' as '{zip_path_string}'")
+            nrm_file.writestr(zip_path_string, file_path.read_bytes())
         
         nrm_file.close()
     
