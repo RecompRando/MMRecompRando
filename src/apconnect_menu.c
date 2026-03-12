@@ -2,6 +2,7 @@
 #include "apconnect_menu.h"
 #include "recompconfig.h"
 #include "recomputils.h"
+#include "rando_glue.h"
 
 RECOMP_IMPORT(".", bool rando_init(char* address, char* player_name, char* password));
 
@@ -16,6 +17,7 @@ static void connectPressed(RecompuiResource resource, const RecompuiEventData* d
 
         if (success) {
             randoStart(true);
+            py_rando_init(server_text, slot_text, password_text);
             recompui_hide_context(connect_menu.context);
             recompui_close_context(connect_menu.context);
             randoEmitNormalNotification("Successfully connected");
