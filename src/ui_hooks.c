@@ -696,8 +696,6 @@ extern s16 sAmmoDigitsYPositions[4];
 u8 currentI;
 u16 oldBombCapacity;
 
-RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
-
 // @ap Draw green 10 Bombchu ammo count if no bomb bag.
 RECOMP_HOOK("Interface_DrawAmmoCount")
 void green_chu_count(PlayState* play, s16 button, s16 alpha) {

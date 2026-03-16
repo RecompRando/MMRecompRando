@@ -4,8 +4,6 @@
 
 #include "apcommon.h"
 
-RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
-
 #define FLAGS (ACTOR_FLAG_10)
 
 #define THIS ((EnElforg*)thisx)

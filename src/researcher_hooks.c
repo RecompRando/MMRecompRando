@@ -5,8 +5,6 @@
 
 #define GI_SONG_NOVA GI_AC
 
-RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
-
 struct EnMk;
 
 typedef void (*EnMkActionFunc)(struct EnMk*, PlayState*);

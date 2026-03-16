@@ -6,8 +6,6 @@
 
 #include "apcommon.h"
 
-RECOMP_IMPORT(".", bool rando_get_receive_filled_wallets_enabled());
-
 extern s16 sExtraItemBases[];
 extern s16 sAmmoRefillCounts[];
 extern s16 sBombchuRefillCounts[];
@@ -750,8 +748,6 @@ void func_8084748C(Player* this, f32* speed, f32 speedTarget, s16 yawTarget);
 bool playerObjectStatic;
 bool playerUseExtended = false;
 s16 playerExtendedGid;
-
-RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
 
 RECOMP_PATCH void Player_DrawGetItemImpl(PlayState* play, Player* player, Vec3f* refPos, s32 drawIdPlusOne) {
     f32 sp34;
@@ -1567,13 +1563,13 @@ RECOMP_PATCH s32 Actor_OfferGetItem(Actor* actor, PlayState* play, GetItemId get
                         itemShuffled = true;
                         trueGI = rando_get_item_id(LOCATION_QUEST_BOTTLE);
                         location_to_send = LOCATION_QUEST_BOTTLE;
-                    } else if (getItemId == GI_MILK && actor->id == ACTOR_ID_BARTEN && !rando_location_is_checked(LOCATION_MILK) && rando_shopsanity_enabled()) {
+                    } else if (getItemId == GI_MILK && actor->id == ACTOR_ID_BARTEN && !rando_location_is_checked(LOCATION_MILK) && rando_get_slotdata_u32("shopsanity")) {
                         // Milk Bar Milk Purchase
                         itemWorkaround = true;
                         itemShuffled = true;
                         location_to_send = LOCATION_MILK;
                         trueGI = rando_get_item_id(LOCATION_MILK);
-                    } else if (getItemId == GI_CHATEAU && actor->id == ACTOR_ID_BARTEN && !rando_location_is_checked(GI_CHATEAU) && rando_shopsanity_enabled()) {
+                    } else if (getItemId == GI_CHATEAU && actor->id == ACTOR_ID_BARTEN && !rando_location_is_checked(GI_CHATEAU) && rando_get_slotdata_u32("shopsanity")) {
                         // Milk Bar Chateau Purchase
                         itemWorkaround = true;
                         itemShuffled = true;
@@ -2248,19 +2244,19 @@ u8 randoItemGive(u32 gi) {
     } else if (item == ITEM_WALLET_ADULT) {
         if (CUR_UPG_VALUE(UPG_WALLET) == 2) {
             // stop sending yourself wallets you freaks
-            if (rando_get_receive_filled_wallets_enabled()) {
+            if (rando_get_slotdata_u32("receive_filled_wallets")) {
                 Rupees_ChangeBy(gUpgradeCapacities[UPG_WALLET][3]); // you can get money though
             }
             return ITEM_NONE;
         } else if (CUR_UPG_VALUE(UPG_WALLET) == 1) {
             Inventory_ChangeUpgrade(UPG_WALLET, 2);
-            if (rando_get_receive_filled_wallets_enabled()) {
+            if (rando_get_slotdata_u32("receive_filled_wallets")) {
                 Rupees_ChangeBy(gUpgradeCapacities[UPG_WALLET][2]);
             }
             return ITEM_NONE;
         }
         Inventory_ChangeUpgrade(UPG_WALLET, 1);
-        if (rando_get_receive_filled_wallets_enabled()) {
+        if (rando_get_slotdata_u32("receive_filled_wallets")) {
             Rupees_ChangeBy(gUpgradeCapacities[UPG_WALLET][1]);
         }
         return ITEM_NONE;

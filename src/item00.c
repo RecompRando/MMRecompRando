@@ -67,8 +67,6 @@ static InitChainEntry sInitChain[] = {
 
 static Item00Type item00ShuffledList[] = { ITEM00_HEART_PIECE };
 
-RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
-
 RECOMP_PATCH void EnItem00_Init(Actor* thisx, PlayState* play) {
     EnItem00* this = THIS;
     s32 pad;

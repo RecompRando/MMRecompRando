@@ -4,15 +4,6 @@
 #include "apcommon.h"
 #include "solo_menu.h"
 
-RECOMP_IMPORT(".", void rando_scan_solo_seeds(const unsigned char* save_filename));
-RECOMP_IMPORT(".", u32 rando_solo_count());
-// Returns the actual string length
-RECOMP_IMPORT(".", u32 rando_solo_get_seed_name(u32 seed_index, char* out, u32 max_length));
-// Returns the actual string length
-RECOMP_IMPORT(".", u32 rando_solo_get_generation_date(u32 seed_index, char* out, u32 max_length));
-
-RECOMP_IMPORT(".", u32 rando_init_solo(u32 seed_index));
-
 RandoSoloMenu solo_menu;
 
 void clearSoloList() {

@@ -138,7 +138,7 @@ bool rando_met_items_condition(u32 required_amount) {
 }
 
 bool rando_met_moon_condition() {
-    return rando_met_remains_condition(rando_get_moon_remains_required()) &&
+    return rando_met_remains_condition(rando_get_slotdata_u32("moon_remains_required")) &&
            rando_met_masks_condition(rando_get_slotdata_u32("moon_masks_required")) &&
            rando_met_star_fox_condition(rando_get_slotdata_u32("moon_star_fox")) &&
            rando_met_owl_condition(rando_get_slotdata_u32("moon_owls_required")) &&
@@ -148,7 +148,7 @@ bool rando_met_moon_condition() {
 }
 
 bool rando_met_majora_condition() {
-    return rando_met_remains_condition(rando_get_majora_remains_required()) &&
+    return rando_met_remains_condition(rando_get_slotdata_u32("majora_remains_required")) &&
            rando_met_masks_condition(rando_get_slotdata_u32("majora_masks_required")) &&
            rando_met_star_fox_condition(rando_get_slotdata_u32("majora_star_fox")) &&
            rando_met_owl_condition(rando_get_slotdata_u32("majora_owls_required")) &&

@@ -4,8 +4,6 @@
 #include "recomputils.h"
 #include "rando_glue.h"
 
-RECOMP_IMPORT(".", bool rando_init(char* address, char* player_name, char* password));
-
 ApconnectMenu connect_menu;
 
 static void connectPressed(RecompuiResource resource, const RecompuiEventData* data, void* userdata) {
@@ -17,7 +15,6 @@ static void connectPressed(RecompuiResource resource, const RecompuiEventData* d
 
         if (success) {
             randoStart(true);
-            py_rando_init(server_text, slot_text, password_text);
             recompui_hide_context(connect_menu.context);
             recompui_close_context(connect_menu.context);
             randoEmitNormalNotification("Successfully connected");
@@ -62,7 +59,7 @@ void randoCreateAPConnectMenu() {
     char address[64];
     char player_name[17];
     char password[128];
-    rando_get_saved_apconnect(recomp_get_save_file_path(), address, player_name, password);
+    // rando_get_saved_apconnect(recomp_get_save_file_path(), address, player_name, password);
 
     // Create a label for the server address.
     connect_menu.server_label = recompui_create_label(connect_menu.context, connect_menu.frame.container, "Server Address:Port", LABELSTYLE_NORMAL);

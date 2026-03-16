@@ -7,8 +7,6 @@
 
 #include "overlays/actors/ovl_Door_Warp1/z_door_warp1.h"
 
-RECOMP_IMPORT(".", bool rando_get_remains_allow_boss_warps_enabled());
-
 #define FLAGS 0x00000000
 
 #define THIS ((DoorWarp1*)thisx)
@@ -126,16 +124,16 @@ RECOMP_PATCH void func_808B8C48(DoorWarp1* this, PlayState* play) {
     Lights_PointNoGlowSetInfo(&this->unk_1F4, this->dyna.actor.world.pos.x, this->dyna.actor.world.pos.y,
                               this->dyna.actor.world.pos.z, 200, 255, 255, 255);
     if (((DOORWARP1_GET_FF(&this->dyna.actor) == ENDOORWARP1_FF_2)
-            && ((CHECK_QUEST_ITEM(QUEST_REMAINS_ODOLWA) && rando_get_remains_allow_boss_warps_enabled())
+            && ((CHECK_QUEST_ITEM(QUEST_REMAINS_ODOLWA) && rando_get_slotdata_u32("remains_allow_boss_warps"))
                 || rando_location_is_checked(LOCATION_REMAINS_ODOLWA))) ||
         ((DOORWARP1_GET_FF(&this->dyna.actor) == ENDOORWARP1_FF_3)
-            && ((CHECK_QUEST_ITEM(QUEST_REMAINS_GOHT) && rando_get_remains_allow_boss_warps_enabled())
+            && ((CHECK_QUEST_ITEM(QUEST_REMAINS_GOHT) && rando_get_slotdata_u32("remains_allow_boss_warps"))
                 || rando_location_is_checked(LOCATION_REMAINS_GOHT))) ||
         ((DOORWARP1_GET_FF(&this->dyna.actor) == ENDOORWARP1_FF_4)
-            && ((CHECK_QUEST_ITEM(QUEST_REMAINS_GYORG) && rando_get_remains_allow_boss_warps_enabled())
+            && ((CHECK_QUEST_ITEM(QUEST_REMAINS_GYORG) && rando_get_slotdata_u32("remains_allow_boss_warps"))
                 || rando_location_is_checked(LOCATION_REMAINS_GYORG))) ||
         ((DOORWARP1_GET_FF(&this->dyna.actor) == ENDOORWARP1_FF_5)
-            && ((CHECK_QUEST_ITEM(QUEST_REMAINS_TWINMOLD) && rando_get_remains_allow_boss_warps_enabled())
+            && ((CHECK_QUEST_ITEM(QUEST_REMAINS_TWINMOLD) && rando_get_slotdata_u32("remains_allow_boss_warps"))
                 || rando_location_is_checked(LOCATION_REMAINS_TWINMOLD)))) {
         s16 params = DOORWARP1_GET_FF00_2(&this->dyna.actor);
 
@@ -316,3 +314,19 @@ void CutsceneCmd_OverrideDestination(PlayState* play, CutsceneContext* csCtx, Cs
         }
     }
 }
+
+// bool temp;
+
+// RECOMP_HOOK("Boss01_Init")
+// void fakeclear() {
+//     temp = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE);
+//     SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE);
+// }
+
+// RECOMP_HOOK_RETURN("Boss01_Init")
+// void removeclear() {
+//     if (!temp) {
+//         CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE);
+//     }
+//     SET_WEEKEVENTREG(WEEKEVENTREG_20_01);
+// }

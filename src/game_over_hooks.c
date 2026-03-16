@@ -59,7 +59,7 @@ RECOMP_PATCH void GameOver_Update(PlayState* play) {
             break;
 
         case GAMEOVER_DEATH_FADE_OUT:
-            if (AudioSeq_GetActiveSeqId(SEQ_PLAYER_FANFARE) != NA_BGM_GAME_OVER || rando_death_behavior() >= 1) {
+            if (AudioSeq_GetActiveSeqId(SEQ_PLAYER_FANFARE) != NA_BGM_GAME_OVER || rando_get_slotdata_u32("death_behavior") >= 1) {
                 func_80169F78(&play->state);
                 if (gSaveContext.respawnFlag != -7) {
                     gSaveContext.respawnFlag = -6;
@@ -132,7 +132,7 @@ RECOMP_PATCH void func_80831F34(PlayState* play, Player* this, PlayerAnimationHe
     Player_SetAction(play, this, sp24 ? Player_Action_62 : Player_Action_24, 0);
     Player_AnimationPlayOnce(play, this, anim);
 
-    if (rando_death_behavior() >= 2) {
+    if (rando_get_slotdata_u32("death_behavior") >= 2) {
         this->skelAnime.endFrame = 0.0f;
     } else {
         if (anim == &gPlayerAnim_link_derth_rebirth) {

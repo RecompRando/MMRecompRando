@@ -19,10 +19,9 @@ RECOMP_IMPORT("*", int recomp_set_no_bow_epona_fix(bool new_val));
 RECOMP_IMPORT("*", int recomp_set_allow_no_ocarina_tf(bool new_val));
 RECOMP_IMPORT("*", int recomp_set_h_and_d_no_sword_fix(bool new_val));
 
-RECOMP_IMPORT(".", int rando_get_starting_heart_locations());
-RECOMP_IMPORT(".", int rando_get_tunic_color());
-RECOMP_IMPORT(".", bool rando_get_game_is_oot(u32 player_id));
-RECOMP_IMPORT(".", bool rando_get_game_is_ww(u32 player_id));
+// temp
+bool rando_get_game_is_oot(u32 player_id) {return false;}
+bool rando_get_game_is_ww(u32 player_id) {return false;}
 
 RECOMP_IMPORT("mm_recomp_better_double_sot", void dsot_set_skip_dsot_cutscene(bool new_val));
 RECOMP_IMPORT("mm_recomp_better_double_sot", void dsot_set_time(PlayState* play, s32 day, u16 time));
@@ -66,6 +65,8 @@ void removeAllScoutsWithPrefix(u32 prefix) {
 
 void randoScout() {
     rando_queue_scouts_all();
+
+    recomp_printf("scouting\n");
 
     if (rando_get_slotdata_u32("skullsanity") == 2)
     {
@@ -294,6 +295,8 @@ void randoScout() {
     }
 
     rando_send_queued_scouts(0);
+
+    recomp_printf("done scouting\n");
 }
 
 s8 giToItemId[GI_MAX] = {
@@ -509,6 +512,14 @@ u32 old_items_size;
 bool waiting_death_link = false;
 bool sending_death_link = false;
 
+s16 rando_damage_multiplier() {
+    u32 multiplier_option = rando_get_slotdata_u32("damage_multiplier");
+    if (multiplier_option == 4) {
+        return 0xF;
+    }
+    return multiplier_option;
+}
+
 /**
  * @return false if player is out of health
  */
@@ -545,7 +556,7 @@ RECOMP_PATCH s32 Health_ChangeBy(PlayState* play, s16 healthChange) {
             rando_send_death_link();
         }
 
-        if (rando_death_behavior() == 3) {
+        if (rando_get_slotdata_u32("death_behavior") == 3) {
             Interface_StartMoonCrash(play);
         }
 
@@ -586,7 +597,7 @@ s32 Health_ChangeBy_NoSound(PlayState* play, s16 healthChange) {
             rando_send_death_link();
         }
 
-        if (rando_death_behavior() == 3) {
+        if (rando_get_slotdata_u32("death_behavior") == 3) {
             Interface_StartMoonCrash(play);
         }
 
@@ -897,7 +908,7 @@ void update_rando(PlayState* play) {
 
             s16 old_health = gSaveContext.save.saveInfo.playerData.health;
 
-            u8 new_magic_level = rando_has_item_async(AP_ITEM_ID_MAGIC);
+            u8 new_magic_level = rando_has_item(AP_ITEM_ID_MAGIC);
 
             if (new_magic_level >= 1 && !gSaveContext.save.saveInfo.playerData.isMagicAcquired) {
                 randoItemGive(AP_ITEM_ID_MAGIC);
@@ -907,7 +918,7 @@ void update_rando(PlayState* play) {
                 randoItemGive(AP_ITEM_ID_MAGIC);
             }
 
-            if (!rando_is_magic_trap()) {
+            if (!rando_get_slotdata_u32("magic_is_a_trap")) {
                 if (new_magic_level < 1) {
                     gSaveContext.save.saveInfo.playerData.magic = 0;
                 }
@@ -1045,7 +1056,7 @@ void update_rando(PlayState* play) {
             rando_send_location(0x0D0000 | GI_OCARINA_OF_TIME);
             rando_send_location(0x0D0067);
 
-            for (int i = 0; i < rando_get_starting_heart_locations(); ++i)
+            for (int i = 0; i < rando_get_slotdata_u32("starting_heart_locations"); ++i)
             {
                 rando_send_location(0x0D0000 | i);
             }
@@ -1072,7 +1083,7 @@ void update_rando(PlayState* play) {
 
         if (play->pauseCtx.state == 0 && rando_get_death_link_enabled() && rando_get_death_link_pending()) {
             Play_KillPlayer();
-            if (rando_death_behavior() == 3) {
+            if (rando_get_slotdata_u32("death_behavior") == 3) {
                 Interface_StartMoonCrash(play);
             }
             rando_reset_death_link_pending();
@@ -1080,7 +1091,7 @@ void update_rando(PlayState* play) {
 
         // check for 100% condition to give majora soul (gigarando)
         // TODO add checks for the rest of the conditions
-        if (rando_met_all_goal() && !rando_location_is_checked_async(AP_ITEM_ID_SOUL_BOSS_MAJORA)) {
+        if (rando_met_all_goal() && !rando_location_is_checked(AP_ITEM_ID_SOUL_BOSS_MAJORA)) {
             Player* player = GET_PLAYER(play);
             Actor_OfferGetItemHook(player->tatlActor, play, rando_get_item_id(AP_ITEM_ID_SOUL_BOSS_MAJORA), AP_ITEM_ID_SOUL_BOSS_MAJORA, 100.0f, 100.0f, true, true);
             // rando_complete_goal();

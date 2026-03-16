@@ -11,8 +11,6 @@
 
 void Message_OpenText(PlayState* play, u16 textId);
 
-RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
-
 void sanitizeRandoText(char* rando_string) {
     u8 c = rando_string[0];
     u8 next = 0;
@@ -177,7 +175,7 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
 
     // recomp_printf("text id: 0x%04X\n", textId);
 
-    if (textId == 0x52 && rando_skulltulas_enabled()) {
+    if (textId == 0x52 && rando_get_slotdata_u32("skullsanity") != 2) {
         textId = 0x75;
     }
 
@@ -563,7 +561,7 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
     }
 
     // Business Scrubs (0x15EA)
-    if (textId == 0x15EA && rando_scrubs_enabled()) {
+    if (textId == 0x15EA && rando_get_slotdata_u32("scrubsanity")) {
         Actor* talkActor = msgCtx->talkActor;
         if (talkActor != NULL && talkActor->id == ACTOR_EN_AKINDONUTS) {
             s32 scrubType = talkActor->params & 3;
@@ -655,7 +653,7 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
     }
 
     // Milk Bar (0x2B0B)
-    if (textId == 0x2B0B && rando_shopsanity_enabled()) {
+    if (textId == 0x2B0B && rando_get_slotdata_u32("shopsanity")) {
         u32 location1 = 0x26392;  // (ACTOR_EN_TAB << 8) | GI_MILK
         u32 location2 = 0x91;     // GI_CHATEAU
         bool sold1 = rando_location_is_checked(location1);
@@ -790,15 +788,16 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
     }
     
     // Potion Shop
-    if ((textId & 0xFF00) == 0x3600 || (textId & 0xFF00) == 0x3700 || (textId == 0x0880 && rando_shopsanity_enabled() && !rando_location_is_checked_async(0x090002))) {
+    if ((textId & 0xFF00) == 0x3600 || (textId & 0xFF00) == 0x3700 || (textId == 0x0880 && rando_get_slotdata_u32("shopsanity") && !rando_location_is_checked(0x090002))) {
         msg = shop_msg;
         font->msgBuf.schar[0] = 0x06;
         font->msgBuf.schar[1] = 0x30;
-        if (textId == 0x0880) {
-            price = rando_get_shop_price(0x02); // SI_POTION_BLUE
-        } else {
-            price = rando_get_shop_price(textId & 0xFF);
-        }
+        price = 10; // temp
+        // if (textId == 0x0880) {
+        //     price = rando_get_shop_price(0x02); // SI_POTION_BLUE
+        // } else {
+        //     price = rando_get_shop_price(textId & 0xFF);
+        // }
         // recomp_printf("shop price: %d 0x%02X%02X\n", price, ((price & 0xFF00) >> 8), (price & 0xFF));
         font->msgBuf.schar[5] = (price & 0xFF00) >> 8;
         font->msgBuf.schar[6] = price & 0xFF;
@@ -809,7 +808,7 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         u8 count_str[128] = "\x11This is your \xbf";
         u8 count_done_str[128] = "\x11You've found all of them!\xbf";
         u8* count_msg = count_str;
-        u8 swamp_token_count = ((rando_skulltulas_enabled()) ? rando_has_item(GI_TRUE_SKULL_TOKEN) : Inventory_GetSkullTokenCount(0x27));
+        u8 swamp_token_count = ((rando_get_slotdata_u32("skullsanity") != 2) ? rando_has_item(GI_TRUE_SKULL_TOKEN) : Inventory_GetSkullTokenCount(0x27));
         if (swamp_token_count >= 30) {
             count_msg = count_done_str;
         }
@@ -850,7 +849,7 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         u8 count_str[128] = "\x11This is your \xbf";
         u8 count_done_str[128] = "\x11You've found all of them!\xbf";
         u8* count_msg = count_str;
-        u8 ocean_token_count = ((rando_skulltulas_enabled()) ? rando_has_item(GI_OCEAN_SKULL_TOKEN) : Inventory_GetSkullTokenCount(0x28));
+        u8 ocean_token_count = ((rando_get_slotdata_u32("skullsanity") != 2) ? rando_has_item(GI_OCEAN_SKULL_TOKEN) : Inventory_GetSkullTokenCount(0x28));
         if (ocean_token_count >= 30) {
             count_msg = count_done_str;
         }

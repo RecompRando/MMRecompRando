@@ -128,7 +128,7 @@ void OnEnInvisibleRuppe_Update(Actor* thisx, PlayState* play) {
     u32* wonderRupeeLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     Color_RGB8 color = { 127, 255, 255 };
 
-    if (!rando_get_slotdata_u32("invisisanity") || rando_location_is_checked_async(*wonderRupeeLocation)) return;
+    if (!rando_get_slotdata_u32("invisisanity") || rando_location_is_checked(*wonderRupeeLocation)) return;
 
     if (rando_get_camc_enabled() != CAMC_SHOW_UNCHECKED) { // show normal color with "show unchecked" option
         get_rando_color(&color, *wonderRupeeLocation);

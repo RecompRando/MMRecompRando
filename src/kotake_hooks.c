@@ -67,8 +67,6 @@ typedef enum {
 
 void EnTrt_GivenRedPotionForKoume(EnTrt* this, PlayState* play);
 
-RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
-
 void EnTrt_OfferItem(EnTrt* this, PlayState* play) {
     Player* player = GET_PLAYER(play);
 

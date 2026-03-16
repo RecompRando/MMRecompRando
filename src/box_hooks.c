@@ -5,8 +5,6 @@
 #include "apcommon.h"
 #include "models/custom_chest.h"
 
-RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
-
 struct EnBox;
 struct struct_80867BDC_a0;
 

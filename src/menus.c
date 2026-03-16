@@ -72,7 +72,6 @@ void createUiFrame(RecompuiContext context, UiFrame* frame) {
 
 #define C_TO_PARAMS(c) (c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF
 
-RECOMP_IMPORT(".", int rando_get_tunic_color());
 RECOMP_IMPORT("mm_recomp_colors", void colors_set_human_tunic(u8 r, u8 g, u8 b));
 
 RECOMP_DECLARE_EVENT(rando_on_connect());
@@ -111,7 +110,7 @@ void RandoMenu_Main(GameState* thisx) {
         }
         recomp_change_save_file(file_name);
 
-        colors_set_human_tunic(C_TO_PARAMS(rando_get_tunic_color()));
+        colors_set_human_tunic(C_TO_PARAMS(rando_get_slotdata_u32("link_tunic_color")));
         Setup_InitImpl(this);
     }
 

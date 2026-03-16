@@ -257,7 +257,7 @@ RECOMP_PATCH s32 func_808F4414(PlayState* play, EnIn* this, s32 arg2) {
                     if (msgCtx->choiceIndex == 0) {
                         Audio_PlaySfx_MessageDecide();
                         if (gSaveContext.save.saveInfo.playerData.rupees >= play->msgCtx.unk1206C) {
-                            if (rando_shopsanity_enabled() && !rando_location_is_checked(LOCATION_GORMAN_MILK)) {
+                            if (rando_get_slotdata_u32("shopsanity") && !rando_location_is_checked(LOCATION_GORMAN_MILK)) {
                                 this->actionFunc = func_808F3C40;
                                 Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_GORMAN_MILK), LOCATION_GORMAN_MILK, 500.0f, 100.0f, true, true);
                                 Rupees_ChangeBy(-play->msgCtx.unk1206C);
@@ -435,7 +435,7 @@ RECOMP_PATCH s32 func_808F4414(PlayState* play, EnIn* this, s32 arg2) {
 
                 case 0x347E:
                     func_808F35D8(this, play);
-                    if (rando_shopsanity_enabled() && !rando_location_is_checked(LOCATION_GORMAN_MILK)) {
+                    if (rando_get_slotdata_u32("shopsanity") && !rando_location_is_checked(LOCATION_GORMAN_MILK)) {
                         this->actionFunc = func_808F3B40;
                         Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_GORMAN_MILK), LOCATION_GORMAN_MILK, 500.0f, 100.0f, true, true);
                         ret = true;
@@ -570,7 +570,7 @@ RECOMP_PATCH s32 func_808F4414(PlayState* play, EnIn* this, s32 arg2) {
                     if (msgCtx->choiceIndex == 0) {
                         Audio_PlaySfx_MessageDecide();
                         if (gSaveContext.save.saveInfo.playerData.rupees >= play->msgCtx.unk1206C) {
-                            if (rando_shopsanity_enabled() && !rando_location_is_checked(LOCATION_GORMAN_MILK)) {
+                            if (rando_get_slotdata_u32("shopsanity") && !rando_location_is_checked(LOCATION_GORMAN_MILK)) {
                                 this->actionFunc = func_808F3C40;
                                 Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_GORMAN_MILK), LOCATION_GORMAN_MILK, 500.0f, 100.0f, true, true);
                                 Rupees_ChangeBy(-play->msgCtx.unk1206C);
@@ -689,7 +689,7 @@ RECOMP_PATCH s32 func_808F4414(PlayState* play, EnIn* this, s32 arg2) {
 
                 case 0x34A1:
                     func_808F35D8(this, play);
-                    if (rando_shopsanity_enabled() && !rando_location_is_checked(LOCATION_GORMAN_MILK)) {
+                    if (rando_get_slotdata_u32("shopsanity") && !rando_location_is_checked(LOCATION_GORMAN_MILK)) {
                         this->actionFunc = func_808F3B40;
                         Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_GORMAN_MILK), LOCATION_GORMAN_MILK, 500.0f, 100.0f, true, true);
                         ret = true;

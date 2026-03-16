@@ -7,8 +7,6 @@
 #define SHOP_ITEM_TEXT (0x3600 | this->actor.params)
 #define SHOP_ITEM_BUY_TEXT (0x3700 | this->actor.params)
 
-RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
-
 #include "overlays/actors/ovl_En_GirlA/z_en_girla.h"
 
 #define THIS ((EnGirlA*)thisx)
@@ -61,7 +59,7 @@ void EnGirlA_WaitForObject(EnGirlA* this, PlayState* play) {
 RECOMP_PATCH void EnGirlA_Update(Actor* thisx, PlayState* play) {
     EnGirlA* this = THIS;
 
-    if (!shopObjectLoaded[this->actor.params] && rando_shopsanity_enabled() && !rando_location_is_checked(LOCATION_SHOP_ITEM)) {
+    if (!shopObjectLoaded[this->actor.params] && rando_get_slotdata_u32("shopsanity") && !rando_location_is_checked(LOCATION_SHOP_ITEM)) {
         EnGirlA_WaitForObject(this, play);
     }
 
@@ -76,7 +74,7 @@ RECOMP_PATCH void EnGirlA_Draw(Actor* thisx, PlayState* play) {
         this->drawFunc(&this->actor, play, 0);
     }
 
-    if (rando_shopsanity_enabled() && !rando_location_is_checked(LOCATION_SHOP_ITEM)) {
+    if (rando_get_slotdata_u32("shopsanity") && !rando_location_is_checked(LOCATION_SHOP_ITEM)) {
         s16 getItemId = rando_get_item_id(LOCATION_SHOP_ITEM);
         if (shopObjectLoaded[this->actor.params]) {
             // fix rotation of some items
@@ -175,7 +173,7 @@ void EnGirlA_RandoBuyFanfare(PlayState* play, EnGirlA* this) {
 }
 
 RECOMP_PATCH void EnGirlA_InitItem(PlayState* play, EnGirlA* this) {
-    if (!rando_shopsanity_enabled() || rando_location_is_checked(LOCATION_SHOP_ITEM)) {
+    if (!rando_get_slotdata_u32("shopsanity") || rando_location_is_checked(LOCATION_SHOP_ITEM)) {
         ShopItemEntry* shopItem = &sShopItemEntries[this->actor.params];
 
         this->actor.textId = shopItem->descriptionTextId;
@@ -197,7 +195,7 @@ RECOMP_PATCH void EnGirlA_InitItem(PlayState* play, EnGirlA* this) {
 
 RECOMP_PATCH void EnGirlA_InitalUpdate(EnGirlA* this, PlayState* play) {
     s16 params = this->actor.params;
-    if (rando_shopsanity_enabled() && !rando_location_is_checked(LOCATION_SHOP_ITEM)
+    if (rando_get_slotdata_u32("shopsanity") && !rando_location_is_checked(LOCATION_SHOP_ITEM)
         && !(this->actor.params == SI_BOTTLE ||
             this->actor.params == SI_SWORD_GREAT_FAIRY ||
             this->actor.params == SI_SWORD_KOKIRI ||
@@ -286,7 +284,7 @@ RECOMP_PATCH void EnGirlA_InitalUpdate(EnGirlA* this, PlayState* play) {
 
 // @rando prevent vanilla shield from being bought without already having a progressive shield
 RECOMP_PATCH s32 EnGirlA_CanBuyShieldHero(PlayState* play, EnGirlA* this) {
-    if (!rando_has_item_async(GI_SHIELD_HERO) || GET_CUR_EQUIP_VALUE(EQUIP_TYPE_SHIELD) != EQUIP_VALUE_SHIELD_NONE) {
+    if (!rando_has_item(GI_SHIELD_HERO) || GET_CUR_EQUIP_VALUE(EQUIP_TYPE_SHIELD) != EQUIP_VALUE_SHIELD_NONE) {
         return CANBUY_RESULT_NO_ROOM;
     }
     if (gSaveContext.save.saveInfo.playerData.rupees < play->msgCtx.unk1206C) {
@@ -297,7 +295,7 @@ RECOMP_PATCH s32 EnGirlA_CanBuyShieldHero(PlayState* play, EnGirlA* this) {
 
 // @rando prevent arrows from being bought without having a progressive bow
 RECOMP_PATCH s32 EnGirlA_CanBuyArrows(PlayState* play, EnGirlA* this) {
-    if (!rando_has_item_async(GI_QUIVER_30) || AMMO(ITEM_BOW) >= CUR_CAPACITY(UPG_QUIVER)) {
+    if (!rando_has_item(GI_QUIVER_30) || AMMO(ITEM_BOW) >= CUR_CAPACITY(UPG_QUIVER)) {
         return CANBUY_RESULT_NO_ROOM_2;
     }
     if (gSaveContext.save.saveInfo.playerData.rupees < play->msgCtx.unk1206C) {
@@ -309,7 +307,7 @@ RECOMP_PATCH s32 EnGirlA_CanBuyArrows(PlayState* play, EnGirlA* this) {
 // @rando adjust bombchu purchases to bombchu bag
 RECOMP_PATCH s32 EnGirlA_CanBuyBombchus(PlayState* play, EnGirlA* this) {
     // if (GET_CUR_UPG_VALUE(UPG_BOMB_BAG) == 0) {
-    if (!rando_has_item_async(GI_BAG_BOMBCHU)) {
+    if (!rando_has_item(GI_BAG_BOMBCHU)) {
         return CANBUY_RESULT_CANNOT_GET_NOW;
     }
     // if (AMMO(ITEM_BOMBCHU) >= CUR_CAPACITY(UPG_BOMB_BAG)) {
