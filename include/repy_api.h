@@ -11,22 +11,6 @@
     \
  */
 
-
-// Ultratypes used by the Python API:
-typedef signed char            REPY_s8;
-typedef unsigned char          REPY_u8;
-typedef signed short int       REPY_s16;
-typedef unsigned short int     REPY_u16;
-typedef signed long            REPY_s32;
-typedef unsigned long          REPY_u32;
-typedef signed long long int   REPY_s64;
-typedef unsigned long long int REPY_u64;
-
-typedef float  REPY_f32;
-typedef double REPY_f64;
-
-typedef _Bool REPY_bool;
-
 /**
  * @brief The mod id string for REPY.
  * 
@@ -62,6 +46,114 @@ typedef _Bool REPY_bool;
 /** \defgroup repy_types Types
  * \brief All of the C types that REPY defines.
  *  @{
+ */
+
+/** \defgroup repy_numerical_types Numerical Types
+ * \brief Numerical Types used by REPY.
+ * 
+ * The `repy_api.h` header specifies it's own numerical types to avoid relying on libultra headers.
+ *  @{
+ */
+
+ /**
+  * @brief A signed, 8-bit integer compatible with libultra's `s8`.
+  * 
+  * Casting from the libultra `s8` type should not be required.
+  */
+typedef signed char            REPY_s8;
+
+ /**
+  * @brief An unsigned, 8-bit integer compatible with libultra's `u8`.
+  * 
+  * Casting from the libultra `u8` type should not be required.
+  */
+typedef unsigned char          REPY_u8;
+
+ /**
+  * @brief A signed, 16-bit integer compatible with libultra's `s16`.
+  * 
+  * Casting from the libultra `s16` type should not be required.
+  */
+typedef signed short int       REPY_s16;
+
+ /**
+  * @brief An unsigned, 16-bit integer compatible with libultra's `u16`.
+  * 
+  * Casting from the libultra `u16` type should not be required.
+  */
+typedef unsigned short int     REPY_u16;
+
+ /**
+  * @brief A signed, 32-bit integer compatible with libultra's `s32`.
+  * 
+  * Casting from the libultra `s8` type should not be required.
+  */
+typedef signed long            REPY_s32;
+
+ /**
+  * @brief An unsigned, 13-bit integer compatible with libultra's `u32`.
+  * 
+  * Casting from the libultra `u32` type should not be required.
+  */
+typedef unsigned long          REPY_u32;
+
+ /**
+  * @brief A signed, 64-bit integer compatible with libultra's `s64`.
+  * 
+  * Casting from the libultra `s64` type should not be required.
+  */
+typedef signed long long int   REPY_s64;
+
+ /**
+  * @brief An unsigned, 64-bit integer compatible with libultra's `u64`.
+  * 
+  * Casting from the libultra `s64` type should not be required.
+  */
+typedef unsigned long long int REPY_u64;
+
+ /**
+  * @brief A 32-bit floating point value compatible with libultra's `f32`.
+  * 
+  * Casting from the libultra `f32` type should not be required.
+  */
+typedef float  REPY_f32;
+
+ /**
+  * @brief A 64-bit floating point value compatible with libultra's `f64`.
+  * 
+  * Casting from the libultra `f64` type should not be required.
+  */
+typedef double REPY_f64;
+
+/**
+ * @brief A boolean type compatible with libultra's `bool` type.
+ * 
+ * Casting from the libultra `bool` type should not be required.
+ */
+typedef _Bool REPY_bool;
+
+/**
+ * @brief Used to set the type of code-string being compiled, in line with how Python's
+ * built-in `compile` function operates.
+ * 
+ * Used with `REPY_CompileCStr` and `REPY_CompileCStr`. `REPY_Compile` accepts a `REPY_Handle` argument instead, 
+ * which should reference a Python `str` object.
+ * 
+ * See `REPY_CodeModeEnum` for values.
+ */
+typedef enum REPY_CodeModeEnum {
+    REPY_CODE_EXEC = 0, ///< Equivalent to `exec`
+    REPY_CODE_EVAL = 1, ///< Equivalent to `eval`
+    REPY_CODE_SINGLE = 2 ///< Equivalent to `single`
+} REPY_CodeMode;
+
+/** @}*/
+
+/** \defgroup repy_handle_types Handle Types
+ * \brief Types used by REPY to represent entities that exist outside of mod code.
+ * 
+ * Generally, these are represented using integer values.
+ * @{
  */
 
 /**
@@ -109,13 +201,6 @@ typedef _Bool REPY_bool;
 typedef unsigned int REPY_Handle;
 
 /**
- * @brief Represents the absence of a Python object in REPY API functions.
- * 
- * A more readable alternative to simply entering 0.
- */
-#define REPY_NO_OBJECT 0
-
-/**
  * @brief Index value for a specific Python interpreter, either the main interpreter or a registered subinterpreter.
  * 
  * Values of `REPY_InterpreterIndex` follow this schema:
@@ -126,33 +211,45 @@ typedef unsigned int REPY_Handle;
  */
 typedef signed int REPY_InterpreterIndex;
 
+/** \defgroup repy_handle_types_special_values Handle Special Values
+ * \brief Macros representing special values for REPY \ref repy_handle_types.
+ * 
+ * Read the descriptions to see which handle type the macro goes with.
+ * @{
+ */
+
 /**
- * @brief Represents the index of the main Python interpreter.
+ * @brief Represents the absence of a Python object in REPY API functions. Goes with `REPY_Handle`.
+ * 
+ * A more readable alternative to simply entering 0.
+ */
+#define REPY_NO_OBJECT 0
+
+/**
+ * @brief Represents the index of the main Python interpreter. Goes with `REPY_InterpreterIndex`.
  * 
  * A more readable alternative to simply entering 0.
  */
 #define REPY_MAIN_INTERPRETER 0
 
 /**
- * @brief A value indicating that the interpreter stack is empty.
+ * @brief A value indicating that the interpreter stack is empty. Goes with `REPY_InterpreterIndex`.
  * 
  * A more readable alternative to simply entering -1.
  * 
  */
 #define REPY_INTERPRETER_STACK_EMPTY -1
 
-/**
- * @brief Used to set the type of code-string being compiled, in line with how Python's
- * built-in `compile` function operates.
+/** @}*/
+/** @}*/
+
+/** \defgroup repy_object_types Object Types
+ * \brief Types used by REPY for objects that exist in mod memory.
  * 
- * Used with `REPY_CompileCStr` and `REPY_CompileCStr`. `REPY_Compile` accepts a `REPY_Handle` argument instead, 
- * which should reference a Python `str` object.
+ * Specified as `void` in this header to conceal internals for ABI compatability.
+ * Use pointers to access the objects themselves.
+ * @{
  */
-typedef enum REPY_CodeMode {
-    REPY_CODE_EXEC = 0,
-    REPY_CODE_EVAL = 1,
-    REPY_CODE_SINGLE = 2
-} REPY_CodeMode;
 
 /**
  * @brief Helper object used to when iterating through Python objects in loops in C code.
@@ -206,6 +303,7 @@ typedef void REPY_IfStmtHelper;
 typedef void REPY_DeferredCleanupHelper;
 
 /** @}*/
+
 /** @}*/
 
 /** \defgroup repy_events Events
@@ -734,7 +832,7 @@ REPY_FN_SETUP_INTERP_WITH_GLOBALS(REPY_MAIN_INTERPRETER)
  * The global scope is only released if the global and local scopes are the same.
  */
 #define REPY_FN_CLEANUP \
-REPY_DeferredCleanupHelper_Destroy(REPY_FN_AUTO_CLEANUP, 1); \
+REPY_DeferredCleanupHelper_Destroy(REPY_FN_AUTO_CLEANUP); \
 REPY_Release(REPY_FN_LOCAL_SCOPE); \
 REPY_PopInterpreter() \
 
@@ -1508,7 +1606,7 @@ REPY_DictSetCStr(REPY_FN_LOCAL_SCOPE, module_name, REPY_MakeSUH(REPY_ImportModul
  * @return The value of the variable as a `REPY_Handle`.
  */
 #define REPY_FN_GET(var_name) \
-REPY_DictGetCStr(REPY_FN_LOCAL_SCOPE, var_name);
+REPY_DictGetCStr(REPY_FN_LOCAL_SCOPE, var_name)
 
 /**
  * @brief Sets a variable in the the local scope, using a `REPY_Handle` for the value.
@@ -2061,7 +2159,7 @@ REPY_IMPORT(REPY_InterpreterIndex REPY_PreInitRegisterSubinterpreter());
  * 
  * It is safe to use this function with a Single-Use handle, since it will not try to release the handle twice.
  * 
- * @param REPY_Release The handle to release.
+ * @param py_handle The handle to release.
  */
 REPY_IMPORT(void REPY_Release(REPY_Handle py_handle));
 
@@ -2128,7 +2226,7 @@ REPY_IMPORT(void REPY_SetSUH(REPY_Handle py_handle_no_release, REPY_bool value))
  * Note that, unlike the other functions in this category, this function WILL release Single-Use handles.
  * In the future, a `_no_release` version of this function may be added.
  * 
- * @param py_handle_no_release A handle for an object you need another handle to.
+ * @param handle_no_release A handle for an object you need another handle to.
  * @return A new handle to the same object.
  */
 REPY_IMPORT(REPY_Handle REPY_CopyHandle(REPY_Handle handle_no_release));
@@ -2227,13 +2325,13 @@ REPY_IMPORT(REPY_InterpreterIndex REPY_GetHandleInterpreter(REPY_Handle handle_n
 REPY_IMPORT(void REPY_AddCStrToSysPath(const char* filepath));
 
 /**
- * @brief Adds this NRM to the current interpreter's `sys.path. 
+ * @brief Adds this NRM to the current interpreter's `sys.path`. 
  * 
- *  Unlike `REPY_PreInitAddToSysPath`, this will only add a path to the current interpreter. The `sys.path` values of any
-  * other interpreters defined before this point will be unaffected.
-  * 
-  * This function is defined as `inline` in the `repy_api.h` header in order to be able to grab this mod's nrm path, and
-  * is primarily a wrapper for `REPY_AddCStrToSysPath`.
+ * Unlike `REPY_PreInitAddToSysPath`, this will only add a path to the current interpreter. The `sys.path` values of any
+* other interpreters defined before this point will be unaffected.
+* 
+* This function is defined as `inline` in the `repy_api.h` header in order to be able to grab this mod's nrm path, and
+* is primarily a wrapper for `REPY_AddCStrToSysPath`.
  */
 inline void REPY_AddNrmToSysPath() {
     const char* filepath = (const char*) recomp_get_mod_file_path();
@@ -2242,25 +2340,31 @@ inline void REPY_AddNrmToSysPath() {
 }
 
 /**
- * @brief Construct a new Python module from a NULL-terminated code string, importable by name.
+ * @brief Construct a new Python module from a NULL-terminated code string, optionally importable by name.
  * 
  * The Python code of the module is run immediately, rather than on first import.
  * 
  * @param identifier The name of the new module. Should be NULL-terminated.
  * @param code The Python code for the module. Should be NULL-terminated.
+ * @param add_to_sys If true, the module is added to Python's `sys.modules`, allowing it to be brought into scope via an `import` statement. 
+ * If false, the module will only be available through the returned `REPY_Handle`.
+ * @return a new `REPY_Handle` for the module.
  */
-REPY_IMPORT(void REPY_ConstructModuleFromCStr(const char* identifier, const char* code, REPY_bool add_to_sys));
+REPY_IMPORT(REPY_Handle REPY_ConstructModuleFromCStr(const char* identifier, const char* code, REPY_bool add_to_sys));
 
 /**
- * @brief Construct a new Python module from a `char` array, importable by name.
+ * @brief Construct a new Python module from a `char` array, optionally importable by name.
  * 
  * The Python code of the module is run immediately, rather than on first import.
  * 
  * @param identifier The name of the new module. Should be NULL-terminated.
  * @param code The Python code for the module. Does not need to be null terminated.
  * @param len The length of the Python code, in bytes.
+ * @param add_to_sys If true, the module is added to Python's `sys.modules`, allowing it to be brought into scope via an `import` statement. 
+ * If false, the module will only be available through the returned `REPY_Handle`.
+ * @return a new `REPY_Handle` for the module.
  */
-REPY_IMPORT(void REPY_ConstructModuleFromCStrN(const char* identifier, const char* code, REPY_u32 len, REPY_bool add_to_sys));
+REPY_IMPORT(REPY_Handle REPY_ConstructModuleFromCStrN(const char* identifier, const char* code, REPY_u32 len, REPY_bool add_to_sys));
 
 /**
  * @brief Imports a Python module by name and returns a handle to it.
@@ -2306,6 +2410,7 @@ REPY_IMPORT(REPY_Handle REPY_CreateBool_SUH(REPY_bool value));
  * Intended to be used with a Python `bool`. Behavior with other Python types may change between versions.
  * 
  * @param object The handle for the Python object in question.
+ * @return A `bool` value corresponding to the Python `object`. If a Python error occurs, this value is undefined.
  */
 REPY_IMPORT(REPY_bool REPY_CastBool(REPY_Handle object));
 
@@ -2336,6 +2441,7 @@ REPY_IMPORT(REPY_Handle REPY_CreateU8_SUH(REPY_u8 value));
  * Intended to be used with a Python `int`. Behavior with other Python types may change between versions.
  * 
  * @param object The handle for the Python object in question.
+ * @return A `u8` value corresponding to the Python `object`. If a Python error occurs, this value is undefined.
  */
 REPY_IMPORT(REPY_u8 REPY_CastU8(REPY_Handle object));
 
@@ -2366,6 +2472,7 @@ REPY_IMPORT(REPY_Handle REPY_CreateS8_SUH(REPY_s8 value));
  * Intended to be used with a Python `int`. Behavior with other Python types may change between versions.
  * 
  * @param object The handle for the Python object in question.
+ * @return An `s8` value corresponding to the Python `object`. If a Python error occurs, this value is undefined.
  */
 REPY_IMPORT(REPY_s8 REPY_CastS8(REPY_Handle object));
 
@@ -2396,6 +2503,7 @@ REPY_IMPORT(REPY_Handle REPY_CreateU16_SUH(REPY_u16 value));
  * Intended to be used with a Python `int`. Behavior with other Python types may change between versions.
  * 
  * @param object The handle for the Python object in question.
+ * @return A `u16` value corresponding to the Python `object`. If a Python error occurs, this value is undefined.
  */
 REPY_IMPORT(REPY_u16 REPY_CastU16(REPY_Handle object));
 
@@ -2426,6 +2534,7 @@ REPY_IMPORT(REPY_Handle REPY_CreateS16_SUH(REPY_s16 value));
  * Intended to be used with a Python `int`. Behavior with other Python types may change between versions.
  * 
  * @param object The handle for the Python object in question.
+ * @return An `s16` value corresponding to the Python `object`. If a Python error occurs, this value is undefined.
  */
 REPY_IMPORT(REPY_s16 REPY_CastS16(REPY_Handle object));
 
@@ -2456,6 +2565,7 @@ REPY_IMPORT(REPY_Handle REPY_CreateU32_SUH(REPY_u32 value));
  * Intended to be used with a Python `int`. Behavior with other Python types may change between versions.
  * 
  * @param object The handle for the Python object in question.
+ * @return A `u32` value corresponding to the Python `object`. If a Python error occurs, this value is undefined.
  */
 REPY_IMPORT(REPY_u32 REPY_CastU32(REPY_Handle object));
 
@@ -2486,6 +2596,7 @@ REPY_IMPORT(REPY_Handle REPY_CreateS32_SUH(REPY_s32 value));
  * Intended to be used with a Python `int`. Behavior with other Python types may change between versions.
  * 
  * @param object The handle for the Python object in question.
+ * @return An `s32*` value corresponding to the Python `object`. If a Python error occurs, this value is undefined.
  */
 REPY_IMPORT(REPY_s32 REPY_CastS32(REPY_Handle object));
 
@@ -2516,6 +2627,7 @@ REPY_IMPORT(REPY_Handle REPY_CreateF32_SUH(REPY_f32 value));
  * Intended to be used with a Python `float`. Behavior with other Python types may change between versions.
  * 
  * @param object The handle for the Python object in question.
+ * @return An `f32` value corresponding to the Python `object`. If a Python error occurs, this value is undefined.
  */
 REPY_IMPORT(REPY_f32 REPY_CastF32(REPY_Handle object));
 
@@ -2546,6 +2658,7 @@ REPY_IMPORT(REPY_Handle REPY_CreatePtr_SUH(void* value));
  * Intended to be used with a Python `int`. Behavior with other Python types may change between versions.
  * 
  * @param object The handle for the Python object in question.
+ * @return A `void*` value corresponding to the Python `object`. If a Python error occurs, this value is undefined.
  */
 REPY_IMPORT(void* REPY_CastPtr(REPY_Handle object));
 
@@ -2576,6 +2689,7 @@ REPY_IMPORT(REPY_Handle REPY_CreateU64_SUH(REPY_u64 value));
  * Intended to be used with a Python `int`. Behavior with other Python types may change between versions.
  * 
  * @param object The handle for the Python object in question.
+ * @return A `u64` value corresponding to the Python `object`. If a Python error occurs, this value is undefined.
  */
 REPY_IMPORT(REPY_u64 REPY_CastU64(REPY_Handle object));
 
@@ -2606,6 +2720,7 @@ REPY_IMPORT(REPY_Handle REPY_CreateS64_SUH(REPY_s64 value));
  * Intended to be used with a Python `int`. Behavior with other Python types may change between versions.
  * 
  * @param object The handle for the Python object in question.
+ * @return An `s64` value corresponding to the Python `object`. If a Python error occurs, this value is undefined.
  */
 REPY_IMPORT(REPY_s64 REPY_CastS64(REPY_Handle object));
 
@@ -2635,7 +2750,8 @@ REPY_IMPORT(REPY_Handle REPY_CreateF64_SUH(REPY_f64 value));
  * 
  * Intended to be used with a Python `float`. Behavior with other Python types may change between versions.
  * 
- * @param object The handle for the Python object in question.
+ * @param object The handle for the Python object in question. 
+ * @return An `f64` value corresponding to the Python `object`. If a Python error occurs, this value is undefined.
  */
 REPY_IMPORT(REPY_f64 REPY_CastF64(REPY_Handle object));
 
@@ -2645,7 +2761,7 @@ REPY_IMPORT(REPY_f64 REPY_CastF64(REPY_Handle object));
  * The handle returned by this function will need to be released, either by making is Single-Use or by calling `REPY_Release`.
  * Failure to release this handle will result in a memory leak. 
  * 
- * @param value The value for the Python `str`.
+ * @param string The value for the Python `str`.
  * @return A new handle for your Python `str`.
  */
 REPY_IMPORT(REPY_Handle REPY_CreateStr(const char* string));
@@ -2773,45 +2889,6 @@ REPY_IMPORT(char* REPY_CastByteStr(REPY_Handle object));
 REPY_IMPORT(REPY_Handle REPY_MemcpyToBytes(void* src, REPY_u32 len, REPY_bool reverse));
 
 /**
- * @brief Copy the content of a Python `bytes` object into mod memory.
- * 
- * The `bytes` data will be copied exactly as is, NULL-terminators and all. No additional NULL-terminator will be
- * added to the end of the data.
- * 
- * If the Python `bytes` object is smaller than `len`, then the remainder of destination will be untouched. If the
- * `bytes` object is larger than len, then copying will terminate when `len` is reached. Use the return value to get
- * how many bytes were actually copied.
- * 
- * Behavior with Python types other than `bytes` is undefined, and may change between versions.
- * 
- * @param dst The beginning of the memory region to write to. 
- * @param len The size of the destination region to copy, in bytes. 
- * @param reverse Set to `false` to copy normally, or `true` to reverse the byte order of the data being copied.
- * @param bytes_obj The Python `bytes` object to copy from.
- * @return The number of bytes actually copied.
- */
-REPY_IMPORT(REPY_u32 REPY_MemcpyFromBytes(void* dst, REPY_u32 len, REPY_bool reverse, REPY_Handle bytes_obj));
-
-
-/**
- * @brief Copy the content of a Python `bytes` object into mod memory, automatically allocating the space for it
- * with `recomp_alloc`.
- * 
- * The `bytes` data will be copied exactly as is, NULL-terminators and all. No additional NULL-terminator will be
- * added to the end of the data.
- * 
- * Failure to free the `void*` returned by this function with `recomp_free` will result in a memory leak.
- * 
- * Behavior with Python types other than `bytes` is undefined, and may change between versions.
- * 
- * @param reverse Set to `false` to copy normally, or `true` to reverse the byte order of the data being copied.
- * @param bytes_obj The Python `bytes` object to copy from.
- * @param write_size A pointer to a `u32`, where the number of bytes copied can be written to.
- * @return A `void*` to the data copied into mod memory.
- */
-REPY_IMPORT(void* REPY_AllocAndCopyBytes(REPY_bool reverse, REPY_Handle bytes_obj, REPY_u32* write_size));
-
-/**
  * @brief Create a Python `bytearray` object from a chunk of mod memory.
  * 
  * This function copies the entire `src` region exactly as is, NULL-terminators and all.
@@ -2824,16 +2901,14 @@ REPY_IMPORT(void* REPY_AllocAndCopyBytes(REPY_bool reverse, REPY_Handle bytes_ob
 REPY_IMPORT(REPY_Handle REPY_MemcpyToByteArray(void* src, REPY_u32 len, REPY_bool reverse));
 
 /**
- * @brief Copy the content of a Python `bytearray` object into mod memory.
+ * @brief Copy the content of a Python object supporting buffer protocol (such as `bytes` and `bytearray`) into mod memory.
  * 
- * The `bytearray` data will be copied exactly as is, NULL-terminators and all. No additional NULL-terminator will be
+ * The binary data from the buffer will be copied exactly as is, NULL bytes and all. No additional NULL bytes will be 
  * added to the end of the data.
  * 
- * If the Python `bytearray` object is smaller than `len`, then the remainder of destination will be untouched. If the
+ * If the Python buffer object is smaller than `len`, then the remainder of destination will be untouched. If the
  * `bytearray` object is larger than len, then copying will terminate when `len` is reached. Use the return value to get
  * how many bytes were actually copied.
- * 
- * Behavior with Python types other than `bytearray` is undefined, and may change between versions.
  * 
  * @param dst The beginning of the memory region to write to. 
  * @param len The size of the destination region to copy, in bytes. 
@@ -2841,14 +2916,14 @@ REPY_IMPORT(REPY_Handle REPY_MemcpyToByteArray(void* src, REPY_u32 len, REPY_boo
  * @param bytes_obj The Python `bytearray` object to copy from.
  * @return The number of bytes actually copied.
  */
-REPY_IMPORT(REPY_u32 REPY_MemcpyFromByteArray(void* dst, REPY_u32 len, REPY_bool reverse, REPY_Handle bytes_obj));
+REPY_IMPORT(REPY_u32 REPY_MemcpyFromBuffer(void* dst, REPY_u32 len, REPY_bool reverse, REPY_Handle buffer));
 
 /**
- * @brief Copy the content of a Python `bytearray` object into mod memory, automatically allocating the space for it
- * with `recomp_alloc`.
+ * @brief Copy the content of a Python object supporting buffer protocol into mod memory, automatically allocating 
+ * the space for it with `recomp_alloc`.
  * 
- * The `bytes` data will be copied exactly as is, NULL-terminators and all. No additional NULL-terminator will be
- * added to the end of the data.
+ * The binary data from the buffer will be copied exactly as is, NULL bytes and all. No additional NULL bytes will
+ * be added to the end of the data.
  * 
  * Failure to free the `void*` returned by this function with `recomp_free` will result in a memory leak.
  * 
@@ -2859,7 +2934,7 @@ REPY_IMPORT(REPY_u32 REPY_MemcpyFromByteArray(void* dst, REPY_u32 len, REPY_bool
  * @param write_size A pointer to a `u32`, where the number of bytes copied can be written to.
  * @return A `void*` to the data copied into mod memory.
  */
-REPY_IMPORT(void* REPY_AllocAndCopyByteArray(REPY_bool reverse, REPY_Handle bytes_obj, REPY_u32* write_size));
+REPY_IMPORT(void* REPY_AllocAndCopyBuffer(REPY_bool reverse, REPY_Handle buffer, REPY_u32* write_size));
 
 /** @}*/
 
@@ -3153,7 +3228,7 @@ REPY_IMPORT(REPY_Handle REPY_CreateDict_SUH(REPY_u32 size, ...));
  * Note that any hashable Python type can be used as a dict key, not just `str` objects.
  * 
  * @param dict The `dict` to get an entry from.
- * @param dict The key for the entry. Should be a hashable Python type.
+ * @param key The key for the entry. Should be a hashable Python type.
  * @return The retrieved object. Will be `REPY_NO_HANDLE` if an error occured.
  */
 REPY_IMPORT(REPY_Handle REPY_DictGet(REPY_Handle dict, REPY_Handle key));
@@ -3165,7 +3240,7 @@ REPY_IMPORT(REPY_Handle REPY_DictGet(REPY_Handle dict, REPY_Handle key));
  * code execution scopes.
  * 
  * @param dict The `dict` to get an entry from.
- * @param dict The key for the entry. Should be a NULL-terminated C string.
+ * @param key The key for the entry. Should be a NULL-terminated C string.
  * @return The retrieved object. Will be `REPY_NO_HANDLE` if an error occured.
  */
 REPY_IMPORT(REPY_Handle REPY_DictGetCStr(REPY_Handle dict, char* key));
@@ -3176,7 +3251,7 @@ REPY_IMPORT(REPY_Handle REPY_DictGetCStr(REPY_Handle dict, char* key));
  * Note that any hashable Python type can be used as a dict key, not just `str` objects.
  * 
  * @param dict The `dict` to insert into.
- * @param dict The key for the entry. Should be a hashable Python type.
+ * @param key The key for the entry. Should be a hashable Python type.
  * @param value The object to add.
  */
 REPY_IMPORT(void REPY_DictSet(REPY_Handle dict, REPY_Handle key, REPY_Handle value));
@@ -3189,7 +3264,7 @@ REPY_IMPORT(void REPY_DictSet(REPY_Handle dict, REPY_Handle key, REPY_Handle val
  * code execution scopes.
  * 
  * @param dict The `dict` to insert into.
- * @param dict The key for the entry. Should be a NULL-terminated C string.
+ * @param key The key for the entry. Should be a NULL-terminated C string.
  * @param value The object to add.
  */
 REPY_IMPORT(void REPY_DictSetCStr(REPY_Handle dict, char* key, REPY_Handle value));
@@ -3200,7 +3275,7 @@ REPY_IMPORT(void REPY_DictSetCStr(REPY_Handle dict, char* key, REPY_Handle value
  * Note that any hashable Python type can be used as a dict key, not just `str` objects.
  * 
  * @param dict The `dict` to check for a key in.
- * @param dict The key for the entry. Should be a hashable Python type.
+ * @param key The key for the entry. Should be a hashable Python type.
  * @return `true` if the entry exists, `false` otherwise.
  */
 REPY_IMPORT(REPY_bool REPY_DictHas(REPY_Handle dict, REPY_Handle key));
@@ -3212,7 +3287,7 @@ REPY_IMPORT(REPY_bool REPY_DictHas(REPY_Handle dict, REPY_Handle key));
  * code execution scopes.
  * 
  * @param dict The `dict` to check for a key in.
- * @param dict The key for the entry. Should be a NULL-terminated C string.
+ * @param key The key for the entry. Should be a NULL-terminated C string.
  * @return `true` if the entry exists, `false` otherwise.
  */
 REPY_IMPORT(REPY_bool REPY_DictHasCStr(REPY_Handle dict, char* key));
@@ -3223,7 +3298,7 @@ REPY_IMPORT(REPY_bool REPY_DictHasCStr(REPY_Handle dict, char* key));
  * Note that any hashable Python type can be used as a dict key, not just `str` objects.
  * 
  * @param dict The `dict` to remove an entry from.
- * @param dict The key for the entry. Should be a hashable Python type.
+ * @param key The key for the entry. Should be a hashable Python type.
  */
 REPY_IMPORT(void REPY_DictDel(REPY_Handle dict, REPY_Handle key));
 
@@ -3234,7 +3309,7 @@ REPY_IMPORT(void REPY_DictDel(REPY_Handle dict, REPY_Handle key));
  * code execution scopes.
  * 
  * @param dict The `dict` to remove an entry from.
- * @param dict The key for the entry. Should be a NULL-terminated C string.
+ * @param key The key for the entry. Should be a NULL-terminated C string.
  */
 REPY_IMPORT(void REPY_DictDelCStr(REPY_Handle dict, char* key));
 /** @}*/
@@ -3395,7 +3470,7 @@ REPY_IMPORT(REPY_Handle REPY_EvalCStr(const char* code, REPY_Handle global_scope
 REPY_IMPORT(REPY_Handle REPY_EvalCStrN(const char* code, REPY_u32 len, REPY_Handle global_scope_nullable, REPY_Handle local_scope_nullable));
 
 /**
- * @brief Adds the Python object represented by a set of `REPY_handle`s to a dict, using the keys following the scheme `_0`, `_1`, `_2`, etc.
+ * @brief Adds the Python object represented by a set of `REPY_Handle` handles to a dict, using the keys following the scheme `_0`, `_1`, `_2`, etc.
  * These keys serve as valid Python variable names to be used in code strings.
  * 
  * This is a convienience function for quick `REPY_Exec` and `REPY_Eval` statements where establishing a
@@ -3406,13 +3481,13 @@ REPY_IMPORT(REPY_Handle REPY_EvalCStrN(const char* code, REPY_u32 len, REPY_Hand
  * `dict` will have new key-value pairs added to it, and **provided** handle is returned (that is to say, no new handle is created). 
  * Be advised that this will cause issues if `dict_nullable` is Single-Use.
  * 
- * @param dict_no_release Should be either a valid `REPY_Handle for a dictionary, or `REPY_NO_OBJECT`.
+ * @param dict_nullable_no_release Should be either a valid `REPY_Handle` for a dictionary, or `REPY_NO_OBJECT`.
  * @param size the number of Python objects to add to the `dict`
- * @param ... The Python objects to add to the dict. 
+ * @param ... The Python objects to add to the `dict`. 
  * @return A `REPY_Handle` for the resulting dict. Will be the same as `dict_nullable` if that argument was set to anything other than
  * `REPY_NO_OBJECT`
  */
-REPY_IMPORT(REPY_Handle REPY_VariadicLocals(REPY_Handle dict_nullable, REPY_u32 size, ...));
+REPY_IMPORT(REPY_Handle REPY_VariadicLocals(REPY_Handle dict_nullable_no_release, REPY_u32 size, ...));
 
 /**
  * @brief Shorthand for `REPY_VariadicLocals`
@@ -3435,13 +3510,13 @@ REPY_IMPORT(REPY_Handle REPY_VariadicLocals(REPY_Handle dict_nullable, REPY_u32 
  * Also important, because this function marks the returned `REPY_Handle` as single use, but can potentially return the same handle as it was given,
  * the handle for `dict_nullable` will become Single-Use if it was previously permanent.
  * 
- * @param dict_no_release Should be either a valid `REPY_Handle for a dictionary, or `REPY_NO_OBJECT`.
+ * @param dict_nullable_no_release Should be either a valid `REPY_Handle` for a dictionary, or `REPY_NO_OBJECT`.
  * @param size the number of Python objects to add to the `dict`
  * @param ... The Python objects to add to the dict. 
  * @return A `REPY_Handle` for the resulting dict. Will be the same as `dict_nullable` if that argument was set to anything other than
- * `REPY_NO_OBJECT`
+ * `REPY_NO_OBJECT`.
  */
-REPY_IMPORT(REPY_Handle REPY_VariadicLocals_SUH(REPY_Handle dict_nullable, REPY_u32 size, ...));
+REPY_IMPORT(REPY_Handle REPY_VariadicLocals_SUH(REPY_Handle dict_nullable_no_release, REPY_u32 size, ...));
 
 /**
  * @brief Shorthand for `REPY_VariadicLocals_SUH`
@@ -3491,7 +3566,7 @@ REPY_IMPORT(REPY_Handle REPY_CallReturn(REPY_Handle func, REPY_Handle args_nulla
  * `REPY_CreateTuple_SUH` and `REPY_CreateDict_SUH` serve as easy methods of nesting argument construction into a call to this function.
  * 
  * @param object The Python object to call a member of.
- * @param func The name of the object attribute to call. Should be a Python `str`.
+ * @param name The name of the object attribute to call. Should be a Python `str`.
  * @param args_nullable A `tuple` of the positional arguments to pass to the function. Use `REPY_NO_OBJECT` to forgo positional arguments.
  * @param kwargs_nullable A `dict` of the keyword arguments to pass to the function. Use `REPY_NO_OBJECT` to forgo keyword arguments.
  * @return `true` if the call executed without error, `false` otherwise.
@@ -3505,7 +3580,7 @@ REPY_IMPORT(REPY_bool REPY_CallAttr(REPY_Handle object, REPY_Handle name, REPY_H
  * `REPY_CreateTuple_SUH` and `REPY_CreateDict_SUH` serve as easy methods of nesting argument construction into a call to this function.
  * 
  * @param object The Python object to call a member of.
- * @param func The name of the object attribute to call. Should be a NULL-terminated C string.
+ * @param name The name of the object attribute to call. Should be a NULL-terminated C string.
  * @param args_nullable A `tuple` of the positional arguments to pass to the function. Use `REPY_NO_OBJECT` to forgo positional arguments.
  * @param kwargs_nullable A `dict` of the keyword arguments to pass to the function. Use `REPY_NO_OBJECT` to forgo keyword arguments.
  * @return `true` if the call executed without error, `false` otherwise.
@@ -3523,7 +3598,7 @@ REPY_IMPORT(REPY_bool REPY_CallAttrCStr(REPY_Handle object, char* name, REPY_Han
  * `REPY_CreateTuple_SUH` and `REPY_CreateDict_SUH` serve as easy methods of nesting argument construction into a call to this function.
  * 
  * @param object The Python object to call a member of.
- * @param func The name of the object attribute to call. Should be a NULL-terminated C string.
+ * @param name The name of the object attribute to call. Should be a NULL-terminated C string.
  * @param args_nullable A `tuple` of the positional arguments to pass to the function. Use `REPY_NO_OBJECT` to forgo positional arguments.
  * @param kwargs_nullable A `dict` of the keyword arguments to pass to the function. Use `REPY_NO_OBJECT` to forgo keyword arguments.
  * @return A handle for the resulting object. Will be `REPY_NO_HANDLE` if an error occured.
@@ -3541,7 +3616,7 @@ REPY_IMPORT(REPY_Handle REPY_CallAttrReturn(REPY_Handle object, REPY_Handle name
  * `REPY_CreateTuple_SUH` and `REPY_CreateDict_SUH` serve as easy methods of nesting argument construction into a call to this function.
  * 
  * @param object The Python object to call a member of.
- * @param func The name of the object attribute to call. Should be a NULL-terminated C string.
+ * @param name The name of the object attribute to call. Should be a NULL-terminated C string.
  * @param args_nullable A `tuple` of the positional arguments to pass to the function. Use `REPY_NO_OBJECT` to forgo positional arguments.
  * @param kwargs_nullable A `dict` of the keyword arguments to pass to the function. Use `REPY_NO_OBJECT` to forgo keyword arguments.
  * @return A handle for the resulting object. Will be `REPY_NO_HANDLE` if an error occured.
@@ -3553,11 +3628,16 @@ REPY_IMPORT(REPY_Handle REPY_CallAttrCStrReturn(REPY_Handle object, char* name, 
 /** \defgroup repy_error_funcs Error Handling
  * \brief Functions used for Python error handling.
  * 
- * REPY API functions will try to catch any unhandled Python errors they raise, print them to the console, and make the exception objects available
- * through this interface. Note that passing bad/invalid handles (or using `REPY_NO_OBJECT` when not allowed) will not result in Python 
+ * REPY API functions will try to catch any unhandled Python errors they raise, print them to the console, and make the exception 
+ * objects available through this interface. Be advised that the Python error state is thread and interpreter specific, and
+ * therefore these functions will only provide error information for the current interpreter and the current N64Recompiled thread.
+ * Errors from pure Python threads (such as those created by `threading.Thread`) will need to be handled by Python code in their 
+ * own threads.
+ * 
+ * Note that passing bad/invalid handles (or using `REPY_NO_OBJECT` when not allowed) will not result in Python 
  * errors to be raised, because looking up the Python object for a given handle happens before the interpreter is invoked. As a result,
- * such issues will likely result in a crash instead.
- *  @{
+ * such issues will result in a fatal error message being printed to REPY's log, followed by a fatal exit.
+ * @{
  */
 
 /**
@@ -3570,34 +3650,34 @@ REPY_IMPORT(REPY_Handle REPY_CallAttrCStrReturn(REPY_Handle object, char* name, 
 REPY_IMPORT(REPY_bool REPY_IsErrorSet());
 
 /**
- * @brief Get the type of the current Python exception.
+ * @brief Get the type of a captured Python exception for the current interpreter and thread.
  * 
  * Note that each invokation of this method will result in a new handle being created to the appropriate type object.
  * 
- * @return The type for the currently captured Python exception. Returns `None` if no exception is currently captured.
+ * @return The type for the captured Python exception. Returns `None` if no exception is currently captured.
  */
 REPY_IMPORT(REPY_Handle REPY_GetErrorType());
 
 /**
- * @brief Get the trace object for the Python exception.
+ * @brief Get the trace object for the Python exception for the current interpreter and thread.
  * 
  * Note that each invokation of this method will result in a new handle being created to the trace object.
  * 
- * @return The trace object for the currently captured Python exception. Returns `None` if no exception is currently captured.
+ * @return The trace object for the captured Python exception. Returns `None` if no exception is currently captured.
  */
 REPY_IMPORT(REPY_Handle REPY_GetErrorTrace());
 
 /**
- * @brief Get the current Python exception.
+ * @brief Get the captured Python exception object for the current interpreter and thread.
  * 
  * Note that each invokation of this method will result in a new handle being created to the exception.
  * 
- * @return The currently captured Python exception. Returns `None` if no exception is currently captured.
+ * @return The captured Python exception. Returns `None` if no exception is currently captured.
  */
 REPY_IMPORT(REPY_Handle REPY_GetErrorValue());
 
 /**
- * @brief Releases the currently captured exception.
+ * @brief Releases the captured exception for the current interpreter and thread.
  * 
  * Call once you're done with your error handling, so that `REPY_IsErrorSet` doesn't return `true` for an error already dealt with.
  */
@@ -3644,14 +3724,13 @@ inline REPY_Handle REPY_GetNrmZipFile() {
  * You don't usually need to invoke these directly.
  *  @{
  */
-
 /**
  * @brief Constructs the `filename` strings used by most macros that enable inlining Python code into C files.
  * 
  * The pointer returned by this function must be freed with `recomp_free`. Failure to do so will result in a memory leak.
  * 
  * @param category A category prefix for the filename string. Usually the name of the invoking macro.
- * @param filename A C filename to associate with a piece of Python code. Usually `_FILE_NAME__.
+ * @param filename A C filename to associate with a piece of Python code. Usually `_FILE_NAME__`.
  * @param function_name The name of C function to associate with a piece of Python code. Usually `__func__`.
  * @param line_number A line number in a C file to associate with a piece of Python code. Usually `__LINE__`.
  * @param identifier An identifiying string for a piece of Python code. Usually the bytecode identifier from the C file.
@@ -3659,9 +3738,7 @@ inline REPY_Handle REPY_GetNrmZipFile() {
  */
 REPY_IMPORT(char* REPY_InlineCodeSourceStrHelper(char* category, char* filename, char* function_name, REPY_u32 line_number, char* identifier));
 
-/** @}*/
-
-/** \defgroup repy_iterator_helper_methods `REPY_IteratorHelper` Methods
+/** \defgroup repy_iterator_helper_methods REPY_IteratorHelper Methods
  * \brief Method functions to operate on `REPY_IteratorHelper` objects.
  * 
  *  @{
@@ -3675,6 +3752,7 @@ REPY_IMPORT(char* REPY_InlineCodeSourceStrHelper(char* category, char* filename,
  * @param py_object a `REPY_Handle` for the Python object to iterate through.
  * @param py_scope_nullable a `REPY_Handle` to a Python `dict` being used a local scope. Can be `REPY_NO_OBJECT`.
  * @param var_name the variable name for the `REPY_IteratorHelper` pointer. If `py_scope_nullable` is set to `REPY_NO_OBJECT`, use `NULL`.
+ * @param auto_destroy If true, the `REPY_IteratorHelper` will automatically be destroyed once the loop ends.
  * @return A pointer to the new `REPY_IteratorHelper` on the heap.
  */
 REPY_IMPORT(REPY_IteratorHelper* REPY_IteratorHelper_Create(REPY_Handle py_object, REPY_Handle py_scope_nullable, const char* var_name, REPY_bool auto_destroy));
@@ -3696,7 +3774,6 @@ REPY_IMPORT(void REPY_IteratorHelper_Destroy(REPY_IteratorHelper* helper));
  * Used by the `REPY_FOREACH` and `REPY_FN_FOREACH_CACHE` macros.
  * 
  * @param helper A pointer to the `REPY_IteratorHelper` to update.
- * @param auto_destroy If true, the `REPY_IteratorHelper` will automatically be destroyed once the loop ends.
  * @return `true` if the iteration/loop should continue. `false` once it's time to end.
  */
 REPY_IMPORT(REPY_bool REPY_IteratorHelper_Update(REPY_IteratorHelper* helper));
@@ -3716,16 +3793,22 @@ REPY_IMPORT(REPY_u32 REPY_IteratorHelper_GetIndex(REPY_IteratorHelper* helper));
  * @brief Gets the `REPY_Handle` for a `REPY_IteratorHelper` object's current Python object.
  * 
  * The term `Borrow` is used because the lifetime of the returned `REPY_Handle` is managed by
- * the `REPY_IteratorHelper` itself, and therefore you should not release it yourself.
+ * the `REPY_IteratorHelper` itself, and therefore you should not release it manually.
  * 
  * If you need to access this object outside of the current iteration step, use `REPY_CopyHandle`.
  * 
- * @param helper The `REPY_IteratorHelper` to get the `REPY_Handle` from.
+ * @param helper The `REPY_teratorHelper` to get the `REPY_Handle` from.
  * @return The `REPY_Handle` referring to the current object from the `REPY_IteratorHelper`.
  */
 REPY_IMPORT(REPY_Handle REPY_IteratorHelper_BorrowCurrent(REPY_IteratorHelper* helper));
 
 /** @}*/
+
+/** \defgroup repy_if_stmt_chain_methods REPY_IfStmtChain Methods
+ * \brief Method functions to operate on `REPY_IfStmtChain` objects.
+ * 
+ *  @{
+ */
 
 /**
  * @brief Creates a new link in a `REPY_IfStmtChain` if statement chain.
@@ -3733,7 +3816,7 @@ REPY_IMPORT(REPY_Handle REPY_IteratorHelper_BorrowCurrent(REPY_IteratorHelper* h
  * Invoked as part of `REPY_IfStmtHelper` operations, but exposed for manual use here.
  * 
  * @param expr_string The Python expression to evaluate. Should be a NULL-terminated C string. Will be compiled into Python bytecode immediately.
- * @param filename A C filename to associate with the Python expression. Usually `_FILE_NAME__.
+ * @param filename A C filename to associate with the Python expression. Usually `_FILE_NAME__`.
  * @param function_name The name of C function to associate with the Python expression. Usually `__func__`.
  * @param line_number A line number in a C file to associate with the Python expression. Usually `__LINE__`.
  * @param identifier An identifiying string for the Python expression. Usually the bytecode identifier from the C file.
@@ -3747,44 +3830,75 @@ REPY_IMPORT(REPY_IfStmtChain* REPY_IfStmtChain_Create(char* expr_string, char* f
  * 
  * Exists for completeness sake. Since `REPY_IfStmtChain` pointers should usualy be `static` in their own functions, this doesn't really get much use.
  * 
- * @param helper A pointer to the `REPY_IfStmtChain` to recursively destroy.
+ * @param chain A pointer to the `REPY_IfStmtChain` to recursively destroy.
  */
 REPY_IMPORT(void REPY_IfStmtChain_Destroy(REPY_IfStmtChain* chain));
 
 /**
- * @brief Construct a new repy import object
+ * @brief Returns a pointer to the next `IfStmtChain` in the series.
+ *
+ * The term `Borrow` is used because the lifetime of the returned `IfStmtChain` is managed by it's parent (the `chain` argument).
+ * If the parent is destroyed (using `REPY_IfStmtChain_Destroy`), this pointer will no longer be valid.
+ *
+ * Destroying the returned `IfStmtChain` manually is not catastrophic so long as you set the parent's next link to `NULL`,
+ * as this signals to `REPY_IfStmtHelper_Step` to simply regenerate the link. However, there isn't much benefit to doing so.
+ * Chains are meant to be preserved as a means of code caching.
  * 
- * @param chain 
+ * @param chain The `REPY_IfStmtChain` to get the next element from.
+ * @return A pointer to the next element in the chain.
  */
 REPY_IMPORT(REPY_IfStmtChain* REPY_IfStmtChain_BorrowNext(REPY_IfStmtChain* chain));
 
 /**
- * @brief Construct a new repy import object
+ * @brief Sets the next `REPY_IfStmtChain` in a series.
+ *
+ * The term `Steal` is used because the `REPY_IfStmtHelper` represented by the `chain` argument (IE, the parent) assumes ownership
+ * of the `REPY_IfStmtHelper` represented by `next`. Ergo, you shouldn't destroy `next` youself without setting the next link
+ * of `chain` to `NULL`.
  * 
- * @param chain 
+ * @param chain The `REPY_IfStmtChain` to set the next element for.
+ * @param next The `REPY_IfStmtChain` to be the next element in the chain.
  */
 REPY_IMPORT(void REPY_IfStmtChain_StealNext(REPY_IfStmtChain* chain, REPY_IfStmtChain* next));
 
 /**
- * @brief Construct a new repy import object
+ * @brief Retrieves the evaluated bytecode expression for this `REPY_IfStmtChain` as a `REPY_Handle`.
  * 
- * @param REPY_IfStmtChain_BorrowEvachainlBytecode 
+ *  The term `Borrow` is used because the lifetime of the returned `REPY_Handle` is managed by the `REPY_IfStmtChain` specified in the
+ * `chain` argument. If the parent is destroyed (using `REPY_IfStmtChain_Destroy`), this pointer will no longer be valid. Additionally,
+ * you should not release this handle yourself, as `REPY_IfStmtHelper_Step` will not regenerate it.
+ * 
+ * @param chain The `REPY_IfStmtChain` to get the expression bytecode from.
+ * @return The `REPY_Handle` for expression bytecode.
  */
 REPY_IMPORT(REPY_Handle REPY_IfStmtChain_BorrowEvalBytecode(REPY_IfStmtChain* chain));
 
 /**
- * @brief Construct a new repy import object
+ * @brief Sets 
+ * @brief Retrieves the evaluated bytecode expression for this `REPY_IfStmtChain`.
+ *
+ * The term `Steal` is used because the `REPY_IfStmtHelper` represented by the `chain` argument (IE, the parent) assumes ownership
+ * of the `REPY_Handle` passed in as `eval_bytecode`. Ergo, you shouldn't release `eval_bytecode` youself after this.
  * 
- * @param chain 
+ * @param chain The `REPY_IfStmtChain` to set the expression bytecode for.
+ * @param eval_bytecode A `REPY_Handle` to be the new expression bytecode.
  */
 REPY_IMPORT(void REPY_IfStmtChain_StealEvalBytecode(REPY_IfStmtChain* chain, REPY_Handle eval_bytecode));
+
+/** @}*/
+
+/** \defgroup repy_if_stmt_helper_methods REPY_IfStmtHelper Methods
+ * \brief Method functions to operate on `REPY_IfStmtHelper` objects.
+ * 
+ *  @{
+ */
 
 /**
  * @brief Initializes a `REPY_IfStmtHelper` for controlling managing a Pythonic if/else block.
  * 
  * Used by several of the various `REPY_FN_IF_CACHE` macros.
  * 
- * @param root A pointer to the `REPY_IfStmtChain*` (ergo, a douple-pointer) variable for the first link in the if/else chain. For caching purposes, this
+ * @param chain_root A pointer to the `REPY_IfStmtChain*` (ergo, a douple-pointer) variable for the first link in the if/else chain. For caching purposes, this
  * will usually be a `static` variable. If value of the variable at `root` us NULL, that will be taken to mean that the chain has not been created yet
  * (IE, this is the first run of this if/else block).
  * @return A pointer to the new `REPY_IfStmtHelper`.
@@ -3812,7 +3926,7 @@ REPY_IMPORT(void REPY_IfStmtHelper_Destroy(REPY_IfStmtHelper* helper));
  * @param local_scope The local scope `dict` to evaluate the expression in.
  * @param expr_string The Python expression to evaluate. Should be a NULL-terminated C string. Will be compiled into Python bytecode immediately.
  * This argument is only used if there is no next link in the `REPY_IfStmtChain` chain (meaning the link needs to be created).
- * @param filename A C filename to associate with the Python expression. Usually `_FILE_NAME__.
+ * @param filename A C filename to associate with the Python expression. Usually `_FILE_NAME__`.
  * This argument is only used if there is no next link in the `REPY_IfStmtChain` chain (meaning the link needs to be created).
  * @param function_name The name of C function to associate with the Python expression. Usually `__func__`.
  * This argument is only used if there is no next link in the `REPY_IfStmtChain` chain (meaning the link needs to be created).
@@ -3823,15 +3937,101 @@ REPY_IMPORT(void REPY_IfStmtHelper_Destroy(REPY_IfStmtHelper* helper));
  */
 REPY_IMPORT(REPY_bool REPY_IfStmtHelper_Step(REPY_IfStmtHelper* helper, REPY_Handle global_scope, REPY_Handle local_scope, char* expr_string, char* filename, char* function_name, REPY_u32 line_number, char* identifier));
 
+/** @}*/
+
+/** \defgroup repy_deferred_cleanup_helper_methods REPY_DeferredCleanupHelper Methods
+ * \brief Method functions to operate on `REPY_DeferredCleanupHelper` objects.
+ * 
+ *  @{
+ */
+
+ /**
+  * @brief Create a new `REPY_DeferredCleanupHelper` object.
+  * 
+  * Internally, allocation is handled via `recomp_alloc`.
+  * 
+  * @return A pointer to the new `REPY_DeferredCleanupHelper` instance.
+  */
 REPY_IMPORT(REPY_DeferredCleanupHelper* REPY_DeferredCleanupHelper_Create());
+
+/**
+ * @brief Adds a `REPY_Handle` to be release by a `REPY_DeferredCleanupHelper` instance.
+ * 
+ * The `REPY_DeferredCleanupHelper` will now be responsible for releasing this handle. Don't release it yourself,
+ * or make the Single-Use. This function will not release a Single-Use handle if it recieves one.
+ * 
+ * For the sake of easily wrapping other function calls, this function returns the same `REPY_Handle` it was given.
+ * 
+ * @param cleanup The `REPY_DeferredCleanupHelper` to add `handle_no_release` to.
+ * @param handle_no_release A `REPY_Handle` to be released by this cleanup helper.
+ * @return the `REPY_Handle` specified in `handle_no_release`.
+ */
 REPY_IMPORT(REPY_Handle REPY_DeferredCleanupHelper_AddHandle(REPY_DeferredCleanupHelper* cleanup, REPY_Handle handle_no_release));
+
+/**
+ * @brief Adds a region of memory (specified by a `void*`) to be freed with `recomp_free` by a `REPY_DeferredCleanupHelper` instance.
+ * 
+ * The `REPY_DeferredCleanupHelper` will now be responsible for freeing this memory. Do not free it yourself.
+ * 
+ * The memory will be released using `recomp_free`. If `recomp_free` is not the appropriate for releasing this memory,
+ * then do not use this mechanism. In the future, `REPY_DeferredCleanupHelper` may be updated to allow specifying custom
+ * types to be released. 
+ * 
+ * For the sake of easily wrapping other function calls, this function returns the same `void*`it was given.
+ * 
+ * @param cleanup The `REPY_DeferredCleanupHelper` to add `pointer` to.
+ * @param pointer A `void*` to be freed by this cleanup helper.
+ * @return the `void*` specified in `pointer`.
+ */
 REPY_IMPORT(void* REPY_DeferredCleanupHelper_AddRecompFree(REPY_DeferredCleanupHelper* cleanup, void* pointer));
+
+/**
+ * @brief Adds a `REPY_IteratorHelper` to be destroyed by a `REPY_DeferredCleanupHelper` instance.
+ * 
+ * The `REPY_DeferredCleanupHelper` will now be responsible for destroying this `REPY_IteratorHelper`. Do not destroy it yourself.
+ * 
+ * For the sake of easily wrapping other function calls, this function returns the same `REPY_IteratorHelper*` it was given.
+ * 
+ * @param cleanup The `REPY_DeferredCleanupHelper` to add `iterator_helper` to.
+ * @param iterator_helper A `REPY_IteratorHelper` to be released by this cleanup helper.
+ * @return the `REPY_IteratorHelper` specified in `iterator_helper`.
+ */
 REPY_IMPORT(REPY_IteratorHelper* REPY_DeferredCleanupHelper_AddIteratorHelper(REPY_DeferredCleanupHelper* cleanup, REPY_IteratorHelper* iterator_helper));
+
+/**
+ * @brief Adds a `REPY_IfStmtHelper` to be destroyed by a `REPY_DeferredCleanupHelper` instance.
+ * 
+ * The `REPY_DeferredCleanupHelper` will now be responsible for destroying this `REPY_IfStmtHelper`. Do not destroy it yourself.
+ * 
+ * For the sake of easily wrapping other function calls, this function returns the same `REPY_IfStmtHelper*` it was given.
+ * 
+ * @param cleanup The `REPY_DeferredCleanupHelper` to add `if_stmt_helper` to.
+ * @param if_stmt_helper A `REPY_IfStmtHelper` to be released by this cleanup helper.
+ * @return the `REPY_IfStmtHelper` specified in `if_stmt_helper`.
+ */
 REPY_IMPORT(REPY_IfStmtHelper* REPY_DeferredCleanupHelper_AddIfStmtHelper(REPY_DeferredCleanupHelper* cleanup, REPY_IfStmtHelper* if_stmt_helper));
+
+/**
+ * @brief Clean up all of the resources registered to a `REPY_DeferredCleanupHelper` without destroying the instance itself.
+ * 
+ * The `REPY_DeferredCleanupHelper` now be considered empty again, and thus you can reuse it by adding new resources for it to clean up.
+ * 
+ * @param cleanup The `REPY_DeferredCleanupHelper` to run.
+ */
 REPY_IMPORT(void REPY_DeferredCleanupHelper_CleanNow(REPY_DeferredCleanupHelper* cleanup));
-REPY_IMPORT(void REPY_DeferredCleanupHelper_Destroy(REPY_DeferredCleanupHelper* cleanup, REPY_bool clean_now));
+
+/**
+ * @brief Destroy a `REPY_DeferredCleanupHelper` instance and clean up all of the resources registered to it.
+ * 
+ * It is safe to destroy a `REPY_DeferredCleanupHelper` instance that never had any resources added to it.
+ * 
+ * @param cleanup The `REPY_DeferredCleanupHelper` to run.
+ */
+REPY_IMPORT(void REPY_DeferredCleanupHelper_Destroy(REPY_DeferredCleanupHelper* cleanup));
 
 /** @}*/
 /** @}*/
 /** @}*/
+/** @}*/
+
 #endif
