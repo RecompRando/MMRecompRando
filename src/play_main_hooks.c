@@ -66,8 +66,6 @@ void removeAllScoutsWithPrefix(u32 prefix) {
 void randoScout() {
     rando_queue_scouts_all();
 
-    recomp_printf("scouting\n");
-
     if (rando_get_slotdata_u32("skullsanity") == 2)
     {
         for (int i = 0x00; i <= 0x1E; ++i)
@@ -295,8 +293,6 @@ void randoScout() {
     }
 
     rando_send_queued_scouts(0);
-
-    recomp_printf("done scouting\n");
 }
 
 s8 giToItemId[GI_MAX] = {
@@ -1070,11 +1066,13 @@ void update_rando(PlayState* play) {
         if (new_items_size > old_items_size) {
             u32 item_id = rando_get_item(old_items_size);
             if (rando_get_sending_player(old_items_size) != rando_get_own_slot_id() || rando_get_item_location(old_items_size) <= 0) {
-                char item_name[64];
-                char player_name[36];
-                rando_get_item_name_from_id(item_id, item_name);
-                rando_get_sending_player_name(old_items_size, player_name);
+                char* item_name;
+                char* player_name;
+                rando_get_item_name_from_id(item_id, &item_name);
+                rando_get_sending_player_name(old_items_size, &player_name);
                 randoEmitRecieveNotification(item_name, player_name, randoConvertItemId(item_id), RANDO_ITEM_CLASS_PROGRESSION); // TODO: fix item classification
+                recomp_free(item_name);
+                recomp_free(player_name);
             }
             randoItemGive(item_id);
 

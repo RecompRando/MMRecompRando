@@ -435,12 +435,14 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         bool sold1 = rando_location_is_checked(location1);
         bool sold2 = rando_location_is_checked(location2);
 
-        char item1_str[67], item2_str[67];
-        char player1_str[36], player2_str[36];
-        rando_get_location_item_name(location1, item1_str);
-        rando_get_location_item_name(location2, item2_str);
-        rando_get_location_item_player(location1, player1_str);
-        rando_get_location_item_player(location2, player2_str);
+        char* item1_str;
+        char* item2_str;
+        char* player1_str;
+        char* player2_str;
+        rando_get_location_item_name(location1, &item1_str);
+        rando_get_location_item_name(location2, &item2_str);
+        rando_get_location_item_player(location1, &player1_str);
+        rando_get_location_item_player(location2, &player2_str);
         sanitizeRandoText(item1_str);
         sanitizeRandoText(item2_str);
         sanitizeRandoText(player1_str);
@@ -558,6 +560,11 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         }
 
         font->msgBuf.schar[msg_i++] = 0xBF;
+
+        recomp_free(item1_str);
+        recomp_free(item2_str);
+        recomp_free(player1_str);
+        recomp_free(player2_str);
     }
 
     // Business Scrubs (0x15EA)
@@ -569,10 +576,10 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
             s16 scrub_price = sScrubPrices[scrubType];
             bool sold = rando_location_is_checked(location);
 
-            char item_str[67];
-            char player_str[36];
-            rando_get_location_item_name(location, item_str);
-            rando_get_location_item_player(location, player_str);
+            char* item_str;
+            char* player_str;
+            rando_get_location_item_name(location, &item_str);
+            rando_get_location_item_player(location, &player_str);
             sanitizeRandoText(item_str);
             sanitizeRandoText(player_str);
 
@@ -649,6 +656,9 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
             }
 
             font->msgBuf.schar[msg_i++] = 0xBF;
+            
+            recomp_free(item_str);
+            recomp_free(player_str);
         }
     }
 
@@ -659,12 +669,14 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         bool sold1 = rando_location_is_checked(location1);
         bool sold2 = rando_location_is_checked(location2);
 
-        char item1_str[67], item2_str[67];
-        char player1_str[36], player2_str[36];
-        rando_get_location_item_name(location1, item1_str);
-        rando_get_location_item_name(location2, item2_str);
-        rando_get_location_item_player(location1, player1_str);
-        rando_get_location_item_player(location2, player2_str);
+        char* item1_str;
+        char* item2_str;
+        char* player1_str;
+        char* player2_str;
+        rando_get_location_item_name(location1, &item1_str);
+        rando_get_location_item_name(location2, &item2_str);
+        rando_get_location_item_player(location1, &player1_str);
+        rando_get_location_item_player(location2, &player2_str);
         sanitizeRandoText(item1_str);
         sanitizeRandoText(item2_str);
         sanitizeRandoText(player1_str);
@@ -785,6 +797,11 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         }
 
         font->msgBuf.schar[msg_i++] = 0xBF;
+
+        recomp_free(item1_str);
+        recomp_free(item2_str);
+        recomp_free(player1_str);
+        recomp_free(player2_str);
     }
     
     // Potion Shop
@@ -995,8 +1012,8 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
             }
         }
     } else if (msg == shop_msg) {
-        char item_str[67];
-        char player_str[36];
+        char* item_str;
+        char* player_str;
 
         u32 shop_location = (0x090000 | (textId & 0xFF));
         bool buying = false;
@@ -1005,8 +1022,8 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
             shop_location = 0x090002;
         }
 
-        rando_get_location_item_name(shop_location, item_str);
-        rando_get_location_item_player(shop_location, player_str);
+        rando_get_location_item_name(shop_location, &item_str);
+        rando_get_location_item_player(shop_location, &player_str);
         sanitizeRandoText(item_str);
         sanitizeRandoText(player_str);
 
@@ -1155,13 +1172,15 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         }
 
         font->msgBuf.schar[msg_i] = 0xBF;
+        recomp_free(item_str);
+        recomp_free(player_str);
     } else if (msg == ap_msg) {
         char was_sent_str[128] = "was sent to ";
-        char item_str[67];
-        char player_str[36];
+        char* item_str;
+        char* player_str;
 
-        rando_get_location_item_name(rando_get_last_location_sent(), item_str);
-        rando_get_location_item_player(rando_get_last_location_sent(), player_str);
+        rando_get_location_item_name(rando_get_last_location_sent(), &item_str);
+        rando_get_location_item_player(rando_get_last_location_sent(), &player_str);
         sanitizeRandoText(item_str);
         sanitizeRandoText(player_str);
 
@@ -1205,11 +1224,14 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         font->msgBuf.schar[msg_i] = 0x00;
         font->msgBuf.schar[msg_i + 1] = '!';
         font->msgBuf.schar[msg_i + 2] = 0xBF;
+        
+        recomp_free(item_str);
+        recomp_free(player_str);
     } else if (msg == self_msg) {
         char you_found_str[128] = "You found your\x11\x01";
-        char item_str[67];
+        char* item_str;
 
-        rando_get_location_item_name(rando_get_last_location_sent(), item_str);
+        rando_get_location_item_name(rando_get_last_location_sent(), &item_str);
         sanitizeRandoText(item_str);
 
         char c = you_found_str[0];
@@ -1236,6 +1258,8 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         font->msgBuf.schar[msg_i] = 0x00;
         font->msgBuf.schar[msg_i + 1] = '!';
         font->msgBuf.schar[msg_i + 2] = 0xBF;
+
+        recomp_free(item_str);
     }
 
     // for reverse-engineering text

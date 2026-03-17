@@ -97,11 +97,11 @@ void RandoMenu_Main(GameState* thisx) {
     // Perform the original setup init after connection.
     if (rando_started) {
         // Set the filename based on the seed and session type.
-        char seed_name[64];
+        char* seed_name;
+        char* slot_name;
         char file_name[72];
-        char slot_name[20];
-        rando_get_seed_name(seed_name, sizeof(seed_name));
-        rando_get_own_slot_name(slot_name);
+        rando_get_seed_name(&seed_name, sizeof(seed_name));
+        rando_get_own_slot_name(&slot_name);
         if (is_multiworld) {
             sprintf(file_name, "multi_%s_%s", slot_name, seed_name);
         }
