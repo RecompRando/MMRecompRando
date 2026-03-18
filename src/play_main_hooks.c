@@ -66,231 +66,231 @@ void removeAllScoutsWithPrefix(u32 prefix) {
 void randoScout() {
     rando_queue_scouts_all();
 
-    if (rando_get_slotdata_u32("skullsanity") == 2)
-    {
-        for (int i = 0x00; i <= 0x1E; ++i)
-        {
-            if (i == 0x03)
-            {
-                continue;
-            }
+    // if (rando_get_slotdata_u32("skullsanity") == 2)
+    // {
+    //     for (int i = 0x00; i <= 0x1E; ++i)
+    //     {
+    //         if (i == 0x03)
+    //         {
+    //             continue;
+    //         }
             
-            u32 location_id = 0x062700 | i;
-            rando_remove_queued_scout(location_id);
-        }
-        for (int i = 0x01; i <= 0x1E; ++i)
-        {
-            u32 location_id = 0x062800 | i;
-            rando_remove_queued_scout(location_id);
-        }
-    }
+    //         u32 location_id = 0x062700 | i;
+    //         rando_remove_queued_scout(location_id);
+    //     }
+    //     for (int i = 0x01; i <= 0x1E; ++i)
+    //     {
+    //         u32 location_id = 0x062800 | i;
+    //         rando_remove_queued_scout(location_id);
+    //     }
+    // }
     
-    for (u32 i = rando_get_slotdata_u32("starting_heart_locations"); i < 8; ++i)
-    {
-        u32 location_id = 0x0D0000 | i;
-        rando_remove_queued_scout(location_id);
-    }
+    // for (u32 i = rando_get_slotdata_u32("starting_heart_locations"); i < 8; ++i)
+    // {
+    //     u32 location_id = 0x0D0000 | i;
+    //     rando_remove_queued_scout(location_id);
+    // }
 
-    if (rando_get_slotdata_u32("cowsanity") == 0)
-    {
-        for (int i = 0x10; i <= 0x17; ++i)
-        {
-            u32 location_id = 0xBEEF00 | i;
-            rando_remove_queued_scout(location_id);
-        }
-    }
+    // if (rando_get_slotdata_u32("cowsanity") == 0)
+    // {
+    //     for (int i = 0x10; i <= 0x17; ++i)
+    //     {
+    //         u32 location_id = 0xBEEF00 | i;
+    //         rando_remove_queued_scout(location_id);
+    //     }
+    // }
     
-    if (rando_get_slotdata_u32("scrubsanity") == 0)
-    {
-        rando_remove_queued_scout(0x090100 | GI_MAGIC_BEANS);
-        rando_remove_queued_scout(0x090100 | GI_BOMB_BAG_40);
-        rando_remove_queued_scout(0x090100 | GI_POTION_GREEN);
-        rando_remove_queued_scout(0x090100 | GI_POTION_BLUE);
-    }
+    // if (rando_get_slotdata_u32("scrubsanity") == 0)
+    // {
+    //     rando_remove_queued_scout(0x090100 | GI_MAGIC_BEANS);
+    //     rando_remove_queued_scout(0x090100 | GI_BOMB_BAG_40);
+    //     rando_remove_queued_scout(0x090100 | GI_POTION_GREEN);
+    //     rando_remove_queued_scout(0x090100 | GI_POTION_BLUE);
+    // }
     
-    if (rando_get_slotdata_u32("shopsanity") != 2)
-    {
-        rando_remove_queued_scout(0x05481E);
-        rando_remove_queued_scout(0x024234);
+    // if (rando_get_slotdata_u32("shopsanity") != 2)
+    // {
+    //     rando_remove_queued_scout(0x05481E);
+    //     rando_remove_queued_scout(0x024234);
         
-        if (rando_get_slotdata_u32("shopsanity") == 1)
-        {
-            for (int i = SI_FAIRY_2; i <= SI_POTION_RED_3; ++i)
-            {
-                u32 location_id = 0x090000 | i;
-                rando_remove_queued_scout(location_id);
-            }
+    //     if (rando_get_slotdata_u32("shopsanity") == 1)
+    //     {
+    //         for (int i = SI_FAIRY_2; i <= SI_POTION_RED_3; ++i)
+    //         {
+    //             u32 location_id = 0x090000 | i;
+    //             rando_remove_queued_scout(location_id);
+    //         }
             
-            rando_remove_queued_scout(0x090000 | SI_BOMB_3);
-            rando_remove_queued_scout(0x090000 | SI_ARROWS_SMALL_3);
-            rando_remove_queued_scout(0x090000 | SI_POTION_RED_6);
-        }
-        else
-        {
-            for (int i = SI_POTION_RED_1; i <= SI_POTION_RED_6; ++i)
-            {
-                if (i == SI_BOMB_BAG_20_1 || i == SI_BOMB_BAG_40)
-                {
-                    continue;
-                }
+    //         rando_remove_queued_scout(0x090000 | SI_BOMB_3);
+    //         rando_remove_queued_scout(0x090000 | SI_ARROWS_SMALL_3);
+    //         rando_remove_queued_scout(0x090000 | SI_POTION_RED_6);
+    //     }
+    //     else
+    //     {
+    //         for (int i = SI_POTION_RED_1; i <= SI_POTION_RED_6; ++i)
+    //         {
+    //             if (i == SI_BOMB_BAG_20_1 || i == SI_BOMB_BAG_40)
+    //             {
+    //                 continue;
+    //             }
                 
-                u32 location_id = 0x090000 | i;
-                rando_remove_queued_scout(location_id);
-            }
+    //             u32 location_id = 0x090000 | i;
+    //             rando_remove_queued_scout(location_id);
+    //         }
             
-            rando_remove_queued_scout(0x090013);
-            rando_remove_queued_scout(0x090015);
+    //         rando_remove_queued_scout(0x090013);
+    //         rando_remove_queued_scout(0x090015);
             
-            rando_remove_queued_scout(0x026392);
-            rando_remove_queued_scout(0x090000 | GI_CHATEAU);
-            rando_remove_queued_scout(0x006792);
-            rando_remove_queued_scout(0x000091);
-        }
-    }
+    //         rando_remove_queued_scout(0x026392);
+    //         rando_remove_queued_scout(0x090000 | GI_CHATEAU);
+    //         rando_remove_queued_scout(0x006792);
+    //         rando_remove_queued_scout(0x000091);
+    //     }
+    // }
     
-    if (rando_get_slotdata_u32("curiostity_shop_trades") == 0)
-    {
-        rando_remove_queued_scout(0x07C402);
-        rando_remove_queued_scout(0x07C404);
-        rando_remove_queued_scout(0x07C405);
-        rando_remove_queued_scout(0x07C407);
-    }
+    // if (rando_get_slotdata_u32("curiostity_shop_trades") == 0)
+    // {
+    //     rando_remove_queued_scout(0x07C402);
+    //     rando_remove_queued_scout(0x07C404);
+    //     rando_remove_queued_scout(0x07C405);
+    //     rando_remove_queued_scout(0x07C407);
+    // }
     
-    if (rando_get_slotdata_u32("intro_checks") == 0)
-    {
-        rando_remove_queued_scout(0x061A00);
-        // ignore intro grass
-        for (int j = 0; j <= 0xFF; j++) {
-            rando_remove_queued_scout(AP_PREFIX_GRASS_KEATON | (SCENE_OPENINGDAN << 8) | j);
-            rando_remove_queued_scout(AP_PREFIX_GRASS_KEATON | (SCENE_LOST_WOODS << 8) | j);
-            rando_remove_queued_scout(AP_PREFIX_MURE_GRASS | (SCENE_LOST_WOODS << 8) | j);
-        }
-    }
+    // if (rando_get_slotdata_u32("intro_checks") == 0)
+    // {
+    //     rando_remove_queued_scout(0x061A00);
+    //     // ignore intro grass
+    //     for (int j = 0; j <= 0xFF; j++) {
+    //         rando_remove_queued_scout(AP_PREFIX_GRASS_KEATON | (SCENE_OPENINGDAN << 8) | j);
+    //         rando_remove_queued_scout(AP_PREFIX_GRASS_KEATON | (SCENE_LOST_WOODS << 8) | j);
+    //         rando_remove_queued_scout(AP_PREFIX_MURE_GRASS | (SCENE_LOST_WOODS << 8) | j);
+    //     }
+    // }
     
-    if (rando_get_slotdata_u32("grasssanity") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_GRASS_GROUP);
-        removeAllScoutsWithPrefix(AP_PREFIX_GRASS_GROUP2);
-        removeAllScoutsWithPrefix(AP_PREFIX_GRASS_KUSA);
-        removeAllScoutsWithPrefix(AP_PREFIX_GRASS_KEATON);
-        removeAllScoutsWithPrefix(AP_PREFIX_MURE_GRASS);
-    }
+    // if (rando_get_slotdata_u32("grasssanity") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_GRASS_GROUP);
+    //     removeAllScoutsWithPrefix(AP_PREFIX_GRASS_GROUP2);
+    //     removeAllScoutsWithPrefix(AP_PREFIX_GRASS_KUSA);
+    //     removeAllScoutsWithPrefix(AP_PREFIX_GRASS_KEATON);
+    //     removeAllScoutsWithPrefix(AP_PREFIX_MURE_GRASS);
+    // }
     
-    if (rando_get_slotdata_u32("potsanity") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_POTS);
-    }
+    // if (rando_get_slotdata_u32("potsanity") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_POTS);
+    // }
     
-    if (rando_get_slotdata_u32("hitsanity") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_HITSPOT);
-    }
+    // if (rando_get_slotdata_u32("hitsanity") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_HITSPOT);
+    // }
     
-    if (rando_get_slotdata_u32("rocksanity") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_ROCKS);
-        removeAllScoutsWithPrefix(AP_PREFIX_BOULDERS);
-        removeAllScoutsWithPrefix(AP_PREFIX_MURE_ROCKS);
-    }
+    // if (rando_get_slotdata_u32("rocksanity") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_ROCKS);
+    //     removeAllScoutsWithPrefix(AP_PREFIX_BOULDERS);
+    //     removeAllScoutsWithPrefix(AP_PREFIX_MURE_ROCKS);
+    // }
     
-    if (rando_get_slotdata_u32("soilsanity") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_SOIL);
-    }
+    // if (rando_get_slotdata_u32("soilsanity") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_SOIL);
+    // }
     
-    if (rando_get_slotdata_u32("rupeesanity") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_FREESTANDING);
-        removeAllScoutsWithPrefix(AP_PREFIX_SONGWALL);
-    }
+    // if (rando_get_slotdata_u32("rupeesanity") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_FREESTANDING);
+    //     removeAllScoutsWithPrefix(AP_PREFIX_SONGWALL);
+    // }
     
-    if (rando_get_slotdata_u32("invisisanity") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_INVISRUPEES);
-    }
+    // if (rando_get_slotdata_u32("invisisanity") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_INVISRUPEES);
+    // }
     
-    if (rando_get_slotdata_u32("snowsanity") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_SNOWBALLS);
-    }
+    // if (rando_get_slotdata_u32("snowsanity") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_SNOWBALLS);
+    // }
     
-    if (rando_get_slotdata_u32("woodsanity") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_SMALL_CRATES);
-        removeAllScoutsWithPrefix(AP_PREFIX_BIG_CRATES);
-        removeAllScoutsWithPrefix(AP_PREFIX_BARRELS);
-    }
+    // if (rando_get_slotdata_u32("woodsanity") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_SMALL_CRATES);
+    //     removeAllScoutsWithPrefix(AP_PREFIX_BIG_CRATES);
+    //     removeAllScoutsWithPrefix(AP_PREFIX_BARRELS);
+    // }
     
-    if (rando_get_slotdata_u32("realfairysanity") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_FAIRIES);
-        removeAllScoutsWithPrefix(AP_PREFIX_GOSSIP);
-        removeAllScoutsWithPrefix(AP_PREFIX_BUTTERFLIES);
-    }
+    // if (rando_get_slotdata_u32("realfairysanity") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_FAIRIES);
+    //     removeAllScoutsWithPrefix(AP_PREFIX_GOSSIP);
+    //     removeAllScoutsWithPrefix(AP_PREFIX_BUTTERFLIES);
+    // }
     
-    if (rando_get_slotdata_u32("iciclesanity") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_ICICLES);
-    }
+    // if (rando_get_slotdata_u32("iciclesanity") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_ICICLES);
+    // }
     
-    if (rando_get_slotdata_u32("scarecrowsanity") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_SCARECROW);
-    }
+    // if (rando_get_slotdata_u32("scarecrowsanity") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_SCARECROW);
+    // }
     
-    if (rando_get_slotdata_u32("hivesanity") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_BEEHIVES);
-    }
+    // if (rando_get_slotdata_u32("hivesanity") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_BEEHIVES);
+    // }
     
-    if (rando_get_slotdata_u32("notebooksanity") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_NOTEBOOK);
-    }
+    // if (rando_get_slotdata_u32("notebooksanity") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_NOTEBOOK);
+    // }
     
-    if (rando_get_slotdata_u32("owlsanity") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_OWLS);
-    }
+    // if (rando_get_slotdata_u32("owlsanity") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_OWLS);
+    // }
     
-    if (rando_get_slotdata_u32("frogsanity") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_FROGS);
-    }
+    // if (rando_get_slotdata_u32("frogsanity") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_FROGS);
+    // }
     
-    if (rando_get_slotdata_u32("treesanity") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_PALM_TREES);
-        removeAllScoutsWithPrefix(AP_PREFIX_SNOW_TREES);
-        removeAllScoutsWithPrefix(AP_PREFIX_WOOD_TREES);
-        removeAllScoutsWithPrefix(AP_PREFIX_TREE_TREES);
-    }
+    // if (rando_get_slotdata_u32("treesanity") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_PALM_TREES);
+    //     removeAllScoutsWithPrefix(AP_PREFIX_SNOW_TREES);
+    //     removeAllScoutsWithPrefix(AP_PREFIX_WOOD_TREES);
+    //     removeAllScoutsWithPrefix(AP_PREFIX_TREE_TREES);
+    // }
     
-    if (rando_get_slotdata_u32("websanity") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_WEBS);
-    }
+    // if (rando_get_slotdata_u32("websanity") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_WEBS);
+    // }
     
-    if (rando_get_slotdata_u32("flowersanity") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_FLOWERS);
-    }
+    // if (rando_get_slotdata_u32("flowersanity") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_FLOWERS);
+    // }
     
-    if (rando_get_slotdata_u32("signsanity") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_SIGNS);
-    }
+    // if (rando_get_slotdata_u32("signsanity") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_SIGNS);
+    // }
 
-    if (rando_get_slotdata_u32("oneoffs") == 0)
-    {
-        removeAllScoutsWithPrefix(AP_PREFIX_ONEOFFS);
-        removeAllScoutsWithPrefix(0x063F00); // goron trial chest
-    }
+    // if (rando_get_slotdata_u32("oneoffs") == 0)
+    // {
+    //     removeAllScoutsWithPrefix(AP_PREFIX_ONEOFFS);
+    //     removeAllScoutsWithPrefix(0x063F00); // goron trial chest
+    // }
     
-    if (rando_get_slotdata_u32("completion_goal") == 0)
-    {
-        rando_remove_queued_scout(0x0B012F);
-    }
+    // if (rando_get_slotdata_u32("completion_goal") == 0)
+    // {
+    //     rando_remove_queued_scout(0x0B012F);
+    // }
 
     rando_send_queued_scouts(0);
 }
@@ -833,36 +833,36 @@ u32 rando_get_item_id(u32 location)
         }
     }
     
-    // TODO: make this not work
-    u32 receiving_player = rando_get_location_item_player_id(location);
+    // // TODO: make this not work
+    // u32 receiving_player = rando_get_location_item_player_id(location);
 
-    if (rando_get_game_is_oot(receiving_player)) {
-        switch (rando_get_location_type(location))
-        {
-            case RANDO_ITEM_CLASS_PROGRESSION:
-            case RANDO_ITEM_CLASS_TRAP:
-                return GI_OOT_ITEM_PROG;
-            case RANDO_ITEM_CLASS_USEFUL:
-                return GI_OOT_ITEM_USEFUL;
-            case RANDO_ITEM_CLASS_JUNK:
-            default:
-                return GI_OOT_ITEM_FILLER;
-        }
-    }
+    // if (rando_get_game_is_oot(receiving_player)) {
+    //     switch (rando_get_location_type(location))
+    //     {
+    //         case RANDO_ITEM_CLASS_PROGRESSION:
+    //         case RANDO_ITEM_CLASS_TRAP:
+    //             return GI_OOT_ITEM_PROG;
+    //         case RANDO_ITEM_CLASS_USEFUL:
+    //             return GI_OOT_ITEM_USEFUL;
+    //         case RANDO_ITEM_CLASS_JUNK:
+    //         default:
+    //             return GI_OOT_ITEM_FILLER;
+    //     }
+    // }
     
-    if (rando_get_game_is_ww(receiving_player)) {
-        switch (rando_get_location_type(location))
-        {
-            case RANDO_ITEM_CLASS_PROGRESSION:
-            case RANDO_ITEM_CLASS_TRAP:
-                return GI_WW_ITEM_PROG;
-            case RANDO_ITEM_CLASS_USEFUL:
-                return GI_WW_ITEM_USEFUL;
-            case RANDO_ITEM_CLASS_JUNK:
-            default:
-                return GI_WW_ITEM_FILLER;
-        }
-    }
+    // if (rando_get_game_is_ww(receiving_player)) {
+    //     switch (rando_get_location_type(location))
+    //     {
+    //         case RANDO_ITEM_CLASS_PROGRESSION:
+    //         case RANDO_ITEM_CLASS_TRAP:
+    //             return GI_WW_ITEM_PROG;
+    //         case RANDO_ITEM_CLASS_USEFUL:
+    //             return GI_WW_ITEM_USEFUL;
+    //         case RANDO_ITEM_CLASS_JUNK:
+    //         default:
+    //             return GI_WW_ITEM_FILLER;
+    //     }
+    // }
 
     switch (rando_get_location_type(location)) {
         case RANDO_ITEM_CLASS_PROGRESSION:
