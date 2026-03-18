@@ -889,6 +889,7 @@ void update_rando(PlayState* play) {
     gPlay = play;
 
     notificationUpdateCycle();
+    rando_populate(); // in an ideal world this only runs after LocationInfo is recieved
 
     if (saveOpened) {
         new_items_size = rando_get_items_size();
