@@ -11,7 +11,8 @@ static void connectPressed(RecompuiResource resource, const RecompuiEventData* d
         char* server_text = recompui_get_input_text(connect_menu.server_textinput);
         char* slot_text = recompui_get_input_text(connect_menu.slot_textinput);
         char* password_text = recompui_get_input_text(connect_menu.password_textinput);
-        bool success = rando_init(server_text, slot_text, password_text);
+        char* connection_failed_msg;
+        bool success = rando_init(server_text, slot_text, password_text, &connection_failed_msg);
 
         if (success) {
             randoStart(true);
@@ -23,7 +24,8 @@ static void connectPressed(RecompuiResource resource, const RecompuiEventData* d
         }
         else {
             recompui_close_context(connect_menu.context);
-            randoEmitErrorNotification("Failed to connect");
+            // randoEmitErrorNotification("Failed to connect");
+            randoEmitErrorNotification(connection_failed_msg);
             recompui_open_context(connect_menu.context);
         }
 
