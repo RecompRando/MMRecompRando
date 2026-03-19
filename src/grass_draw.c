@@ -183,6 +183,9 @@ void ObjGrass_DrawOpaRando(Actor* thisx, PlayState* play2) {
     // @recomp Extract this actor's ID.
     u32 actor_id = actor_transform_id(thisx);
 
+    // @glue push the interpreter on the stack to reduce lag from deactivations
+    REPY_PushInterpreter(rando_interp);
+
     for (i = 0; i < this->activeGrassGroups; i++) {
         grassGroup = &this->grassGroups[i];
 
@@ -219,6 +222,9 @@ void ObjGrass_DrawOpaRando(Actor* thisx, PlayState* play2) {
         }
     }
 
+    // @glue deactivate the interpreter
+    REPY_PopInterpreter();
+
     CLOSE_DISPS(play->state.gfxCtx);
 }
 
@@ -239,6 +245,9 @@ void ObjGrass_DrawXluRando(Actor* thisx, PlayState* play) {
     
     // @recomp Extract this actor's ID.
     u32 actor_id = actor_transform_id(thisx);
+
+    // @glue push the interpreter on the stack to reduce lag from deactivations
+    REPY_PushInterpreter(rando_interp);
 
     for (i = 0; i < this->activeGrassGroups; i++) {
         grassGroup = &this->grassGroups[i];
@@ -269,6 +278,9 @@ void ObjGrass_DrawXluRando(Actor* thisx, PlayState* play) {
             }
         }
     }
+
+    // @glue deactivate the interpreter
+    REPY_PopInterpreter();
 
     CLOSE_DISPS(play->state.gfxCtx);
 }
