@@ -880,6 +880,8 @@ RECOMP_DECLARE_EVENT(rando_on_start());
 
 bool rando_met_all_goal();
 
+bool last_deathlink_status;
+
 RECOMP_CALLBACK("*", recomp_on_play_main)
 void update_rando(PlayState* play) {
     u32 new_items_size;
@@ -1079,6 +1081,11 @@ void update_rando(PlayState* play) {
             randoItemGive(item_id);
 
             old_items_size += 1;
+        }
+
+        if (recomp_get_config_u32("deathlink") != last_deathlink_status) {
+            last_deathlink_status = recomp_get_config_u32("deathlink");
+            rando_toggle_death_link(recomp_get_config_u32("deathlink"));
         }
 
         if (play->pauseCtx.state == 0 && rando_get_death_link_enabled() && rando_get_death_link_pending()) {

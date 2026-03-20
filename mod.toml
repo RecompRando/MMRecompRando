@@ -72,10 +72,19 @@ additional_files = [ "thumb.dds" ]
 [[manifest.config_options]]
 id = "notification_position"
 name = "Notification Position"
-description = "Sets where incoming item notifications appear on your screen"
+description = "Sets where incoming item notifications appear on your screen."
 type = "Enum"
 options = [ "Top Left", "Top Right", "Bottom Left", "Bottom Right" ]
 default = "Top Left"
+
+[[manifest.config_options]]
+id = "deathlink"
+name = "DeathLink"
+description = """- Multiworlds Only -
+Sets if you die when other players who also have "DeathLink" enabled die - the reverse is true as well."""
+type = "Enum"
+options = [ "Disabled", "Enabled" ]
+default = "Enabled"
 
 [[manifest.config_options]]
 id = "camc_enabled"
