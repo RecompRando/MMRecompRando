@@ -44,6 +44,7 @@ u32 reverseERLookup(u32 placements, u32 index) {
 RECOMP_HOOK("Play_Init")
 void onPlayInit(GameState* thisx) {
     PlayState* play = (PlayState*)thisx;
+    gPlay = play;
 
     switch (gSaveContext.save.entrance) {
         // change the intro cutscene where you fall down into a new cycle
@@ -146,6 +147,12 @@ void onPlayInit(GameState* thisx) {
     //         return;
     //     }
     // }
+}
+
+RECOMP_HOOK_RETURN("Play_Init")
+void postPlayInit() {
+    // send the current scene id to datastorage
+    rando_datastorage_replace_u32("scene", (u32)gPlay->sceneId);
 }
 
 // returns a fake sceneId based on different parameters
