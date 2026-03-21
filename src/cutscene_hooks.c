@@ -44,22 +44,17 @@ void memcpy(u8* __dest, u8* __src, size_t __n) {
     }
 }
 
-RECOMP_PATCH s16 CutsceneManager_Start(s16 csId, Actor* actor) {
+// remind me to completely gut this for a better goal system
+RECOMP_HOOK("CutsceneManager_Start")
+void completeGoal(s16 csId, Actor* actor) {
     ActorCutscene* csEntry;
-    Camera* subCam;
-    Camera* retCam;
     s32 csType = 0;
-    s16 actor_id = -1;
-
+    
     if ((csId <= CS_ID_NONE) || (sCutsceneMgr.csId != CS_ID_NONE)) {
-        return csId;
+        return;
     }
 
-    sCutsceneMgr.startMethod = CS_START_0;
     csEntry = CutsceneManager_GetCutsceneEntryImpl(csId);
-
-    ShrinkWindow_Letterbox_SetSizeTarget(csEntry->letterboxSize);
-    CutsceneManager_SetHudVisibility(csEntry->hudVisibility);
 
     if (csId == CS_ID_GLOBAL_END) {
         csType = 1;
@@ -81,49 +76,6 @@ RECOMP_PATCH s16 CutsceneManager_Start(s16 csId, Actor* actor) {
     if (csId == 9 && csType == 1 && csEntry->scriptIndex == 0 && ((u32) csEntry) == 0x807137D4) {
         rando_complete_goal();
     }
-
-    if (csType != 0) {
-        sCutsceneMgr.retCamId = Play_GetActiveCamId(sCutsceneMgr.play);
-        sCutsceneMgr.subCamId = Play_CreateSubCamera(sCutsceneMgr.play);
-
-        subCam = Play_GetCamera(sCutsceneMgr.play, sCutsceneMgr.subCamId);
-        retCam = Play_GetCamera(sCutsceneMgr.play, sCutsceneMgr.retCamId);
-
-        if ((retCam->setting == CAM_SET_START0) || (retCam->setting == CAM_SET_START2) ||
-            (retCam->setting == CAM_SET_START1)) {
-            if (CutsceneManager_FindEntranceCsId() != csId) {
-                func_800E0348(retCam);
-            } else {
-                Camera_UnsetStateFlag(retCam, CAM_STATE_2);
-            }
-        }
-
-        memcpy((u8*) subCam, (u8*) retCam, sizeof(Camera));
-        subCam->camId = sCutsceneMgr.subCamId;
-        Camera_UnsetStateFlag(subCam, CAM_STATE_6 | CAM_STATE_0);
-
-        Play_ChangeCameraStatus(sCutsceneMgr.play, sCutsceneMgr.retCamId, CAM_STATUS_WAIT);
-        Play_ChangeCameraStatus(sCutsceneMgr.play, sCutsceneMgr.subCamId, CAM_STATUS_ACTIVE);
-
-        subCam->target = sCutsceneMgr.targetActor = actor;
-        subCam->behaviorFlags = 0;
-
-        if (csType == 1) {
-            Camera_ChangeSetting(subCam, CAM_SET_FREE0);
-            Cutscene_StartScripted(sCutsceneMgr.play, csEntry->scriptIndex);
-            sCutsceneMgr.length = csEntry->length;
-        } else {
-            if (csEntry->csCamId != CS_CAM_ID_NONE) {
-                Camera_ChangeActorCsCamIndex(subCam, csEntry->csCamId);
-            } else {
-                Camera_ChangeSetting(subCam, CAM_SET_FREE0);
-            }
-            sCutsceneMgr.length = csEntry->length;
-        }
-    }
-    sCutsceneMgr.csId = csId;
-
-    return csId;
 }
 
 RECOMP_PATCH s16 CutsceneManager_MarkNextCutscenes(void) {
