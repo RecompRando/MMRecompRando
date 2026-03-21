@@ -111,10 +111,3 @@ RECOMP_PATCH s16 CutsceneManager_MarkNextCutscenes(void) {
     }
     return count;
 }
-
-RECOMP_PATCH void CutsceneManager_Queue(s16 csId) {
-    //recomp_printf("queueing csId: 0x%04X\n", csId);
-    if (csId > CS_ID_NONE) {
-        sWaitingCutsceneList[csId >> 3] |= 1 << (csId & 7);
-    }
-}
