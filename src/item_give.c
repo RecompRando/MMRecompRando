@@ -1627,7 +1627,7 @@ RECOMP_PATCH s32 Actor_OfferGetItem(Actor* actor, PlayState* play, GetItemId get
     return false;
 }
 
-s32 Actor_OfferGetItemHook(Actor* actor, PlayState* play, GetItemId getItemId, u32 location, f32 xzRange, f32 yRange, bool use_workaround, bool item_is_shuffled) {
+RECOMP_EXPORT s32 Actor_OfferGetItemHook(Actor* actor, PlayState* play, GetItemId getItemId, u32 location, f32 xzRange, f32 yRange, bool use_workaround, bool item_is_shuffled) {
     Player* player = GET_PLAYER(play);
 
     if (!(player->stateFlags1 &

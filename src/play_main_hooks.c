@@ -673,7 +673,7 @@ ItemId randoConvertItemId(u32 ap_item_id) {
     }
 }
 
-u32 rando_get_item_id(u32 location)
+RECOMP_EXPORT u32 rando_get_item_id(u32 location)
 {
     if (location == 0) return GI_NONE;
     

@@ -3,12 +3,13 @@
 
 #include "apcommon.h"
 
-// we'll come back to this later
+// this is temporary until all mods using these exports swap to the actual functions
+// they will likely need to include https://github.com/LT-Schmiddy/recomp-rando-python-glue/blob/master/include_in_dependents/rando_glue.h
 
-// // Sending Checks
-// RECOMP_EXPORT s32 Actor_OfferGetItemHookExternal(Actor* actor, PlayState* play, GetItemId getItemId, u32 location, f32 xzRange, f32 yRange, bool use_workaround, bool item_is_shuffled) {
-//     return Actor_OfferGetItemHook(actor, play, getItemId, location, xzRange, yRange, use_workaround, item_is_shuffled);
-// }
+// Sending Checks
+RECOMP_EXPORT s32 Actor_OfferGetItemHookExternal(Actor* actor, PlayState* play, GetItemId getItemId, u32 location, f32 xzRange, f32 yRange, bool use_workaround, bool item_is_shuffled) {
+    return Actor_OfferGetItemHook(actor, play, getItemId, location, xzRange, yRange, use_workaround, item_is_shuffled);
+}
 
 // RECOMP_EXPORT void rando_send_location_external(u32 location_id) {
 //     return rando_send_location(location_id);
@@ -19,14 +20,14 @@
 //     return rando_location_is_checked(location_id);
 // }
 
-// RECOMP_EXPORT bool rando_location_is_checked_external(u32 location_id) {
-//     return rando_location_is_checked(location_id);
-// }
+RECOMP_EXPORT bool rando_location_is_checked_external(u32 location_id) {
+    return rando_location_is_checked(location_id);
+}
 
-// // Get Simple Data From Rando
-// RECOMP_EXPORT u32 rando_get_random_seed_external() {
-//     return rando_get_random_seed();
-// }
+// Get Simple Data From Rando
+RECOMP_EXPORT u32 rando_get_random_seed_external() {
+    return rando_get_random_seed();
+}
 
 // RECOMP_EXPORT u32 rando_get_moon_remains_required_external() {
 //     return rando_get_slotdata_u32("moon_remains_required");
@@ -48,10 +49,10 @@
 //     return rando_get_location_type(location_id);
 // }
 
-// // Get Randomizer/Archipelago Specific Data
-// RECOMP_EXPORT u32 rando_get_item_id_external(u32 location_id) {
-//     return rando_get_item_id(location_id);
-// }
+// Get Randomizer/Archipelago Specific Data
+RECOMP_EXPORT u32 rando_get_item_id_external(u32 location_id) {
+    return rando_get_item_id(location_id);
+}
 
 // RECOMP_EXPORT void rando_broadcast_location_hint_external(u32 location_id) {
 //     return rando_broadcast_location_hint(location_id);
