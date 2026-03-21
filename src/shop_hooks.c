@@ -29,6 +29,18 @@ typedef enum {
 
 #include "overlays/actors/ovl_En_Trt/z_en_trt.h"
 
+s32 rando_get_shop_price(u32 shop_item_id) {
+    REPY_FN_SETUP_RANDO;
+    REPY_FN_SET_U32("shop_item_id", shop_item_id);
+    REPY_FN_EVAL_CACHE_S32(
+        py_rando_get_shop_price,
+        "recomp_data.ctx.slot_data['shop_prices'][shop_item_id]\n",
+        price
+    );
+    REPY_FN_CLEANUP;
+    return price;
+}
+
 // Curiosity Shop
 void EnFsn_SetupResumeInteraction(EnFsn* this, PlayState* play);
 void EnFsn_PlayerCannotBuy(EnFsn* this, PlayState* play);

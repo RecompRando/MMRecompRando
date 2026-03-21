@@ -163,6 +163,8 @@ u8 getItemColor(u32 location) {
 
 void Message_FindMessage(PlayState* play, u16 textId);
 
+s32 rando_get_shop_price(u32 shop_item_id);
+
 RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
     MessageContext* msgCtx = &play->msgCtx;
     Font* font = &msgCtx->font;
@@ -809,12 +811,11 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         msg = shop_msg;
         font->msgBuf.schar[0] = 0x06;
         font->msgBuf.schar[1] = 0x30;
-        price = 10; // temp
-        // if (textId == 0x0880) {
-        //     price = rando_get_shop_price(0x02); // SI_POTION_BLUE
-        // } else {
-        //     price = rando_get_shop_price(textId & 0xFF);
-        // }
+        if (textId == 0x0880) {
+            price = rando_get_shop_price(0x02); // SI_POTION_BLUE
+        } else {
+            price = rando_get_shop_price(textId & 0xFF);
+        }
         // recomp_printf("shop price: %d 0x%02X%02X\n", price, ((price & 0xFF00) >> 8), (price & 0xFF));
         font->msgBuf.schar[5] = (price & 0xFF00) >> 8;
         font->msgBuf.schar[6] = price & 0xFF;
