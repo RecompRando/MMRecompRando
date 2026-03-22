@@ -47,11 +47,6 @@ void init_rando()
     dsot_set_skip_dsot_cutscene(true);
     registerActorExtensions();
 
-    randoCreateStartMenu();
-    randoCreateSoloMenu();
-    randoCreateYamlConfigMenu();
-    randoCreateAPConnectMenu();
-
     randoCreateNotificationContainer();
 }
 
