@@ -466,7 +466,7 @@ extern Gfx gBoxChestLidOrnateDL[];
 extern Gfx gBoxChestLidGildedDL[];
 extern Gfx gBoxChestLidDL[];
 
-Gfx* GenericContainer_SetTextures(PlayState* play, Gfx* gfx, u8* customDraw, u32 location);
+Gfx* GenericContainer_SetTextures(PlayState* play, Gfx* gfx, u8* customDraw, u32 location, bool overrideChecked);
 
 RECOMP_PATCH void EnBox_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList, Vec3s* rot, Actor* thisx, Gfx** gfx) {
     EnBox* this = THIS;
@@ -482,7 +482,7 @@ RECOMP_PATCH void EnBox_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList
     s16 getItem = rando_get_item_id(location);
     if (limbIndex == OBJECT_BOX_CHEST_LIMB_01) {
         gSPMatrix((*gfx)++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
-        *gfx = GenericContainer_SetTextures(play, (*gfx), &customDraw, location);
+        *gfx = GenericContainer_SetTextures(play, (*gfx), &customDraw, location, true);
         if (customDraw == CAMC_DRAW_ENABLED) {
             gSPDisplayList((*gfx)++, randoChestBaseDL);
         } else if (customDraw == CAMC_DRAW_CUSTOM) {
@@ -513,7 +513,7 @@ RECOMP_PATCH void EnBox_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList
         }
     } else if (limbIndex == OBJECT_BOX_CHEST_LIMB_03) {
         gSPMatrix((*gfx)++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
-        *gfx = GenericContainer_SetTextures(play, (*gfx), &customDraw, location);
+        *gfx = GenericContainer_SetTextures(play, (*gfx), &customDraw, location, true);
         if (customDraw == CAMC_DRAW_ENABLED || customDraw == CAMC_DRAW_CUSTOM) {
             if (getItem == GI_AP_FILLER) {
                 gSPDisplayList((*gfx)++, randoChestLidJunkDL);

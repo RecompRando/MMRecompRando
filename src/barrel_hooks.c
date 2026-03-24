@@ -52,7 +52,7 @@ void ObjTaru_DropBarricadeItem(ObjTaru* this, PlayState* play) {
 extern Gfx gObjTaruBreakablePiratePanelDL[];
 extern Gfx gObjTaruBarrelDL[];
 
-Gfx* GenericContainer_SetTextures(PlayState* play, Gfx* gfx, u8* customDraw, u32 location);
+Gfx* GenericContainer_SetTextures(PlayState* play, Gfx* gfx, u8* customDraw, u32 location, bool overrideChecked);
 
 RECOMP_PATCH void ObjTaru_Draw(Actor* thisx, PlayState* play) {
     u32* barrelLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
@@ -63,7 +63,7 @@ RECOMP_PATCH void ObjTaru_Draw(Actor* thisx, PlayState* play) {
     gSPDisplayList(POLY_OPA_DISP++, gSetupDLs[SETUPDL_25]);
     gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
 
-    POLY_OPA_DISP = GenericContainer_SetTextures(play, POLY_OPA_DISP, &customDraw, *barrelLocation);
+    POLY_OPA_DISP = GenericContainer_SetTextures(play, POLY_OPA_DISP, &customDraw, *barrelLocation, false);
     if (rando_get_slotdata_u32("woodsanity") && customDraw) {
         if (OBJ_TARU_GET_80(thisx)) {
             gSPDisplayList(POLY_OPA_DISP++, randoBreakablePiratePanelDL);
