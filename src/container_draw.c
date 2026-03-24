@@ -9,8 +9,9 @@
 
 #include "models/container_textures.h"
 
-Gfx* GenericContainer_SetTextures(PlayState* play, Gfx* gfx, u8* customDraw, u32 location) {
-    if (rando_location_is_checked(location) || !rando_get_camc_enabled()) {
+Gfx* GenericContainer_SetTextures(PlayState* play, Gfx* gfx, u8* customDraw, u32 location, bool overrideChecked) {
+    // override chests from being disabled if their location was checked
+    if ((rando_location_is_checked(location) && !overrideChecked) || !rando_get_camc_enabled()) {
         *customDraw = CAMC_DRAW_DISABLED;
         return gfx;
     }

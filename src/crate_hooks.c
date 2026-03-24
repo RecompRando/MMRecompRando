@@ -13,7 +13,7 @@
 #define LOCATION_CRATE_BIG (AP_PREFIX_BIG_CRATES | (play->sceneId << 8) | (play->roomCtx.curRoom.num << 4) \
                             | randoGetLoadedActorNumInSameRoom(play, thisx))
 
-Gfx* GenericContainer_SetTextures(PlayState* play, Gfx* gfx, u8* customDraw, u32 location);
+Gfx* GenericContainer_SetTextures(PlayState* play, Gfx* gfx, u8* customDraw, u32 location, bool overrideChecked);
 
 // small crate
 RECOMP_HOOK("ObjKibako_Init")
@@ -42,7 +42,7 @@ RECOMP_PATCH void ObjKibako_Draw(Actor* thisx, PlayState* play) {
     gSPDisplayList(POLY_OPA_DISP++, gSetupDLs[SETUPDL_25]);
     gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
 
-    POLY_OPA_DISP = GenericContainer_SetTextures(play, POLY_OPA_DISP, &customDraw, *crateSmallLocation);
+    POLY_OPA_DISP = GenericContainer_SetTextures(play, POLY_OPA_DISP, &customDraw, *crateSmallLocation, false);
     if (rando_get_slotdata_u32("woodsanity") && customDraw) {
         if (KIBAKO_BANK_INDEX(thisx) == 0) {
             gSPDisplayList(POLY_OPA_DISP++, randoSmallCrateDangeonDL);
@@ -98,7 +98,7 @@ RECOMP_PATCH void ObjKibako2_Draw(Actor* thisx, PlayState* play) {
     gSPDisplayList(POLY_OPA_DISP++, gSetupDLs[SETUPDL_25]);
     gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
 
-    POLY_OPA_DISP = GenericContainer_SetTextures(play, POLY_OPA_DISP, &customDraw, *crateBigLocation);
+    POLY_OPA_DISP = GenericContainer_SetTextures(play, POLY_OPA_DISP, &customDraw, *crateBigLocation, false);
     if (rando_get_slotdata_u32("woodsanity") && customDraw) {
         gSPDisplayList(POLY_OPA_DISP++, randoLargeCrateDL);
     } else {
