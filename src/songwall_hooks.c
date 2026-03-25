@@ -30,7 +30,7 @@ RECOMP_PATCH void EnGakufu_GiveReward(EnGakufu* this, PlayState* play) {
         //     location = LOCATION_SONGWALL_HOUR(hour, i);
         // }
         
-        if (!rando_location_is_checked(location)) {
+        if (!rando_location_is_checked(location) && rando_get_slotdata_u32("rupeesanity")) {
             Item_RandoDropCollectible(play, &sRewardDropsSpawnTerminaFieldPos, ITEM00_APITEM, location);
         } else {
             Item_DropCollectible(play, &sRewardDropsSpawnTerminaFieldPos, sRewardDrops[i + sRewardDropsIndex[hour]]);
