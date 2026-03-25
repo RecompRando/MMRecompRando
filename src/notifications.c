@@ -311,15 +311,14 @@ RecompuiTextureHandle notification_get_item_image(const u8 item) {
 }
 
 RecompuiColor* notification_get_item_classification_color(RandoItemClassification item_class) {
-    switch (item_class) {
-        case RANDO_ITEM_CLASS_PROGRESSION:
-            return &progTextColor;
-        case RANDO_ITEM_CLASS_USEFUL:
-            return &usefulTextColor;
-        case RANDO_ITEM_CLASS_JUNK:
-            return &junkTextColor;
-        case RANDO_ITEM_CLASS_TRAP:
-            return &trapTextColor;
+    if (item_class & RANDO_ITEM_CLASS_PROGRESSION) {
+        return &progTextColor;
+    } else if (item_class & RANDO_ITEM_CLASS_USEFUL) {
+        return &usefulTextColor;
+    } else if (item_class & RANDO_ITEM_CLASS_JUNK) {
+        return &junkTextColor;
+    } else if (item_class & RANDO_ITEM_CLASS_TRAP) {
+        return &trapTextColor;
     }
 
     return &msgTextColor;

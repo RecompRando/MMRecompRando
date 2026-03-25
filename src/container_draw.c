@@ -93,24 +93,20 @@ Gfx* GenericContainer_SetTextures(PlayState* play, Gfx* gfx, u8* customDraw, u32
             // redundant due to GI models
             if (!rando_get_location_has_local_item(location)) {
                 *customDraw = CAMC_DRAW_CUSTOM;
-                switch (rando_get_location_type(location)) {
-                    case RANDO_ITEM_CLASS_PROGRESSION:
-                    case RANDO_ITEM_CLASS_TRAP:
-                        front_tex = apProgFrontLeftTex;
-                        side_tex = apProgCornerTex;
-                        extra_tex = apProgFrontRightTex;
-                        break;
-                    case RANDO_ITEM_CLASS_USEFUL:
-                        front_tex = apUsefulFrontLeftTex;
-                        side_tex = apUsefulCornerTex;
-                        extra_tex = apUsefulFrontRightTex;
-                        break;
-                    case RANDO_ITEM_CLASS_JUNK:
-                    default:
-                        front_tex = apJunkFrontLeftTex;
-                        side_tex = apJunkCornerTex;
-                        extra_tex = apJunkFrontRightTex;
-                        break;
+                u32 item_type = rando_get_location_type(location);
+                if (item_type & RANDO_ITEM_CLASS_PROGRESSION ||
+                        item_type & RANDO_ITEM_CLASS_TRAP) {
+                    front_tex = apProgFrontLeftTex;
+                    side_tex = apProgCornerTex;
+                    extra_tex = apProgFrontRightTex;
+                } else if (item_type & RANDO_ITEM_CLASS_USEFUL) {
+                    front_tex = apUsefulFrontLeftTex;
+                    side_tex = apUsefulCornerTex;
+                    extra_tex = apUsefulFrontRightTex;
+                } else { // RANDO_ITEM_CLASS_JUNK
+                    front_tex = apJunkFrontLeftTex;
+                    side_tex = apJunkCornerTex;
+                    extra_tex = apJunkFrontRightTex;
                 }
             } else {
                 // switch (rando_get_location_type(location)) {

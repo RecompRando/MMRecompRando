@@ -819,7 +819,7 @@ void EnItem00_RandoTextAndFreeze(EnItem00* this, PlayState* play) {
 
     u32* item00Location = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
     u32 locationType = rando_get_location_type(*item00Location);
-    if (locationType != 0 && locationType != 2) {
+    if (locationType & RANDO_ITEM_CLASS_PROGRESSION || locationType & RANDO_ITEM_CLASS_TRAP) { // only freeze on prog/trap
         player->actor.freezeTimer = 10;
         player->stateFlags1 |= PLAYER_STATE1_20000000;
         
@@ -857,7 +857,7 @@ void EnItem00_RandoGive(EnItem00* this, PlayState* play, s32 getItemId, u32 loca
     this->unk152 = 35;
 
     u32 locationType = rando_get_location_type(location);
-    if (locationType != RANDO_ITEM_CLASS_JUNK && locationType != RANDO_ITEM_CLASS_USEFUL) {
+    if (locationType & RANDO_ITEM_CLASS_PROGRESSION || locationType & RANDO_ITEM_CLASS_TRAP) { // only freeze on prog/trap
         player->actor.freezeTimer = 10;
         player->stateFlags1 |= PLAYER_STATE1_20000000;
 
