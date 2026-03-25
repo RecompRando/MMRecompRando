@@ -329,7 +329,7 @@ typedef void REPY_DeferredCleanupHelper;
  * 
  * Takes no arguments, returns void.
  */
-#define REPY_ON_CONFIG_SUBINTERPRETERS RECOMP_CALLBACK(REPY_MOD_ID_STR, REPY_OnConfigSubinterpreters)
+#define REPY_ON_CONFIG_INTERPRETERS RECOMP_CALLBACK(REPY_MOD_ID_STR, REPY_OnConfigInterpreters)
 
 /**
  * @brief Event that runs immediately after `REPY_ON_INIT_SUBINTERPRETERS`. Used by the various global and static code caching macros.
@@ -369,16 +369,34 @@ typedef void REPY_DeferredCleanupHelper;
  * @brief Adds this .nrm file to Python's module search path.
  * 
  * This will allow you to add Python modules (both single files and module folders) to your mod by
- * including them under the `additional_files` section of your mod.toml
+ * including them under the `additional_files` section of your mod.toml. See \ref including_python_modules for more information.
  * 
- * These modules will be available by the time `REPY_ON_INIT` runs, and will be available to all subinterpreters.
+ * These modules will be available by the time `REPY_ON_CONFIG_INTERPRETERS` runs, and will be available to all subinterpreters.
+ * Unless you're creating a mod that bundles Python packages for other mods to use, this is likely not the behavior you want.
  */
-#define REPY_PREINIT_ADD_NRM_TO_SYS_PATH \
+#define REPY_PREINIT_ADD_NRM_TO_ALL_INTERPRETERS \
 REPY_ON_PRE_INIT void _repy_register_nrm () { \
     const unsigned char* nrm_file_path = recomp_get_mod_file_path(); \
     REPY_PreInitAddSysPath(nrm_file_path); \
     recomp_free((void*)nrm_file_path); \
 };
+
+
+/**
+ * @brief Adds this .nrm file to the main Python interpreter's module search path.
+ * 
+ * This will allow you to add Python modules (both single files and module folders) to your mod by
+ * including them under the `additional_files` section of your mod.toml. See \ref including_python_modules for more information.
+ * 
+ * These modules will be available during `REPY_ON_CONFIG_INTERPRETERS`.
+ */
+#define REPY_ADD_NRM_TO_MAIN_INTERPRETER \
+REPY_ON_CONFIG_INTERPRETERS void __repy_config_main_interpreter() { \
+    recomp_printf("Configuring Main Interpreter (Index %i)\n", 0); \
+    REPY_PushInterpreter(subinterp_identifier); \
+    REPY_AddNrmToSysPath(); \
+    REPY_PopInterpreter(); \
+} 
 
  /**
   * @brief Use this macro at the global level of a C file to initialize a subinterpreter on startup.
@@ -387,15 +405,15 @@ REPY_ON_PRE_INIT void _repy_register_nrm () { \
   * for which is set via the `subinterp_identifier` argument.
   * 
   * This macro also adds this .nrm to the import path`sys.path` for the new subinterpreter, meaning that
-  * the subinterpreter can import Python modules stored within the .nrm.
+  * the subinterpreter can import Python modules stored within the `.nrm`. See \ref including_python_modules for more information.
   */
 #define REPY_REGISTER_SUBINTERPRETER(subinterp_identifier) \
 REPY_InterpreterIndex subinterp_identifier = 0; \
-REPY_ON_PRE_INIT void subinterp_identifier ## _register() { \
+REPY_ON_PRE_INIT void __repy_config_ ## subinterp_identifier () { \
     subinterp_identifier = REPY_PreInitRegisterSubinterpreter(); \
     recomp_printf("Registering Subinterpreter '%s' (Index %i)\n", #subinterp_identifier, subinterp_identifier); \
 } \
-REPY_ON_CONFIG_SUBINTERPRETERS void subinterp_identifier ## _config() { \
+REPY_ON_CONFIG_INTERPRETERS void subinterp_identifier ## _config() { \
     recomp_printf("Configuring Subinterpreter '%s' (Index %i)\n", #subinterp_identifier, subinterp_identifier); \
     REPY_PushInterpreter(subinterp_identifier); \
     REPY_AddNrmToSysPath(); \
@@ -2234,10 +2252,23 @@ REPY_IMPORT(REPY_Handle REPY_CopyHandle(REPY_Handle handle_no_release));
 /** @}*/
 
 /** \defgroup repy_interpreter_funcs (Sub)Interpreter Functions
- * \brief Functions Used for Python interpreter/subinterpreter operations.
+ * \brief Functions Used for REPY's Interpreter Stack, which handles interpreter/subinterpreter operations as well as `PyThreadState` management.
  * 
- * REPY manages the lifetime of the main Python interpreter and subinterpreters for you, keeping track of each interpreter via a
- * `REPY_InterpreterIndex` value.
+ * REPY used a free-threaded build of Python, with the traditional Python GIL is a non-factor. However, the CPython still needs to know whether
+ * or not a given thread needs access to the interpreter (and when subinterpreters are in use, which interpreter) using an opaque struct in CPython
+ * called `PyThreadState`.
+ *
+ * Because the mod developer has no control over what other mods a player may install, and whether these mods use REPY, no single mod can be given 
+ * responsibility for managing the `PyThreadState` directly. Therefore, REPY implements something called the Interpreter Stack: If a given mod code
+ * thread requires access to the main interpreter, a call to `REPY_PushInterpreter` tells REPY a mod needs access to a specific interpreter, and a 
+ * call to `REPY_PopInterpreter` tells REPY that the previously requested access is no longer needed. Using this, REPY itself manages the `PyThreadState`
+ * of a given N64Recompiled thread, making changes to the state only necessary.
+ * 
+ * For this reason, it is recommended to call `REPY_PushInterpreter` at the top of any function that needs Python interpreter access, and to call
+ * `REPY_PopInterpreter` before that function returns. The exception is when `REPY_FN` macros, as the setup and cleanup macros will automatically do 
+ * this for you.
+ * 
+ waitr* See \ref repy_performance_interpreter_stack for potential performance pitfalls related to Interpreter Stack management.
  * 
  * See \ref subinterpreters for more information on what they are, and REPY's usage of them.
  * 
@@ -2913,7 +2944,7 @@ REPY_IMPORT(REPY_Handle REPY_MemcpyToByteArray(void* src, REPY_u32 len, REPY_boo
  * @param dst The beginning of the memory region to write to. 
  * @param len The size of the destination region to copy, in bytes. 
  * @param reverse Set to `false` to copy normally, or `true` to reverse the byte order of the data being copied.
- * @param bytes_obj The Python `bytearray` object to copy from.
+ * @param buffer The Python buffer object to copy from.
  * @return The number of bytes actually copied.
  */
 REPY_IMPORT(REPY_u32 REPY_MemcpyFromBuffer(void* dst, REPY_u32 len, REPY_bool reverse, REPY_Handle buffer));
@@ -2930,8 +2961,8 @@ REPY_IMPORT(REPY_u32 REPY_MemcpyFromBuffer(void* dst, REPY_u32 len, REPY_bool re
  * Behavior with Python types other than `bytearray` is undefined, and may change between versions.
  * 
  * @param reverse Set to `false` to copy normally, or `true` to reverse the byte order of the data being copied.
- * @param bytes_obj The Python `bytearray` object to copy from.
- * @param write_size A pointer to a `u32`, where the number of bytes copied can be written to.
+ * @param buffer The Python buffer object to copy from.
+ * @param write_size A pointer to a `u32`, where the number of bytes copied can be written to. Can be NULL.
  * @return A `void*` to the data copied into mod memory.
  */
 REPY_IMPORT(void* REPY_AllocAndCopyBuffer(REPY_bool reverse, REPY_Handle buffer, REPY_u32* write_size));
