@@ -212,14 +212,10 @@ RECOMP_PATCH void EnBox_Init(Actor* thisx, PlayState* play) {
         if (LOCATION_ENBOX == 0x061700) {
             chestType = rando_get_location_type(LOCATION_ENBOX_CHEST_GAME);
         }
-        switch (chestType) {
-            case 0:
-            case 2:
-                this->type = ENBOX_TYPE_SMALL;
-                break;
-            default:
-                this->type = ENBOX_TYPE_BIG;
-                break;
+        if (chestType & RANDO_ITEM_CLASS_PROGRESSION || chestType & RANDO_ITEM_CLASS_TRAP) { // might make traps small as a minor hint
+            this->type = ENBOX_TYPE_BIG;
+        } else {
+            this->type = ENBOX_TYPE_SMALL;
         }
     }
 
@@ -488,15 +484,10 @@ RECOMP_PATCH void EnBox_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList
         } else if (customDraw == CAMC_DRAW_CUSTOM) {
             gSPDisplayList((*gfx)++, randoChestBaseAsymmetricDL);
         } else if (rando_get_camc_enabled() && customDraw != CAMC_DRAW_UNCHECKED) { // unchecked is redundant in-game
-            switch (rando_get_location_type(location)) {
-                case RANDO_ITEM_CLASS_PROGRESSION:
-                case RANDO_ITEM_CLASS_USEFUL:
-                case RANDO_ITEM_CLASS_TRAP:
-                    gSPDisplayList((*gfx)++, &gBoxChestBaseGildedDL);
-                    break;
-                case RANDO_ITEM_CLASS_JUNK:
-                    gSPDisplayList((*gfx)++, &gBoxChestBaseDL);
-                    break;
+            if (rando_get_location_type(location) == RANDO_ITEM_CLASS_JUNK) {
+                gSPDisplayList((*gfx)++, &gBoxChestBaseDL);
+            } else {
+                gSPDisplayList((*gfx)++, &gBoxChestBaseGildedDL);
             }
         } else {
             if (ENBOX_GET_TYPE(&this->dyna.actor) == ENBOX_TYPE_BIG_ORNATE) {
@@ -521,15 +512,10 @@ RECOMP_PATCH void EnBox_PostLimbDraw(PlayState* play, s32 limbIndex, Gfx** dList
                 gSPDisplayList((*gfx)++, randoChestLidDL);
             }
         } else if (rando_get_camc_enabled() && customDraw != CAMC_DRAW_UNCHECKED) { // unchecked is redundant in-game
-            switch (rando_get_location_type(location)) {
-                case RANDO_ITEM_CLASS_PROGRESSION:
-                case RANDO_ITEM_CLASS_USEFUL:
-                case RANDO_ITEM_CLASS_TRAP:
-                    gSPDisplayList((*gfx)++, &gBoxChestLidGildedDL);
-                    break;
-                case RANDO_ITEM_CLASS_JUNK:
-                    gSPDisplayList((*gfx)++, &gBoxChestLidDL);
-                    break;
+            if (rando_get_location_type(location) == RANDO_ITEM_CLASS_JUNK) {
+                gSPDisplayList((*gfx)++, &gBoxChestLidDL);
+            } else {
+                gSPDisplayList((*gfx)++, &gBoxChestLidGildedDL);
             }
         } else {
             if (ENBOX_GET_TYPE(&this->dyna.actor) == ENBOX_TYPE_BIG_ORNATE) {

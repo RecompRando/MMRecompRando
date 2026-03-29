@@ -859,15 +859,14 @@ RECOMP_EXPORT u32 rando_get_item_id(u32 location)
     //     }
     // }
 
-    switch (rando_get_location_type(location)) {
-        case RANDO_ITEM_CLASS_PROGRESSION:
-        case RANDO_ITEM_CLASS_TRAP:
-            return GI_AP_PROG;
-        case RANDO_ITEM_CLASS_USEFUL:
-            return GI_AP_USEFUL;
-        case RANDO_ITEM_CLASS_JUNK:
-        default:
-            return GI_AP_FILLER;
+    u32 item_type = rando_get_location_type(location);
+    if (item_type & RANDO_ITEM_CLASS_PROGRESSION ||
+            item_type & RANDO_ITEM_CLASS_TRAP) {
+        return GI_AP_PROG;
+    } else if (item_type & RANDO_ITEM_CLASS_USEFUL) {
+        return GI_AP_USEFUL;
+    } else { // RANDO_ITEM_CLASS_JUNK
+        return GI_AP_FILLER;
     }
 }
 

@@ -183,17 +183,16 @@ bool get_rando_color(Color_RGB8* rColor, u32 location) {
             *rColor = randoSpiderColor;
             return true;
         default:
-            switch (rando_get_location_type(location)) {
-                case RANDO_ITEM_CLASS_PROGRESSION:
-                case RANDO_ITEM_CLASS_TRAP:
-                    *rColor = rainbowColor;
-                    return true;
-                case RANDO_ITEM_CLASS_USEFUL:
-                    *rColor = randoUsefulColor;
-                    return true;
-                case RANDO_ITEM_CLASS_JUNK:
-                default:
-                    return false;
+            u32 item_type = rando_get_location_type(location);
+            if (item_type & RANDO_ITEM_CLASS_PROGRESSION ||
+                    item_type & RANDO_ITEM_CLASS_TRAP) {
+                *rColor = rainbowColor;
+                return true;
+            } else if (item_type & RANDO_ITEM_CLASS_USEFUL) {
+                *rColor = randoUsefulColor;
+                return true;
+            } else { // RANDO_ITEM_CLASS_JUNK
+                return false;
             }
     }
 }
