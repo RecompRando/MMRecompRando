@@ -345,10 +345,12 @@ u8 getTextId(s16 gi);
 
 extern s8 giToItemId[];
 
-#define RANDO_ITEM_CLASS_JUNK           0b000
-#define RANDO_ITEM_CLASS_PROGRESSION    0b001
-#define RANDO_ITEM_CLASS_USEFUL         0b010
-#define RANDO_ITEM_CLASS_TRAP           0b100
+typedef enum {
+    RANDO_ITEM_CLASS_JUNK           = 0b000,
+    RANDO_ITEM_CLASS_PROGRESSION    = 0b001,
+    RANDO_ITEM_CLASS_USEFUL         = 0b010,
+    RANDO_ITEM_CLASS_TRAP           = 0b100
+} RandoItemClassification;
 
 void randoCreateStartMenu();
 void randoShowStartMenu();
