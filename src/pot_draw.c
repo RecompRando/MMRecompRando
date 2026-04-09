@@ -85,35 +85,26 @@ void GenericPot_DrawRando(PlayState* play, u32 location, u8 potType) {
             pot_top_tex = pot_spider_top;
             break;
         default:
+            u32 item_type = rando_get_location_type(location);
             if (!rando_get_location_has_local_item(location)) {
-                switch (rando_get_location_type(location)) {
-                    case RANDO_ITEM_CLASS_PROGRESSION:
-                    case RANDO_ITEM_CLASS_TRAP:
-                        pot_side_tex = pot_prog_side;
-                        pot_top_tex = pot_prog_top;
-                        break;
-                    case RANDO_ITEM_CLASS_USEFUL:
-                        pot_side_tex = pot_useful_side;
-                        pot_top_tex = pot_useful_top;
-                        break;
-                    case RANDO_ITEM_CLASS_JUNK:
-                    default:
-                        pot_side_tex = pot_filler_side;
-                        pot_top_tex = pot_filler_top;
-                        break;
+                if (item_type & RANDO_ITEM_CLASS_PROGRESSION ||
+                        item_type & RANDO_ITEM_CLASS_TRAP) {
+                    pot_side_tex = pot_prog_side;
+                    pot_top_tex = pot_prog_top;
+                } else if (item_type & RANDO_ITEM_CLASS_USEFUL) {
+                    pot_side_tex = pot_useful_side;
+                    pot_top_tex = pot_useful_top;
+                } else { // RANDO_ITEM_CLASS_JUNK
+                    pot_side_tex = pot_filler_side;
+                    pot_top_tex = pot_filler_top;
                 }
             } else {
-                switch (rando_get_location_type(location)) {
-                    case RANDO_ITEM_CLASS_PROGRESSION:
-                    case RANDO_ITEM_CLASS_TRAP:
-                        pot_side_tex = pot_major_side;
-                        pot_top_tex = pot_major_top;
-                        break;
-                    case RANDO_ITEM_CLASS_USEFUL:
-                    case RANDO_ITEM_CLASS_JUNK:
-                    default:
-                        drawOriginal = true;
-                        break;
+                if (item_type & RANDO_ITEM_CLASS_PROGRESSION ||
+                        item_type & RANDO_ITEM_CLASS_TRAP) {
+                    pot_side_tex = pot_major_side;
+                    pot_top_tex = pot_major_top;
+                } else { // useful/junk
+                    drawOriginal = true;
                 }
             }
     }
