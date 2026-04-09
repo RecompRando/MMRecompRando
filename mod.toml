@@ -81,6 +81,16 @@ options = [ "Top Left", "Top Right", "Bottom Left", "Bottom Right" ]
 default = "Top Left"
 
 [[manifest.config_options]]
+id = "local_notifications"
+name = "Show Local Notifications"
+description = """Sets if you want to be notified when your player/slot recieves an item.
+
+This is mainly useful to those wanting to play co-op on the same "slot" within a multiworld."""
+type = "Enum"
+options = [ "Disabled", "Enabled" ]
+default = "Disabled"
+
+[[manifest.config_options]]
 id = "deathlink"
 name = "DeathLink"
 description = """- Multiworlds Only -
