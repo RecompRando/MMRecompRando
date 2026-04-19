@@ -30,6 +30,10 @@ void AfterEnRuppecrow_SpawnRupee() {
     EnRuppecrow* this = sEnRuppecrow;
     PlayState* play = gPlay;
 
+    if (!rando_get_slotdata_u32("rupeesanity")) {
+        return;
+    }
+
     Player* player = GET_PLAYER(play);
     f32 xOffset;
     s16 rupeeIndex = this->rupeeIndex - 1;
@@ -51,7 +55,7 @@ void AfterEnRuppecrow_SpawnRupee() {
     }
 }
 
-// prevent rupee crow dropped items from despawning
+// prevent rupee crow dropped items from despawning (should this only happen for rupeesanity?)
 RECOMP_PATCH void EnRuppecrow_UpdateRupees(EnRuppecrow* this) {
     // EnItem00* rupee;
     // s16 rupeeIndex;
