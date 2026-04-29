@@ -161,6 +161,12 @@ RECOMP_PATCH void Sram_InitNewSave(void) {
     SET_EQUIP_VALUE(EQUIP_TYPE_SHIELD, EQUIP_VALUE_SHIELD_NONE);
     CUR_FORM_EQUIP(EQUIP_SLOT_B) = ITEM_NONE;
 
+    if (!rando_get_slotdata_u32("magic_is_a_trap")) {
+        if (!rando_has_item(AP_ITEM_ID_MAGIC)) {
+            gSaveContext.save.saveInfo.playerData.magic = 0;
+        }
+    }
+
     Sram_GenerateRandomSaveFields();
 
     gSaveContext.save.saveInfo.playerData.threeDayResetCount = 1;
