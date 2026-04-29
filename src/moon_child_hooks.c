@@ -2,6 +2,9 @@
 #include "global.h"
 
 #include "apcommon.h"
+#include "eztr_api.h"
+EZTR_DECLARE_CUSTOM_MSG_HANDLE(Rando_Moon_Child_Return);
+
 
 #define MOONCHILD_LIMB_MAX 0x12
 #include "overlays/actors/ovl_En_Js/z_en_js.h"
@@ -43,7 +46,7 @@ RECOMP_PATCH void func_8096A38C(EnJs* this, PlayState* play) {
                             case 0:
                                 // @rando send player back to first day if they don't meet the victory condition
                                 if (!rando_met_majora_condition()) {
-                                    Message_ContinueTextbox(play, 0x2778);
+                                    Message_ContinueTextbox(play, EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_Moon_Child_Return)));
                                     Animation_MorphToPlayOnce(&this->skelAnime, &gMoonChildGettingUpAnim, -5.0f);
                                     this->unk_2B8 |= 0x10;
                                     break;
@@ -83,7 +86,7 @@ RECOMP_PATCH void func_8096A38C(EnJs* this, PlayState* play) {
                             case 0:
                                 // @rando send player back to first day if they don't meet the victory condition
                                 if (rando_location_is_checked(GI_MASK_FIERCE_DEITY) && !rando_met_majora_condition()) {
-                                    Message_ContinueTextbox(play, 0x2778);
+                                    Message_ContinueTextbox(play, EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_Moon_Child_Return)));
                                     Animation_MorphToPlayOnce(&this->skelAnime, &gMoonChildGettingUpAnim, -5.0f);
                                     this->unk_2B8 |= 0x10;
                                     break;
@@ -103,30 +106,29 @@ RECOMP_PATCH void func_8096A38C(EnJs* this, PlayState* play) {
                         break;
 
                     // @rando send player back to first day if they don't meet the victory condition
-                    case 0x2778:
-                        switch (play->msgCtx.choiceIndex) {
-                            case 0:
-                                Message_CloseTextbox(play);
-                                SET_EVENTINF(EVENTINF_TRIGGER_DAYTELOP);
-                                gSaveContext.save.day = 0;
-                                gSaveContext.respawnFlag = -4;
-                                play->nextEntrance = ENTRANCE(SOUTH_CLOCK_TOWN, 0);
-                                gSaveContext.save.entrance = play->nextEntrance;
-                                play->transitionTrigger = TRANS_TRIGGER_START;
-                                play->transitionType = TRANS_TYPE_FADE_BLACK;
-                                Sram_SaveEndOfCycle(play);
-                                break;
-
-                            case 1:
-                                Message_ContinueTextbox(play, 0x21FD);
-                                break;
-
-                            default:
-                                break;
-                        }
-                        break;
-
                     default:
+                        if (play->msgCtx.currentTextId == EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_Moon_Child_Return))) {
+                            switch (play->msgCtx.choiceIndex) {
+                                case 0:
+                                    Message_CloseTextbox(play);
+                                    SET_EVENTINF(EVENTINF_TRIGGER_DAYTELOP);
+                                    gSaveContext.save.day = 0;
+                                    gSaveContext.respawnFlag = -4;
+                                    play->nextEntrance = ENTRANCE(SOUTH_CLOCK_TOWN, 0);
+                                    gSaveContext.save.entrance = play->nextEntrance;
+                                    play->transitionTrigger = TRANS_TRIGGER_START;
+                                    play->transitionType = TRANS_TYPE_FADE_BLACK;
+                                    Sram_SaveEndOfCycle(play);
+                                    break;
+
+                                case 1:
+                                    Message_ContinueTextbox(play, 0x21FD);
+                                    break;
+
+                                default:
+                                    break;
+                            }
+                        }
                         break;
                 }
             }
@@ -187,7 +189,7 @@ void EnJs_PreventFightAfterFDOffer(EnJs* this, PlayState* play) {
     if (Actor_ProcessTalkRequest(&this->actor, &play->state)) {
         this->actor.flags &= ~ACTOR_FLAG_10000;
         this->actionFunc = func_8096A38C;
-        Message_StartTextbox(play, 0x2778, &this->actor);
+        Message_StartTextbox(play, EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_Moon_Child_Return)), &this->actor);
     } else {
         Actor_OfferTalkExchange(&this->actor, play, 1000.0f, 1000.0f, PLAYER_IA_MINUS1);
     }
