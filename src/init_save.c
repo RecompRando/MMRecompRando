@@ -157,7 +157,9 @@ RECOMP_PATCH void Sram_InitNewSave(void) {
     gSaveContext.save.saveInfo.playerData.healthCapacity = 0x10;
     gSaveContext.save.saveInfo.playerData.health = 0x10;
 
+    SET_EQUIP_VALUE(EQUIP_TYPE_SWORD, EQUIP_VALUE_SWORD_NONE);
     SET_EQUIP_VALUE(EQUIP_TYPE_SHIELD, EQUIP_VALUE_SHIELD_NONE);
+    CUR_FORM_EQUIP(EQUIP_SLOT_B) = ITEM_NONE;
 
     Sram_GenerateRandomSaveFields();
 
@@ -216,7 +218,7 @@ void Sram_ResetSaveCycle(PlayState* play) {
                 BUTTON_ITEM_EQUIP(0, EQUIP_SLOT_B) = ITEM_SWORD_KOKIRI + sword_level - 1;
             }
         }
-        SET_EQUIP_VALUE(EQUIP_TYPE_SWORD, EQUIP_VALUE_SWORD_KOKIRI + sword_level - 1);
+        SET_EQUIP_VALUE(EQUIP_TYPE_SWORD, MIN(sword_level, EQUIP_VALUE_SWORD_GILDED));
     }
 
     if ((STOLEN_ITEM_1 == ITEM_SWORD_GREAT_FAIRY) || (STOLEN_ITEM_2 == ITEM_SWORD_GREAT_FAIRY)) {
