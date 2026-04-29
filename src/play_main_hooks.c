@@ -602,6 +602,25 @@ bool rando_get_camc_enabled() {
     return recomp_get_config_u32("camc_enabled");
 }
 
+// TODO: properly account for all different types of saves
+RECOMP_HOOK("Sram_StartWriteToFlashDefault")
+void rando_save_state_normally() {
+    recomp_printf("saving rando state from normal saves\n");
+    rando_save_current_state();
+}
+
+RECOMP_HOOK("Sram_StartWriteToFlashOwlSave")
+void rando_save_state_from_owl() {
+    recomp_printf("saving rando state from owls\n");
+    rando_save_current_state();
+}
+
+RECOMP_CALLBACK("*", recomp_on_autosave)
+void rando_handle_autosaves(PlayState* play) {
+    recomp_printf("saving rando state from autosave\n");
+    rando_save_current_state();
+}
+
 ItemId randoConvertItemId(u32 ap_item_id) {
     ap_item_id &= 0xFFFFFF;
 
@@ -884,161 +903,24 @@ void update_rando(PlayState* play) {
 
     gPlay = play;
 
+    // @glue push the interpreter on the stack to reduce lag from deactivations
+    REPY_PushInterpreter(rando_interp);
+
+    REPY_FN_SETUP_RANDO;
+
     notificationUpdateCycle();
     rando_populate_locations(); // in an ideal world this only runs after LocationInfo is recieved
     rando_update_cache();
 
     if (saveOpened) {
-        new_items_size = rando_get_items_size();
-
         if (!initItems) {
-            u8 new_bow_level = rando_has_item(GI_QUIVER_30);
-            u8 new_bomb_level = rando_has_item(GI_BOMB_BAG_20);
-            u8 new_wallet_level = rando_has_item(GI_WALLET_ADULT);
-            u8 new_sword_level = rando_has_item(GI_SWORD_KOKIRI);
-            u8 new_shield_level = rando_has_item(GI_SHIELD_HERO);
+            // TODO: account for each different type of save
+            REPY_FN_EXEC_CACHE(
+                py_rando_load_saved_state,
+                "RecompClient.run_async_task_and_wait_once(RecompClient.load_saved_state())\n" // async due to sending offline locations
+            );
 
-            u8 bottle_count = 0;
-
-            s16 old_health = gSaveContext.save.saveInfo.playerData.health;
-
-            u8 new_magic_level = rando_has_item(AP_ITEM_ID_MAGIC);
-
-            if (new_magic_level >= 1 && !gSaveContext.save.saveInfo.playerData.isMagicAcquired) {
-                randoItemGive(AP_ITEM_ID_MAGIC);
-            }
-
-            if (new_magic_level >= 2 && !gSaveContext.save.saveInfo.playerData.isDoubleMagicAcquired) {
-                randoItemGive(AP_ITEM_ID_MAGIC);
-            }
-
-            if (!rando_get_slotdata_u32("magic_is_a_trap")) {
-                if (new_magic_level < 1) {
-                    gSaveContext.save.saveInfo.playerData.magic = 0;
-                }
-            }
-
-            gSaveContext.save.saveInfo.playerData.healthCapacity = 0x10;
-            gSaveContext.save.saveInfo.playerData.health = 0x10;
-
-            if (GET_QUEST_HEART_PIECE_COUNT > 0) {
-                DECREMENT_QUEST_HEART_PIECE_COUNT;
-            }
-
-            SET_EQUIP_VALUE(EQUIP_TYPE_SWORD, EQUIP_VALUE_SWORD_NONE);
-            if (gSaveContext.save.playerForm == PLAYER_FORM_HUMAN) {
-                CUR_FORM_EQUIP(EQUIP_SLOT_B) = ITEM_NONE;
-            } else {
-                BUTTON_ITEM_EQUIP(0, EQUIP_SLOT_B) = ITEM_NONE;
-            }
-            Interface_LoadItemIconImpl(play, EQUIP_SLOT_B);
-
-            new_bow_level -= CUR_UPG_VALUE(UPG_QUIVER);
-            for (i = 0; i < new_bow_level; ++i) {
-                randoItemGive(GI_QUIVER_30);
-            }
-
-            new_bomb_level -= CUR_UPG_VALUE(UPG_BOMB_BAG);
-            for (i = 0; i < new_bomb_level; ++i) {
-                randoItemGive(GI_BOMB_BAG_20);
-            }
-
-            new_wallet_level -= CUR_UPG_VALUE(UPG_WALLET);
-            for (i = 0; i < new_wallet_level; ++i) {
-                randoItemGive(GI_WALLET_ADULT);
-            }
-
-            new_sword_level -= GET_CUR_EQUIP_VALUE(EQUIP_TYPE_SWORD);
-            for (i = 0; i < new_sword_level; ++i) {
-                randoItemGive(GI_SWORD_KOKIRI);
-            }
-
-            new_shield_level -= GET_CUR_EQUIP_VALUE(EQUIP_TYPE_SHIELD);
-            for (i = 0; i < new_shield_level; ++i) {
-                randoItemGive(GI_SHIELD_HERO);
-            }
-
-            for (i = SLOT_BOTTLE_1; i <= SLOT_BOTTLE_6; ++i) {
-                if ((gSaveContext.save.saveInfo.inventory.items[i] >= ITEM_POTION_RED && gSaveContext.save.saveInfo.inventory.items[i] <= ITEM_OBABA_DRINK) || gSaveContext.save.saveInfo.inventory.items[i] == ITEM_BOTTLE) {
-                    bottle_count += 1;
-                }
-            }
-
-            if (rando_has_item(GI_BOMBCHUS_1) || rando_has_item(GI_BOMBCHUS_5) || rando_has_item(GI_BOMBCHUS_10) || rando_has_item(GI_BOMBCHUS_20)) {
-                randoItemGive(GI_BOMBCHUS_20);
-            }
-
-            gSaveContext.save.saveInfo.skullTokenCount = 0;
-            gSaveContext.save.saveInfo.skullTokenCount |= rando_has_item(GI_TRUE_SKULL_TOKEN) << 0x10;
-            gSaveContext.save.saveInfo.skullTokenCount |= rando_has_item(GI_OCEAN_SKULL_TOKEN);
-
-            gSaveContext.save.saveInfo.inventory.strayFairies[0] = rando_has_item(AP_ITEM_ID_STRAY_FAIRY_WOODFALL);
-            gSaveContext.save.saveInfo.inventory.strayFairies[1] = rando_has_item(AP_ITEM_ID_STRAY_FAIRY_SNOWHEAD);
-            gSaveContext.save.saveInfo.inventory.strayFairies[2] = rando_has_item(AP_ITEM_ID_STRAY_FAIRY_GREATBAY);
-            gSaveContext.save.saveInfo.inventory.strayFairies[3] = rando_has_item(AP_ITEM_ID_STRAY_FAIRY_STONETOWER);
-
-            DUNGEON_KEY_COUNT(0) = rando_has_item(0x090078);
-            DUNGEON_KEY_COUNT(1) = rando_has_item(0x090178);
-            DUNGEON_KEY_COUNT(2) = rando_has_item(0x090278);
-            DUNGEON_KEY_COUNT(3) = rando_has_item(0x090378);
-
-            for (i = old_items_size; i < new_items_size; ++i) {
-                u32 item_id = rando_get_item(i) & 0xFFFFFF;
-                u8 gi = item_id & 0xFF;
-                bool is_gi = (item_id & 0xFF0000) == 0;
-                if (is_gi) {
-                    if ((gi == GI_BOMBCHUS_1 || gi == GI_BOMBCHUS_5 || gi == GI_BOMBCHUS_10 || gi == GI_BOMBCHUS_20) && INV_HAS(ITEM_BOMBCHU)) {
-                        continue;
-                    }
-                    switch (gi) {
-                        case GI_POTION_RED_BOTTLE:
-                        case GI_CHATEAU_BOTTLE:
-                        case GI_BOTTLE:
-                        case GI_MILK_BOTTLE:
-                            if (bottle_count > 0) {
-                                bottle_count -= 1;
-                                continue;
-                            }
-                            break;
-                        case GI_QUIVER_30:
-                        case GI_BOMB_BAG_20:
-                        case GI_WALLET_ADULT:
-                        case GI_SWORD_KOKIRI:
-                        case GI_SHIELD_HERO:
-                        case GI_TRUE_SKULL_TOKEN:
-                        case GI_OCEAN_SKULL_TOKEN:
-                            continue;
-                    }
-                    if (gi == GI_HEART_CONTAINER || gi == GI_HEART_PIECE) {
-                        old_health = 0x140;
-                    }
-                } else {
-                    switch (item_id) {
-                        case AP_ITEM_ID_MAGIC:
-                        case AP_ITEM_ID_STRAY_FAIRY_WOODFALL:
-                        case AP_ITEM_ID_STRAY_FAIRY_SNOWHEAD:
-                        case AP_ITEM_ID_STRAY_FAIRY_GREATBAY:
-                        case AP_ITEM_ID_STRAY_FAIRY_STONETOWER:
-                        case AP_ITEM_ID_KEY_SMALL_WOODFALL:
-                        case AP_ITEM_ID_KEY_SMALL_SNOWHEAD:
-                        case AP_ITEM_ID_KEY_SMALL_GREATBAY:
-                        case AP_ITEM_ID_KEY_SMALL_STONETOWER:
-                            continue;
-                    }
-                    switch (item_id & 0xFF0000) {
-                        case 0x0A0000:
-                        case 0x0B0000:
-                        case 0x0C0000:
-                        case 0x0D0000:
-                        case 0x0E0000:
-                        case 0x0F0000:
-                            continue;
-                    }
-                }
-                randoItemGive(item_id);
-            }
-
-            gSaveContext.save.saveInfo.playerData.health = MIN(old_health, gSaveContext.save.saveInfo.playerData.healthCapacity);
+            // below is left over from our old system, keeping this here for safety
 
             if (gSaveContext.save.playerForm == PLAYER_FORM_FIERCE_DEITY) {
                 CUR_FORM_EQUIP(EQUIP_SLOT_B) = ITEM_SWORD_DEITY;
@@ -1055,26 +937,45 @@ void update_rando(PlayState* play) {
                 rando_send_location(0x0D0000 | i);
             }
 
-            old_items_size = new_items_size;
             initItems = true;
-
             rando_on_start();
         }
 
-        if (new_items_size > old_items_size) {
-            u32 item_id = rando_get_item(old_items_size);
-            if (rando_get_sending_player(old_items_size) != rando_get_own_slot_id() || rando_get_item_location(old_items_size) <= 0) {
+        REPY_FN_EXEC_CACHE(
+            py_rando_get_new_items,
+            "from collections import Counter\n"
+            "ctx = recomp_data.ctx\n"
+            "new_items = list((Counter(ctx.items_received) - Counter(ctx.local_received)).elements())\n" // sure man
+            // "if new_items:\n"
+            // "    print(new_items)\n"
+        );
+
+        REPY_FN_FOREACH_CACHE(py_rando_handle_new_items, "network_item", "new_items") {
+            REPY_FN_EXEC_CACHE(
+                py_rando_give_new_item,
+                "item_id = network_item.item\n"
+                "location = network_item.player\n"
+                "player = network_item.player\n"
+                "item_type = network_item.flags\n"
+                "ctx.local_received.append(network_item)\n"
+            );
+
+            u32 item_id = REPY_FN_GET_U32("item_id");
+            u32 location = REPY_FN_GET_U32("location");
+            u32 player = REPY_FN_GET_U32("player");
+            u32 item_type = REPY_FN_GET_U32("item_type");
+
+            // note: this could probably be done differently, but partially uses old systems for now
+            if (player != rando_get_own_slot_id() || recomp_get_config_u32("local_notifications")) {
                 char* item_name;
                 char* player_name;
                 rando_get_item_name_from_id(item_id, &item_name);
-                rando_get_sending_player_name(old_items_size, &player_name);
-                randoEmitRecieveNotification(item_name, player_name, randoConvertItemId(item_id), RANDO_ITEM_CLASS_PROGRESSION); // TODO: fix item classification
+                rando_get_sending_player_name(location, &player_name);
+                randoEmitRecieveNotification(item_name, player_name, randoConvertItemId(item_id), item_type);
                 recomp_free(item_name);
                 recomp_free(player_name);
             }
             randoItemGive(item_id);
-
-            old_items_size += 1;
         }
 
         if (recomp_get_config_u32("deathlink") != last_deathlink_status) {
@@ -1109,6 +1010,10 @@ void update_rando(PlayState* play) {
         // CURRENT_DAY
         
     }
+
+    // @glue deactivate the interpreter
+    REPY_FN_CLEANUP;
+    REPY_PopInterpreter();
 }
 
 RECOMP_HOOK("FileSelect_Main")
