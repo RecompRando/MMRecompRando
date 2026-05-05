@@ -217,7 +217,7 @@ EZTR_MSG_CALLBACK(randoPictograph) {
                 EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "picture" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
             }
 }
-
+extern GetItemEntryAP sGetItemTable_ap[];
 //Replacements of existing IDs
 EZTR_ON_INIT void init_text() {
     EZTR_Basic_ReplaceText(
@@ -530,7 +530,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got a " EZTR_CC_COLOR_PINK "Woodfall " EZTR_CC_COLOR_RED "Stray Fairy" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got a " EZTR_CC_COLOR_PINK "Woodfall " EZTR_CC_COLOR_RED "Stray Fairy" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_NEWLINE "This is your " EZTR_CC_COLOR_RED EZTR_CC_STRAY_FAIRIES "" EZTR_CC_COLOR_DEFAULT " one." EZTR_CC_END "",
         NULL
     );
     EZTR_Basic_AddCustomText(EZTR_HNAME(Rando_GI_SHSF),
@@ -541,7 +541,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got a " EZTR_CC_COLOR_GREEN "Snowhead " EZTR_CC_COLOR_RED "Stray Fairy" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got a " EZTR_CC_COLOR_GREEN "Snowhead " EZTR_CC_COLOR_RED "Stray Fairy" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_NEWLINE "This is your " EZTR_CC_COLOR_RED EZTR_CC_STRAY_FAIRIES "" EZTR_CC_COLOR_DEFAULT " one." EZTR_CC_END "",
         NULL
     );
     EZTR_Basic_AddCustomText(EZTR_HNAME(Rando_GI_GBSF),
@@ -552,7 +552,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got a " EZTR_CC_COLOR_BLUE "Great Bay " EZTR_CC_COLOR_RED "Stray Fairy" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got a " EZTR_CC_COLOR_BLUE "Great Bay " EZTR_CC_COLOR_RED "Stray Fairy" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_NEWLINE "This is your " EZTR_CC_COLOR_RED EZTR_CC_STRAY_FAIRIES "" EZTR_CC_COLOR_DEFAULT " one." EZTR_CC_END "",
         NULL
     );
     EZTR_Basic_AddCustomText(EZTR_HNAME(Rando_GI_GBSF),
@@ -563,7 +563,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got a " EZTR_CC_COLOR_YELLOW "Stone Tower " EZTR_CC_COLOR_RED "Stray Fairy" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got a " EZTR_CC_COLOR_YELLOW "Stone Tower " EZTR_CC_COLOR_RED "Stray Fairy" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_NEWLINE "This is your " EZTR_CC_COLOR_RED EZTR_CC_STRAY_FAIRIES "" EZTR_CC_COLOR_DEFAULT " one." EZTR_CC_END "",
         NULL
     );
     EZTR_Basic_AddCustomText(EZTR_HNAME(Rando_GI_WFBK),
@@ -830,4 +830,9 @@ EZTR_ON_INIT void init_text() {
         "\xBF",
         randoMilkBar
     );
+    sGetItemTable_ap[GI_SWORD_KOKIRI].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Kokiri_Sword));
+    sGetItemTable_ap[GI_BAG_BOMBCHU].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Bombchu_Bag));
+    // sGetItemTable_ap[GI_APLOGO_USEFUL].textId = EZTR_GET_ID_H(Rando_Send_Item);
+    // sGetItemTable_ap[GI_APLOGO_FILLER].textId = EZTR_GET_ID_H(Rando_Send_Item);
+    // sGetItemTable_ap[GI_APLOGO_PROG].textId = EZTR_GET_ID_H(Rando_Send_Item);
 }

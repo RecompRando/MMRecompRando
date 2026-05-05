@@ -327,13 +327,13 @@ typedef enum {
 u8 randoItemGive(u32 gi);
 u32 rando_get_item_id(u32 location_id);
 
-typedef struct GetItemEntry {
+typedef struct GetItemEntryAP {
     /* 0x0 */ u8 itemId;
     /* 0x1 */ u8 field; // various bit-packed data
     /* 0x2 */ s16 gid;   // defines the draw id and chest opening animation
     /* 0x3 */ u8 textId;
     /* 0x4 */ u16 objectId;
-} GetItemEntry; // size = 0x6
+} GetItemEntryAP; // size = 0x6
 
 bool isAP(s16 gi);
 
@@ -341,7 +341,7 @@ u16 getObjectId(s16 gi);
 
 s16 getGid(s16 gi);
 
-u8 getTextId(s16 gi);
+u16 getTextId(s16 gi);
 
 extern s8 giToItemId[];
 

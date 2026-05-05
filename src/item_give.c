@@ -67,7 +67,7 @@ void func_8082DB90(PlayState* play, Player* this, PlayerAnimationHeader* anim);
  */
 #define GIFIELD(flags, dropType) ((flags) | (dropType))
 
-GetItemEntry sGetItemTable_ap[] = {
+GetItemEntryAP sGetItemTable_ap[] = {
     // GI_RUPEE_GREEN
     GET_ITEM(ITEM_RUPEE_GREEN, OBJECT_GI_RUPY, GID_RUPEE_GREEN, 0xC4, GIFIELD(0, ITEM00_RUPEE_GREEN), CHEST_ANIM_SHORT),
     // GI_RUPEE_BLUE
@@ -722,7 +722,7 @@ s16 getGid(s16 gi) {
     return (((gid < 0) ? -1 : 1)*gid) - 1;
 }
 
-u8 getTextId(s16 gi) {
+u16 getTextId(s16 gi) {
     return sGetItemTable_ap[gi - 1].textId;
 }
 
@@ -842,7 +842,7 @@ RECOMP_PATCH void func_80848250(PlayState* play, Player* this) {
 
 // Player_UpdateCurrentGetItemDrawId?
 RECOMP_PATCH void func_8082ECE0(Player* this) {
-    GetItemEntry* giEntry;
+    GetItemEntryAP* giEntry;
     s16 gid;
     if (itemWorkaround) {
         giEntry = &sGetItemTable_ap[trueGI - 1];
@@ -895,7 +895,7 @@ RECOMP_PATCH s32 func_808482E0(PlayState* play, Player* this) {
     }
 
     if (this->av1.actionVar1 == 0) {
-        GetItemEntry* giEntry;
+        GetItemEntryAP* giEntry;
         if (itemWorkaround) {
             gi = ABS_ALT(trueGI);
             if (rando_has_item(GI_OCARINA_OF_TIME)) {
@@ -1364,7 +1364,7 @@ typedef struct EnBom {
 } EnBom; // size = 0x204
 
 void func_8082DAD4(Player* this);
-void func_8083D168(PlayState* play, Player* this, GetItemEntry* giEntry);
+void func_8083D168(PlayState* play, Player* this, GetItemEntryAP* giEntry);
 s32 func_80832558(PlayState* play, Player* this, PlayerFuncD58 arg2);
 void func_8082E920(PlayState* play, Player* this, s32 moveFlags);
 void Player_AnimationPlayOnce(PlayState* play, Player* this, PlayerAnimationHeader* anim);
@@ -1377,7 +1377,7 @@ RECOMP_PATCH s32 Player_ActionChange_2(Player* this, PlayState* play) {
         if (interactRangeActor != NULL) {
             if (this->getItemId > GI_NONE) {
                 if (this->getItemId < GI_MAX || this->getItemId > GI_MAX) {
-                    GetItemEntry* giEntry = &sGetItemTable_ap[this->getItemId - 1];
+                    GetItemEntryAP* giEntry = &sGetItemTable_ap[this->getItemId - 1];
                     interactRangeActor->parent = &this->actor;
                     if ((Item_CheckObtainability(giEntry->itemId) == ITEM_NONE) ||
                         ((s16)giEntry->objectId == OBJECT_GI_BOMB_2)) {
@@ -1415,7 +1415,7 @@ RECOMP_PATCH s32 Player_ActionChange_2(Player* this, PlayState* play) {
                             if (itemWorkaround) {
                                 this->getItemId = -trueGI;
                             }
-                            GetItemEntry* giEntry = &sGetItemTable_ap[-this->getItemId - 1];
+                            GetItemEntryAP* giEntry = &sGetItemTable_ap[-this->getItemId - 1];
                             EnBox* chest = (EnBox*)interactRangeActor;
 
                             /*if ((giEntry->itemId != ITEM_NONE) &&

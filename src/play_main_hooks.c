@@ -966,15 +966,15 @@ void update_rando(PlayState* play) {
             u32 item_type = REPY_FN_GET_U32("item_type");
 
             // note: this could probably be done differently, but partially uses old systems for now
-            if (player != rando_get_own_slot_id() || recomp_get_config_u32("local_notifications")) {
-                char* item_name;
-                char* player_name;
-                rando_get_item_name_from_id(item_id, &item_name);
-                rando_get_sending_player_name(location, &player_name);
-                randoEmitRecieveNotification(item_name, player_name, randoConvertItemId(item_id), item_type);
-                recomp_free(item_name);
-                recomp_free(player_name);
-            }
+            // if (player != rando_get_own_slot_id() || recomp_get_config_u32("local_notifications")) {
+            //     char* item_name;
+            //     char* player_name;
+            //     rando_get_item_name_from_id(item_id, &item_name);
+            //     rando_get_sending_player_name(location, &player_name);
+            //     randoEmitRecieveNotification(item_name, player_name, randoConvertItemId(item_id), item_type);
+            //     recomp_free(item_name);
+            //     recomp_free(player_name);
+            // }
             randoItemGive(item_id);
         }
 
