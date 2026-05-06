@@ -39,6 +39,7 @@ dependencies = [
     "owls_never_quit:1.0.0",
     "mm_recomp_better_double_sot:1.0.1",
     "mm_recomp_colors:0.5.0",
+    "MM_EZ_Text_Replacer_API:2.3.0",
     "REPY_PopularPythonPackages:1.0.0"
 ]
 

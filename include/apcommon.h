@@ -20,6 +20,23 @@
 
 #define GI_BAG_BOMBCHU GI_54
 
+#define GI_STRAY_FAIRY_CLOCKTOWN GI_B2
+#define GI_STRAY_FAIRY_WOODFALL GI_46
+#define GI_STRAY_FAIRY_SNOWHEAD GI_47
+#define GI_STRAY_FAIRY_GREATBAY GI_48
+#define GI_STRAY_FAIRY_STONETOWER GI_49
+
+#define GI_SONG_TIME GI_A6 
+#define GI_SONG_HEALING GI_AF 
+#define GI_SONG_EPONA GI_A5 
+#define GI_SONG_SOARING GI_A3 
+#define GI_SONG_STORMS GI_A2 
+#define GI_SONG_SONATA GI_AE 
+#define GI_SONG_LULLABY GI_AD 
+#define GI_SONG_NOVA GI_AC 
+#define GI_SONG_ELEGY GI_A8 
+#define GI_SONG_OATH GI_A7 
+
 #define GI_SPIN_ATTACK GI_71
 #define GI_OCEAN_SKULL_TOKEN GI_72
 #define GI_DEFENSE_DOUBLE GI_73
@@ -327,13 +344,13 @@ typedef enum {
 u8 randoItemGive(u32 gi);
 u32 rando_get_item_id(u32 location_id);
 
-typedef struct GetItemEntry {
+typedef struct GetItemEntryAP {
     /* 0x0 */ u8 itemId;
     /* 0x1 */ u8 field; // various bit-packed data
     /* 0x2 */ s16 gid;   // defines the draw id and chest opening animation
-    /* 0x3 */ u8 textId;
+    /* 0x3 */ u16 textId;
     /* 0x4 */ u16 objectId;
-} GetItemEntry; // size = 0x6
+} GetItemEntryAP; // size = 0x6
 
 bool isAP(s16 gi);
 
@@ -341,7 +358,7 @@ u16 getObjectId(s16 gi);
 
 s16 getGid(s16 gi);
 
-u8 getTextId(s16 gi);
+u16 getTextId(s16 gi);
 
 extern s8 giToItemId[];
 
