@@ -406,26 +406,26 @@ void EnElforg_WaitForObject(EnElforg* this, PlayState* play) {
     }
 
     switch (getItemId) {
-        case GI_B2:
+        case GI_STRAY_FAIRY_CLOCKTOWN:
             this->area = STRAY_FAIRY_AREA_CLOCK_TOWN;
             townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
             townFairyRenderNormal[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
             break;
-        case GI_46:
+        case GI_STRAY_FAIRY_WOODFALL:
             this->area = STRAY_FAIRY_AREA_WOODFALL;
             townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
             townFairyRenderNormal[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
             break;
-        case GI_47:
+        case GI_STRAY_FAIRY_SNOWHEAD:
             this->area = STRAY_FAIRY_AREA_SNOWHEAD;
             townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
             townFairyRenderNormal[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
-        case GI_48:
+        case GI_STRAY_FAIRY_GREATBAY:
             this->area = STRAY_FAIRY_AREA_GREAT_BAY;
             townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
             townFairyRenderNormal[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
             break;
-        case GI_49:
+        case GI_STRAY_FAIRY_STONETOWER:
             this->area = STRAY_FAIRY_AREA_STONE_TOWER;
             townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
             townFairyRenderNormal[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
