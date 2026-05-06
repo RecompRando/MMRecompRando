@@ -331,7 +331,7 @@ typedef struct GetItemEntryAP {
     /* 0x0 */ u8 itemId;
     /* 0x1 */ u8 field; // various bit-packed data
     /* 0x2 */ s16 gid;   // defines the draw id and chest opening animation
-    /* 0x3 */ u8 textId;
+    /* 0x3 */ u16 textId;
     /* 0x4 */ u16 objectId;
 } GetItemEntryAP; // size = 0x6
 

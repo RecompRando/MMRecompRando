@@ -830,8 +830,9 @@ EZTR_ON_INIT void init_text() {
         "\xBF",
         randoMilkBar
     );
-    sGetItemTable_ap[GI_SWORD_KOKIRI].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Kokiri_Sword));
-    sGetItemTable_ap[GI_BAG_BOMBCHU].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Bombchu_Bag));
+    
+    sGetItemTable_ap[GI_SWORD_KOKIRI - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Kokiri_Sword));
+    sGetItemTable_ap[GI_BAG_BOMBCHU - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Bombchu_Bag));
     // sGetItemTable_ap[GI_APLOGO_USEFUL].textId = EZTR_GET_ID_H(Rando_Send_Item);
     // sGetItemTable_ap[GI_APLOGO_FILLER].textId = EZTR_GET_ID_H(Rando_Send_Item);
     // sGetItemTable_ap[GI_APLOGO_PROG].textId = EZTR_GET_ID_H(Rando_Send_Item);
