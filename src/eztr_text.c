@@ -9,12 +9,14 @@
 
 #include "z64snap.h"
 
-//old defines that I didn't use
+extern GetItemEntryAP sGetItemTable_ap[];
+
+// old defines that I didn't use
 // #define RANDO_AP_ITEM "\xFF"
 // #define RANDO_AP_PLAYER "\xFE"
 // #define RANDO_AP_COLOR "\xFD"
 
-//sets colours for AP item class. probably doesn't work
+// sets colours for AP item class. probably doesn't work
 // u8 getAPItemColor(u32 location) {
 //     switch (rando_get_location_type(location)) {
 //         case 1:  return 0x05; // EZTR_CC_COLOR_LIGHTBLUE;  // progression - purple
@@ -24,6 +26,7 @@
 //         default: return 0x07; // EZTR_CC_COLOR_SILVER;  // filler - grey
 //     }
 // }
+
 u8 getAPItemColor(u32 location) {
     u32 type = rando_get_location_type(location);
     if (type & 0b001) {
@@ -36,7 +39,8 @@ u8 getAPItemColor(u32 location) {
         return 0x07; // EZTR_CC_COLOR_SILVER;  // filler - grey
     }
 }
-//Get info from Rando to replace the text with item class colour, player name and item name
+
+// Get info from Rando to replace the text with item class colour, player name and item name
 EZTR_MSG_CALLBACK(randoAPSend) {
     u32 location = rando_get_last_location_sent();
     char* player_name;
@@ -56,6 +60,7 @@ EZTR_MSG_CALLBACK(randoAPSend) {
     recomp_free(player_name);
     recomp_free(item_name);
 }
+
 EZTR_MSG_CALLBACK(randoAPSelf) {
     u32 location = rando_get_last_location_sent();
     char* item_name;
@@ -71,19 +76,24 @@ EZTR_MSG_CALLBACK(randoAPSelf) {
     
     recomp_free(item_name);
 }
+
 EZTR_MSG_CALLBACK(randoTingle) {
     
 }
+
 EZTR_MSG_CALLBACK(randoShop) {
     
 }
+
 EZTR_MSG_CALLBACK(randoScrub) {
     
 }
+
 EZTR_MSG_CALLBACK(randoMilkBar) {
     
 }
-//honestly don't know, but seems important
+
+// honestly don't know, but seems important
 // char* item_str;
 // char* player_str;
 
@@ -93,8 +103,8 @@ EZTR_MSG_CALLBACK(randoMilkBar) {
 // sanitizeRandoText(player_str);
 
 
-//text sanitize stolen from old file. Not sure what role this plays exactly, but I know it fixes crashes on funky letters
-//commented out because this function is already in use elsewhere
+// text sanitize stolen from old file. Not sure what role this plays exactly, but I know it fixes crashes on funky letters
+// commented out because this function is already in use elsewhere
 // void sanitizeRandoText(char* rando_string) {
 //     u8 c = rando_string[0];
 //     u8 next = 0;
@@ -130,32 +140,32 @@ EZTR_MSG_CALLBACK(randoMilkBar) {
 //     }
 // }
 
-EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Send_Item);//"You sent [player] their [item]"
-EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Self_Item);//"You found your [item]"
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Send_Item); // "You sent [player] their [item]"
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Self_Item); // "You found your [item]"
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Kokiri_Sword);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Bombchu_Bag);
-EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_CTSF);//stray fairies
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_CTSF); // stray fairies
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_WFSF);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_SHSF);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_GBSF);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_STSF);
-EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_WFBK);//boss keys
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_WFBK); // boss keys
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_SHBK);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_GBBK);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_STBK);
-EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_WFSK);//small keys
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_WFSK); // small keys
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_SHSK);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_GBSK);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_STSK);
-EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_WFMap);//maps
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_WFMap); // maps
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_SHMap);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_GBMap);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_STMap);
-EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_WFCompass);//compasses
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_WFCompass); // compasses
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_SHCompass);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_GBCompass);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_STCompass);
-EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Swamp_Token);//skull tokens
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Swamp_Token); // skull tokens
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Ocean_Token);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_FOOL);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Moon_Child_Return);
@@ -165,7 +175,7 @@ EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Scrub);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Milk_Bar);
 
 
-//text replacements for AP items. Not yet set up. Probably won't use but keeping here just in case.
+// text replacements for AP items. Not yet set up. Probably won't use but keeping here just in case.
 // EZTR_MSG_CALLBACK(randoAPSend) {
 //     buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
 //     EZTR_MsgSContent_Sprintf(buf->data.content, "You found " EZTR_CC_COLOR_RED "\xFE" EZTR_CC_COLOR_DEFAULT "'s" EZTR_CC_NEWLINE "" RANDO_AP_COLOR "\xFF" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END ""),
@@ -173,55 +183,55 @@ EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Milk_Bar);
             
 // }
 
-//text replacements for pictograph box
+// text replacements for pictograph box
 EZTR_MSG_CALLBACK(randoPictograph) {
-            if (!CHECK_QUEST_ITEM(QUEST_PICTOGRAPH)) {
-                Snap_RecordPictographedActors(play);
-            }
+    if (!CHECK_QUEST_ITEM(QUEST_PICTOGRAPH)) {
+        Snap_RecordPictographedActors(play);
+    }
 
-            if (Snap_CheckFlag(PICTO_VALID_MONKEY)) {
-                buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
-                EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "picture of a monkey" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
-            } else if (Snap_CheckFlag(PICTO_VALID_BIG_OCTO)) {
-                buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
-                EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "picture of a Big Octo" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
-            } else if (Snap_CheckFlag(PICTO_VALID_SCARECROW)) {
-                buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
-                EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "picture of a scarecrow" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
-            } else if (Snap_CheckFlag(PICTO_VALID_TINGLE)) {
-                buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
-                EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "picture of Tingle" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
-            } else if (Snap_CheckFlag(PICTO_VALID_DEKU_KING)) {
-                buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
-                EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "picture of the Deku King" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
-            } else if (Snap_CheckFlag(PICTO_VALID_PIRATE_GOOD)) {
-                buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
-                EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "good picture of a pirate" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
-            } else if (Snap_CheckFlag(PICTO_VALID_PIRATE_TOO_FAR)) {
-                buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
-                EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "bad picture of a pirate" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
-            } else if (Snap_CheckFlag(PICTO_VALID_LULU_HEAD)) {
-                if (Snap_CheckFlag(PICTO_VALID_LULU_RIGHT_ARM) && Snap_CheckFlag(PICTO_VALID_LULU_LEFT_ARM)) {
-                    buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
-                EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "good picture of Lulu" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
-            } else {
-                    buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
-                EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "bad picture of Lulu" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
-            }
-            } else if (Snap_CheckFlag(PICTO_VALID_IN_SWAMP)) {
-                buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
-                EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "picture of the swamp" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
-            }
-            else {
-                buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
-                EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "picture" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
-            }
+    if (Snap_CheckFlag(PICTO_VALID_MONKEY)) {
+        buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
+        EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "picture of a monkey" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
+    } else if (Snap_CheckFlag(PICTO_VALID_BIG_OCTO)) {
+        buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
+        EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "picture of a Big Octo" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
+    } else if (Snap_CheckFlag(PICTO_VALID_SCARECROW)) {
+        buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
+        EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "picture of a scarecrow" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
+    } else if (Snap_CheckFlag(PICTO_VALID_TINGLE)) {
+        buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
+        EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "picture of Tingle" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
+    } else if (Snap_CheckFlag(PICTO_VALID_DEKU_KING)) {
+        buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
+        EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "picture of the Deku King" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
+    } else if (Snap_CheckFlag(PICTO_VALID_PIRATE_GOOD)) {
+        buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
+        EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "good picture of a pirate" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
+    } else if (Snap_CheckFlag(PICTO_VALID_PIRATE_TOO_FAR)) {
+        buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
+        EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "bad picture of a pirate" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
+    } else if (Snap_CheckFlag(PICTO_VALID_LULU_HEAD)) {
+        if (Snap_CheckFlag(PICTO_VALID_LULU_RIGHT_ARM) && Snap_CheckFlag(PICTO_VALID_LULU_LEFT_ARM)) {
+            buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
+            EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "good picture of Lulu" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
+        } else {
+            buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
+            EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "bad picture of Lulu" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
+        }
+    } else if (Snap_CheckFlag(PICTO_VALID_IN_SWAMP)) {
+        buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
+        EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "picture of the swamp" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
+    }
+    else {
+        buf->data.text_box_type = EZTR_STANDARD_TEXT_BOX_II,
+        EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "picture" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
+    }
 }
-extern GetItemEntryAP sGetItemTable_ap[];
-//Replacements of existing IDs
+
+// Replacements of existing IDs
 EZTR_ON_INIT void init_text() {
     EZTR_Basic_ReplaceText(
-        0x1B9E,//Sonata of Awakening
+        0x1B9E, // Sonata of Awakening
         EZTR_STANDARD_TEXT_BOX_II,
         0,
         EZTR_ICON_NO_ICON,
@@ -233,7 +243,7 @@ EZTR_ON_INIT void init_text() {
         NULL
     );
     EZTR_Basic_ReplaceText(
-        0x1B9F,//Goron's Lullaby
+        0x1B9F, // Goron's Lullaby
         EZTR_STANDARD_TEXT_BOX_II,
         0,
         EZTR_ICON_NO_ICON,
@@ -245,7 +255,7 @@ EZTR_ON_INIT void init_text() {
         NULL
     );
     EZTR_Basic_ReplaceText(
-        0x1BA0,//New Wave Bossa Nova
+        0x1BA0, // New Wave Bossa Nova
         EZTR_STANDARD_TEXT_BOX_II,
         0,
         EZTR_ICON_NO_ICON,
@@ -257,7 +267,7 @@ EZTR_ON_INIT void init_text() {
         NULL
     );
     EZTR_Basic_ReplaceText(
-        0x1BA1,//Elegy of Emptiness
+        0x1BA1, // Elegy of Emptiness
         EZTR_STANDARD_TEXT_BOX_II,
         0,
         EZTR_ICON_NO_ICON,
@@ -269,7 +279,7 @@ EZTR_ON_INIT void init_text() {
         NULL
     );
     EZTR_Basic_ReplaceText(
-        0x1BA2,//Oath to Order
+        0x1BA2, // Oath to Order
         EZTR_STANDARD_TEXT_BOX_II,
         0,
         EZTR_ICON_NO_ICON,
@@ -281,7 +291,7 @@ EZTR_ON_INIT void init_text() {
         NULL
     );
     EZTR_Basic_ReplaceText(
-        0x1BA4,//Song of Time
+        0x1BA4, // Song of Time
         EZTR_STANDARD_TEXT_BOX_II,
         0,
         EZTR_ICON_NO_ICON,
@@ -293,7 +303,7 @@ EZTR_ON_INIT void init_text() {
         NULL
     );
     EZTR_Basic_ReplaceText(
-        0x1BA5,//Song of Healing
+        0x1BA5, // Song of Healing
         EZTR_STANDARD_TEXT_BOX_II,
         0,
         EZTR_ICON_NO_ICON,
@@ -305,7 +315,7 @@ EZTR_ON_INIT void init_text() {
         NULL
     );
     EZTR_Basic_ReplaceText(
-        0x1BA6,//Epona's Song
+        0x1BA6, // Epona's Song
         EZTR_STANDARD_TEXT_BOX_II,
         0,
         EZTR_ICON_NO_ICON,
@@ -317,7 +327,7 @@ EZTR_ON_INIT void init_text() {
         NULL
     );
     EZTR_Basic_ReplaceText(
-        0x1BA7,//Song of Soaring
+        0x1BA7, // Song of Soaring
         EZTR_STANDARD_TEXT_BOX_II,
         0,
         EZTR_ICON_NO_ICON,
@@ -329,7 +339,7 @@ EZTR_ON_INIT void init_text() {
         NULL
     );
     EZTR_Basic_ReplaceText(
-        0x1BA6,//Song of Storms
+        0x1BA6, // Song of Storms
         EZTR_STANDARD_TEXT_BOX_II,
         0,
         EZTR_ICON_NO_ICON,
@@ -341,7 +351,7 @@ EZTR_ON_INIT void init_text() {
         NULL
     );
     EZTR_Basic_ReplaceText(
-        0x00C8,//Magic Power 1
+        0x00C8, // Magic Power 1
         EZTR_STANDARD_TEXT_BOX_II,
         0,
         EZTR_ICON_SMALL_MAGIC_JAR,
@@ -353,7 +363,7 @@ EZTR_ON_INIT void init_text() {
         NULL
     );
     EZTR_Basic_ReplaceText(
-        0x00CA,//Spin Attack Upgrade
+        0x00CA, // Spin Attack Upgrade
         EZTR_STANDARD_TEXT_BOX_II,
         0,
         EZTR_ICON_NO_ICON,
@@ -365,7 +375,7 @@ EZTR_ON_INIT void init_text() {
         NULL
     );
     EZTR_Basic_ReplaceText(
-        0x353C,//Fast Dog
+        0x353C, // Fast Dog
         EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
         0,
         EZTR_ICON_NO_ICON,
@@ -377,7 +387,7 @@ EZTR_ON_INIT void init_text() {
         NULL
     );
     EZTR_Basic_ReplaceText(
-        0x3545,//Slow Dog
+        0x3545, // Slow Dog
         EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
         0,
         EZTR_ICON_NO_ICON,
@@ -390,7 +400,7 @@ EZTR_ON_INIT void init_text() {
     );
     
     // EZTR_Basic_ReplaceText(
-    //     0x20D0,//Gossip Hint joke
+    //     0x20D0, // Gossip Hint joke
     //     EZTR_STANDARD_TEXT_BOX_II,
     //     0,
     //     EZTR_ICON_NO_ICON,
@@ -402,7 +412,7 @@ EZTR_ON_INIT void init_text() {
     //     NULL
     // );
     EZTR_Basic_ReplaceText(
-        0x20D0,//Replaces the Gossip Stone Tatl text to test if it can read the AP items correctly without fully implimenting it on get item.
+        0x20D0, // Replaces the Gossip Stone Tatl text to test if it can read the AP items correctly without fully implimenting it on get item.
         EZTR_STANDARD_TEXT_BOX_II,
         0,
         EZTR_ICON_NO_ICON,
@@ -414,7 +424,7 @@ EZTR_ON_INIT void init_text() {
         randoAPSend
     );
     EZTR_Basic_ReplaceText(
-        0x0090,//Replaces rando text for filler AP items.
+        0x0090, // Replaces rando text for filler AP items.
         EZTR_STANDARD_TEXT_BOX_II,
         0,
         EZTR_ICON_NO_ICON,
@@ -426,7 +436,7 @@ EZTR_ON_INIT void init_text() {
         NULL
     );
     EZTR_Basic_ReplaceText(
-        0x00B3,//Replaces rando text for useful AP items.
+        0x00B3, // Replaces rando text for useful AP items.
         EZTR_STANDARD_TEXT_BOX_II,
         0,
         EZTR_ICON_NO_ICON,
@@ -438,7 +448,7 @@ EZTR_ON_INIT void init_text() {
         NULL
     );
     EZTR_Basic_ReplaceText(
-        0x0077,//Replaces rando text for progression AP items.
+        0x0077, // Replaces rando text for progression AP items.
         EZTR_STANDARD_TEXT_BOX_II,
         0,
         EZTR_ICON_NO_ICON,
@@ -449,7 +459,8 @@ EZTR_ON_INIT void init_text() {
         "No, that didn't work. Try again.",
         randoAPSend
     );
-    //Pictograph Box text
+    
+    // Pictograph Box text
     EZTR_Basic_ReplaceText(
         0x00F8,
         EZTR_STANDARD_TEXT_BOX_I,
@@ -464,8 +475,8 @@ EZTR_ON_INIT void init_text() {
     );
 
 
-    //Custom IDs for items not normally obtained
-    //AP send item text. Probably doesn't work.
+    // Custom IDs for items not normally obtained
+    // AP send item text. Probably doesn't work.
     EZTR_Basic_AddCustomText(EZTR_HNAME(Rando_Send_Item),
         EZTR_STANDARD_TEXT_BOX_II,
         0,
