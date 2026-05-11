@@ -393,7 +393,7 @@ REPY_ON_PRE_INIT void _repy_register_nrm () { \
 #define REPY_ADD_NRM_TO_MAIN_INTERPRETER \
 REPY_ON_CONFIG_INTERPRETERS void __repy_config_main_interpreter() { \
     recomp_printf("Configuring Main Interpreter (Index %i)\n", 0); \
-    REPY_PushInterpreter(subinterp_identifier); \
+    REPY_PushInterpreter(0); \
     REPY_AddNrmToSysPath(); \
     REPY_PopInterpreter(); \
 } 
