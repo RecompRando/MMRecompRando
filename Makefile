@@ -4,7 +4,6 @@ CC      ?= clang
 LD      ?= ld.lld
 
 TARGET  := $(BUILD_DIR)/mod.elf
-AP_LIB := pyglue/build/lib/libapglue.a
 
 LDSCRIPT := mod.ld
 ARCHFLAGS := -target mips -mips2 -mabi=32 -O2 -G0 -mno-abicalls -mno-odd-spreg -mno-check-zero-division \
