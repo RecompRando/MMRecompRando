@@ -917,7 +917,7 @@ void update_rando(PlayState* play) {
             // TODO: account for each different type of save
             REPY_FN_EXEC_CACHE(
                 py_rando_load_saved_state,
-                "RecompClient.run_async_task_and_wait_once(RecompClient.load_saved_state())\n" // async due to sending offline locations
+                "RecompClient.run_async_task_and_wait_once(rando_saves.load_saved_state())\n" // async due to sending offline locations
             );
 
             // below is left over from our old system, keeping this here for safety
