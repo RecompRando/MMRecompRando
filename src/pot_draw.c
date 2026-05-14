@@ -65,11 +65,11 @@ void GenericPot_DrawRando(PlayState* play, u32 location, u8 potType) {
             pot_side_tex = pot_key_side;
             pot_top_tex = pot_spider_top; // there isn't a key top for some reason
             break;
-        case GI_B2:
-        case GI_46:
-        case GI_47:
-        case GI_48:
-        case GI_49:
+        case GI_STRAY_FAIRY_CLOCKTOWN:
+        case GI_STRAY_FAIRY_WOODFALL:
+        case GI_STRAY_FAIRY_SNOWHEAD:
+        case GI_STRAY_FAIRY_GREATBAY:
+        case GI_STRAY_FAIRY_STONETOWER:
             pot_side_tex = pot_fairy_side;
             pot_top_tex = pot_fairy_top;
             break;

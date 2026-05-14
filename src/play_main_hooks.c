@@ -731,15 +731,15 @@ RECOMP_EXPORT u32 rando_get_item_id(u32 location)
                 switch (item & 0xFF)
                 {
                     case 0x7F:
-                        return GI_B2;
+                        return GI_STRAY_FAIRY_CLOCKTOWN;
                     case 0x00:
-                        return GI_46;
+                        return GI_STRAY_FAIRY_WOODFALL;
                     case 0x01:
-                        return GI_47;
+                        return GI_STRAY_FAIRY_SNOWHEAD;
                     case 0x02:
-                        return GI_48;
+                        return GI_STRAY_FAIRY_GREATBAY;
                     case 0x03:
-                        return GI_49;
+                        return GI_STRAY_FAIRY_STONETOWER;
                 }
                 return GI_NONE;
             case 0x020000:
@@ -757,25 +757,25 @@ RECOMP_EXPORT u32 rando_get_item_id(u32 location)
                 switch (item & 0xFF)
                 {
                     case ITEM_SONG_TIME:
-                        return GI_A6;
+                        return GI_SONG_TIME;
                     case ITEM_SONG_HEALING:
-                        return GI_AF;
+                        return GI_SONG_HEALING;
                     case ITEM_SONG_EPONA:
-                        return GI_A5;
+                        return GI_SONG_EPONA;
                     case ITEM_SONG_SOARING:
-                        return GI_A3;
+                        return GI_SONG_SOARING;
                     case ITEM_SONG_STORMS:
-                        return GI_A2;
+                        return GI_SONG_STORMS;
                     case ITEM_SONG_SONATA:
-                        return GI_AE;
+                        return GI_SONG_SONATA;
                     case ITEM_SONG_LULLABY:
-                        return GI_AD;
+                        return GI_SONG_LULLABY;
                     case ITEM_SONG_NOVA:
-                        return GI_AC;
+                        return GI_SONG_NOVA;
                     case ITEM_SONG_ELEGY:
-                        return GI_A8;
+                        return GI_SONG_ELEGY;
                     case ITEM_SONG_OATH:
-                        return GI_A7;
+                        return GI_SONG_OATH;
                 }
                 return GI_NONE;
             case 0x090000:
@@ -917,7 +917,7 @@ void update_rando(PlayState* play) {
             // TODO: account for each different type of save
             REPY_FN_EXEC_CACHE(
                 py_rando_load_saved_state,
-                "RecompClient.run_async_task_and_wait_once(RecompClient.load_saved_state())\n" // async due to sending offline locations
+                "RecompClient.run_async_task_and_wait_once(rando_saves.load_saved_state())\n" // async due to sending offline locations
             );
 
             // below is left over from our old system, keeping this here for safety
