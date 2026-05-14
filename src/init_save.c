@@ -10,6 +10,21 @@ bool saveOpened = false;
 RECOMP_CALLBACK("*", recomp_on_load_save)
 void rando_on_load_save(FileSelectState* fileSelect, SramContext* sramCtx) {
     saveOpened = true;
+
+    REPY_FN_SETUP_RANDO;
+
+    s32 save_slot = gSaveContext.fileNum;
+    if (fileSelect->isOwlSave[gSaveContext.fileNum + 2]) {
+        save_slot = gSaveContext.fileNum + 2;
+    }
+    REPY_FN_SET_S32("save_slot", save_slot);
+    
+    REPY_FN_EXEC_CACHE(
+        py_rando_load_saved_state,
+        "RecompClient.run_async_task_and_wait_once(rando_saves.load_saved_state_from_slot(save_slot))\n" // async due to sending offline locations
+    );
+
+    REPY_FN_CLEANUP;
 }
 
 extern SavePlayerData sSaveDefaultPlayerData;
