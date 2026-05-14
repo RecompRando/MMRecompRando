@@ -128,22 +128,6 @@ def prepend_to_env_path(to_append: Path) -> str:
 
 # ============== Mod Toml/.nrm Building ==============
 
-makefiles['glue'] = glue_makefile = MakefileJob(
-    glue_dir.joinpath("Makefile"),
-    # We can pass information to the makefile here, by declaring additional environmental variables for make to use.
-    # Environmental variables are automatically added to the variable namespace in a makefile.
-    # This template uses a generalized makefile that could be configured to compile multiple mods by passing
-    # different environmental variables here. It's also set up to let us pass in the compiler and linker we want to use.
-    {
-        "PATH": prepend_to_env_path([llvmmips_bin_path]),
-        "CC": str(llvmmips_bin_path.joinpath("clang")),
-        "AR": str(llvmmips_bin_path.joinpath("llvm-ar")),
-        "LD": str(llvmmips_bin_path.joinpath("ld.lld")),
-    },
-    make_cwd=glue_dir
-)
-glue_makefile.depends_on([archive_extractions["llvmmips"]])
-
 # Declaring the makefile that will build our mod's elf binary. In this template, we've declared it second so that we can pass information
 # from the mod toml to the makefile job.
 makefiles['mod'] = main_makefile = MakefileJob(
@@ -159,11 +143,6 @@ makefiles['mod'] = main_makefile = MakefileJob(
     },
     make_cwd=root_dir
 )
-
-# We've set the makefile to use the MIPS-only clang and ld.lld that we downloaded and extracted (The 'llvmmips' DownloadJob and ArchiveExtractJob).
-# So, we'll mark this MakefileJob as depending on that ArchiveExtractJob. We don't need to mark it as depending on the DownloadJob,
-# since the ArchiveExtractJob already depends on the DownloadJob.
-main_makefile.depends_on([archive_extractions["llvmmips"], glue_makefile])
 
 from pyglue import module_files
 include_python_files = module_files.include_python_files

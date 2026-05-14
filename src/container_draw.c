@@ -70,11 +70,11 @@ Gfx* GenericContainer_SetTextures(PlayState* play, Gfx* gfx, u8* customDraw, u32
             front_tex = key_front;
             side_tex = key_side;
             break;
-        case GI_B2:
-        case GI_46:
-        case GI_47:
-        case GI_48:
-        case GI_49:
+        case GI_STRAY_FAIRY_CLOCKTOWN:
+        case GI_STRAY_FAIRY_WOODFALL:
+        case GI_STRAY_FAIRY_SNOWHEAD:
+        case GI_STRAY_FAIRY_GREATBAY:
+        case GI_STRAY_FAIRY_STONETOWER:
             front_tex = fairy_front;
             side_tex = fairy_side;
             break;

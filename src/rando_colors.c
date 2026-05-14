@@ -166,11 +166,11 @@ bool get_rando_color(Color_RGB8* rColor, u32 location) {
         // case GI_COMPASS_STONETOWER:
         //     *rColor = randoKeyColor;
         //     return true;
-        case GI_B2:
-        case GI_46:
-        case GI_47:
-        case GI_48:
-        case GI_49:
+        case GI_STRAY_FAIRY_CLOCKTOWN:
+        case GI_STRAY_FAIRY_WOODFALL:
+        case GI_STRAY_FAIRY_SNOWHEAD:
+        case GI_STRAY_FAIRY_GREATBAY:
+        case GI_STRAY_FAIRY_STONETOWER:
             *rColor = randoFairyColor;
             return true;
         case GI_HEART_PIECE:
