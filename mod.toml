@@ -74,6 +74,14 @@ data_reference_syms_files = [ "Zelda64RecompSyms/mm.us.rev1.datasyms.toml", "Zel
 additional_files = [ "thumb.dds" ]
 
 [[manifest.config_options]]
+id = "enable_notifications"
+name = "Display Notifications"
+description = "Sets if you want to be notified when you receive items."
+type = "Enum"
+options = [ "Disabled", "Enabled" ]
+default = "Enabled"
+
+[[manifest.config_options]]
 id = "notification_position"
 name = "Notification Position"
 description = "Sets where incoming item notifications appear on your screen."
