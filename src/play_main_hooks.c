@@ -602,23 +602,23 @@ bool rando_get_camc_enabled() {
     return recomp_get_config_u32("camc_enabled");
 }
 
-// TODO: properly account for all different types of saves
 RECOMP_HOOK("Sram_StartWriteToFlashDefault")
 void rando_save_state_normally() {
-    recomp_printf("saving rando state from normal saves\n");
-    rando_save_current_state();
+    recomp_printf("saving rando state from normal saves | slot %d\n", gSaveContext.fileNum);
+    rando_save_current_state(gSaveContext.fileNum);
+    rando_save_current_state(gSaveContext.fileNum + 2); // override owl saves
 }
 
 RECOMP_HOOK("Sram_StartWriteToFlashOwlSave")
 void rando_save_state_from_owl() {
-    recomp_printf("saving rando state from owls\n");
-    rando_save_current_state();
+    recomp_printf("saving rando state from owls | slot %d\n", gSaveContext.fileNum + 2);
+    rando_save_current_state(gSaveContext.fileNum + 2);
 }
 
 RECOMP_CALLBACK("*", recomp_on_autosave)
 void rando_handle_autosaves(PlayState* play) {
-    recomp_printf("saving rando state from autosave\n");
-    rando_save_current_state();
+    recomp_printf("saving rando state from autosave | slot %d\n", gSaveContext.fileNum + 2);
+    rando_save_current_state(gSaveContext.fileNum + 2);
 }
 
 ItemId randoConvertItemId(u32 ap_item_id) {
@@ -914,18 +914,12 @@ void update_rando(PlayState* play) {
 
     if (saveOpened) {
         if (!initItems) {
-            // TODO: account for each different type of save
-            REPY_FN_EXEC_CACHE(
-                py_rando_load_saved_state,
-                "RecompClient.run_async_task_and_wait_once(rando_saves.load_saved_state())\n" // async due to sending offline locations
-            );
-
             // below is left over from our old system, keeping this here for safety
 
-            if (gSaveContext.save.playerForm == PLAYER_FORM_FIERCE_DEITY) {
-                CUR_FORM_EQUIP(EQUIP_SLOT_B) = ITEM_SWORD_DEITY;
-                Interface_LoadItemIconImpl(play, EQUIP_SLOT_B);
-            }
+            // if (gSaveContext.save.playerForm == PLAYER_FORM_FIERCE_DEITY) {
+            //     CUR_FORM_EQUIP(EQUIP_SLOT_B) = ITEM_SWORD_DEITY;
+            //     Interface_LoadItemIconImpl(play, EQUIP_SLOT_B);
+            // }
 
             rando_send_location(LOCATION_INVENTORY_SWORD);
             rando_send_location(LOCATION_INVENTORY_SHIELD);
@@ -966,16 +960,17 @@ void update_rando(PlayState* play) {
             u32 item_type = REPY_FN_GET_U32("item_type");
 
             // note: this could probably be done differently, but partially uses old systems for now
-            // if (player != rando_get_own_slot_id() || recomp_get_config_u32("local_notifications")) {
-            //     char* item_name;
-            //     char* player_name;
-            //     rando_get_item_name_from_id(item_id, &item_name);
-            //     rando_get_sending_player_name(location, &player_name);
-            //     randoEmitRecieveNotification(item_name, player_name, randoConvertItemId(item_id), item_type);
-            //     recomp_free(item_name);
-            //     recomp_free(player_name);
-            // }
+            if (recomp_get_config_u32("enable_notifications") && (player != rando_get_own_slot_id() || recomp_get_config_u32("local_notifications"))) {
+                char* item_name;
+                char* player_name;
+                rando_get_item_name_from_id(item_id, &item_name);
+                rando_get_player_name(player, &player_name);
+                randoEmitRecieveNotification(item_name, player_name, randoConvertItemId(item_id), item_type);
+                recomp_free(item_name);
+                recomp_free(player_name);
+            }
             randoItemGive(item_id);
+            break; // TEMP: due to a crash when displaying too many ui elements, items are processed once per frame
         }
 
         if (recomp_get_config_u32("deathlink") != last_deathlink_status) {
