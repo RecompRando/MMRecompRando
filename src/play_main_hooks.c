@@ -308,8 +308,9 @@ RECOMP_PATCH s32 Health_ChangeBy(PlayState* play, s16 healthChange) {
 
     if (gSaveContext.save.saveInfo.playerData.health <= 0) {
         gSaveContext.save.saveInfo.playerData.health = 0;
-        if (rando_get_death_link_enabled()) {
+        if (rando_get_death_link_enabled() && !sending_death_link) {
             rando_send_death_link();
+            sending_death_link = true;
         }
 
         if (rando_get_slotdata_u32("death_behavior") == 3) {
@@ -318,6 +319,7 @@ RECOMP_PATCH s32 Health_ChangeBy(PlayState* play, s16 healthChange) {
 
         return false;
     } else {
+        sending_death_link = false;
         return true;
     }
 }
@@ -750,6 +752,11 @@ void update_rando(PlayState* play) {
                 Interface_StartMoonCrash(play);
             }
             rando_reset_death_link_pending();
+            
+            // display what/who caused the last death
+            char* cause;
+            rando_get_death_link_cause(&cause);
+            randoEmitNormalNotification(cause);
         }
 
         // check for 100% condition to give majora soul (gigarando)
