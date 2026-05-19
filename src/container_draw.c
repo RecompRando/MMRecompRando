@@ -109,18 +109,18 @@ Gfx* GenericContainer_SetTextures(PlayState* play, Gfx* gfx, u8* customDraw, u32
                     extra_tex = apJunkFrontRightTex;
                 }
             } else {
-                // switch (rando_get_location_type(location)) {
-                //     case RANDO_ITEM_CLASS_PROGRESSION:
-                //     case RANDO_ITEM_CLASS_TRAP:
-                //         front_tex = major_side;
-                //         side_tex = major_front;
-                //         break;
-                //     case RANDO_ITEM_CLASS_USEFUL:
-                //     case RANDO_ITEM_CLASS_JUNK:
-                //     default:
-                //         *customDraw = false;
-                //         break;
-                // }
+                switch (rando_get_location_type(location)) {
+                    case RANDO_ITEM_CLASS_PROGRESSION:
+                    case RANDO_ITEM_CLASS_TRAP:
+                        front_tex = major_side;
+                        side_tex = major_front;
+                        break;
+                    case RANDO_ITEM_CLASS_USEFUL:
+                    case RANDO_ITEM_CLASS_JUNK:
+                    default:
+                        *customDraw = false;
+                        break;
+                }
                 *customDraw = CAMC_DRAW_DISABLED;
             }
     }
