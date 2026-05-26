@@ -143,6 +143,7 @@ makefiles['mod'] = main_makefile = MakefileJob(
     },
     make_cwd=root_dir
 )
+main_makefile.depends_on([archive_extractions["llvmmips"]])
 
 from pyglue import module_files
 include_python_files = module_files.include_python_files
