@@ -52,7 +52,9 @@ RECOMP_PATCH void BgSpdweb_Draw(Actor* thisx, PlayState* play) {
     gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
 
     Color_RGB8 color = {255, 255, 255};
-    get_rando_color(&color, *location);
+    if (rando_get_slotdata_u32("websanity")) {
+        get_rando_color(&color, *location);
+    }
     gDPSetPrimColor(POLY_XLU_DISP++, 0, 0xFF, color.r, color.g, color.b, 255);
 
     if (thisx->params == BGSPDWEB_FF_1) {
@@ -193,7 +195,9 @@ RECOMP_PATCH void ObjSpidertent_Draw(Actor* thisx, PlayState* play) {
     gSPMatrix(gfx++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
 
     Color_RGB8 color = {this->unk_3C2, this->unk_3C3, this->unk_3C4};
-    get_rando_color(&color, *location);
+    if (rando_get_slotdata_u32("websanity")) {
+        get_rando_color(&color, *location);
+    }
     
     // gDPSetPrimColor(gfx++, 0, 0xFF, this->unk_3C2, this->unk_3C3, this->unk_3C4, temp_f18);
     gDPSetPrimColor(gfx++, 0, 0xFF, color.r, color.g, color.b, temp_f18);

@@ -50,243 +50,8 @@ void init_rando()
     randoCreateNotificationContainer();
 }
 
-void removeAllScoutsWithPrefix(u32 prefix) {
-    for (int i = 0x00; i <= 0xFFFF; ++i)
-    {
-        u32 location_id = prefix | i;
-        rando_remove_queued_scout(location_id);
-    }
-}
-
 void randoScout() {
     rando_queue_scouts_all();
-
-    // if (rando_get_slotdata_u32("skullsanity") == 2)
-    // {
-    //     for (int i = 0x00; i <= 0x1E; ++i)
-    //     {
-    //         if (i == 0x03)
-    //         {
-    //             continue;
-    //         }
-            
-    //         u32 location_id = 0x062700 | i;
-    //         rando_remove_queued_scout(location_id);
-    //     }
-    //     for (int i = 0x01; i <= 0x1E; ++i)
-    //     {
-    //         u32 location_id = 0x062800 | i;
-    //         rando_remove_queued_scout(location_id);
-    //     }
-    // }
-    
-    // for (u32 i = rando_get_slotdata_u32("starting_heart_locations"); i < 8; ++i)
-    // {
-    //     u32 location_id = 0x0D0000 | i;
-    //     rando_remove_queued_scout(location_id);
-    // }
-
-    // if (rando_get_slotdata_u32("cowsanity") == 0)
-    // {
-    //     for (int i = 0x10; i <= 0x17; ++i)
-    //     {
-    //         u32 location_id = 0xBEEF00 | i;
-    //         rando_remove_queued_scout(location_id);
-    //     }
-    // }
-    
-    // if (rando_get_slotdata_u32("scrubsanity") == 0)
-    // {
-    //     rando_remove_queued_scout(0x090100 | GI_MAGIC_BEANS);
-    //     rando_remove_queued_scout(0x090100 | GI_BOMB_BAG_40);
-    //     rando_remove_queued_scout(0x090100 | GI_POTION_GREEN);
-    //     rando_remove_queued_scout(0x090100 | GI_POTION_BLUE);
-    // }
-    
-    // if (rando_get_slotdata_u32("shopsanity") != 2)
-    // {
-    //     rando_remove_queued_scout(0x05481E);
-    //     rando_remove_queued_scout(0x024234);
-        
-    //     if (rando_get_slotdata_u32("shopsanity") == 1)
-    //     {
-    //         for (int i = SI_FAIRY_2; i <= SI_POTION_RED_3; ++i)
-    //         {
-    //             u32 location_id = 0x090000 | i;
-    //             rando_remove_queued_scout(location_id);
-    //         }
-            
-    //         rando_remove_queued_scout(0x090000 | SI_BOMB_3);
-    //         rando_remove_queued_scout(0x090000 | SI_ARROWS_SMALL_3);
-    //         rando_remove_queued_scout(0x090000 | SI_POTION_RED_6);
-    //     }
-    //     else
-    //     {
-    //         for (int i = SI_POTION_RED_1; i <= SI_POTION_RED_6; ++i)
-    //         {
-    //             if (i == SI_BOMB_BAG_20_1 || i == SI_BOMB_BAG_40)
-    //             {
-    //                 continue;
-    //             }
-                
-    //             u32 location_id = 0x090000 | i;
-    //             rando_remove_queued_scout(location_id);
-    //         }
-            
-    //         rando_remove_queued_scout(0x090013);
-    //         rando_remove_queued_scout(0x090015);
-            
-    //         rando_remove_queued_scout(0x026392);
-    //         rando_remove_queued_scout(0x090000 | GI_CHATEAU);
-    //         rando_remove_queued_scout(0x006792);
-    //         rando_remove_queued_scout(0x000091);
-    //     }
-    // }
-    
-    // if (rando_get_slotdata_u32("curiostity_shop_trades") == 0)
-    // {
-    //     rando_remove_queued_scout(0x07C402);
-    //     rando_remove_queued_scout(0x07C404);
-    //     rando_remove_queued_scout(0x07C405);
-    //     rando_remove_queued_scout(0x07C407);
-    // }
-    
-    // if (rando_get_slotdata_u32("intro_checks") == 0)
-    // {
-    //     rando_remove_queued_scout(0x061A00);
-    //     // ignore intro grass
-    //     for (int j = 0; j <= 0xFF; j++) {
-    //         rando_remove_queued_scout(AP_PREFIX_GRASS_KEATON | (SCENE_OPENINGDAN << 8) | j);
-    //         rando_remove_queued_scout(AP_PREFIX_GRASS_KEATON | (SCENE_LOST_WOODS << 8) | j);
-    //         rando_remove_queued_scout(AP_PREFIX_MURE_GRASS | (SCENE_LOST_WOODS << 8) | j);
-    //     }
-    // }
-    
-    // if (rando_get_slotdata_u32("grasssanity") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_GRASS_GROUP);
-    //     removeAllScoutsWithPrefix(AP_PREFIX_GRASS_GROUP2);
-    //     removeAllScoutsWithPrefix(AP_PREFIX_GRASS_KUSA);
-    //     removeAllScoutsWithPrefix(AP_PREFIX_GRASS_KEATON);
-    //     removeAllScoutsWithPrefix(AP_PREFIX_MURE_GRASS);
-    // }
-    
-    // if (rando_get_slotdata_u32("potsanity") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_POTS);
-    // }
-    
-    // if (rando_get_slotdata_u32("hitsanity") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_HITSPOT);
-    // }
-    
-    // if (rando_get_slotdata_u32("rocksanity") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_ROCKS);
-    //     removeAllScoutsWithPrefix(AP_PREFIX_BOULDERS);
-    //     removeAllScoutsWithPrefix(AP_PREFIX_MURE_ROCKS);
-    // }
-    
-    // if (rando_get_slotdata_u32("soilsanity") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_SOIL);
-    // }
-    
-    // if (rando_get_slotdata_u32("rupeesanity") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_FREESTANDING);
-    //     removeAllScoutsWithPrefix(AP_PREFIX_SONGWALL);
-    // }
-    
-    // if (rando_get_slotdata_u32("invisisanity") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_INVISRUPEES);
-    // }
-    
-    // if (rando_get_slotdata_u32("snowsanity") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_SNOWBALLS);
-    // }
-    
-    // if (rando_get_slotdata_u32("woodsanity") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_SMALL_CRATES);
-    //     removeAllScoutsWithPrefix(AP_PREFIX_BIG_CRATES);
-    //     removeAllScoutsWithPrefix(AP_PREFIX_BARRELS);
-    // }
-    
-    // if (rando_get_slotdata_u32("realfairysanity") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_FAIRIES);
-    //     removeAllScoutsWithPrefix(AP_PREFIX_GOSSIP);
-    //     removeAllScoutsWithPrefix(AP_PREFIX_BUTTERFLIES);
-    // }
-    
-    // if (rando_get_slotdata_u32("iciclesanity") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_ICICLES);
-    // }
-    
-    // if (rando_get_slotdata_u32("scarecrowsanity") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_SCARECROW);
-    // }
-    
-    // if (rando_get_slotdata_u32("hivesanity") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_BEEHIVES);
-    // }
-    
-    // if (rando_get_slotdata_u32("notebooksanity") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_NOTEBOOK);
-    // }
-    
-    // if (rando_get_slotdata_u32("owlsanity") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_OWLS);
-    // }
-    
-    // if (rando_get_slotdata_u32("frogsanity") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_FROGS);
-    // }
-    
-    // if (rando_get_slotdata_u32("treesanity") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_PALM_TREES);
-    //     removeAllScoutsWithPrefix(AP_PREFIX_SNOW_TREES);
-    //     removeAllScoutsWithPrefix(AP_PREFIX_WOOD_TREES);
-    //     removeAllScoutsWithPrefix(AP_PREFIX_TREE_TREES);
-    // }
-    
-    // if (rando_get_slotdata_u32("websanity") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_WEBS);
-    // }
-    
-    // if (rando_get_slotdata_u32("flowersanity") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_FLOWERS);
-    // }
-    
-    // if (rando_get_slotdata_u32("signsanity") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_SIGNS);
-    // }
-
-    // if (rando_get_slotdata_u32("oneoffs") == 0)
-    // {
-    //     removeAllScoutsWithPrefix(AP_PREFIX_ONEOFFS);
-    //     removeAllScoutsWithPrefix(0x063F00); // goron trial chest
-    // }
-    
-    // if (rando_get_slotdata_u32("completion_goal") == 0)
-    // {
-    //     rando_remove_queued_scout(0x0B012F);
-    // }
-
     rando_send_queued_scouts(0);
 }
 
@@ -543,8 +308,9 @@ RECOMP_PATCH s32 Health_ChangeBy(PlayState* play, s16 healthChange) {
 
     if (gSaveContext.save.saveInfo.playerData.health <= 0) {
         gSaveContext.save.saveInfo.playerData.health = 0;
-        if (rando_get_death_link_enabled()) {
+        if (rando_get_death_link_enabled() && !sending_death_link) {
             rando_send_death_link();
+            sending_death_link = true;
         }
 
         if (rando_get_slotdata_u32("death_behavior") == 3) {
@@ -553,6 +319,7 @@ RECOMP_PATCH s32 Health_ChangeBy(PlayState* play, s16 healthChange) {
 
         return false;
     } else {
+        sending_death_link = false;
         return true;
     }
 }
@@ -602,23 +369,24 @@ bool rando_get_camc_enabled() {
     return recomp_get_config_u32("camc_enabled");
 }
 
-// TODO: properly account for all different types of saves
 RECOMP_HOOK("Sram_StartWriteToFlashDefault")
 void rando_save_state_normally() {
-    recomp_printf("saving rando state from normal saves\n");
-    rando_save_current_state();
+    if (gSaveContext.fileNum == 0xFF) return; // ignore "slot" 0xFF (file deletion?)
+    recomp_printf("saving rando state from normal saves | slot %d\n", gSaveContext.fileNum);
+    rando_save_current_state(gSaveContext.fileNum);
+    rando_save_current_state(gSaveContext.fileNum + 2); // override owl saves
 }
 
 RECOMP_HOOK("Sram_StartWriteToFlashOwlSave")
 void rando_save_state_from_owl() {
-    recomp_printf("saving rando state from owls\n");
-    rando_save_current_state();
+    recomp_printf("saving rando state from owls | slot %d\n", gSaveContext.fileNum + 2);
+    rando_save_current_state(gSaveContext.fileNum + 2);
 }
 
 RECOMP_CALLBACK("*", recomp_on_autosave)
 void rando_handle_autosaves(PlayState* play) {
-    recomp_printf("saving rando state from autosave\n");
-    rando_save_current_state();
+    recomp_printf("saving rando state from autosave | slot %d\n", gSaveContext.fileNum + 2);
+    rando_save_current_state(gSaveContext.fileNum + 2);
 }
 
 ItemId randoConvertItemId(u32 ap_item_id) {
@@ -914,18 +682,12 @@ void update_rando(PlayState* play) {
 
     if (saveOpened) {
         if (!initItems) {
-            // TODO: account for each different type of save
-            REPY_FN_EXEC_CACHE(
-                py_rando_load_saved_state,
-                "RecompClient.run_async_task_and_wait_once(RecompClient.load_saved_state())\n" // async due to sending offline locations
-            );
-
             // below is left over from our old system, keeping this here for safety
 
-            if (gSaveContext.save.playerForm == PLAYER_FORM_FIERCE_DEITY) {
-                CUR_FORM_EQUIP(EQUIP_SLOT_B) = ITEM_SWORD_DEITY;
-                Interface_LoadItemIconImpl(play, EQUIP_SLOT_B);
-            }
+            // if (gSaveContext.save.playerForm == PLAYER_FORM_FIERCE_DEITY) {
+            //     CUR_FORM_EQUIP(EQUIP_SLOT_B) = ITEM_SWORD_DEITY;
+            //     Interface_LoadItemIconImpl(play, EQUIP_SLOT_B);
+            // }
 
             rando_send_location(LOCATION_INVENTORY_SWORD);
             rando_send_location(LOCATION_INVENTORY_SHIELD);
@@ -966,16 +728,17 @@ void update_rando(PlayState* play) {
             u32 item_type = REPY_FN_GET_U32("item_type");
 
             // note: this could probably be done differently, but partially uses old systems for now
-            if (player != rando_get_own_slot_id() || recomp_get_config_u32("local_notifications")) {
+            if (recomp_get_config_u32("enable_notifications") && (player != rando_get_own_slot_id() || recomp_get_config_u32("local_notifications"))) {
                 char* item_name;
                 char* player_name;
                 rando_get_item_name_from_id(item_id, &item_name);
-                rando_get_sending_player_name(location, &player_name);
+                rando_get_player_name(player, &player_name);
                 randoEmitRecieveNotification(item_name, player_name, randoConvertItemId(item_id), item_type);
                 recomp_free(item_name);
                 recomp_free(player_name);
             }
             randoItemGive(item_id);
+            break; // TEMP: due to a crash when displaying too many ui elements, items are processed once per frame
         }
 
         if (recomp_get_config_u32("deathlink") != last_deathlink_status) {
@@ -989,6 +752,11 @@ void update_rando(PlayState* play) {
                 Interface_StartMoonCrash(play);
             }
             rando_reset_death_link_pending();
+            
+            // display what/who caused the last death
+            char* cause;
+            rando_get_death_link_cause(&cause);
+            randoEmitNormalNotification(cause);
         }
 
         // check for 100% condition to give majora soul (gigarando)

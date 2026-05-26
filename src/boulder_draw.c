@@ -164,7 +164,9 @@ RECOMP_PATCH void ObjHamishi_Draw(Actor* thisx, PlayState* play) {
     u32* boulder2Location = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
 
     Color_RGB8 color = {255, 170, 130};
-    get_rando_color(&color, *boulder2Location);
+    if (rando_get_slotdata_u32("rocksanity")) {
+        get_rando_color(&color, *boulder2Location);
+    }
 
     OPEN_DISPS(play->state.gfxCtx);
 
