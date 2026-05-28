@@ -663,6 +663,8 @@ bool rando_met_all_goal();
 
 bool last_deathlink_status;
 
+s16 savedSceneId;
+
 RECOMP_CALLBACK("*", recomp_on_play_main)
 void update_rando(PlayState* play) {
     u32 new_items_size;
@@ -670,6 +672,7 @@ void update_rando(PlayState* play) {
     u8* save_ptr;
 
     gPlay = play;
+    savedSceneId = play->sceneId;
 
     // @glue push the interpreter on the stack to reduce lag from deactivations
     REPY_PushInterpreter(rando_interp);

@@ -167,7 +167,7 @@ void DoorWarp1_BeforeSettingWarp(DoorWarp1* this, PlayState* play) {
     originalDungeonFlags[2] = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE);
     originalDungeonFlags[3] = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_STONE_TOWER_TEMPLE);
     
-    if (!rando_get_slotdata_u32("boss_entrance_rando")) return;
+    if (!rando_get_slotdata_u32("boss_entrance_rando") && !rando_get_slotdata_u32("dungeon_entrance_rando")) return;
 
     if ((play->sceneId == SCENE_MITURIN_BS) || (play->sceneId == SCENE_HAKUGIN_BS) ||
         (play->sceneId == SCENE_INISIE_BS) || (play->sceneId == SCENE_SEA_BS)) {
@@ -188,26 +188,38 @@ void DoorWarp1_BeforeSettingWarp(DoorWarp1* this, PlayState* play) {
 
         if (this->unk_202 == 0) {
             shouldOverrideDungeon = true;
-            u32 placements = rando_get_slotdata_u32("er_placements");
-            s32 tempIndex = curBossDungeon;
+            REPY_FN_SETUP_RANDO;
 
-            // swap gbt and istt
-            if (tempIndex == 3) {
-                tempIndex = 2;
-            } else if (tempIndex == 2) {
-                tempIndex = 3;
-            }
+            REPY_FN_SET_S16("current_scene", play->sceneId);
 
-            tempIndex = reverseERLookup(placements, tempIndex);
+            REPY_FN_EXEC_CACHE(
+                rando_get_boss_entrance_rando,
+                "er_placements = recomp_data.ctx.slot_data[\"entrance_rando_results\"]\n"
+                "scene_id_to_name = {\n" // same as in scene_hooks.c, just reduced to bosses only
+                "    0x1F: \"Odolwa's Lair\",\n"
+                "    0x44: \"Goht's Lair\",\n"
+                "    0x5F: \"Gyorg's Lair\",\n"
+                "    0x36: \"Twinmold's Lair\",\n"
+                "}\n"
 
-            // swap gbt and istt (again)
-            if (tempIndex == 3) {
-                realBossDungeon = 2;
-            } else if (tempIndex == 2) {
-                realBossDungeon = 3;
-            } else {
-                realBossDungeon = tempIndex;
-            }
+                "name = scene_id_to_name[current_scene]\n"
+                "while er_placements[name]['from']:\n"
+                "   name = er_placements[name]['from']\n"
+                
+                "real_index = 0\n" // not a big fan of this failsafing into a real dungeon, but oh well
+                "if name == 'Woodfall' or name == 'Woodfall Temple':\n"
+                "   real_index = 0\n"
+                "elif name == 'Snowhead' or name == 'Snowhead Temple':\n"
+                "   real_index = 1\n"
+                "elif name == 'Zora Cape' or name == 'Great Bay Temple':\n"
+                "   real_index = 3\n"
+                "elif name == 'Stone Tower (Inverted)' or name == 'Stone Tower Temple (Inverted)':\n"
+                "   real_index = 2\n"
+            );
+
+            realBossDungeon = REPY_FN_GET_S32("real_index");
+
+            REPY_FN_CLEANUP;
         }
     }
 }
