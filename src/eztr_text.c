@@ -194,8 +194,360 @@ EZTR_MSG_CALLBACK(randoGIFrogs) {
 }
 
 
-EZTR_MSG_CALLBACK(randoTingle) {
-    rando_location_is_checked()
+EZTR_MSG_CALLBACK(randoTingleClockTown) {
+    u32 tingleFirstItem = GI_TINGLE_MAP_CLOCK_TOWN;
+    char* player_name;
+    char* get_player_name;
+    char* item_name;
+    char* get_item_name;
+    u32 tingleSecondItem = GI_TINGLE_MAP_WOODFALL;
+    char* player_name2;
+    char* get_player_name2;
+    char* item_name2;
+    char* get_item_name2;
+
+    char* rupee_cost1;
+    char* rupee_cost2;
+
+    
+    rando_get_location_item_player(tingleFirstItem, &get_player_name);
+    rando_get_location_item_name(tingleFirstItem, &get_item_name);
+    rando_get_location_item_player(tingleSecondItem, &get_player_name2);
+    rando_get_location_item_name(tingleSecondItem, &get_item_name2);
+
+    if (rando_location_is_checked(tingleFirstItem) == true) {player_name = "";
+    } else if (rando_get_location_has_local_item(tingleFirstItem) == true) {player_name = "";
+    } else {player_name = get_player_name;
+    }
+    if (rando_location_is_checked(tingleFirstItem) == true) {item_name = "SOLD OUT";
+    } else {item_name = get_item_name;
+    }
+    if (rando_location_is_checked(tingleSecondItem) == true) {player_name2 = "";
+    } else if (rando_get_location_has_local_item(tingleSecondItem) == true) {player_name2 = "";
+    } else {player_name2 = get_player_name2;
+    }
+    if (rando_location_is_checked(tingleSecondItem) == true) {item_name2 = "SOLD OUT";
+    } else {item_name2 = get_item_name2;
+    }
+    if (rando_location_is_checked(tingleFirstItem) == true) {rupee_cost1 = "";
+    } else {rupee_cost1 = "5 Rupees";
+    }
+    if (rando_location_is_checked(tingleSecondItem) == true) {rupee_cost2 = "";
+    } else {rupee_cost2 = "40 Rupees";
+    }
+
+
+
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "" EZTR_CC_THREE_CHOICE "" EZTR_CC_COLOR_LIGHTBLUE "%s " EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_RED " %s" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_LIGHTBLUE "%s " EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_RED " %s" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_GREEN "No thanks" EZTR_CC_END "",
+        player_name,
+        item_name,
+        rupee_cost1,
+        player_name2,
+        item_name2,
+        rupee_cost2
+    );
+
+    recomp_free(get_item_name);
+    recomp_free(get_item_name2);
+    recomp_free(get_player_name);
+    recomp_free(get_player_name2);
+}
+EZTR_MSG_CALLBACK(randoTingleWoodfall) {
+    u32 tingleFirstItem = GI_TINGLE_MAP_WOODFALL;
+    char* player_name;
+    char* get_player_name;
+    char* item_name;
+    char* get_item_name;
+    u32 tingleSecondItem = GI_TINGLE_MAP_SNOWHEAD;
+    char* player_name2;
+    char* get_player_name2;
+    char* item_name2;
+    char* get_item_name2;
+
+    char* rupee_cost1;
+    char* rupee_cost2;
+
+    
+    rando_get_location_item_player(tingleFirstItem, &get_player_name);
+    rando_get_location_item_name(tingleFirstItem, &get_item_name);
+    rando_get_location_item_player(tingleSecondItem, &get_player_name2);
+    rando_get_location_item_name(tingleSecondItem, &get_item_name2);
+
+    if (rando_location_is_checked(tingleFirstItem) == true) {player_name = "";
+    } else if (rando_get_location_has_local_item(tingleFirstItem) == true) {player_name = "";
+    } else {player_name = get_player_name;
+    }
+    if (rando_location_is_checked(tingleFirstItem) == true) {item_name = "SOLD OUT";
+    } else {item_name = get_item_name;
+    }
+    if (rando_location_is_checked(tingleSecondItem) == true) {player_name2 = "";
+    } else if (rando_get_location_has_local_item(tingleSecondItem) == true) {player_name2 = "";
+    } else {player_name2 = get_player_name2;
+    }
+    if (rando_location_is_checked(tingleSecondItem) == true) {item_name2 = "SOLD OUT";
+    } else {item_name2 = get_item_name2;
+    }
+    if (rando_location_is_checked(tingleFirstItem) == true) {rupee_cost1 = "";
+    } else {rupee_cost1 = "20 Rupees";
+    }
+    if (rando_location_is_checked(tingleSecondItem) == true) {rupee_cost2 = "";
+    } else {rupee_cost2 = "40 Rupees";
+    }
+
+
+
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "" EZTR_CC_THREE_CHOICE "" EZTR_CC_COLOR_LIGHTBLUE "%s " EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_RED " %s" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_LIGHTBLUE "%s " EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_RED " %s" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_GREEN "No thanks" EZTR_CC_END "",        player_name,
+        item_name,
+        rupee_cost1,
+        player_name2,
+        item_name2,
+        rupee_cost2
+    );
+
+    recomp_free(get_item_name);
+    recomp_free(get_item_name2);
+    recomp_free(get_player_name);
+    recomp_free(get_player_name2);
+}
+EZTR_MSG_CALLBACK(randoTingleSnowhead) {
+    u32 tingleFirstItem = GI_TINGLE_MAP_SNOWHEAD;
+    char* player_name;
+    char* get_player_name;
+    char* item_name;
+    char* get_item_name;
+    u32 tingleSecondItem = GI_TINGLE_MAP_ROMANI_RANCH;
+    char* player_name2;
+    char* get_player_name2;
+    char* item_name2;
+    char* get_item_name2;
+
+    char* rupee_cost1;
+    char* rupee_cost2;
+
+    
+    rando_get_location_item_player(tingleFirstItem, &get_player_name);
+    rando_get_location_item_name(tingleFirstItem, &get_item_name);
+    rando_get_location_item_player(tingleSecondItem, &get_player_name2);
+    rando_get_location_item_name(tingleSecondItem, &get_item_name2);
+
+    if (rando_location_is_checked(tingleFirstItem) == true) {player_name = "";
+    } else if (rando_get_location_has_local_item(tingleFirstItem) == true) {player_name = "";
+    } else {player_name = get_player_name;
+    }
+    if (rando_location_is_checked(tingleFirstItem) == true) {item_name = "SOLD OUT";
+    } else {item_name = get_item_name;
+    }
+    if (rando_location_is_checked(tingleSecondItem) == true) {player_name2 = "";
+    } else if (rando_get_location_has_local_item(tingleSecondItem) == true) {player_name2 = "";
+    } else {player_name2 = get_player_name2;
+    }
+    if (rando_location_is_checked(tingleSecondItem) == true) {item_name2 = "SOLD OUT";
+    } else {item_name2 = get_item_name2;
+    }
+    if (rando_location_is_checked(tingleFirstItem) == true) {rupee_cost1 = "";
+    } else {rupee_cost1 = "20 Rupees";
+    }
+    if (rando_location_is_checked(tingleSecondItem) == true) {rupee_cost2 = "";
+    } else {rupee_cost2 = "40 Rupees";
+    }
+
+
+
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "" EZTR_CC_THREE_CHOICE "" EZTR_CC_COLOR_LIGHTBLUE "%s " EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_RED " %s" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_LIGHTBLUE "%s " EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_RED " %s" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_GREEN "No thanks" EZTR_CC_END "",        player_name,
+        item_name,
+        rupee_cost1,
+        player_name2,
+        item_name2,
+        rupee_cost2
+    );
+
+    recomp_free(get_item_name);
+    recomp_free(get_item_name2);
+    recomp_free(get_player_name);
+    recomp_free(get_player_name2);
+}
+EZTR_MSG_CALLBACK(randoTingleMilkRoad) {
+    u32 tingleFirstItem = GI_TINGLE_MAP_ROMANI_RANCH;
+    char* player_name;
+    char* get_player_name;
+    char* item_name;
+    char* get_item_name;
+    u32 tingleSecondItem = GI_TINGLE_MAP_GREAT_BAY;
+    char* player_name2;
+    char* get_player_name2;
+    char* item_name2;
+    char* get_item_name2;
+
+    char* rupee_cost1;
+    char* rupee_cost2;
+
+    
+    rando_get_location_item_player(tingleFirstItem, &get_player_name);
+    rando_get_location_item_name(tingleFirstItem, &get_item_name);
+    rando_get_location_item_player(tingleSecondItem, &get_player_name2);
+    rando_get_location_item_name(tingleSecondItem, &get_item_name2);
+
+    if (rando_location_is_checked(tingleFirstItem) == true) {player_name = "";
+    } else if (rando_get_location_has_local_item(tingleFirstItem) == true) {player_name = "";
+    } else {player_name = get_player_name;
+    }
+    if (rando_location_is_checked(tingleFirstItem) == true) {item_name = "SOLD OUT";
+    } else {item_name = get_item_name;
+    }
+    if (rando_location_is_checked(tingleSecondItem) == true) {player_name2 = "";
+    } else if (rando_get_location_has_local_item(tingleSecondItem) == true) {player_name2 = "";
+    } else {player_name2 = get_player_name2;
+    }
+    if (rando_location_is_checked(tingleSecondItem) == true) {item_name2 = "SOLD OUT";
+    } else {item_name2 = get_item_name2;
+    }
+    if (rando_location_is_checked(tingleFirstItem) == true) {rupee_cost1 = "";
+    } else {rupee_cost1 = "20 Rupees";
+    }
+    if (rando_location_is_checked(tingleSecondItem) == true) {rupee_cost2 = "";
+    } else {rupee_cost2 = "40 Rupees";
+    }
+
+
+
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "" EZTR_CC_THREE_CHOICE "" EZTR_CC_COLOR_LIGHTBLUE "%s " EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_RED " %s" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_LIGHTBLUE "%s " EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_RED " %s" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_GREEN "No thanks" EZTR_CC_END "",        player_name,
+        item_name,
+        rupee_cost1,
+        player_name2,
+        item_name2,
+        rupee_cost2
+    );
+
+    recomp_free(get_item_name);
+    recomp_free(get_item_name2);
+    recomp_free(get_player_name);
+    recomp_free(get_player_name2);
+}
+EZTR_MSG_CALLBACK(randoTingleGreatBay) {
+    u32 tingleFirstItem = GI_TINGLE_MAP_GREAT_BAY;
+    char* player_name;
+    char* get_player_name;
+    char* item_name;
+    char* get_item_name;
+    u32 tingleSecondItem = GI_TINGLE_MAP_STONE_TOWER;
+    char* player_name2;
+    char* get_player_name2;
+    char* item_name2;
+    char* get_item_name2;
+
+    char* rupee_cost1;
+    char* rupee_cost2;
+
+    
+    rando_get_location_item_player(tingleFirstItem, &get_player_name);
+    rando_get_location_item_name(tingleFirstItem, &get_item_name);
+    rando_get_location_item_player(tingleSecondItem, &get_player_name2);
+    rando_get_location_item_name(tingleSecondItem, &get_item_name2);
+
+    if (rando_location_is_checked(tingleFirstItem) == true) {player_name = "";
+    } else if (rando_get_location_has_local_item(tingleFirstItem) == true) {player_name = "";
+    } else {player_name = get_player_name;
+    }
+    if (rando_location_is_checked(tingleFirstItem) == true) {item_name = "SOLD OUT";
+    } else {item_name = get_item_name;
+    }
+    if (rando_location_is_checked(tingleSecondItem) == true) {player_name2 = "";
+    } else if (rando_get_location_has_local_item(tingleSecondItem) == true) {player_name2 = "";
+    } else {player_name2 = get_player_name2;
+    }
+    if (rando_location_is_checked(tingleSecondItem) == true) {item_name2 = "SOLD OUT";
+    } else {item_name2 = get_item_name2;
+    }
+    if (rando_location_is_checked(tingleFirstItem) == true) {rupee_cost1 = "";
+    } else {rupee_cost1 = "20 Rupees";
+    }
+    if (rando_location_is_checked(tingleSecondItem) == true) {rupee_cost2 = "";
+    } else {rupee_cost2 = "40 Rupees";
+    }
+
+
+
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "" EZTR_CC_THREE_CHOICE "" EZTR_CC_COLOR_LIGHTBLUE "%s " EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_RED " %s" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_LIGHTBLUE "%s " EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_RED " %s" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_GREEN "No thanks" EZTR_CC_END "",        player_name,
+        item_name,
+        rupee_cost1,
+        player_name2,
+        item_name2,
+        rupee_cost2
+    );
+
+    recomp_free(get_item_name);
+    recomp_free(get_item_name2);
+    recomp_free(get_player_name);
+    recomp_free(get_player_name2);
+}
+EZTR_MSG_CALLBACK(randoTingleStoneTower) {
+    u32 tingleFirstItem = GI_TINGLE_MAP_STONE_TOWER;
+    char* player_name;
+    char* get_player_name;
+    char* item_name;
+    char* get_item_name;
+    u32 tingleSecondItem = GI_TINGLE_MAP_CLOCK_TOWN;
+    char* player_name2;
+    char* get_player_name2;
+    char* item_name2;
+    char* get_item_name2;
+
+    char* rupee_cost1;
+    char* rupee_cost2;
+
+    
+    rando_get_location_item_player(tingleFirstItem, &get_player_name);
+    rando_get_location_item_name(tingleFirstItem, &get_item_name);
+    rando_get_location_item_player(tingleSecondItem, &get_player_name2);
+    rando_get_location_item_name(tingleSecondItem, &get_item_name2);
+
+    if (rando_location_is_checked(tingleFirstItem) == true) {player_name = "";
+    } else if (rando_get_location_has_local_item(tingleFirstItem) == true) {player_name = "";
+    } else {player_name = get_player_name;
+    }
+    if (rando_location_is_checked(tingleFirstItem) == true) {item_name = "SOLD OUT";
+    } else {item_name = get_item_name;
+    }
+    if (rando_location_is_checked(tingleSecondItem) == true) {player_name2 = "";
+    } else if (rando_get_location_has_local_item(tingleSecondItem) == true) {player_name2 = "";
+    } else {player_name2 = get_player_name2;
+    }
+    if (rando_location_is_checked(tingleSecondItem) == true) {item_name2 = "SOLD OUT";
+    } else {item_name2 = get_item_name2;
+    }
+    if (rando_location_is_checked(tingleFirstItem) == true) {rupee_cost1 = "";
+    } else {rupee_cost1 = "20 Rupees";
+    }
+    if (rando_location_is_checked(tingleSecondItem) == true) {rupee_cost2 = "";
+    } else {rupee_cost2 = "40 Rupees";
+    }
+
+
+
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "" EZTR_CC_THREE_CHOICE "" EZTR_CC_COLOR_LIGHTBLUE "%s " EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_RED " %s" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_LIGHTBLUE "%s " EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_RED " %s" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_GREEN "No thanks" EZTR_CC_END "",        player_name,
+        item_name,
+        rupee_cost1,
+        player_name2,
+        item_name2,
+        rupee_cost2
+    );
+
+    recomp_free(get_item_name);
+    recomp_free(get_item_name2);
+    recomp_free(get_player_name);
+    recomp_free(get_player_name2);
 }
 
 EZTR_MSG_CALLBACK(randoShop) {
@@ -791,8 +1143,8 @@ EZTR_ON_INIT void init_text() {
         5,
         40,
         true,
-        "" EZTR_CC_COLOR_GREEN "" EZTR_CC_THREE_CHOICE "Clock Town    " EZTR_CC_COLOR_RED "5 Rupees" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_GREEN "Woodfall     " EZTR_CC_COLOR_RED "40 Rupees" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_GREEN "No thanks" EZTR_CC_END "",
-        NULL
+        "\xBF",
+        randoTingleClockTown
     );
     // Path to Swamp Tingle (Woodfall)
     EZTR_Basic_ReplaceText(
@@ -804,8 +1156,8 @@ EZTR_ON_INIT void init_text() {
         20,
         40,
         true,
-        "" EZTR_CC_COLOR_GREEN "" EZTR_CC_THREE_CHOICE "Woodfall    " EZTR_CC_COLOR_RED "20 Rupees" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_GREEN "Snowhead    " EZTR_CC_COLOR_RED "40 Rupees" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_GREEN "No thanks" EZTR_CC_END "",
-        NULL
+        "\xBF",
+        randoTingleWoodfall
     );
     // Twin Islands Tingle (Snowhead)
     EZTR_Basic_ReplaceText(
@@ -817,8 +1169,8 @@ EZTR_ON_INIT void init_text() {
         20,
         40,
         true,
-        "" EZTR_CC_COLOR_GREEN "" EZTR_CC_THREE_CHOICE "Snowhead    " EZTR_CC_COLOR_RED "20 Rupees" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_GREEN "Romani Ranch " EZTR_CC_COLOR_RED "40 Rupees" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_GREEN "No thanks" EZTR_CC_END "",
-        NULL
+        "\xBF",
+        randoTingleSnowhead
     );
     // Milk Road Tingle
     EZTR_Basic_ReplaceText(
@@ -830,8 +1182,8 @@ EZTR_ON_INIT void init_text() {
         20,
         40,
         true,
-        "" EZTR_CC_COLOR_GREEN "" EZTR_CC_THREE_CHOICE "Romani Ranch " EZTR_CC_COLOR_RED "20 Rupees" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_GREEN "Great Bay    " EZTR_CC_COLOR_RED "40 Rupees" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_GREEN "No thanks" EZTR_CC_END "",
-        NULL
+        "\xBF",
+        randoTingleMilkRoad
     );
     // Great Bay Coast Tingle
     EZTR_Basic_ReplaceText(
@@ -843,8 +1195,8 @@ EZTR_ON_INIT void init_text() {
         20,
         40,
         true,
-        "" EZTR_CC_COLOR_GREEN "" EZTR_CC_THREE_CHOICE "Great Bay    " EZTR_CC_COLOR_RED "20 Rupees" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_GREEN "Stone Tower " EZTR_CC_COLOR_RED "40 Rupees" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_GREEN "No thanks" EZTR_CC_END "",
-        NULL
+        "\xBF",
+        randoTingleGreatBay
     );
     // Ikana Canyon Tingle
     EZTR_Basic_ReplaceText(
@@ -856,8 +1208,8 @@ EZTR_ON_INIT void init_text() {
         20,
         40,
         true,
-        "" EZTR_CC_COLOR_GREEN "" EZTR_CC_THREE_CHOICE "Stone Tower " EZTR_CC_COLOR_RED "20 Rupees" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_GREEN "Clock Town   " EZTR_CC_COLOR_RED "40 Rupees" EZTR_CC_NEWLINE "" EZTR_CC_COLOR_GREEN "No thanks" EZTR_CC_END "",
-        NULL
+        "\xBF",
+        randoTingleStoneTower
     );
 
 
@@ -1248,17 +1600,17 @@ EZTR_ON_INIT void init_text() {
         "...But you are not strong enough..." EZTR_CC_CARRIAGE_RETURN "" EZTR_CC_BOX_BREAK2 "Shall... I send you back?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "",
         NULL
     );
-    EZTR_Basic_AddCustomText(EZTR_HNAME(Rando_Tingle),
-        EZTR_STANDARD_TEXT_BOX_II,
-        0,
-        EZTR_ICON_NO_ICON,
-        EZTR_NO_VALUE,
-        EZTR_NO_VALUE,
-        EZTR_NO_VALUE,
-        false,
-        "\xBF",
-        randoTingle
-    );
+    // EZTR_Basic_AddCustomText(EZTR_HNAME(Rando_Tingle),
+    //     EZTR_STANDARD_TEXT_BOX_II,
+    //     0,
+    //     EZTR_ICON_NO_ICON,
+    //     EZTR_NO_VALUE,
+    //     EZTR_NO_VALUE,
+    //     EZTR_NO_VALUE,
+    //     false,
+    //     "\xBF",
+    //     randoTingle
+    // );
     EZTR_Basic_AddCustomText(EZTR_HNAME(Rando_Shop),
         EZTR_STANDARD_TEXT_BOX_II,
         0,
