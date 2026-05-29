@@ -2,32 +2,9 @@
 #include "global.h"
 
 #include "apcommon.h"
-#include "overlays/actors/ovl_En_GirlA/z_en_girla.h"
+#include "shops.h"
 
-#define LOCATION_SHOP_ITEM (0x090000 | this->items[this->cursorIndex]->itemParams)
-#define LOCATION_FSN_RUPEE (0x070000 | (this->actor.id) << 8 | this->getItemId)
-
-#define FSN_LIMB_MAX 0x12
-#define ENFSN_LIMB_MAX FSN_LIMB_MAX + 1 // Note: adding 1 to FSN_LIMB_MAX due to bug in the skeleton, see bug in object_fsn.xml
-#include "overlays/actors/ovl_En_Fsn/z_en_fsn.h"
-
-typedef enum {
-    /* 0 */ ENFSN_CUTSCENESTATE_STOPPED,
-    /* 1 */ ENFSN_CUTSCENESTATE_WAITING,
-    /* 2 */ ENFSN_CUTSCENESTATE_PLAYING
-} EnFsnCutsceneState;
-
-#define ANI_LIMB_MAX 0x10
-#define ENOSSAN_LIMB_MAX MAX((s32)FSN_LIMB_MAX + 1, (s32)ANI_LIMB_MAX)
-#include "overlays/actors/ovl_En_Ossan/z_en_ossan.h"
-
-#define ZORA_LIMB_MAX 0x14
-#define BOMB_SHOPKEEPER_LIMB_MAX 0x10
-#define GORON_LIMB_MAX 0x12
-#define ENSOB1_LIMB_MAX MAX(MAX((s32)ZORA_LIMB_MAX, (s32)BOMB_SHOPKEEPER_LIMB_MAX), (s32)GORON_LIMB_MAX)
-#include "overlays/actors/ovl_En_Sob1/z_en_sob1.h"
-
-#include "overlays/actors/ovl_En_Trt/z_en_trt.h"
+s16 shopItemId;
 
 s32 rando_get_shop_price(u32 shop_item_id) {
     REPY_FN_SETUP_RANDO;
@@ -44,6 +21,8 @@ s32 rando_get_shop_price(u32 shop_item_id) {
 // Curiosity Shop
 void EnFsn_SetupResumeInteraction(EnFsn* this, PlayState* play);
 void EnFsn_PlayerCannotBuy(EnFsn* this, PlayState* play);
+
+EnFsn* sEnFsn;
 
 RECOMP_PATCH void EnFsn_GiveItem(EnFsn* this, PlayState* play) {
     if (Actor_HasParent(&this->actor, play)) {
@@ -133,9 +112,35 @@ RECOMP_PATCH void EnFsn_HandleCanPlayerBuyItem(EnFsn* this, PlayState* play) {
     }
 }
 
+RECOMP_HOOK("EnFsn_CursorLeftRight")
+void PreRandoGrabSelectedItem_EnFsn_CursorLeftRight(EnFsn* this) {
+    sEnFsn = this;
+    shopItemId = this->items[this->cursorIndex]->actor.params;
+}
+
+RECOMP_HOOK_RETURN("EnFsn_CursorLeftRight")
+void RandoGrabSelectedItem_EnFsn_CursorLeftRight() {
+    EnFsn* this = sEnFsn;
+    shopItemId = this->items[this->cursorIndex]->actor.params;
+}
+
+RECOMP_HOOK("EnFsn_FaceShopkeeperSelling")
+void PreRandoGrabSelectedItem_EnFsn_FaceShopkeeperSelling(EnFsn* this, PlayState* play) {
+    sEnFsn = this;
+    shopItemId = this->items[this->cursorIndex]->actor.params;
+}
+
+RECOMP_HOOK_RETURN("EnFsn_FaceShopkeeperSelling")
+void RandoGrabSelectedItem_EnFsn_FaceShopkeeperSelling() {
+    EnFsn* this = sEnFsn;
+    shopItemId = this->items[this->cursorIndex]->actor.params;
+}
+
 // Trading Post
 void EnOssan_SetupAction(EnOssan* this, EnOssanActionFunc action);
 void EnOssan_SetupItemPurchased(EnOssan* this, PlayState* play);
+
+EnOssan* sEnOssan;
 
 extern ShopItem sShops_ovl_En_Ossan[2][8];
 
@@ -177,9 +182,55 @@ RECOMP_PATCH void EnOssan_SetupBuyItemWithFanfare(PlayState* play, EnOssan* this
     EnOssan_SetupAction(this, EnOssan_BuyItemWithFanfare);
 }
 
+RECOMP_HOOK("EnOssan_FaceShopkeeper") // grabbing selected item, annoyingly need to hook before and after
+void PreRandoGrabSelectedItem_EnOssan_FaceShopkeeper(EnOssan* this, PlayState* play) {
+    sEnOssan = this;
+}
+
+RECOMP_HOOK_RETURN("EnOssan_FaceShopkeeper")
+void RandoGrabSelectedItem_EnOssan_FaceShopkeeper() {
+    EnOssan* this = sEnOssan;
+    shopItemId = this->items[this->cursorIndex]->actor.params;
+}
+
+RECOMP_HOOK("EnOssan_CursorUpDown")
+void PreRandoGrabSelectedItem_EnOssan_CursorUpDown(EnOssan* this) {
+    sEnOssan = this;
+}
+
+RECOMP_HOOK_RETURN("EnOssan_CursorUpDown")
+void RandoGrabSelectedItem_EnOssan_CursorUpDown() {
+    EnOssan* this = sEnOssan;
+    shopItemId = this->items[this->cursorIndex]->actor.params;
+}
+
+RECOMP_HOOK("EnOssan_BrowseLeftShelf")
+void PreRandoGrabSelectedItem_EnOssan_BrowseLeftShelf(EnOssan* this, PlayState* play) {
+    sEnOssan = this;
+}
+
+RECOMP_HOOK_RETURN("EnOssan_BrowseLeftShelf")
+void RandoGrabSelectedItem_EnOssan_BrowseLeftShelf() {
+    EnOssan* this = sEnOssan;
+    shopItemId = this->items[this->cursorIndex]->actor.params;
+}
+
+RECOMP_HOOK("EnOssan_BrowseRightShelf")
+void PreRandoGrabSelectedItem_EnOssan_BrowseRightShelf(EnOssan* this, PlayState* play) {
+    sEnOssan = this;
+}
+
+RECOMP_HOOK_RETURN("EnOssan_BrowseRightShelf")
+void RandoGrabSelectedItem_EnOssan_BrowseRightShelf() {
+    EnOssan* this = sEnOssan;
+    shopItemId = this->items[this->cursorIndex]->actor.params;
+}
+
 // Zora, Goron, and Bomb
 void EnSob1_SetupAction(EnSob1* this, EnSob1ActionFunc action);
 void EnSob1_SetupItemPurchased(EnSob1* this, PlayState* play);
+
+EnSob1* sEnSob1;
 
 extern ShopItem sShops_ovl_En_Sob1[4][3];
 
@@ -219,6 +270,28 @@ RECOMP_PATCH void EnSob1_SetupBuyItemWithFanfare(PlayState* play, EnSob1* this) 
     Interface_SetHudVisibility(HUD_VISIBILITY_ALL);
     this->drawCursor = 0;
     EnSob1_SetupAction(this, EnSob1_BuyItemWithFanfare);
+}
+
+RECOMP_HOOK("EnSob1_FaceShopkeeper")
+void PreRandoGrabSelectedItem_EnSob1_FaceShopkeeper(EnSob1* this, PlayState* play) {
+    sEnSob1 = this;
+}
+
+RECOMP_HOOK_RETURN("EnSob1_FaceShopkeeper")
+void RandoGrabSelectedItem_EnSob1_FaceShopkeeper() {
+    EnSob1* this = sEnSob1;
+    shopItemId = this->items[this->cursorIndex]->actor.params;
+}
+
+RECOMP_HOOK("EnSob1_CursorLeftRight")
+void PreRandoGrabSelectedItem_EnSob1_CursorLeftRight(PlayState* play, EnSob1* this) {
+    sEnSob1 = this;
+}
+
+RECOMP_HOOK_RETURN("EnSob1_CursorLeftRight")
+void RandoGrabSelectedItem_EnSob1_CursorLeftRight() {
+    EnSob1* this = sEnSob1;
+    shopItemId = this->items[this->cursorIndex]->actor.params;
 }
 
 // Kotake
@@ -423,4 +496,10 @@ RECOMP_PATCH void EnTrt_SelectItem(EnTrt* this, PlayState* play) {
             }
         }
     }
+}
+
+RECOMP_HOOK("EnTrt_GetItemTextId")
+void RandoGrabSelectedItem_EnTrt_GetItemTextId(EnTrt* this) {
+    shopItemId = this->items[this->cursorIndex]->actor.params;
+    // also set/unset free potion flag here
 }

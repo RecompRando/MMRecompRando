@@ -3,9 +3,11 @@
 
 #include "apcommon.h"
 
+#include "eztr_api.h"
+EZTR_DECLARE_CUSTOM_MSG_HANDLE(Rando_Shop);
+EZTR_DECLARE_CUSTOM_MSG_HANDLE(Rando_Shop_Buying);
+
 #define LOCATION_SHOP_ITEM (0x090000 | this->actor.params)
-#define SHOP_ITEM_TEXT (0x3600 | this->actor.params)
-#define SHOP_ITEM_BUY_TEXT (0x3700 | this->actor.params)
 
 #include "overlays/actors/ovl_En_GirlA/z_en_girla.h"
 
@@ -188,7 +190,7 @@ RECOMP_PATCH void EnGirlA_InitItem(PlayState* play, EnGirlA* this) {
     shopObjectLoading[this->actor.params] = false;
     shopObjectLoaded[this->actor.params] = false;
 
-    this->actor.textId = SHOP_ITEM_TEXT;
+    this->actor.textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_Shop));
     this->isOutOfStock = false;
     this->actor.draw = EnGirlA_Draw;
 }
@@ -203,7 +205,9 @@ RECOMP_PATCH void EnGirlA_InitalUpdate(EnGirlA* this, PlayState* play) {
             this->actor.params == SI_SWORD_GILDED
             )) {
         s16 trueGI = rando_get_item_id(LOCATION_SHOP_ITEM);
-        ShopItemEntry item = { getObjectId(trueGI), getGid(trueGI), NULL, 1, SHOP_ITEM_TEXT, SHOP_ITEM_BUY_TEXT, trueGI, EnGirlA_RandoCanBuyFunc,
+        u16 shopItemText = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_Shop));
+        u16 shopBuyText = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_Shop_Buying));
+        ShopItemEntry item = { getObjectId(trueGI), getGid(trueGI), NULL, 1, shopItemText, shopBuyText, trueGI, EnGirlA_RandoCanBuyFunc,
             EnGirlA_RandoBuyFunc, EnGirlA_RandoBuyFanfare };
         ShopItemEntry* shopItem = &item;
 

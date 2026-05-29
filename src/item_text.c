@@ -806,7 +806,7 @@ RECOMP_PATCH void Message_OpenText(PlayState* play, u16 textId) {
         recomp_free(player2_str);
     }
     
-    // Potion Shop
+    // Shop Text
     if ((textId & 0xFF00) == 0x3600 || (textId & 0xFF00) == 0x3700 || (textId == 0x0880 && rando_get_slotdata_u32("shopsanity") && !rando_location_is_checked(0x090002))) {
         msg = shop_msg;
         font->msgBuf.schar[0] = 0x06;

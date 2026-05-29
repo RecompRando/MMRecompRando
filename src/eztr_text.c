@@ -6,6 +6,7 @@
 #include "attributes.h"
 
 #include "apcommon.h"
+#include "shops.h"
 
 #include "z64snap.h"
 
@@ -26,6 +27,8 @@ extern GetItemEntryAP sGetItemTable_ap[];
 //         default: return 0x07; // EZTR_CC_COLOR_SILVER;  // filler - grey
 //     }
 // }
+
+void sanitizeRandoText(char* rando_string);
 
 u8 getAPItemColor(u32 location) {
     u32 type = rando_get_location_type(location);
@@ -79,6 +82,7 @@ EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_FOOL);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Moon_Child_Return);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Tingle); // Shops
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Shop);
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Shop_Buying);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Scrub);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Milk_Bar);
 
@@ -550,8 +554,93 @@ EZTR_MSG_CALLBACK(randoTingleStoneTower) {
     recomp_free(get_player_name2);
 }
 
+extern s16 shopItemId;
 EZTR_MSG_CALLBACK(randoShop) {
+    u32 shop_location = LOCATION_SHOP_ITEM_ID(shopItemId);
+    s32 price = rando_get_shop_price(shopItemId);
+
+    EZTR_MsgBuffer_SetFirstItemRupees(buf, price);
+
+    char* item_name;
+    char* player_name;
+    rando_get_location_item_name(shop_location, &item_name);
+    rando_get_location_item_player(shop_location, &player_name);
+    sanitizeRandoText(item_name);
+    sanitizeRandoText(player_name);
+
+    char* classificationText;
+    u32 type = rando_get_location_type(shop_location);
+    if (type & 0b001) {
+        classificationText = EZTR_CC_COLOR_LIGHTBLUE "Progression Item" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+    } else if (type & 0b010) {
+        classificationText = EZTR_CC_COLOR_BLUE "Useful Item" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+    } else if (type & 0b100) {
+        classificationText = EZTR_CC_COLOR_ORANGE "Trap" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+    } else {
+        classificationText = EZTR_CC_COLOR_SILVER "Filler Item" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+    }
+
+    char forText[128];
+    if (!rando_get_location_has_local_item(shop_location)) {
+        EZTR_MsgSContent_Snprintf(
+            forText,
+            128,
+            " for" EZTR_CC_NEWLINE
+            EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT EZTR_CC_END,
+            player_name
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            forText,
+            128,
+            EZTR_CC_END
+        );
+    }
+
+    char* extraText;
+    if (shopItemId == SI_POTION_BLUE) {
+        extraText = EZTR_CC_NEWLINE EZTR_CC_COLOR_LIGHTBLUE "Requires a Magic Mushroom" EZTR_CC_END;
+    } else {
+        extraText = EZTR_CC_END;
+    }
+
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        EZTR_CC_COLOR_RED "%s: %d Rupees" EZTR_CC_NEWLINE
+        EZTR_CC_COLOR_DEFAULT "This is a %m%m%m" EZTR_CC_PERSISTENT EZTR_CC_END,
+        item_name,
+        price,
+        classificationText,
+        forText,
+        extraText
+    );
+
+    recomp_free(item_name);
+    recomp_free(player_name);
+}
+
+EZTR_MSG_CALLBACK(randoShopBuy) {
+    u32 shop_location = LOCATION_SHOP_ITEM_ID(shopItemId);
+    s32 price = rando_get_shop_price(shopItemId);
     
+    EZTR_MsgBuffer_SetFirstItemRupees(buf, price);
+
+    char* item_name;
+    rando_get_location_item_name(shop_location, &item_name);
+    sanitizeRandoText(item_name);
+
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "%s: %d Rupees" EZTR_CC_NEWLINE
+        EZTR_CC_NEWLINE
+        EZTR_CC_COLOR_GREEN EZTR_CC_TWO_CHOICE
+        "I'll buy it" EZTR_CC_NEWLINE
+        "No thanks" EZTR_CC_PERSISTENT EZTR_CC_END,
+        item_name,
+        price
+    );
+
+    recomp_free(item_name);
 }
 
 EZTR_MSG_CALLBACK(randoScrub) {
@@ -1600,20 +1689,10 @@ EZTR_ON_INIT void init_text() {
         "...But you are not strong enough..." EZTR_CC_CARRIAGE_RETURN "" EZTR_CC_BOX_BREAK2 "Shall... I send you back?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "",
         NULL
     );
-    // EZTR_Basic_AddCustomText(EZTR_HNAME(Rando_Tingle),
-    //     EZTR_STANDARD_TEXT_BOX_II,
-    //     0,
-    //     EZTR_ICON_NO_ICON,
-    //     EZTR_NO_VALUE,
-    //     EZTR_NO_VALUE,
-    //     EZTR_NO_VALUE,
-    //     false,
-    //     "\xBF",
-    //     randoTingle
-    // );
-    EZTR_Basic_AddCustomText(EZTR_HNAME(Rando_Shop),
+    EZTR_Basic_AddCustomText(
+        EZTR_HNAME(Rando_Shop),
         EZTR_STANDARD_TEXT_BOX_II,
-        0,
+        0x30,
         EZTR_ICON_NO_ICON,
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
@@ -1621,6 +1700,18 @@ EZTR_ON_INIT void init_text() {
         false,
         "\xBF",
         randoShop
+    );
+    EZTR_Basic_AddCustomText(
+        EZTR_HNAME(Rando_Shop_Buying),
+        EZTR_STANDARD_TEXT_BOX_II,
+        0x31,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        false,
+        "\xBF",
+        randoShopBuy
     );
     EZTR_Basic_AddCustomText(EZTR_HNAME(Rando_Scrub),
         EZTR_STANDARD_TEXT_BOX_II,
