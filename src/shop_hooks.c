@@ -407,7 +407,7 @@ RECOMP_PATCH void EnTrt_SelectItem(EnTrt* this, PlayState* play) {
             }
         } else if ((talkState == TEXT_STATE_5) && Message_ShouldAdvance(play)) {
             // if (!Inventory_HasEmptyBottle()) {
-            if (!Inventory_HasEmptyBottle() && (rando_location_is_checked(location_to_buy) || !rando_get_slotdata_u32("shopsanity"))) {
+            if (!Inventory_HasEmptyBottle() && rando_location_is_checked(GI_POTION_BLUE)) {
                 Audio_PlaySfx(NA_SE_SY_ERROR);
                 EnTrt_SetupCannotBuy(play, this, 0x846);
             } else {
@@ -415,6 +415,7 @@ RECOMP_PATCH void EnTrt_SelectItem(EnTrt* this, PlayState* play) {
                     CutsceneManager_Stop(this->csId);
                     this->cutsceneState = ENTRT_CUTSCENESTATE_STOPPED;
                 }
+                location_to_buy = GI_POTION_BLUE;
                 EnTrt_SetupBuyItemWithFanfare(play, this);
                 this->drawCursor = 0;
                 this->shopItemSelectedTween = 0.0f;
@@ -422,5 +423,14 @@ RECOMP_PATCH void EnTrt_SelectItem(EnTrt* this, PlayState* play) {
                 SET_WEEKEVENTREG(WEEKEVENTREG_RECEIVED_FREE_BLUE_POTION);
             }
         }
+    }
+}
+
+RECOMP_HOOK("EnTrt_GetItemChoiceTextId")
+void EnTrt_CheckFreeBluePotion(EnTrt* this) {
+    if (rando_location_is_checked(GI_POTION_BLUE)) {
+        SET_WEEKEVENTREG(WEEKEVENTREG_RECEIVED_FREE_BLUE_POTION);
+    } else {
+        CLEAR_WEEKEVENTREG(WEEKEVENTREG_RECEIVED_FREE_BLUE_POTION);
     }
 }

@@ -116,6 +116,13 @@ void EnGirlA_RandoBought(PlayState* play, EnGirlA* this) {
 
 // @rando restock with vanilla items by reinitializing w/ default info
 void EnGirlA_RandoRestock(PlayState* play, EnGirlA* this) {
+    // this if statement only exists for the blue potion item
+    if (rando_get_slotdata_u32("shopsanity") && !rando_location_is_checked(LOCATION_SHOP_ITEM)) {
+        this->isOutOfStock = false;
+        this->actor.draw = EnGirlA_Draw;
+        return;
+    }
+    
     s16 params = this->actor.params;
     ShopItemEntry* shopItem = &sShopItemEntries[params];
 
