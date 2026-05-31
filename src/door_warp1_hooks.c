@@ -200,6 +200,13 @@ void DoorWarp1_BeforeSettingWarp(DoorWarp1* this, PlayState* play) {
 
             realBossDungeon = REPY_FN_GET_S32("real_region");
 
+            // swap great bay temple and stone tower ids
+            if (realBossDungeon == 2) {
+                realBossDungeon = 3;
+            } else if (realBossDungeon == 3) {
+                realBossDungeon = 2;
+            }
+
             REPY_FN_CLEANUP;
         }
     }
