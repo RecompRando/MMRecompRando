@@ -190,34 +190,15 @@ void DoorWarp1_BeforeSettingWarp(DoorWarp1* this, PlayState* play) {
             shouldOverrideDungeon = true;
             REPY_FN_SETUP_RANDO;
 
-            REPY_FN_SET_S16("current_scene", play->sceneId);
+            REPY_FN_SET_S32("current_boss", curBossDungeon);
 
             REPY_FN_EXEC_CACHE(
                 rando_get_boss_entrance_rando,
-                "er_placements = recomp_data.ctx.slot_data[\"entrance_rando_results\"]\n"
-                "scene_id_to_name = {\n" // same as in scene_hooks.c, just reduced to bosses only
-                "    0x1F: \"Odolwa's Lair\",\n"
-                "    0x44: \"Goht's Lair\",\n"
-                "    0x5F: \"Gyorg's Lair\",\n"
-                "    0x36: \"Twinmold's Lair\",\n"
-                "}\n"
-
-                "name = scene_id_to_name[current_scene]\n"
-                "while er_placements[name]['from']:\n"
-                "   name = er_placements[name]['from']\n"
-                
-                "real_index = 0\n" // not a big fan of this failsafing into a real dungeon, but oh well
-                "if name == 'Woodfall' or name == 'Woodfall Temple':\n"
-                "   real_index = 0\n"
-                "elif name == 'Snowhead' or name == 'Snowhead Temple':\n"
-                "   real_index = 1\n"
-                "elif name == 'Zora Cape' or name == 'Great Bay Temple':\n"
-                "   real_index = 3\n"
-                "elif name == 'Stone Tower (Inverted)' or name == 'Stone Tower Temple (Inverted)':\n"
-                "   real_index = 2\n"
+                "boss_placements = recomp_data.ctx.slot_data[\"boss_regions\"]\n"
+                "real_region = boss_placements[str(current_boss)]"
             );
 
-            realBossDungeon = REPY_FN_GET_S32("real_index");
+            realBossDungeon = REPY_FN_GET_S32("real_region");
 
             REPY_FN_CLEANUP;
         }
