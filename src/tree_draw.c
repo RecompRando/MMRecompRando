@@ -52,8 +52,8 @@ RECOMP_PATCH void ObjYasi_Draw(Actor* thisx, PlayState* play) {
     Matrix_Scale(0.1f, 0.1f, 0.1f, MTXMODE_APPLY);
 
     bool* dropped = z64recomp_get_extended_actor_data(thisx, actorDroppedExtension);
-    if (!rando_location_is_checked(LOCATION_PALM_TREE) && !(*dropped) \
-            && !ObjYasi_OnTurtleInGBT(LOCATION_PALM_TREE) && rando_get_camc_enabled()) {
+    if (rando_get_slotdata_u32("treesanity") && !rando_location_is_checked(LOCATION_PALM_TREE) \
+            && !(*dropped) && !ObjYasi_OnTurtleInGBT(LOCATION_PALM_TREE) && rando_get_camc_enabled()) {
         Gfx_DrawDListOpa(play, randoPalmTreeDL);
         
         u32 getItemId = rando_get_item_id(LOCATION_PALM_TREE);
