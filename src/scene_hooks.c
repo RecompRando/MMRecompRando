@@ -48,6 +48,8 @@ void onPlayInit(GameState* thisx) {
     PlayState* play = (PlayState*)thisx;
     gPlay = play;
 
+    if(gSaveContext.gameMode != GAMEMODE_NORMAL) return;
+    
     switch (gSaveContext.save.entrance) {
         // change the intro cutscene where you fall down into a new cycle
         case ENTRANCE(OPENING_DUNGEON, 0):
@@ -84,20 +86,22 @@ void onPlayInit(GameState* thisx) {
 
         REPY_FN_SET_S32("current_entrance", gSaveContext.save.entrance); // where we're meant to be going to
 
-        recomp_printf("current entrance 0x%04X %d\n", gSaveContext.save.entrance, gSaveContext.save.entrance); // %d due to python print in apworld
-        recomp_printf("respawn flag %d\n", gSaveContext.respawnFlag);
+        // recomp_printf("current entrance 0x%04X %d\n", gSaveContext.save.entrance, gSaveContext.save.entrance); // %d due to python print in apworld
+        // recomp_printf("current scene 0x%02X\n", savedSceneId);
+        // recomp_printf("respawn flag %d\n", gSaveContext.respawnFlag);
         
         // song of soaring out of dungeons/bosses? (this doesn't work lmao)
         if (gSaveContext.respawnFlag == -6) {
+            // check if we're in a boss room
             s8 boss_region;
-            if (play->sceneId == SCENE_MITURIN_BS) {
+            if (savedSceneId == SCENE_MITURIN_BS) {
                 boss_region = 0;
-            } else if (play->sceneId == SCENE_HAKUGIN_BS) {
+            } else if (savedSceneId == SCENE_HAKUGIN_BS) {
                 boss_region = 1;
-            } else if (play->sceneId == SCENE_SEA_BS) {
-                boss_region = 3;
-            } else if (play->sceneId == SCENE_INISIE_BS) {
+            } else if (savedSceneId == SCENE_SEA_BS) {
                 boss_region = 2;
+            } else if (savedSceneId == SCENE_INISIE_BS) {
+                boss_region = 3;
             } else {
                 boss_region = -1;
             }
@@ -118,21 +122,24 @@ void onPlayInit(GameState* thisx) {
 
                 switch(real_region) {
                     case 0:
-                        gSaveContext.save.entrance = ENTRANCE(WOODFALL, 1);
+                        play->nextEntrance = ENTRANCE(WOODFALL, 1);
                         break;
                     case 1:
-                        gSaveContext.save.entrance = ENTRANCE(SNOWHEAD, 1);
+                        play->nextEntrance = ENTRANCE(SNOWHEAD, 1);
                         break;
                     case 2:
-                        gSaveContext.save.entrance = ENTRANCE(ZORA_CAPE, 7);
+                        play->nextEntrance = ENTRANCE(ZORA_CAPE, 7);
                         break;
                     case 3:
-                        gSaveContext.save.entrance = ENTRANCE(STONE_TOWER_INVERTED, 1);
+                        play->nextEntrance = ENTRANCE(STONE_TOWER_INVERTED, 1);
                         break;
                 }
+
+                gSaveContext.respawnFlag = 0;
+                gSaveContext.save.entrance = play->nextEntrance;
             }
 
-            REPY_FN_CLEANUP; // do nothing when inside of dungeons (warp to the start of them)
+            REPY_FN_CLEANUP; // do nothing when inside of dungeons (warp to the start of them with no randomization)
             return;
         }
 
@@ -156,7 +163,8 @@ void onPlayInit(GameState* thisx) {
             new_entrance
         );
 
-        gSaveContext.save.entrance = new_entrance;
+        play->nextEntrance = new_entrance;
+        gSaveContext.save.entrance = play->nextEntrance;
 
         REPY_FN_CLEANUP;
     }
