@@ -161,6 +161,8 @@ void DoorWarp1_BeforeSettingWarp(DoorWarp1* this, PlayState* play) {
     shouldOverrideDungeon = false;
     curBossDungeon = -1;
     realBossDungeon = -1;
+    
+    u8 current_boss_normal = 0; // a more sensible number for what boss is being cleared
 
     originalDungeonFlags[0] = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE);
     originalDungeonFlags[1] = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_SNOWHEAD_TEMPLE);
@@ -175,12 +177,16 @@ void DoorWarp1_BeforeSettingWarp(DoorWarp1* this, PlayState* play) {
         // Confusingly, Great Bay Temple and Stone Tower have their numbers swapped around
         if (play->sceneId == SCENE_MITURIN_BS) {
             curBossDungeon = 0;
+            current_boss_normal = 0;
         } else if (play->sceneId == SCENE_HAKUGIN_BS) {
             curBossDungeon = 1;
+            current_boss_normal = 1;
         } else if (play->sceneId == SCENE_SEA_BS) {
             curBossDungeon = 3;
+            current_boss_normal = 2;
         } else if (play->sceneId == SCENE_INISIE_BS) {
             curBossDungeon = 2;
+            current_boss_normal = 3;
         } else {
             curBossDungeon = -1;
             return;
@@ -190,34 +196,22 @@ void DoorWarp1_BeforeSettingWarp(DoorWarp1* this, PlayState* play) {
             shouldOverrideDungeon = true;
             REPY_FN_SETUP_RANDO;
 
-            REPY_FN_SET_S16("current_scene", play->sceneId);
+            REPY_FN_SET_U8("current_boss", current_boss_normal);
 
             REPY_FN_EXEC_CACHE(
                 rando_get_boss_entrance_rando,
-                "er_placements = recomp_data.ctx.slot_data[\"entrance_rando_results\"]\n"
-                "scene_id_to_name = {\n" // same as in scene_hooks.c, just reduced to bosses only
-                "    0x1F: \"Odolwa's Lair\",\n"
-                "    0x44: \"Goht's Lair\",\n"
-                "    0x5F: \"Gyorg's Lair\",\n"
-                "    0x36: \"Twinmold's Lair\",\n"
-                "}\n"
-
-                "name = scene_id_to_name[current_scene]\n"
-                "while er_placements[name]['from']:\n"
-                "   name = er_placements[name]['from']\n"
-                
-                "real_index = 0\n" // not a big fan of this failsafing into a real dungeon, but oh well
-                "if name == 'Woodfall' or name == 'Woodfall Temple':\n"
-                "   real_index = 0\n"
-                "elif name == 'Snowhead' or name == 'Snowhead Temple':\n"
-                "   real_index = 1\n"
-                "elif name == 'Zora Cape' or name == 'Great Bay Temple':\n"
-                "   real_index = 3\n"
-                "elif name == 'Stone Tower (Inverted)' or name == 'Stone Tower Temple (Inverted)':\n"
-                "   real_index = 2\n"
+                "boss_placements = recomp_data.ctx.slot_data[\"boss_regions\"]\n"
+                "real_region = boss_placements[str(current_boss)]"
             );
 
-            realBossDungeon = REPY_FN_GET_S32("real_index");
+            realBossDungeon = REPY_FN_GET_S32("real_region");
+
+            // swap great bay temple and stone tower ids
+            if (realBossDungeon == 2) {
+                realBossDungeon = 3;
+            } else if (realBossDungeon == 3) {
+                realBossDungeon = 2;
+            }
 
             REPY_FN_CLEANUP;
         }
@@ -329,6 +323,7 @@ void CutsceneCmd_OverrideDestination(PlayState* play, CutsceneContext* csCtx, Cs
 
 // bool temp;
 
+// // odolwa
 // RECOMP_HOOK("Boss01_Init")
 // void fakeclear() {
 //     temp = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE);
@@ -341,4 +336,46 @@ void CutsceneCmd_OverrideDestination(PlayState* play, CutsceneContext* csCtx, Cs
 //         CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE);
 //     }
 //     SET_WEEKEVENTREG(WEEKEVENTREG_20_01);
+// }
+
+// // gyorg
+// RECOMP_HOOK("BossHakugin_Init")
+// void fakeclear_gh() {
+//     temp = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_SNOWHEAD_TEMPLE);
+//     SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_SNOWHEAD_TEMPLE);
+// }
+
+// RECOMP_HOOK_RETURN("BossHakugin_Init")
+// void removeclear_gh() {
+//     if (!temp) {
+//         CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_SNOWHEAD_TEMPLE);
+//     }
+// }
+
+// // gyorg
+// RECOMP_HOOK("Boss03_Init")
+// void fakeclear_gy() {
+//     temp = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE);
+//     SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE);
+// }
+
+// RECOMP_HOOK_RETURN("Boss03_Init")
+// void removeclear_gy() {
+//     if (!temp) {
+//         CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE);
+//     }
+// }
+
+// // twinmold
+// RECOMP_HOOK("Boss02_Init")
+// void fakeclear_t() {
+//     temp = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_STONE_TOWER_TEMPLE);
+//     SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_STONE_TOWER_TEMPLE);
+// }
+
+// RECOMP_HOOK_RETURN("Boss02_Init")
+// void removeclear_t() {
+//     if (!temp) {
+//         CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_STONE_TOWER_TEMPLE);
+//     }
 // }

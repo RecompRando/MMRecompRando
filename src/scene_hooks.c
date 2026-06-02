@@ -48,6 +48,8 @@ void onPlayInit(GameState* thisx) {
     PlayState* play = (PlayState*)thisx;
     gPlay = play;
 
+    if(gSaveContext.gameMode != GAMEMODE_NORMAL) return;
+    
     switch (gSaveContext.save.entrance) {
         // change the intro cutscene where you fall down into a new cycle
         case ENTRANCE(OPENING_DUNGEON, 0):
@@ -78,97 +80,91 @@ void onPlayInit(GameState* thisx) {
     // }
     // recomp_printf("ENTRANCE RANDO END\n");
 
-    // Entrance Rando (system will need to change with full entrance rando)
+    // Entrance Rando
     if (saveOpened && (rando_get_slotdata_u32("dungeon_entrance_rando") || rando_get_slotdata_u32("boss_entrance_rando"))) {
         REPY_FN_SETUP_RANDO;
 
-        // TODO: move to a python file
-        REPY_FN_SET_S16("last_scene", savedSceneId); // technically "last scene", but runs before that gets changed
         REPY_FN_SET_S32("current_entrance", gSaveContext.save.entrance); // where we're meant to be going to
 
+        // recomp_printf("current entrance 0x%04X %d\n", gSaveContext.save.entrance, gSaveContext.save.entrance); // %d due to python print in apworld
+        // recomp_printf("current scene 0x%02X\n", savedSceneId);
+        // recomp_printf("respawn flag %d\n", gSaveContext.respawnFlag);
+        
+        // song of soaring out of dungeons/bosses? (this doesn't work lmao)
+        if (gSaveContext.respawnFlag == -6) {
+            // check if we're in a boss room
+            s8 boss_region;
+            if (savedSceneId == SCENE_MITURIN_BS) {
+                boss_region = 0;
+            } else if (savedSceneId == SCENE_HAKUGIN_BS) {
+                boss_region = 1;
+            } else if (savedSceneId == SCENE_SEA_BS) {
+                boss_region = 2;
+            } else if (savedSceneId == SCENE_INISIE_BS) {
+                boss_region = 3;
+            } else {
+                boss_region = -1;
+            }
+
+            // warping out of a boss room warps to the start of the chain
+            if (boss_region >= 0) {
+                recomp_printf("warping out of a boss room\n");
+
+                REPY_FN_SET_S32("current_boss", boss_region);
+
+                REPY_FN_EXEC_CACHE(
+                    rando_get_boss_soaring_warp,
+                    "boss_placements = recomp_data.ctx.slot_data[\"boss_regions\"]\n"
+                    "real_region = boss_placements[str(current_boss)]"
+                );
+
+                s8 real_region = REPY_FN_GET_S8("real_region");
+
+                switch(real_region) {
+                    case 0:
+                        play->nextEntrance = ENTRANCE(WOODFALL, 1);
+                        break;
+                    case 1:
+                        play->nextEntrance = ENTRANCE(SNOWHEAD, 1);
+                        break;
+                    case 2:
+                        play->nextEntrance = ENTRANCE(ZORA_CAPE, 7);
+                        break;
+                    case 3:
+                        play->nextEntrance = ENTRANCE(STONE_TOWER_INVERTED, 1);
+                        break;
+                }
+
+                gSaveContext.respawnFlag = 0;
+                gSaveContext.save.entrance = play->nextEntrance;
+            }
+
+            REPY_FN_CLEANUP; // do nothing when inside of dungeons (warp to the start of them with no randomization)
+            return;
+        }
+
         REPY_FN_EXEC_CACHE(
-            rando_set_entrance_rando,
+            rando_check_entrance_rando,
             "er_placements = recomp_data.ctx.slot_data[\"entrance_rando_results\"]\n"
-            "entrance_id_to_entrance_lookup = {\n"
-            "    0x8610: \"Woodfall\",\n"
-            "    0x3000: \"Woodfall Temple\",\n"
-            "    0x3800: \"Odolwa's Lair\",\n"
-            "    0xB210: \"Snowhead\",\n"
-            "    0x3C00: \"Snowhead Temple\",\n"
-            "    0x8200: \"Goht's Lair\",\n"
-            "    0x6A70: \"Zora Cape\",\n"
-            "    0x8C00: \"Great Bay Temple\",\n"
-            "    0xB800: \"Gyorg's Lair\",\n"
-            "    0xAC10: \"Stone Tower (Inverted)\",\n"
-            "    0x2A00: \"Stone Tower Temple (Inverted)\",\n"
-            "    0x6600: \"Twinmold's Lair\",\n"
-            "}\n"
-            "scene_id_to_name = {\n"
-            "    0x46: \"Woodfall\",\n"
-            "    0x1B: \"Woodfall Temple\",\n"
-            "    0x1F: \"Odolwa's Lair\",\n"
-            "    0x5C: \"Snowhead\",\n"
-            "    0x21: \"Snowhead Temple\",\n"
-            "    0x44: \"Goht's Lair\",\n"
-            "    0x38: \"Zora Cape\",\n"
-            "    0x49: \"Great Bay Temple\",\n"
-            "    0x5F: \"Gyorg's Lair\",\n"
-            "    0x59: \"Stone Tower (Inverted)\",\n"
-            "    0x18: \"Stone Tower Temple (Inverted)\",\n"
-            "    0x36: \"Twinmold's Lair\",\n"
-            "}\n"
-            "in_lookup = current_entrance in entrance_id_to_entrance_lookup and last_scene in scene_id_to_name" // TODO: not enough to prevent some debug crashes
+            "in_lookup = str(current_entrance) in er_placements"
         );
 
-        if (!REPY_FN_GET_BOOL("in_lookup")) {
+        if (!REPY_FN_GET_BOOL("in_lookup") ||
+            gSaveContext.respawnFlag == -5) { // voidout? (-6 seems to be owl warps)
             REPY_FN_CLEANUP;
             return;
         }
 
-        bool entering = true; // entering dungeon/boss room, exiting dungeon on false
+        recomp_printf("doing entrance rando\n");
 
-        // determine dungeon directionality (exiting or going to boss)
-        switch (savedSceneId) {
-            case SCENE_MITURIN: // woodfall temple
-                if (gSaveContext.save.entrance == ENTRANCE(WOODFALL, 1)) {
-                    entering = false;
-                }
-                break;
-            case SCENE_HAKUGIN: // snowhead temple
-                if (gSaveContext.save.entrance == ENTRANCE(SNOWHEAD, 1)) {
-                    entering = false;
-                }
-                break;
-            case SCENE_SEA: // great bay temple
-                if (gSaveContext.save.entrance == ENTRANCE(ZORA_CAPE, 7)) {
-                    entering = false;
-                }
-                break;
-            case SCENE_INISIE_R: // inverted stone tower temple
-                if (gSaveContext.save.entrance == ENTRANCE(STONE_TOWER_INVERTED, 1)) {
-                    entering = false;
-                }
-                break;
-        }
+        REPY_FN_EVAL_CACHE_S32(
+            rando_do_entrance_rando,
+            "er_placements[str(current_entrance)]",
+            new_entrance
+        );
 
-        if (entering) {
-            REPY_FN_EXEC_CACHE(
-                rando_do_entering_entrance_rando,
-                "new_entrance_name = er_placements[scene_id_to_name[last_scene]]['to']\n"
-                "new_entrance = er_placements[new_entrance_name]['entrance_id']\n"
-                "print(er_placements[new_entrance_name])\n"
-            );
-            gSaveContext.save.entrance = REPY_FN_GET_S32("new_entrance");
-        } else {
-            REPY_FN_EXEC_CACHE(
-                rando_do_exiting_entrance_rando,
-                "entrance_name = scene_id_to_name[last_scene]\n"
-                "while er_placements[entrance_name]['from']:\n"
-                "   entrance_name = er_placements[entrance_name]['from']\n"
-                "new_entrance = er_placements[entrance_name]['entrance_id']\n"
-            );
-            gSaveContext.save.entrance = REPY_FN_GET_S32("new_entrance");
-        }
+        play->nextEntrance = new_entrance;
+        gSaveContext.save.entrance = play->nextEntrance;
 
         REPY_FN_CLEANUP;
     }

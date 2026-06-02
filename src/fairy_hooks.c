@@ -62,7 +62,7 @@ void EnElf_RandoFairyTouched(EnElf* this, PlayState* play) {
         return;
     }
 
-    if (rando_get_slotdata_u32("realfairysanity") && !rando_location_is_checked(*fairyLocation) && !this->unk_246) { // trying to make it print less
+    if (!rando_location_is_checked(*fairyLocation) && !this->unk_246) { // trying to make it print less
         Actor* item00 = Actor_Spawn(&play->actorCtx, play, ACTOR_EN_ITEM00, this->actor.world.pos.x, this->actor.world.pos.y, this->actor.world.pos.z, 0,
                                 0, 0, ITEM00_APITEM);
         item00Location = z64recomp_get_extended_actor_data(item00, actorLocationExtension);
