@@ -292,3 +292,10 @@ RECOMP_PATCH void func_80BEFAF0(EnAkindonuts* this, PlayState* play) {
     }
     this->unk_356++;
 }
+
+s16 currentScrub;
+
+RECOMP_HOOK("func_80BEEE10")
+void WhoIsThisScrub(Actor* thisx, PlayState* play) {
+    currentScrub = ENAKINDONUTS_GET_3(thisx);
+}

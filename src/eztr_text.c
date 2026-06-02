@@ -94,6 +94,8 @@ EZTR_MSG_CALLBACK(randoAPSend) {
     
     rando_get_location_item_player(location, &player_name);
     rando_get_location_item_name(location, &item_name);
+    sanitizeRandoText(item_name);
+    sanitizeRandoText(player_name);
     
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
@@ -112,6 +114,7 @@ EZTR_MSG_CALLBACK(randoAPSelf) {
     char* item_name;
 
     rando_get_location_item_name(location, &item_name);
+    sanitizeRandoText(item_name);
     
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
@@ -127,6 +130,7 @@ EZTR_MSG_CALLBACK(randoGIOwlStatue) {
     char* item_name;
 
     rando_get_location_item_name(location, &item_name);
+    sanitizeRandoText(item_name);
     
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
@@ -142,6 +146,7 @@ EZTR_MSG_CALLBACK(randoGISongs) {
     char* item_name;
 
     rando_get_location_item_name(location, &item_name);
+    sanitizeRandoText(item_name);
     
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
@@ -171,6 +176,7 @@ EZTR_MSG_CALLBACK(randoGISouls) {
     char* item_name;
 
     rando_get_location_item_name(location, &item_name);
+    sanitizeRandoText(item_name);
     
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
@@ -186,6 +192,7 @@ EZTR_MSG_CALLBACK(randoGIFrogs) {
     char* item_name;
 
     rando_get_location_item_name(location, &item_name);
+    sanitizeRandoText(item_name);
     
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
@@ -256,13 +263,17 @@ switch (currentTingle) {
     rando_get_location_item_name(tingleFirstItem, &item_name);
     rando_get_location_item_player(tingleSecondItem, &player_name2);
     rando_get_location_item_name(tingleSecondItem, &item_name2);
+    sanitizeRandoText(item_name);
+    sanitizeRandoText(player_name);
+    sanitizeRandoText(item_name2);
+    sanitizeRandoText(player_name2);
 
     char player_name_with_space1[128];
     if (!rando_get_location_has_local_item(tingleFirstItem) && (!rando_location_is_checked(tingleFirstItem))) {
         EZTR_MsgSContent_Snprintf(
             player_name_with_space1,
             128,
-            " %s" EZTR_CC_END,
+            " (" EZTR_CC_COLOR_LIGHTBLUE "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
             player_name
         );
     } else {
@@ -277,7 +288,7 @@ switch (currentTingle) {
         EZTR_MsgSContent_Snprintf(
             player_name_with_space2,
             128,
-            " %s" EZTR_CC_END,
+            " (" EZTR_CC_COLOR_LIGHTBLUE "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
             player_name2
         );
     } else {
@@ -349,8 +360,8 @@ switch (currentTingle) {
     }
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
-        EZTR_CC_THREE_CHOICE EZTR_CC_COLOR_GREEN "%m" EZTR_CC_COLOR_LIGHTBLUE "%m" EZTR_CC_COLOR_RED "%m" EZTR_CC_NEWLINE
-        EZTR_CC_COLOR_GREEN "%m" EZTR_CC_COLOR_LIGHTBLUE "%m" EZTR_CC_COLOR_RED "%m" EZTR_CC_NEWLINE
+        EZTR_CC_THREE_CHOICE EZTR_CC_COLOR_GREEN "%m" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_COLOR_PINK "%m" EZTR_CC_NEWLINE
+        EZTR_CC_COLOR_GREEN "%m" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_COLOR_PINK "%m" EZTR_CC_NEWLINE
         EZTR_CC_COLOR_GREEN "No thanks" EZTR_CC_END,
         item_sold_out1,
         player_name_with_space1,
@@ -456,12 +467,244 @@ EZTR_MSG_CALLBACK(randoShopBuy) {
     recomp_free(item_name);
 }
 
+#define LOCATION_SCRUB_SHOP(item) (0x090100 | item)
+
+extern s16 currentScrub;
 EZTR_MSG_CALLBACK(randoScrub) {
+    u32 scrubLocation = LOCATION_SCRUB_SHOP(GI_MAGIC_BEANS);
+    char* player_name;
+    char* item_name;
+    u16 price = 5;
+    char vanilla_scrub_text[256];
     
+    switch (currentScrub) {
+        case 0:
+            scrubLocation = LOCATION_SCRUB_SHOP(GI_MAGIC_BEANS);
+            price = 10;
+            EZTR_MsgSContent_Snprintf(
+                vanilla_scrub_text,
+                256,
+                EZTR_CC_SFX "|3A|D2Do you know what " EZTR_CC_COLOR_GREEN "magic beans"
+                EZTR_CC_NEWLINE "" EZTR_CC_COLOR_DEFAULT "are, sir?"
+                EZTR_CC_NEWLINE "I'll sell you one for " EZTR_CC_COLOR_PINK "10 Rupees" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_EVENT "" EZTR_CC_END "",
+                NULL
+            );
+            break;
+        case 1:
+            scrubLocation = LOCATION_SCRUB_SHOP(GI_BOMB_BAG_40);
+            price = 200;
+            EZTR_MsgSContent_Snprintf(
+                vanilla_scrub_text,
+                256,
+                EZTR_CC_SFX "|38|81I'll give you my Biggest Bomb Bag," 
+                EZTR_CC_NEWLINE "regularly priced at " EZTR_CC_COLOR_PINK "1000 Rupees" EZTR_CC_COLOR_DEFAULT "..." 
+                EZTR_CC_NEWLINE "" EZTR_CC_CARRIAGE_RETURN "" EZTR_CC_BOX_BREAK2 "In return, you'll give me your " EZTR_CC_COLOR_RED "Big" 
+                EZTR_CC_NEWLINE "Bomb Bag " EZTR_CC_COLOR_DEFAULT "and just " EZTR_CC_COLOR_PINK "200 Rupees" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_EVENT "" EZTR_CC_END "",
+                NULL
+            );
+            break;
+        case 2:
+            scrubLocation = LOCATION_SCRUB_SHOP(GI_POTION_GREEN);
+            price = 40;
+            EZTR_MsgSContent_Snprintf(
+                vanilla_scrub_text,
+                256,
+                EZTR_CC_SFX "|39|8CI'll sell you a " EZTR_CC_COLOR_GREEN "Green Potion" EZTR_CC_COLOR_DEFAULT " for" 
+                EZTR_CC_NEWLINE "" EZTR_CC_COLOR_PINK "40 Rupees" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_EVENT2 "" EZTR_CC_END "",
+                NULL
+            );
+            break;
+        case 3:
+            scrubLocation = LOCATION_SCRUB_SHOP(GI_POTION_BLUE);
+            price = 100;
+            EZTR_MsgSContent_Snprintf(
+                vanilla_scrub_text,
+                256,
+                EZTR_CC_SFX "|3A|D2Don't you need any " EZTR_CC_COLOR_BLUE "Blue Potion" EZTR_CC_COLOR_DEFAULT " in" 
+                EZTR_CC_NEWLINE "case you get cursed?" 
+                EZTR_CC_NEWLINE "One drink is " EZTR_CC_COLOR_PINK "100 Rupees" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_EVENT "" EZTR_CC_END "",
+                NULL
+            );
+            break;
+    }
+
+    if (rando_get_slotdata_u32("scrubsanity") && !rando_location_is_checked(scrubLocation)) {
+        rando_get_location_item_player(scrubLocation, &player_name);
+        rando_get_location_item_name(scrubLocation, &item_name);
+        sanitizeRandoText(item_name);
+        sanitizeRandoText(player_name);
+
+        // SANITIZE PLAYER AND ITEM NAMES HERE
+
+        char player_name_when_nonlocal[128];
+        if (!rando_get_location_has_local_item(scrubLocation) && (!rando_location_is_checked(scrubLocation))) {
+            EZTR_MsgSContent_Snprintf(
+                player_name_when_nonlocal,
+                128,
+                EZTR_CC_NEWLINE "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
+                player_name
+            );
+        } else {
+            EZTR_MsgSContent_Snprintf(
+                player_name_when_nonlocal,
+                128,
+                EZTR_CC_END
+            );
+        }
+
+        EZTR_MsgSContent_Sprintf(
+            buf->data.content,
+            "For " EZTR_CC_COLOR_PINK "%d Rupees" EZTR_CC_COLOR_DEFAULT ", I'm selling"
+            EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_EVENT "" EZTR_CC_END,
+            price,
+            getAPItemColor(scrubLocation),
+            item_name,
+            player_name_when_nonlocal
+        );
+
+        recomp_free(item_name);
+        recomp_free(player_name);
+    } else {
+        EZTR_MsgSContent_Sprintf(
+            buf->data.content,
+            "%m" EZTR_CC_EVENT "" EZTR_CC_END,
+            vanilla_scrub_text
+        );
+    }
 }
 
+// #define LOCATION_MILK (ACTOR_ID_BARTEN << 8 | GI_MILK)
+#define MILK_BAR_LOCATION_CHATEAU GI_CHATEAU
+
 EZTR_MSG_CALLBACK(randoMilkBar) {
+    u32 milkBarFirstItem = 0x026392; // Regular Milk Purchase check ID
+    char* player_name;
+    char* item_name;
+    u16 price1 = 20;
+    u32 milkBarSecondItem = MILK_BAR_LOCATION_CHATEAU;
+    char* player_name2;
+    char* item_name2;
+    u16 price2 = 200;
+
+    rando_get_location_item_player(milkBarFirstItem, &player_name);
+    rando_get_location_item_name(milkBarFirstItem, &item_name);
+    rando_get_location_item_player(milkBarSecondItem, &player_name2);
+    rando_get_location_item_name(milkBarSecondItem, &item_name2);
+    sanitizeRandoText(item_name);
+    sanitizeRandoText(player_name);
+    sanitizeRandoText(item_name2);
+    sanitizeRandoText(player_name2);
+
+    char player_name_with_space1[128];
+    if (!rando_get_location_has_local_item(milkBarFirstItem) && (!rando_location_is_checked(milkBarFirstItem))) {
+        EZTR_MsgSContent_Snprintf(
+            player_name_with_space1,
+            128,
+            " (" EZTR_CC_COLOR_LIGHTBLUE "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
+            player_name
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            player_name_with_space1,
+            128,
+            EZTR_CC_END
+        );
+    }
+    char player_name_with_space2[128];
+    if (!rando_get_location_has_local_item(milkBarSecondItem) && (!rando_location_is_checked(milkBarSecondItem))) {
+        EZTR_MsgSContent_Snprintf(
+            player_name_with_space2,
+            128,
+            " (" EZTR_CC_COLOR_LIGHTBLUE "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
+            player_name2
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            player_name_with_space2,
+            128,
+            EZTR_CC_END
+        );
+    }
+    char item_sold_already1[128];
+    if (!rando_location_is_checked(milkBarFirstItem)) {
+        EZTR_MsgSContent_Snprintf(
+            item_sold_already1,
+            128,
+            "%s" EZTR_CC_END,
+            item_name
+        );        
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            item_sold_already1,
+            128,
+            EZTR_CC_COLOR_GREEN "Regular Milk:" EZTR_CC_END
+        );
+    }
+    char item_sold_already2[128];
+    if (!rando_location_is_checked(milkBarSecondItem)) {
+        EZTR_MsgSContent_Snprintf(
+            item_sold_already2,
+            128,
+            "%s" EZTR_CC_END,
+            item_name2
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            item_sold_already2,
+            128,
+            EZTR_CC_COLOR_GREEN "Chateau:" EZTR_CC_END
+        );
+    }
+    char rupee_cost1[128];
+    if (!rando_location_is_checked(milkBarFirstItem)) {
+        EZTR_MsgSContent_Snprintf(
+            rupee_cost1,
+            128,
+            " %d Rupees" EZTR_CC_END,
+            price1
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            rupee_cost1,
+            128,
+            " 20 Rupees" EZTR_CC_END
+        );
+    }
+    char rupee_cost2[128];
+    if (!rando_location_is_checked(milkBarSecondItem)) {
+        EZTR_MsgSContent_Snprintf(
+            rupee_cost2,
+            128,
+            " %d Rupees" EZTR_CC_END,
+            price2
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            rupee_cost2,
+            128,
+            " 200 Rupees" EZTR_CC_END
+        );
+    }
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "What'll it be?" 
+        EZTR_CC_CARRIAGE_RETURN EZTR_CC_CARRIAGE_RETURN EZTR_CC_NEWLINE 
+        EZTR_CC_BOX_BREAK2 EZTR_CC_THREE_CHOICE EZTR_CC_COLOR_GREEN "%m:" EZTR_CC_COLOR_PINK "%m" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_NEWLINE
+        EZTR_CC_COLOR_GREEN "%m:" EZTR_CC_COLOR_PINK "%m" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_NEWLINE
+        EZTR_CC_COLOR_GREEN "Nothing" EZTR_CC_END,
+        item_sold_already1,
+        rupee_cost1,
+        player_name_with_space1,
+        item_sold_already2,
+        rupee_cost2,
+        player_name_with_space2
+    );
     
+    recomp_free(item_name);
+    recomp_free(item_name2);
+    recomp_free(player_name);
+    recomp_free(player_name2);
+
 }
 
 EZTR_MSG_CALLBACK(WoodfallStrayFairyCount) {
@@ -968,9 +1211,512 @@ EZTR_MSG_CALLBACK(randoPictograph) {
         EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "picture" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
     }
 }
+EZTR_MSG_CALLBACK(randoLotterySignHint) {
+    u32 lotteryItem = LOCATION_LOTTERY_SHOP;
+    char* player_name;
+    char* item_name;
 
+    rando_get_location_item_player(lotteryItem, &player_name);
+    rando_get_location_item_name(lotteryItem, &item_name);
+    sanitizeRandoText(item_name);
+    sanitizeRandoText(player_name);
+
+    char player_name_when_nonlocal[128];
+    if (!rando_get_location_has_local_item(lotteryItem) && (!rando_location_is_checked(lotteryItem))) {
+        EZTR_MsgSContent_Snprintf(
+            player_name_when_nonlocal,
+            128,
+            "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
+            player_name
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            player_name_when_nonlocal,
+            128,
+            EZTR_CC_END
+        );
+    }
+    char item_is_checked[128];
+    if (!rando_location_is_checked(lotteryItem)) {
+        EZTR_MsgSContent_Snprintf(
+            item_is_checked,
+            128,
+            "%s" EZTR_CC_END,
+            item_name
+        );        
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            item_is_checked,
+            128,
+            EZTR_CC_COLOR_SILVER "50 Rupees" EZTR_CC_END
+        );
+    }
+    char* lotteryItemClass;
+    u32 type = rando_get_location_type(lotteryItem);
+    if (type & 0b001) {
+        lotteryItemClass = EZTR_CC_COLOR_LIGHTBLUE "" EZTR_CC_END;
+    } else if (type & 0b010) {
+        lotteryItemClass = EZTR_CC_COLOR_BLUE "" EZTR_CC_END;
+    } else if (type & 0b100) {
+        lotteryItemClass = EZTR_CC_COLOR_ORANGE "" EZTR_CC_END;
+    } else {
+        lotteryItemClass = EZTR_CC_COLOR_SILVER ""  EZTR_CC_END;
+    }
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "          Lottery Shop"
+        EZTR_CC_NEWLINE "Grand Prize:"
+        EZTR_CC_NEWLINE "%m%m" 
+        EZTR_CC_NEWLINE "" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END "",
+        lotteryItemClass,
+        item_is_checked,
+        player_name_when_nonlocal
+    );
+    
+    recomp_free(item_name);
+    recomp_free(player_name);
+
+}
+EZTR_MSG_CALLBACK(randoLotteryNPCHint) {
+    u32 lotteryItem = LOCATION_LOTTERY_SHOP;
+    char* player_name;
+    char* item_name;
+
+    rando_get_location_item_player(lotteryItem, &player_name);
+    rando_get_location_item_name(lotteryItem, &item_name);
+    sanitizeRandoText(item_name);
+    sanitizeRandoText(player_name);
+
+    char player_name_when_nonlocal[128];
+    if (!rando_get_location_has_local_item(lotteryItem) && (!rando_location_is_checked(lotteryItem))) {
+        EZTR_MsgSContent_Snprintf(
+            player_name_when_nonlocal,
+            128,
+            "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
+            player_name
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            player_name_when_nonlocal,
+            128,
+            EZTR_CC_END
+        );
+    }
+    char item_is_checked[128];
+    if (!rando_location_is_checked(lotteryItem)) {
+        EZTR_MsgSContent_Snprintf(
+            item_is_checked,
+            128,
+            "%s" EZTR_CC_END,
+            item_name
+        );        
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            item_is_checked,
+            128,
+            EZTR_CC_COLOR_SILVER "50 Rupees" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END
+        );
+    }
+    char* lotteryItemClass;
+    u32 type = rando_get_location_type(lotteryItem);
+    if (type & 0b001) {
+        lotteryItemClass = EZTR_CC_COLOR_LIGHTBLUE "" EZTR_CC_END;
+    } else if (type & 0b010) {
+        lotteryItemClass = EZTR_CC_COLOR_BLUE "" EZTR_CC_END;
+    } else if (type & 0b100) {
+        lotteryItemClass = EZTR_CC_COLOR_ORANGE "" EZTR_CC_END;
+    } else {
+        lotteryItemClass = EZTR_CC_COLOR_SILVER ""  EZTR_CC_END;
+    }
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "Would you like the chance to buy"
+        EZTR_CC_NEWLINE "your dreams for " EZTR_CC_COLOR_PINK "10 Rupees" EZTR_CC_COLOR_DEFAULT "?"
+        EZTR_CC_NEWLINE "" EZTR_CC_CARRIAGE_RETURN "" EZTR_CC_BOX_BREAK2 "Pick any three numbers, and if"
+        EZTR_CC_NEWLINE "those are picked, you'll win"
+        EZTR_CC_NEWLINE "%m%m" 
+        EZTR_CC_NEWLINE "" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END "",
+        lotteryItemClass,
+        item_is_checked,
+        player_name_when_nonlocal
+    );
+    
+    recomp_free(item_name);
+    recomp_free(player_name);
+
+}
+EZTR_MSG_CALLBACK(randoGrave1Hint) {
+    u32 location1 = 0x0000A2; // Graveyard Day 1 Iron Knuckle Song
+    char* player_name;
+    char* item_name;
+    u32 location2 = 0x060C03; // Graveyard Day 1 Bats Chest
+    char* player_name2;
+    char* item_name2;
+
+    rando_get_location_item_player(location1, &player_name);
+    rando_get_location_item_name(location1, &item_name);
+    rando_get_location_item_player(location2, &player_name2);
+    rando_get_location_item_name(location2, &item_name2);
+    sanitizeRandoText(item_name);
+    sanitizeRandoText(player_name);
+    sanitizeRandoText(item_name2);
+    sanitizeRandoText(player_name2);
+
+    char player_name_when_nonlocal[128];
+    if (!rando_get_location_has_local_item(location1)) {
+        EZTR_MsgSContent_Snprintf(
+            player_name_when_nonlocal,
+            128,
+            "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
+            player_name
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            player_name_when_nonlocal,
+            128,
+            EZTR_CC_END
+        );
+    }
+    char item_is_checked[128];
+    if (!rando_location_is_checked(location1)) {
+        EZTR_MsgSContent_Snprintf(
+            item_is_checked,
+            128,
+            "%s" EZTR_CC_END,
+            item_name
+        );        
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            item_is_checked,
+            128,
+            EZTR_CC_COLOR_SILVER "nothing" EZTR_CC_END
+        );
+    }
+    char player_name_when_nonlocal2[128];
+    if (!rando_get_location_has_local_item(location2)) {
+        EZTR_MsgSContent_Snprintf(
+            player_name_when_nonlocal2,
+            128,
+            "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
+            player_name2
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            player_name_when_nonlocal2,
+            128,
+            EZTR_CC_END
+        );
+    }
+    char item_is_checked2[128];
+    if (!rando_location_is_checked(location2)) {
+        EZTR_MsgSContent_Snprintf(
+            item_is_checked2,
+            128,
+            "%s" EZTR_CC_END,
+            item_name2
+        );        
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            item_is_checked2,
+            128,
+            EZTR_CC_COLOR_SILVER "nothing" EZTR_CC_END
+        );
+    }
+
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "Hear lies the melody that"
+        EZTR_CC_NEWLINE "summons the tears of"
+        EZTR_CC_NEWLINE "%c%m" 
+        EZTR_CC_NEWLINE "" EZTR_CC_COLOR_DEFAULT "%m"
+        EZTR_CC_NEWLINE EZTR_CC_BOX_BREAK2 "Those who defeat the"
+        EZTR_CC_NEWLINE "evil will find"
+        EZTR_CC_NEWLINE "%c%m" 
+        EZTR_CC_NEWLINE "" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END "",
+        getAPItemColor(location1),
+        item_is_checked,
+        player_name_when_nonlocal,
+        getAPItemColor(location2),
+        item_is_checked2,
+        player_name_when_nonlocal2
+    );
+    
+    recomp_free(item_name);
+    recomp_free(player_name);
+    recomp_free(item_name2);
+    recomp_free(player_name2);
+
+}
+EZTR_MSG_CALLBACK(randoGrave2Hint) {
+    u32 location1 = 0x060C00; // Graveyard Day 2 Iron Knuckle Chest
+    char* player_name;
+    char* item_name;
+
+    rando_get_location_item_player(location1, &player_name);
+    rando_get_location_item_name(location1, &item_name);
+    sanitizeRandoText(item_name);
+    sanitizeRandoText(player_name);
+
+    char player_name_when_nonlocal[128];
+    if (!rando_get_location_has_local_item(location1)) {
+        EZTR_MsgSContent_Snprintf(
+            player_name_when_nonlocal,
+            128,
+            "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
+            player_name
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            player_name_when_nonlocal,
+            128,
+            EZTR_CC_END
+        );
+    }
+    char item_is_checked[128];
+    if (!rando_location_is_checked(location1)) {
+        EZTR_MsgSContent_Snprintf(
+            item_is_checked,
+            128,
+            "%s" EZTR_CC_END,
+            item_name
+        );        
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            item_is_checked,
+            128,
+            EZTR_CC_COLOR_SILVER "nothing" EZTR_CC_END
+        );
+    }
+
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "Those who possess eyes that can"
+        EZTR_CC_NEWLINE "see the truth will find"
+        EZTR_CC_NEWLINE "%c%m" 
+        EZTR_CC_NEWLINE "" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END "",
+        getAPItemColor(location1),
+        item_is_checked,
+        player_name_when_nonlocal
+    );
+    
+    recomp_free(item_name);
+    recomp_free(player_name);
+
+}
+EZTR_MSG_CALLBACK(randoGrave3Hint) {
+    u32 location1 = 0x063000; // Graveyard Day 3 Dampe Big Poe Chest
+    char* player_name;
+    char* item_name;
+
+    rando_get_location_item_player(location1, &player_name);
+    rando_get_location_item_name(location1, &item_name);
+    sanitizeRandoText(item_name);
+    sanitizeRandoText(player_name);
+
+    char player_name_when_nonlocal[128];
+    if (!rando_get_location_has_local_item(location1)) {
+        EZTR_MsgSContent_Snprintf(
+            player_name_when_nonlocal,
+            128,
+            "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
+            player_name
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            player_name_when_nonlocal,
+            128,
+            EZTR_CC_END
+        );
+    }
+    char item_is_checked[128];
+    if (!rando_location_is_checked(location1)) {
+        EZTR_MsgSContent_Snprintf(
+            item_is_checked,
+            128,
+            "%s" EZTR_CC_END,
+            item_name
+        );        
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            item_is_checked,
+            128,
+            EZTR_CC_COLOR_SILVER "nothing" EZTR_CC_END
+        );
+    }
+
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "Bringing light to the darkness"
+        EZTR_CC_NEWLINE "will reveal to you"
+        EZTR_CC_NEWLINE "%c%m" 
+        EZTR_CC_NEWLINE "" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END "",
+        getAPItemColor(location1),
+        item_is_checked,
+        player_name_when_nonlocal
+    );
+    
+    recomp_free(item_name);
+    recomp_free(player_name);
+
+}
 // Replacements of existing IDs
 EZTR_ON_INIT void init_text() {
+    EZTR_Basic_ReplaceText(
+        0x13F9, // Night 1 Ikana Gravestone
+        EZTR_STANDARD_TEXT_BOX_II,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "\xBF",
+        randoGrave1Hint
+);
+EZTR_Basic_ReplaceText(
+        0x13FB, // Night 2 Ikana Gravestone
+        EZTR_STANDARD_TEXT_BOX_II,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "\xBF",
+        randoGrave2Hint
+);
+EZTR_Basic_ReplaceText(
+        0x13FA, // Night 3 Ikana Gravestone
+        EZTR_STANDARD_TEXT_BOX_II,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "\xBF",
+        randoGrave3Hint
+);
+    EZTR_Basic_ReplaceText(
+        0x1C13, // Lottery Shop sign
+        EZTR_STANDARD_TEXT_BOX_II,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "\xBF",
+        randoLotterySignHint
+    );
+    EZTR_Basic_ReplaceText(
+        0x2B5C, // Lottery Shop NPC
+        EZTR_STANDARD_TEXT_BOX_II,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "\xBF",
+        randoLotteryNPCHint
+    );
+    EZTR_Basic_ReplaceText(
+        0x15E9, // Magic Bean Scrub
+        EZTR_STANDARD_TEXT_BOX_II,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "\xBF",
+        randoScrub
+    );
+    EZTR_Basic_ReplaceText(
+        0x15F3, // Magic Bean Scrub in new home
+        EZTR_STANDARD_TEXT_BOX_II,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "\xBF",
+        randoScrub
+    );
+    EZTR_Basic_ReplaceText(
+        0x1600, // Bomb Bag Scrub
+        EZTR_STANDARD_TEXT_BOX_II,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "\xBF",
+        randoScrub
+    );
+    EZTR_Basic_ReplaceText(
+        0x1606, // Bomb Bag Scrub in new home
+        EZTR_STANDARD_TEXT_BOX_II,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "\xBF",
+        randoScrub
+    );
+    EZTR_Basic_ReplaceText(
+        0x1612, // Green Potion Scrub
+        EZTR_STANDARD_TEXT_BOX_II,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "\xBF",
+        randoScrub
+    );
+    EZTR_Basic_ReplaceText(
+        0x1617, // Green Potion Scrub in new home
+        EZTR_STANDARD_TEXT_BOX_II,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "\xBF",
+        randoScrub
+    );
+    EZTR_Basic_ReplaceText(
+        0x1626, // Blue Potion Scrub
+        EZTR_STANDARD_TEXT_BOX_II,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "\xBF",
+        randoScrub
+    );
+    EZTR_Basic_ReplaceText(
+        0x162D, // Blue Potion Scrub in new home
+        EZTR_STANDARD_TEXT_BOX_II,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "\xBF",
+        randoScrub
+    );
     EZTR_Basic_ReplaceText(
         0x353C, // Fast Dog
         EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
@@ -1033,6 +1779,18 @@ EZTR_ON_INIT void init_text() {
         false,
         "\xBF",
         randoPictograph
+    );
+    EZTR_Basic_ReplaceText(
+        0x2B0B,
+        EZTR_STANDARD_TEXT_BOX_II,
+        1,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        20,
+        200,
+        true,
+        "\xBF",
+        randoMilkBar
     );
     // Tingle Text
     // North Clock Town Tingle
