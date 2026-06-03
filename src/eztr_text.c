@@ -12,24 +12,6 @@
 
 extern GetItemEntryAP sGetItemTable_ap[];
 
-// old defines that I didn't use
-// #define RANDO_AP_ITEM "\xFF"
-// #define RANDO_AP_PLAYER "\xFE"
-// #define RANDO_AP_COLOR "\xFD"
-
-// sets colours for AP item class. probably doesn't work
-// u8 getAPItemColor(u32 location) {
-//     switch (rando_get_location_type(location)) {
-//         case 1:  return 0x05; // EZTR_CC_COLOR_LIGHTBLUE;  // progression - purple
-//         case 2:  return 0x03; // EZTR_CC_COLOR_BLUE;  // useful - blue
-//         case 3:  return 0x08; // EZTR_CC_COLOR_ORANGE;  // trap - orange
-//         case 0:
-//         default: return 0x07; // EZTR_CC_COLOR_SILVER;  // filler - grey
-//     }
-// }
-
-void sanitizeRandoText(char* rando_string);
-
 u8 getAPItemColor(u32 location) {
     u32 type = rando_get_location_type(location);
     if (type & 0b001) {
@@ -41,6 +23,55 @@ u8 getAPItemColor(u32 location) {
     } else {
         return 0x07; // EZTR_CC_COLOR_SILVER;  // filler - grey
     }
+}
+
+void sanitizeRandoText(char* rando_string) {
+    u8 c = rando_string[0];
+    u8 next = 0;
+    u8 i = 0;
+    bool shift_string = false;
+
+    while (c != 0) {
+        if (c <= 0x08 || (c >= 0x0A && c <= 0x1F) || (c >= 0xB0 && c <= 0xBB) || (c >= 0xBF && c <= 0xE8) || (c >= 0xF0 && c <= 0xFF)) {
+            next = rando_string[i+1];
+            if (c == 0xC3 && next == 0xA1) { // á
+                rando_string[i] = 0x98;
+                shift_string = true;
+            } else {
+                rando_string[i] = 0xAE; // replace all invalid bytes with ¿
+            }
+        }
+
+        if (shift_string) {
+            u8 new_i = i + 1;
+            u8 new_c = rando_string[new_i];
+            u8 new_next = rando_string[new_i + 1];
+            while (new_c != 0) {
+                rando_string[new_i] = new_next;
+                new_i++;
+                new_c = rando_string[new_i];
+                new_next = rando_string[new_i + 1];
+            }
+            shift_string = false;
+        }
+
+        i++;
+        c = rando_string[i];
+    }
+}
+
+RECOMP_HOOK_RETURN("Message_OpenText")
+void Post_Message_OpenText() {
+    PlayState* play = gPlay;
+    MessageContext* msgCtx = &play->msgCtx;
+
+    // QoL: let us skip all text
+    msgCtx->textUnskippable = false;
+
+    // below is if we specifically need to unset skippable text from the original function
+    // if ((msgCtx->unk11F0C == 1) || (msgCtx->unk11F0C == 3)) {
+    //     msgCtx->textUnskippable = false;
+    // }
 }
 
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Send_Item); // "You sent [player] their [item]"
