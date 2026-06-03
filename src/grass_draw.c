@@ -340,6 +340,15 @@ RECOMP_PATCH void func_80A5EA48(Actor* thisx, PlayState* play) {
     EnKusa2* this = (EnKusa2*)thisx;
     s32 alpha;
 
+    if (!rando_get_slotdata_u32("grasssanity")) {
+        if (this->unk_1CF == 0xFF) {
+            Gfx_DrawDListOpa(play, gKusaBushType1DL);
+        } else {
+            func_80A5E80C(play, this->unk_1CF);
+        }
+        return;
+    }
+
     u32* keatonLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
 
     if (this->unk_1CF == 0xFF) {

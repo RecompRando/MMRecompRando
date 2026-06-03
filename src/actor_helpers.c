@@ -212,7 +212,8 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_HS:
         case ACTOR_EN_AL:
         case ACTOR_EN_BAL:
-        case ACTOR_EN_MK:
+        case ACTOR_EN_MK: // Marine Lab Researcher
+        case ACTOR_EN_FISH2: // Marine Lab Fish
         case ACTOR_EN_BJT:
         case ACTOR_EN_AH:
         case ACTOR_EN_TAB:
@@ -231,7 +232,10 @@ void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
         case ACTOR_EN_IN: //Gorman Bros
         case ACTOR_EN_ZOW:
         case ACTOR_EN_ZOT:
-        case ACTOR_EN_ZOV:
+        case ACTOR_EN_ZOV: // Lulu
+        case ACTOR_EN_ZOS: // Evan
+        case ACTOR_EN_ZOB: // Japas
+        case ACTOR_EN_ZOD: // Tijo
         case ACTOR_EN_KUJIYA:
         case ACTOR_EN_LIFT_NUTS:
         case ACTOR_EN_GO:
