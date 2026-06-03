@@ -391,15 +391,15 @@ switch (currentTingle) {
     }
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
-        EZTR_CC_THREE_CHOICE EZTR_CC_COLOR_GREEN "%m" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_COLOR_PINK "%m" EZTR_CC_NEWLINE
-        EZTR_CC_COLOR_GREEN "%m" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_COLOR_PINK "%m" EZTR_CC_NEWLINE
+        EZTR_CC_THREE_CHOICE EZTR_CC_COLOR_GREEN "%m" EZTR_CC_COLOR_RED "%m" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_NEWLINE
+        EZTR_CC_COLOR_GREEN "%m" EZTR_CC_COLOR_RED "%m" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_NEWLINE
         EZTR_CC_COLOR_GREEN "No thanks" EZTR_CC_END,
         item_sold_out1,
-        player_name_with_space1,
         remove_rupee_when_checked1,
+        player_name_with_space1,
         item_sold_out2,
-        player_name_with_space2,
-        remove_rupee_when_checked2
+        remove_rupee_when_checked2,
+        player_name_with_space2
     );
     
     recomp_free(item_name);
@@ -1190,6 +1190,30 @@ EZTR_MSG_CALLBACK(randoPictograph) {
     }
 }
 
+EZTR_MSG_CALLBACK(randoBankHints) {
+    u32 bankFirstItem = 0x000008; // West Clock Town Bank 200 Rupees
+    u32 bankSecondItem = 0x080177; // West Clock Town Bank 500 Rupees
+    u32 bankThirdItem = 0x070177; // West Clock Town Bank 1000 Rupees
+
+    char* is_bank_important;
+    u32 type = rando_get_location_type(bankFirstItem);
+    u32 type2 = rando_get_location_type(bankSecondItem);
+    u32 type3 = rando_get_location_type(bankThirdItem);
+    if (type & 0b001 || type2 & 0b001 || type3 & 0b001) {
+        is_bank_important = "." EZTR_CC_NEWLINE "At least one of them looks" EZTR_CC_COLOR_LIGHTBLUE "important" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END;
+    } else if (type & 0b010 || type2 & 0b010 || type3 & 0b010) {
+        is_bank_important = "." EZTR_CC_NEWLINE "At least one of them looks" EZTR_CC_COLOR_BLUE "useful" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END;
+    } else {
+        is_bank_important = EZTR_CC_NEWLINE "that I was going to " EZTR_CC_COLOR_SILVER "throw away" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END;
+    }
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "For example, if you deposit enough" EZTR_CC_NEWLINE 
+        EZTR_CC_COLOR_PINK "Rupees" EZTR_CC_COLOR_DEFAULT ", you'll get up to three items%m" EZTR_CC_EVENT EZTR_CC_END,
+        is_bank_important
+    );
+
+}
 EZTR_MSG_CALLBACK(randoLotterySignHint) {
     u32 lotteryItem = LOCATION_LOTTERY_SHOP;
     char* player_name;
@@ -1231,26 +1255,14 @@ EZTR_MSG_CALLBACK(randoLotterySignHint) {
             EZTR_CC_COLOR_SILVER "50 Rupees" EZTR_CC_END
         );
     }
-    
-    char* lotteryItemClass;
-    u32 type = rando_get_location_type(lotteryItem);
-    if (type & 0b001) {
-        lotteryItemClass = EZTR_CC_COLOR_LIGHTBLUE "" EZTR_CC_END;
-    } else if (type & 0b010) {
-        lotteryItemClass = EZTR_CC_COLOR_BLUE "" EZTR_CC_END;
-    } else if (type & 0b100) {
-        lotteryItemClass = EZTR_CC_COLOR_ORANGE "" EZTR_CC_END;
-    } else {
-        lotteryItemClass = EZTR_CC_COLOR_SILVER ""  EZTR_CC_END;
-    }
-    
+        
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
         "          Lottery Shop"
         EZTR_CC_NEWLINE "Grand Prize:"
-        EZTR_CC_NEWLINE "%m%m" 
+        EZTR_CC_NEWLINE "%c%m" 
         EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END,
-        lotteryItemClass,
+        getAPItemColor(lotteryItem),
         item_is_checked,
         player_name_when_nonlocal
     );
@@ -1301,27 +1313,15 @@ EZTR_MSG_CALLBACK(randoLotteryNPCHint) {
         );
     }
 
-    char* lotteryItemClass;
-    u32 type = rando_get_location_type(lotteryItem);
-    if (type & 0b001) {
-        lotteryItemClass = EZTR_CC_COLOR_LIGHTBLUE "" EZTR_CC_END;
-    } else if (type & 0b010) {
-        lotteryItemClass = EZTR_CC_COLOR_BLUE "" EZTR_CC_END;
-    } else if (type & 0b100) {
-        lotteryItemClass = EZTR_CC_COLOR_ORANGE "" EZTR_CC_END;
-    } else {
-        lotteryItemClass = EZTR_CC_COLOR_SILVER ""  EZTR_CC_END;
-    }
-
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
         "Would you like the chance to buy"
         EZTR_CC_NEWLINE "your dreams for " EZTR_CC_COLOR_PINK "10 Rupees" EZTR_CC_COLOR_DEFAULT "?"
         EZTR_CC_NEWLINE "" EZTR_CC_CARRIAGE_RETURN "" EZTR_CC_BOX_BREAK2 "Pick any three numbers, and if"
         EZTR_CC_NEWLINE "those are picked, you'll win"
-        EZTR_CC_NEWLINE "%m%m" 
+        EZTR_CC_NEWLINE "%c%m" 
         EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END "",
-        lotteryItemClass,
+        getAPItemColor(lotteryItem),
         item_is_checked,
         player_name_when_nonlocal
     );
@@ -1605,6 +1605,18 @@ EZTR_Basic_ReplaceText(
         true,
         "\xBF",
         randoLotteryNPCHint
+    );
+    EZTR_Basic_ReplaceText(
+        0x044D, // Bank hints
+        EZTR_STANDARD_TEXT_BOX_II,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "\xBF",
+        randoBankHints
     );
     EZTR_Basic_ReplaceText(
         0x15E9, // Magic Bean Scrub
