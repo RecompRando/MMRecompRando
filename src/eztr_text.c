@@ -1139,63 +1139,10 @@ EZTR_MSG_CALLBACK(OceanSpiderTokenCount) {
         }
 }
 
-// honestly don't know, but seems important
-// char* item_str;
-// char* player_str;
-
-// rando_get_location_item_name(rando_get_last_location_sent(), &item_str);
-// rando_get_location_item_player(rando_get_last_location_sent(), &player_str);
-// sanitizeRandoText(item_str);
-// sanitizeRandoText(player_str);
-
-
-// text sanitize stolen from old file. Not sure what role this plays exactly, but I know it fixes crashes on funky letters
-// commented out because this function is already in use elsewhere
-// void sanitizeRandoText(char* rando_string) {
-//     u8 c = rando_string[0];
-//     u8 next = 0;
-//     u8 i = 0;
-//     bool shift_string = false;
-
-//     while (c != 0) {
-//         if (c <= 0x08 || (c >= 0x0A && c <= 0x1F) || (c >= 0xB0 && c <= 0xBB) || (c >= 0xBF && c <= 0xE8) || (c >= 0xF0 && c <= 0xFF)) {
-//             next = rando_string[i+1];
-//             if (c == 0xC3 && next == 0xA1) { // á
-//                 rando_string[i] = 0x98;
-//                 shift_string = true;
-//             } else {
-//                 rando_string[i] = 0xAE; // replace all invalid bytes with ¿
-//             }
-//         }
-
-//         if (shift_string) {
-//             u8 new_i = i + 1;
-//             u8 new_c = rando_string[new_i];
-//             u8 new_next = rando_string[new_i + 1];
-//             while (new_c != 0) {
-//                 rando_string[new_i] = new_next;
-//                 new_i++;
-//                 new_c = rando_string[new_i];
-//                 new_next = rando_string[new_i + 1];
-//             }
-//             shift_string = false;
-//         }
-
-//         i++;
-//         c = rando_string[i];
-//     }
-// }
-
-
-
-
-
 // text replacements for AP items. Not yet set up. Probably won't use but keeping here just in case.
 // EZTR_MSG_CALLBACK(randoAPSend) {
 //     buf->data.text_box_type = EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
-//     EZTR_MsgSContent_Sprintf(buf->data.content, "You found " EZTR_CC_COLOR_RED "\xFE" EZTR_CC_COLOR_DEFAULT "'s" EZTR_CC_NEWLINE "" RANDO_AP_COLOR "\xFF" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END ""),
-        
-            
+//     EZTR_MsgSContent_Sprintf(buf->data.content, "You found " EZTR_CC_COLOR_RED "\xFE" EZTR_CC_COLOR_DEFAULT "'s" EZTR_CC_NEWLINE "" RANDO_AP_COLOR "\xFF" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END ""),     
 // }
 
 // text replacements for pictograph box
@@ -1242,6 +1189,7 @@ EZTR_MSG_CALLBACK(randoPictograph) {
         EZTR_MsgSContent_Sprintf(buf->data.content, "Keep this " EZTR_CC_COLOR_RED "picture" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN "" EZTR_CC_NEWLINE "" EZTR_CC_NEWLINE "" EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE "No" EZTR_CC_END "");
     }
 }
+
 EZTR_MSG_CALLBACK(randoLotterySignHint) {
     u32 lotteryItem = LOCATION_LOTTERY_SHOP;
     char* player_name;
@@ -1257,7 +1205,7 @@ EZTR_MSG_CALLBACK(randoLotterySignHint) {
         EZTR_MsgSContent_Snprintf(
             player_name_when_nonlocal,
             128,
-            "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
+            EZTR_CC_NEWLINE "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
             player_name
         );
     } else {
@@ -1267,6 +1215,7 @@ EZTR_MSG_CALLBACK(randoLotterySignHint) {
             EZTR_CC_END
         );
     }
+    
     char item_is_checked[128];
     if (!rando_location_is_checked(lotteryItem)) {
         EZTR_MsgSContent_Snprintf(
@@ -1282,6 +1231,7 @@ EZTR_MSG_CALLBACK(randoLotterySignHint) {
             EZTR_CC_COLOR_SILVER "50 Rupees" EZTR_CC_END
         );
     }
+    
     char* lotteryItemClass;
     u32 type = rando_get_location_type(lotteryItem);
     if (type & 0b001) {
@@ -1293,12 +1243,13 @@ EZTR_MSG_CALLBACK(randoLotterySignHint) {
     } else {
         lotteryItemClass = EZTR_CC_COLOR_SILVER ""  EZTR_CC_END;
     }
+    
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
         "          Lottery Shop"
         EZTR_CC_NEWLINE "Grand Prize:"
         EZTR_CC_NEWLINE "%m%m" 
-        EZTR_CC_NEWLINE "" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END "",
+        EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END,
         lotteryItemClass,
         item_is_checked,
         player_name_when_nonlocal
@@ -1306,8 +1257,8 @@ EZTR_MSG_CALLBACK(randoLotterySignHint) {
     
     recomp_free(item_name);
     recomp_free(player_name);
-
 }
+
 EZTR_MSG_CALLBACK(randoLotteryNPCHint) {
     u32 lotteryItem = LOCATION_LOTTERY_SHOP;
     char* player_name;
@@ -1323,7 +1274,7 @@ EZTR_MSG_CALLBACK(randoLotteryNPCHint) {
         EZTR_MsgSContent_Snprintf(
             player_name_when_nonlocal,
             128,
-            "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
+            EZTR_CC_NEWLINE "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
             player_name
         );
     } else {
@@ -1333,6 +1284,7 @@ EZTR_MSG_CALLBACK(randoLotteryNPCHint) {
             EZTR_CC_END
         );
     }
+    
     char item_is_checked[128];
     if (!rando_location_is_checked(lotteryItem)) {
         EZTR_MsgSContent_Snprintf(
@@ -1348,6 +1300,7 @@ EZTR_MSG_CALLBACK(randoLotteryNPCHint) {
             EZTR_CC_COLOR_SILVER "50 Rupees" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END
         );
     }
+
     char* lotteryItemClass;
     u32 type = rando_get_location_type(lotteryItem);
     if (type & 0b001) {
@@ -1359,6 +1312,7 @@ EZTR_MSG_CALLBACK(randoLotteryNPCHint) {
     } else {
         lotteryItemClass = EZTR_CC_COLOR_SILVER ""  EZTR_CC_END;
     }
+
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
         "Would you like the chance to buy"
@@ -1366,7 +1320,7 @@ EZTR_MSG_CALLBACK(randoLotteryNPCHint) {
         EZTR_CC_NEWLINE "" EZTR_CC_CARRIAGE_RETURN "" EZTR_CC_BOX_BREAK2 "Pick any three numbers, and if"
         EZTR_CC_NEWLINE "those are picked, you'll win"
         EZTR_CC_NEWLINE "%m%m" 
-        EZTR_CC_NEWLINE "" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END "",
+        EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END "",
         lotteryItemClass,
         item_is_checked,
         player_name_when_nonlocal
@@ -1374,8 +1328,8 @@ EZTR_MSG_CALLBACK(randoLotteryNPCHint) {
     
     recomp_free(item_name);
     recomp_free(player_name);
-
 }
+
 EZTR_MSG_CALLBACK(randoGrave1Hint) {
     u32 location1 = 0x0000A2; // Graveyard Day 1 Iron Knuckle Song
     char* player_name;
@@ -1823,6 +1777,21 @@ EZTR_Basic_ReplaceText(
         "\xBF",
         randoMilkBar
     );
+
+    // Kotake Blue Potion Text
+    EZTR_Basic_ReplaceText(
+        0x0880,
+        EZTR_STANDARD_TEXT_BOX_II,
+        0x30,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        false,
+        "\xBF",
+        randoShop
+    );
+
     // Tingle Text
     // North Clock Town Tingle
     EZTR_Basic_ReplaceText(
