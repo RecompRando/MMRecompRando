@@ -614,6 +614,115 @@ EZTR_MSG_CALLBACK(randoScrub) {
     recomp_free(item_name);
     recomp_free(player_name);
 }
+EZTR_MSG_CALLBACK(randoScrubNotSelling) {
+    u32 scrubLocation = LOCATION_SCRUB_SHOP(GI_MAGIC_BEANS);
+    if (!rando_get_slotdata_u32("scrubsanity") || rando_location_is_checked(scrubLocation)) {
+        return;
+    }
+
+    char* player_name;
+    char* item_name;
+    u16 price = 5;
+    u16 requiredForm = 1;
+    switch (currentScrub) {
+        case 0:
+            scrubLocation = LOCATION_SCRUB_SHOP(GI_MAGIC_BEANS);
+            price = 10;
+            requiredForm = 1;
+            break;
+        case 1:
+            scrubLocation = LOCATION_SCRUB_SHOP(GI_BOMB_BAG_40);
+            price = 200;
+            requiredForm = 2;
+            break;
+        case 2:
+            scrubLocation = LOCATION_SCRUB_SHOP(GI_POTION_GREEN);
+            price = 40;
+            requiredForm = 3;
+            break;
+        case 3:
+            scrubLocation = LOCATION_SCRUB_SHOP(GI_POTION_BLUE);
+            price = 100;
+            requiredForm = 4;
+            break;
+    }
+
+    rando_get_location_item_player(scrubLocation, &player_name);
+    rando_get_location_item_name(scrubLocation, &item_name);
+    sanitizeRandoText(item_name);
+    sanitizeRandoText(player_name);
+
+    char formatted_player_name[128];
+    if (!rando_get_location_has_local_item(scrubLocation) && (!rando_location_is_checked(scrubLocation))) {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            EZTR_CC_NEWLINE "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_NEWLINE EZTR_CC_END,
+            player_name
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            EZTR_CC_NEWLINE EZTR_CC_END
+        );
+    }
+    char extra_text[256];
+    if (requiredForm == 1) {
+        EZTR_MsgSContent_Snprintf(
+            extra_text,
+            128,
+            EZTR_CC_BOX_BREAK2 "But only to Deku Scrubs. I'd really" EZTR_CC_NEWLINE
+            "like to leave my hometown. I'm" EZTR_CC_NEWLINE
+            "hoping to find some success in" EZTR_CC_NEWLINE
+            "a livelier place!" EZTR_CC_END,
+            NULL
+            );
+    } else if (requiredForm == 2){
+        EZTR_MsgSContent_Snprintf(
+            extra_text,
+            128,
+            EZTR_CC_BOX_BREAK2 "But only to Gorons." EZTR_CC_NEWLINE
+            "What I'd really like to do is go" EZTR_CC_NEWLINE 
+            "back home and do business where" EZTR_CC_NEWLINE
+            "I'm surrounded by the trees and grass." EZTR_CC_END,
+            NULL
+            );
+    } else if (requiredForm == 3) {
+        EZTR_MsgSContent_Snprintf(
+            extra_text,
+            128,
+            EZTR_CC_BOX_BREAK2 "But only to Zora." EZTR_CC_NEWLINE
+            "Actually, I'd like to do business" EZTR_CC_NEWLINE 
+            "someplace where it's cooler and" EZTR_CC_NEWLINE
+            "the air is clean." EZTR_CC_END,
+            NULL
+            );
+    } else if (requiredForm == 4) {
+        EZTR_MsgSContent_Snprintf(
+            extra_text,
+            128,
+            EZTR_CC_BOX_BREAK2 "Actually, I want to do business in" EZTR_CC_NEWLINE 
+            "the sea breeze while listening to" EZTR_CC_NEWLINE
+            "the sound of the waves." EZTR_CC_END,
+            NULL
+            );
+    }
+
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "For " EZTR_CC_COLOR_PINK "%d Rupees" EZTR_CC_COLOR_DEFAULT ", I'm selling"
+        EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "%m%m" EZTR_CC_EVENT EZTR_CC_END,
+        price,
+        getAPItemColor(scrubLocation),
+        item_name,
+        formatted_player_name,
+        extra_text
+    );
+
+    recomp_free(item_name);
+    recomp_free(player_name);
+}
 
 #define LOCATION_MILK (0x263 << 8 | GI_MILK) // (ACTOR_ID_BARTEN << 8 | GI_MILK)
 #define MILK_BAR_LOCATION_CHATEAU GI_CHATEAU
@@ -1669,7 +1778,23 @@ EZTR_ON_INIT void init_text() {
         EZTR_CC_NEWLINE "I'll sell you one for " EZTR_CC_COLOR_PINK "10 Rupees" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_EVENT EZTR_CC_END,
         randoScrub
     );
-    
+    EZTR_Basic_ReplaceText(
+        0x15E1, // Magic Bean Scrub when talking as non-deku
+        EZTR_STANDARD_TEXT_BOX_I,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "" EZTR_CC_SFX "|39|A7I sell " EZTR_CC_COLOR_GREEN "Magic Beans " EZTR_CC_COLOR_DEFAULT "to Deku" EZTR_CC_NEWLINE 
+        "Scrubs, but I'd really like to leave" EZTR_CC_NEWLINE 
+        "my hometown." EZTR_CC_NEWLINE 
+        EZTR_CC_BOX_BREAK2 "I'm hoping to find some success in" EZTR_CC_NEWLINE 
+        "a livelier place!" EZTR_CC_EVENT "" EZTR_CC_END "",
+        randoScrubNotSelling
+    );
+        
     EZTR_Basic_ReplaceText(
         0x15F3, // Magic Bean Scrub in new home
         EZTR_STANDARD_TEXT_BOX_II,
@@ -1699,6 +1824,23 @@ EZTR_ON_INIT void init_text() {
         EZTR_CC_CARRIAGE_RETURN EZTR_CC_BOX_BREAK2 "In return, you'll give me your " EZTR_CC_COLOR_RED "Big" EZTR_CC_NEWLINE
         "Bomb Bag " EZTR_CC_COLOR_DEFAULT "and just " EZTR_CC_COLOR_PINK "200 Rupees" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_EVENT EZTR_CC_END,
         randoScrub
+    );
+    EZTR_Basic_ReplaceText(
+        0x15F5, // Bomb Bag Scrub when talking to Deku
+        EZTR_STANDARD_TEXT_BOX_I,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "I sell bomb bags, but I'm focusing" EZTR_CC_NEWLINE 
+        "my marketing efforts on " EZTR_CC_COLOR_RED "Gorons." EZTR_CC_NEWLINE 
+        "" EZTR_CC_COLOR_DEFAULT "" EZTR_CC_CARRIAGE_RETURN "" EZTR_CC_BOX_BREAK2 
+        "What I'd really like to do is go" EZTR_CC_NEWLINE 
+        "back home and do business where" EZTR_CC_NEWLINE 
+        "I'm surrounded by trees and grass." EZTR_CC_EVENT "" EZTR_CC_END "",
+        randoScrubNotSelling
     );
     
     EZTR_Basic_ReplaceText(
@@ -1730,6 +1872,23 @@ EZTR_ON_INIT void init_text() {
         EZTR_CC_NEWLINE EZTR_CC_COLOR_PINK "40 Rupees" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_EVENT2 EZTR_CC_END,
         randoScrub
     );
+    EZTR_Basic_ReplaceText(
+        0x1608, // Green Potion Scrub when talking to Goron
+        EZTR_STANDARD_TEXT_BOX_I,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        EZTR_CC_SFX "|39|A7I'm selling " EZTR_CC_COLOR_GREEN "Green Potions" EZTR_CC_COLOR_DEFAULT ", but I'm" EZTR_CC_NEWLINE 
+        "focusing my marketing efforts on" EZTR_CC_NEWLINE 
+        "Zoras." EZTR_CC_NEWLINE "" EZTR_CC_BOX_BREAK2 
+        "Actually, I'd like to do business" EZTR_CC_NEWLINE 
+        "someplace where it's cooler and" EZTR_CC_NEWLINE 
+        "the air is clean." EZTR_CC_EVENT "" EZTR_CC_END "",
+        randoScrubNotSelling
+    );
     
     EZTR_Basic_ReplaceText(
         0x1617, // Green Potion Scrub in new home
@@ -1758,6 +1917,21 @@ EZTR_ON_INIT void init_text() {
         "case you get cursed?" EZTR_CC_NEWLINE
         "One drink is " EZTR_CC_COLOR_PINK "100 Rupees" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_EVENT EZTR_CC_END,
         randoScrub
+    );
+    EZTR_Basic_ReplaceText(
+        0x161C, // Blue Potion Scrub talking to Zora
+        EZTR_STANDARD_TEXT_BOX_I,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        EZTR_CC_SFX "|39|A7I'm here to sell " EZTR_CC_COLOR_BLUE "Blue Potion" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_NEWLINE 
+        EZTR_CC_CARRIAGE_RETURN "" EZTR_CC_CARRIAGE_RETURN "" EZTR_CC_BOX_BREAK2 "Actually, I want to do business in" EZTR_CC_NEWLINE 
+        "the sea breeze while listening to" EZTR_CC_NEWLINE 
+        "the sound of the waves." EZTR_CC_EVENT "" EZTR_CC_END "",
+        randoScrubNotSelling
     );
     
     EZTR_Basic_ReplaceText(
