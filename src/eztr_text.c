@@ -165,7 +165,7 @@ EZTR_MSG_CALLBACK(randoAPSend) {
     
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
-        "You found " EZTR_CC_COLOR_RED "%s" EZTR_CC_COLOR_DEFAULT "'s" EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You found " EZTR_CC_COLOR_RED "%s" EZTR_CC_COLOR_DEFAULT "'s" EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         player_name,
         getAPItemColor(location),
         item_name
@@ -184,7 +184,7 @@ EZTR_MSG_CALLBACK(randoAPSelf) {
     
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
-        "You found your" EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You found your" EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         getAPItemColor(location),
         item_name
     );
@@ -201,7 +201,7 @@ EZTR_MSG_CALLBACK(randoGIOwlStatue) {
     
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
-        "You can now soar to the" EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You can now soar to the" EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         getAPItemColor(location),
         item_name
     );
@@ -218,7 +218,7 @@ EZTR_MSG_CALLBACK(randoGISongs) {
     
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
-        "You learned the " EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You learned the " EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         getAPItemColor(location),
         item_name
     );
@@ -231,13 +231,13 @@ EZTR_MSG_CALLBACK(randoGIMagic) {
     if (magic_count < 2) {
         EZTR_MsgSContent_Sprintf(
             buf->data.content,
-            "You got " EZTR_CC_COLOR_RED "Magic Power" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+            "You got " EZTR_CC_COLOR_RED "Magic Power" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
             NULL
         );
     } else if (magic_count == 2) {
         EZTR_MsgSContent_Sprintf(
             buf->data.content,
-            "Your " EZTR_CC_COLOR_RED "Magic Power" EZTR_CC_COLOR_DEFAULT " has been " EZTR_CC_COLOR_RED "doubled" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+            "Your " EZTR_CC_COLOR_RED "Magic Power" EZTR_CC_COLOR_DEFAULT " has been " EZTR_CC_COLOR_RED "doubled" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
             NULL
         );
     }
@@ -252,7 +252,7 @@ EZTR_MSG_CALLBACK(randoGISouls) {
     
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
-        "You found the" EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You found the" EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         getAPItemColor(location),
         item_name
     );
@@ -270,7 +270,7 @@ EZTR_MSG_CALLBACK(randoGIFrogs) {
     // TODO: set different colors for each frog
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
-        "You found the %c%s" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You found the %c%s" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         getAPItemColor(location),
         item_name
     );
@@ -553,103 +553,66 @@ EZTR_MSG_CALLBACK(randoShopBuy) {
 extern s16 currentScrub;
 EZTR_MSG_CALLBACK(randoScrub) {
     u32 scrubLocation = LOCATION_SCRUB_SHOP(GI_MAGIC_BEANS);
+    if (!rando_get_slotdata_u32("scrubsanity") || rando_location_is_checked(scrubLocation)) {
+        return;
+    }
+
     char* player_name;
     char* item_name;
     u16 price = 5;
-    char vanilla_scrub_text[256];
     
     switch (currentScrub) {
         case 0:
             scrubLocation = LOCATION_SCRUB_SHOP(GI_MAGIC_BEANS);
             price = 10;
-            EZTR_MsgSContent_Snprintf(
-                vanilla_scrub_text,
-                256,
-                EZTR_CC_SFX "|3A|D2Do you know what " EZTR_CC_COLOR_GREEN "magic beans"
-                EZTR_CC_NEWLINE "" EZTR_CC_COLOR_DEFAULT "are, sir?"
-                EZTR_CC_NEWLINE "I'll sell you one for " EZTR_CC_COLOR_PINK "10 Rupees" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_EVENT "" EZTR_CC_END "",
-                NULL
-            );
             break;
         case 1:
             scrubLocation = LOCATION_SCRUB_SHOP(GI_BOMB_BAG_40);
             price = 200;
-            EZTR_MsgSContent_Snprintf(
-                vanilla_scrub_text,
-                256,
-                EZTR_CC_SFX "|38|81I'll give you my Biggest Bomb Bag," 
-                EZTR_CC_NEWLINE "regularly priced at " EZTR_CC_COLOR_PINK "1000 Rupees" EZTR_CC_COLOR_DEFAULT "..." 
-                EZTR_CC_NEWLINE "" EZTR_CC_CARRIAGE_RETURN "" EZTR_CC_BOX_BREAK2 "In return, you'll give me your " EZTR_CC_COLOR_RED "Big" 
-                EZTR_CC_NEWLINE "Bomb Bag " EZTR_CC_COLOR_DEFAULT "and just " EZTR_CC_COLOR_PINK "200 Rupees" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_EVENT "" EZTR_CC_END "",
-                NULL
-            );
             break;
         case 2:
             scrubLocation = LOCATION_SCRUB_SHOP(GI_POTION_GREEN);
             price = 40;
-            EZTR_MsgSContent_Snprintf(
-                vanilla_scrub_text,
-                256,
-                EZTR_CC_SFX "|39|8CI'll sell you a " EZTR_CC_COLOR_GREEN "Green Potion" EZTR_CC_COLOR_DEFAULT " for" 
-                EZTR_CC_NEWLINE "" EZTR_CC_COLOR_PINK "40 Rupees" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_EVENT2 "" EZTR_CC_END "",
-                NULL
-            );
             break;
         case 3:
             scrubLocation = LOCATION_SCRUB_SHOP(GI_POTION_BLUE);
             price = 100;
-            EZTR_MsgSContent_Snprintf(
-                vanilla_scrub_text,
-                256,
-                EZTR_CC_SFX "|3A|D2Don't you need any " EZTR_CC_COLOR_BLUE "Blue Potion" EZTR_CC_COLOR_DEFAULT " in" 
-                EZTR_CC_NEWLINE "case you get cursed?" 
-                EZTR_CC_NEWLINE "One drink is " EZTR_CC_COLOR_PINK "100 Rupees" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_EVENT "" EZTR_CC_END "",
-                NULL
-            );
             break;
     }
 
-    if (rando_get_slotdata_u32("scrubsanity") && !rando_location_is_checked(scrubLocation)) {
-        rando_get_location_item_player(scrubLocation, &player_name);
-        rando_get_location_item_name(scrubLocation, &item_name);
-        sanitizeRandoText(item_name);
-        sanitizeRandoText(player_name);
+    rando_get_location_item_player(scrubLocation, &player_name);
+    rando_get_location_item_name(scrubLocation, &item_name);
+    sanitizeRandoText(item_name);
+    sanitizeRandoText(player_name);
 
-        char formatted_player_name[128];
-        if (!rando_get_location_has_local_item(scrubLocation) && (!rando_location_is_checked(scrubLocation))) {
-            EZTR_MsgSContent_Snprintf(
-                formatted_player_name,
-                128,
-                EZTR_CC_NEWLINE "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
-                player_name
-            );
-        } else {
-            EZTR_MsgSContent_Snprintf(
-                formatted_player_name,
-                128,
-                EZTR_CC_END
-            );
-        }
-
-        EZTR_MsgSContent_Sprintf(
-            buf->data.content,
-            "For " EZTR_CC_COLOR_PINK "%d Rupees" EZTR_CC_COLOR_DEFAULT ", I'm selling"
-            EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_EVENT "" EZTR_CC_END,
-            price,
-            getAPItemColor(scrubLocation),
-            item_name,
-            formatted_player_name
+    char formatted_player_name[128];
+    if (!rando_get_location_has_local_item(scrubLocation) && (!rando_location_is_checked(scrubLocation))) {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            EZTR_CC_NEWLINE "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
+            player_name
         );
-
-        recomp_free(item_name);
-        recomp_free(player_name);
     } else {
-        EZTR_MsgSContent_Sprintf(
-            buf->data.content,
-            "%m" EZTR_CC_EVENT "" EZTR_CC_END,
-            vanilla_scrub_text
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            EZTR_CC_END
         );
     }
+
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "For " EZTR_CC_COLOR_PINK "%d Rupees" EZTR_CC_COLOR_DEFAULT ", I'm selling"
+        EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_EVENT EZTR_CC_END,
+        price,
+        getAPItemColor(scrubLocation),
+        item_name,
+        formatted_player_name
+    );
+
+    recomp_free(item_name);
+    recomp_free(player_name);
 }
 
 #define LOCATION_MILK (0x263 << 8 | GI_MILK) // (ACTOR_ID_BARTEN << 8 | GI_MILK)
@@ -890,7 +853,7 @@ EZTR_MSG_CALLBACK(SnowheadSmallKeyCount) {
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
         "You got a " EZTR_CC_COLOR_GREEN "Snowhead " EZTR_CC_COLOR_RED "Small Key" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_NEWLINE
-        "This is your " EZTR_CC_COLOR_RED "%m" EZTR_CC_COLOR_DEFAULT " one." EZTR_CC_END "",
+        "This is your " EZTR_CC_COLOR_RED "%m" EZTR_CC_COLOR_DEFAULT " one." EZTR_CC_END,
         count_str
     );
 }
@@ -904,7 +867,7 @@ EZTR_MSG_CALLBACK(StoneTowerSmallKeyCount) {
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
         "You got a " EZTR_CC_COLOR_YELLOW "Stone Tower " EZTR_CC_COLOR_RED "Small Key" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_NEWLINE
-        "This is your " EZTR_CC_COLOR_RED "%m" EZTR_CC_COLOR_DEFAULT " one." EZTR_CC_END "",
+        "This is your " EZTR_CC_COLOR_RED "%m" EZTR_CC_COLOR_DEFAULT " one." EZTR_CC_END,
         count_str
     );
 }
@@ -1050,30 +1013,14 @@ EZTR_MSG_CALLBACK(randoBankHints) {
 
 EZTR_MSG_CALLBACK(randoLotterySignHint) {
     u32 lotteryItem = LOCATION_LOTTERY_SHOP;
-    char* player_name;
     char* item_name;
+    char* player_name;
 
-    rando_get_location_item_player(lotteryItem, &player_name);
     rando_get_location_item_name(lotteryItem, &item_name);
+    rando_get_location_item_player(lotteryItem, &player_name);
     sanitizeRandoText(item_name);
     sanitizeRandoText(player_name);
 
-    char formatted_player_name[128];
-    if (!rando_get_location_has_local_item(lotteryItem) && (!rando_location_is_checked(lotteryItem))) {
-        EZTR_MsgSContent_Snprintf(
-            formatted_player_name,
-            128,
-            EZTR_CC_NEWLINE "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
-            player_name
-        );
-    } else {
-        EZTR_MsgSContent_Snprintf(
-            formatted_player_name,
-            128,
-            EZTR_CC_END
-        );
-    }
-    
     char formatted_item_name[128];
     if (!rando_location_is_checked(lotteryItem)) {
         EZTR_MsgSContent_Snprintf(
@@ -1089,31 +1036,6 @@ EZTR_MSG_CALLBACK(randoLotterySignHint) {
             EZTR_CC_COLOR_SILVER "50 Rupees" EZTR_CC_END
         );
     }
-        
-    EZTR_MsgSContent_Sprintf(
-        buf->data.content,
-        "          Lottery Shop"
-        EZTR_CC_NEWLINE "Grand Prize:"
-        EZTR_CC_NEWLINE "%c%m" 
-        EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END,
-        getAPItemColor(lotteryItem),
-        formatted_item_name,
-        formatted_player_name
-    );
-    
-    recomp_free(item_name);
-    recomp_free(player_name);
-}
-
-EZTR_MSG_CALLBACK(randoLotteryNPCHint) {
-    u32 lotteryItem = LOCATION_LOTTERY_SHOP;
-    char* player_name;
-    char* item_name;
-
-    rando_get_location_item_player(lotteryItem, &player_name);
-    rando_get_location_item_name(lotteryItem, &item_name);
-    sanitizeRandoText(item_name);
-    sanitizeRandoText(player_name);
 
     char formatted_player_name[128];
     if (!rando_get_location_has_local_item(lotteryItem) && (!rando_location_is_checked(lotteryItem))) {
@@ -1130,7 +1052,32 @@ EZTR_MSG_CALLBACK(randoLotteryNPCHint) {
             EZTR_CC_END
         );
     }
+        
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "          Lottery Shop"
+        "Grand Prize:" EZTR_CC_NEWLINE
+        "%c%m" EZTR_CC_NEWLINE
+        EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END,
+        getAPItemColor(lotteryItem),
+        formatted_item_name,
+        formatted_player_name
+    );
     
+    recomp_free(item_name);
+    recomp_free(player_name);
+}
+
+EZTR_MSG_CALLBACK(randoLotteryNPCHint) {
+    u32 lotteryItem = LOCATION_LOTTERY_SHOP;
+    char* item_name;
+    char* player_name;
+
+    rando_get_location_item_name(lotteryItem, &item_name);
+    rando_get_location_item_player(lotteryItem, &player_name);
+    sanitizeRandoText(item_name);
+    sanitizeRandoText(player_name);
+
     char formatted_item_name[128];
     if (!rando_location_is_checked(lotteryItem)) {
         EZTR_MsgSContent_Snprintf(
@@ -1147,14 +1094,31 @@ EZTR_MSG_CALLBACK(randoLotteryNPCHint) {
         );
     }
 
+    char formatted_player_name[128];
+    if (!rando_get_location_has_local_item(lotteryItem) && (!rando_location_is_checked(lotteryItem))) {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            EZTR_CC_NEWLINE "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
+            player_name
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            EZTR_CC_END
+        );
+    }
+
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
         "Would you like the chance to buy"
-        EZTR_CC_NEWLINE "your dreams for " EZTR_CC_COLOR_PINK "10 Rupees" EZTR_CC_COLOR_DEFAULT "?"
-        EZTR_CC_NEWLINE "" EZTR_CC_CARRIAGE_RETURN "" EZTR_CC_BOX_BREAK2 "Pick any three numbers, and if"
-        EZTR_CC_NEWLINE "those are picked, you'll win"
-        EZTR_CC_NEWLINE "%c%m" 
-        EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END "",
+        "your dreams for " EZTR_CC_COLOR_PINK "10 Rupees" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_NEWLINE
+        EZTR_CC_CARRIAGE_RETURN EZTR_CC_BOX_BREAK2
+        "Pick any three numbers, and if" EZTR_CC_NEWLINE
+        "those are picked, you'll win" EZTR_CC_NEWLINE
+        "%c%m" EZTR_CC_NEWLINE
+        EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END,
         getAPItemColor(lotteryItem),
         formatted_item_name,
         formatted_player_name
@@ -1166,36 +1130,21 @@ EZTR_MSG_CALLBACK(randoLotteryNPCHint) {
 
 EZTR_MSG_CALLBACK(randoGrave1Hint) {
     u32 location1 = 0x0000A2; // Graveyard Day 1 Iron Knuckle Song
-    char* player_name;
     char* item_name;
+    char* player_name;
     u32 location2 = 0x060C03; // Graveyard Day 1 Bats Chest
-    char* player_name2;
     char* item_name2;
+    char* player_name2;
 
-    rando_get_location_item_player(location1, &player_name);
     rando_get_location_item_name(location1, &item_name);
-    rando_get_location_item_player(location2, &player_name2);
+    rando_get_location_item_player(location1, &player_name);
     rando_get_location_item_name(location2, &item_name2);
+    rando_get_location_item_player(location2, &player_name2);
     sanitizeRandoText(item_name);
     sanitizeRandoText(player_name);
     sanitizeRandoText(item_name2);
     sanitizeRandoText(player_name2);
 
-    char formatted_player_name[128];
-    if (!rando_get_location_has_local_item(location1)) {
-        EZTR_MsgSContent_Snprintf(
-            formatted_player_name,
-            128,
-            "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
-            player_name
-        );
-    } else {
-        EZTR_MsgSContent_Snprintf(
-            formatted_player_name,
-            128,
-            EZTR_CC_END
-        );
-    }
     char formatted_item_name[128];
     if (!rando_location_is_checked(location1)) {
         EZTR_MsgSContent_Snprintf(
@@ -1211,21 +1160,23 @@ EZTR_MSG_CALLBACK(randoGrave1Hint) {
             EZTR_CC_COLOR_SILVER "nothing" EZTR_CC_END
         );
     }
-    char formatted_player_name2[128];
-    if (!rando_get_location_has_local_item(location2)) {
+    
+    char formatted_player_name[128];
+    if (!rando_get_location_has_local_item(location1) && !rando_location_is_checked(location1)) {
         EZTR_MsgSContent_Snprintf(
-            formatted_player_name2,
+            formatted_player_name,
             128,
-            "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
-            player_name2
+            EZTR_CC_NEWLINE EZTR_CC_COLOR_DEFAULT "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
+            player_name
         );
     } else {
         EZTR_MsgSContent_Snprintf(
-            formatted_player_name2,
+            formatted_player_name,
             128,
             EZTR_CC_END
         );
     }
+
     char formatted_item_name2[128];
     if (!rando_location_is_checked(location2)) {
         EZTR_MsgSContent_Snprintf(
@@ -1242,16 +1193,31 @@ EZTR_MSG_CALLBACK(randoGrave1Hint) {
         );
     }
 
+    char formatted_player_name2[128];
+    if (!rando_get_location_has_local_item(location2) && !rando_location_is_checked(location2)) {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name2,
+            128,
+            EZTR_CC_NEWLINE EZTR_CC_COLOR_DEFAULT "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
+            player_name2
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name2,
+            128,
+            EZTR_CC_END
+        );
+    }
+
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
-        "Hear lies the melody that"
-        EZTR_CC_NEWLINE "summons the tears of"
-        EZTR_CC_NEWLINE "%c%m" 
-        EZTR_CC_NEWLINE "" EZTR_CC_COLOR_DEFAULT "%m"
-        EZTR_CC_NEWLINE EZTR_CC_BOX_BREAK2 "Those who defeat the"
-        EZTR_CC_NEWLINE "evil will find"
-        EZTR_CC_NEWLINE "%c%m" 
-        EZTR_CC_NEWLINE "" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END "",
+        "Hear lies the melody that" EZTR_CC_NEWLINE
+        "summons the tears of" EZTR_CC_NEWLINE
+        "%c%m%m" EZTR_CC_NEWLINE
+        EZTR_CC_BOX_BREAK2
+        "Those who defeat the" EZTR_CC_NEWLINE
+        "evil will find" EZTR_CC_NEWLINE
+        "%c%m%m" EZTR_CC_END,
         getAPItemColor(location1),
         formatted_item_name,
         formatted_player_name,
@@ -1267,32 +1233,17 @@ EZTR_MSG_CALLBACK(randoGrave1Hint) {
 }
 
 EZTR_MSG_CALLBACK(randoGrave2Hint) {
-    u32 location1 = 0x060C00; // Graveyard Day 2 Iron Knuckle Chest
-    char* player_name;
+    u32 location = 0x060C00; // Graveyard Day 2 Iron Knuckle Chest
     char* item_name;
+    char* player_name;
 
-    rando_get_location_item_player(location1, &player_name);
-    rando_get_location_item_name(location1, &item_name);
+    rando_get_location_item_name(location, &item_name);
+    rando_get_location_item_player(location, &player_name);
     sanitizeRandoText(item_name);
     sanitizeRandoText(player_name);
 
-    char formatted_player_name[128];
-    if (!rando_get_location_has_local_item(location1)) {
-        EZTR_MsgSContent_Snprintf(
-            formatted_player_name,
-            128,
-            "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
-            player_name
-        );
-    } else {
-        EZTR_MsgSContent_Snprintf(
-            formatted_player_name,
-            128,
-            EZTR_CC_END
-        );
-    }
     char formatted_item_name[128];
-    if (!rando_location_is_checked(location1)) {
+    if (!rando_location_is_checked(location)) {
         EZTR_MsgSContent_Snprintf(
             formatted_item_name,
             128,
@@ -1307,13 +1258,28 @@ EZTR_MSG_CALLBACK(randoGrave2Hint) {
         );
     }
 
+    char formatted_player_name[128];
+    if (!rando_get_location_has_local_item(location) && !rando_location_is_checked(location)) {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            EZTR_CC_NEWLINE EZTR_CC_COLOR_DEFAULT "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
+            player_name
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            EZTR_CC_END
+        );
+    }
+
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
         "Those who possess eyes that can"
         EZTR_CC_NEWLINE "see the truth will find"
-        EZTR_CC_NEWLINE "%c%m" 
-        EZTR_CC_NEWLINE "" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END "",
-        getAPItemColor(location1),
+        EZTR_CC_NEWLINE "%c%m%m" EZTR_CC_END,
+        getAPItemColor(location),
         formatted_item_name,
         formatted_player_name
     );
@@ -1323,32 +1289,17 @@ EZTR_MSG_CALLBACK(randoGrave2Hint) {
 }
 
 EZTR_MSG_CALLBACK(randoGrave3Hint) {
-    u32 location1 = 0x063000; // Graveyard Day 3 Dampe Big Poe Chest
-    char* player_name;
+    u32 location = 0x063000; // Graveyard Day 3 Dampe Big Poe Chest
     char* item_name;
+    char* player_name;
 
-    rando_get_location_item_player(location1, &player_name);
-    rando_get_location_item_name(location1, &item_name);
+    rando_get_location_item_name(location, &item_name);
+    rando_get_location_item_player(location, &player_name);
     sanitizeRandoText(item_name);
     sanitizeRandoText(player_name);
 
-    char formatted_player_name[128];
-    if (!rando_get_location_has_local_item(location1)) {
-        EZTR_MsgSContent_Snprintf(
-            formatted_player_name,
-            128,
-            "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
-            player_name
-        );
-    } else {
-        EZTR_MsgSContent_Snprintf(
-            formatted_player_name,
-            128,
-            EZTR_CC_END
-        );
-    }
     char formatted_item_name[128];
-    if (!rando_location_is_checked(location1)) {
+    if (!rando_location_is_checked(location)) {
         EZTR_MsgSContent_Snprintf(
             formatted_item_name,
             128,
@@ -1363,19 +1314,265 @@ EZTR_MSG_CALLBACK(randoGrave3Hint) {
         );
     }
 
+    char formatted_player_name[128];
+    if (!rando_get_location_has_local_item(location) && !rando_location_is_checked(location)) {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            EZTR_CC_NEWLINE EZTR_CC_COLOR_DEFAULT "(" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT ")" EZTR_CC_END,
+            player_name
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            EZTR_CC_END
+        );
+    }
+
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
         "Bringing light to the darkness"
         EZTR_CC_NEWLINE "will reveal to you"
-        EZTR_CC_NEWLINE "%c%m" 
-        EZTR_CC_NEWLINE "" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END "",
-        getAPItemColor(location1),
+        EZTR_CC_NEWLINE "%c%m%m" EZTR_CC_END,
+        getAPItemColor(location),
         formatted_item_name,
         formatted_player_name
     );
     
     recomp_free(item_name);
     recomp_free(player_name);
+}
+
+// Bomb Shop Powder Keg Goron (he won't stop talking about Powder Kegs)
+#define LOCATION_POWDER_KEG_GORON 0x024234
+EZTR_MSG_CALLBACK(randoBombShopGoronNonGoronGreeting) {
+    if (rando_location_is_checked(LOCATION_POWDER_KEG_GORON)) {
+        return;
+    }
+
+    char* item_name;
+    rando_get_location_item_name(LOCATION_POWDER_KEG_GORON, &item_name);
+    sanitizeRandoText(item_name);
+
+    char* player_name;
+    rando_get_location_item_player(LOCATION_POWDER_KEG_GORON, &player_name);
+    sanitizeRandoText(player_name);
+
+    char formatted_player_name[128];
+    if (!rando_get_location_has_local_item(LOCATION_POWDER_KEG_GORON)) {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            EZTR_CC_NEWLINE EZTR_CC_COLOR_DEFAULT "for %s" EZTR_CC_END,
+            player_name
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            EZTR_CC_END
+        );
+    }
+    
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        EZTR_CC_SFX "|38|FCHullo. Did ya come to buy a" EZTR_CC_NEWLINE
+        "%c%s%m" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_CONTINUE EZTR_CC_END,
+        getAPItemColor(LOCATION_POWDER_KEG_GORON),
+        item_name,
+        formatted_player_name
+    );
+}
+
+EZTR_MSG_CALLBACK(randoBombShopGoronNonGoronSecret) {
+    if (rando_location_is_checked(LOCATION_POWDER_KEG_GORON)) {
+        return;
+    }
+
+    char* classificationText;
+    u32 type = rando_get_location_type(LOCATION_POWDER_KEG_GORON);
+    if (type & 0b001) {
+        classificationText = EZTR_CC_COLOR_LIGHTBLUE " Progression Item" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+    } else if (type & 0b010) {
+        classificationText = EZTR_CC_COLOR_BLUE " Useful Item" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+    } else if (type & 0b100) {
+        classificationText = EZTR_CC_COLOR_ORANGE " Trap" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+    } else {
+        classificationText = "n " EZTR_CC_COLOR_SILVER "Item" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+    }
+    
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "..This is just between us, but I" EZTR_CC_NEWLINE
+        "have a%m that this shop" EZTR_CC_NEWLINE
+        "doesn't even carry." EZTR_CC_CONTINUE EZTR_CC_END,
+        classificationText
+    );
+}
+
+EZTR_MSG_CALLBACK(randoBombShopGoronNonGoronHeavy) {
+    if (rando_location_is_checked(LOCATION_POWDER_KEG_GORON)) {
+        return;
+    }
+    
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        EZTR_CC_SFX "|3A|BBLook, I'd like you to buy my %citem," EZTR_CC_COLOR_DEFAULT EZTR_CC_NEWLINE
+        "too, but it's just too heavy for" EZTR_CC_NEWLINE
+        "you to carry." EZTR_CC_NEWLINE
+        EZTR_CC_DELAY "|00|04" EZTR_CC_QUICKTEXT_ENABLE "Sorry." EZTR_CC_QUICKTEXT_DISABLE EZTR_CC_END,
+        getAPItemColor(LOCATION_POWDER_KEG_GORON)
+    );
+}
+
+EZTR_MSG_CALLBACK(randoBombShopGoronGreeting) {
+    if (rando_location_is_checked(LOCATION_POWDER_KEG_GORON)) {
+        return;
+    }
+
+    char* item_name;
+    rando_get_location_item_name(LOCATION_POWDER_KEG_GORON, &item_name);
+    sanitizeRandoText(item_name);
+
+    char* player_name;
+    rando_get_location_item_player(LOCATION_POWDER_KEG_GORON, &player_name);
+    sanitizeRandoText(player_name);
+
+    char formatted_player_name[128];
+    if (!rando_get_location_has_local_item(LOCATION_POWDER_KEG_GORON)) {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            EZTR_CC_COLOR_DEFAULT "%s's" EZTR_CC_NEWLINE EZTR_CC_END,
+            player_name
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            EZTR_CC_END
+        );
+    }
+    
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        EZTR_CC_SFX "|38|FC" EZTR_CC_QUICKTEXT_ENABLE "Oh! Of all places!" EZTR_CC_QUICKTEXT_DISABLE EZTR_CC_NEWLINE
+        EZTR_CC_CARRIAGE_RETURN EZTR_CC_CARRIAGE_RETURN
+        EZTR_CC_BOX_BREAK2
+        "You're a Goron, so you can carry" EZTR_CC_NEWLINE
+        "%m%c%s" EZTR_CC_COLOR_DEFAULT "," EZTR_CC_NEWLINE
+        "right?" EZTR_CC_CONTINUE EZTR_CC_END,
+        formatted_player_name,
+        getAPItemColor(LOCATION_POWDER_KEG_GORON),
+        item_name
+    );
+}
+
+EZTR_MSG_CALLBACK(randoBombShopGoronWhatSell) {
+    if (rando_location_is_checked(LOCATION_POWDER_KEG_GORON)) {
+        return;
+    }
+
+    char* item_name;
+    rando_get_location_item_name(LOCATION_POWDER_KEG_GORON, &item_name);
+    sanitizeRandoText(item_name);
+
+    char* player_name;
+    rando_get_location_item_player(LOCATION_POWDER_KEG_GORON, &player_name);
+    sanitizeRandoText(player_name);
+
+    char formatted_player_name[128];
+    if (!rando_get_location_has_local_item(LOCATION_POWDER_KEG_GORON)) {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            EZTR_CC_COLOR_GREEN "%s's" EZTR_CC_END,
+            player_name
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            "a" EZTR_CC_END
+        );
+    }
+    
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "Then I'll sell you %m" EZTR_CC_NEWLINE
+        "%c%s" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END,
+        formatted_player_name,
+        getAPItemColor(LOCATION_POWDER_KEG_GORON),
+        item_name
+    );
+}
+
+bool randomizedKegGoronItem;
+EZTR_MSG_CALLBACK(randoBombShopGoronIsSell) {
+    randomizedKegGoronItem = false;
+    if (rando_location_is_checked(LOCATION_POWDER_KEG_GORON)) {
+        return;
+    }
+
+    u32 price = 50; // TODO: randomize
+
+    char* item_name;
+    rando_get_location_item_name(LOCATION_POWDER_KEG_GORON, &item_name);
+    sanitizeRandoText(item_name);
+
+    char* player_name;
+    rando_get_location_item_player(LOCATION_POWDER_KEG_GORON, &player_name);
+    sanitizeRandoText(player_name);
+
+    char formatted_player_name[128];
+    if (!rando_get_location_has_local_item(LOCATION_POWDER_KEG_GORON)) {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            EZTR_CC_COLOR_GREEN "%s's" EZTR_CC_END,
+            player_name
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            "a" EZTR_CC_END
+        );
+    }
+    
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "So, won't ya buy %m" EZTR_CC_NEWLINE
+        "%c%s" EZTR_CC_NEWLINE
+        EZTR_CC_COLOR_DEFAULT "for " EZTR_CC_COLOR_PINK "%d Rupees" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_CONTINUE EZTR_CC_END,
+        formatted_player_name,
+        getAPItemColor(LOCATION_POWDER_KEG_GORON),
+        item_name,
+        price
+    );
+    randomizedKegGoronItem = true;
+}
+
+EZTR_MSG_CALLBACK(randoBombShopGoronHasSell) {
+    if (!randomizedKegGoronItem) {
+        return;
+    }
+
+    char* item_name;
+    rando_get_location_item_name(LOCATION_POWDER_KEG_GORON, &item_name);
+    sanitizeRandoText(item_name);
+    
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        EZTR_CC_SFX "|3A|BB" EZTR_CC_COLOR_RED "%s" EZTR_CC_COLOR_DEFAULT " made by my" EZTR_CC_NEWLINE
+        "instructor are extremely powerful." EZTR_CC_NEWLINE
+        EZTR_CC_CARRIAGE_RETURN EZTR_CC_BOX_BREAK2
+        "Come back and see me if you run" EZTR_CC_NEWLINE
+        "out." EZTR_CC_END,
+        item_name
+    );
+    randomizedKegGoronItem = false;
 }
 
 // Replacements of existing IDs
@@ -1467,7 +1664,9 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         true,
-        "\xBF",
+        EZTR_CC_SFX "|3A|D2Do you know what " EZTR_CC_COLOR_GREEN "magic beans" EZTR_CC_NEWLINE
+        EZTR_CC_COLOR_DEFAULT "are, sir?"
+        EZTR_CC_NEWLINE "I'll sell you one for " EZTR_CC_COLOR_PINK "10 Rupees" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_EVENT EZTR_CC_END,
         randoScrub
     );
     
@@ -1480,7 +1679,9 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         true,
-        "\xBF",
+        EZTR_CC_SFX "|3A|D2Do you know what " EZTR_CC_COLOR_GREEN "magic beans"
+        EZTR_CC_NEWLINE EZTR_CC_COLOR_DEFAULT "are?" EZTR_CC_NEWLINE
+        "I'll sell you one for " EZTR_CC_COLOR_PINK "10 Rupees" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_EVENT EZTR_CC_END,
         randoScrub
     );
     
@@ -1493,7 +1694,10 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         true,
-        "\xBF",
+        EZTR_CC_SFX "|38|81I'll give you my Biggest Bomb Bag," EZTR_CC_NEWLINE
+        "regularly priced at " EZTR_CC_COLOR_PINK "1000 Rupees" EZTR_CC_COLOR_DEFAULT "..." EZTR_CC_NEWLINE
+        EZTR_CC_CARRIAGE_RETURN EZTR_CC_BOX_BREAK2 "In return, you'll give me your " EZTR_CC_COLOR_RED "Big" EZTR_CC_NEWLINE
+        "Bomb Bag " EZTR_CC_COLOR_DEFAULT "and just " EZTR_CC_COLOR_PINK "200 Rupees" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_EVENT EZTR_CC_END,
         randoScrub
     );
     
@@ -1506,7 +1710,10 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         true,
-        "\xBF",
+        EZTR_CC_SFX "|38|81I'll give you my Biggest Bomb Bag," EZTR_CC_NEWLINE
+        "regularly priced at 1000 Rupees," EZTR_CC_NEWLINE 
+        "for your " EZTR_CC_COLOR_RED "Big Bomb Bag " EZTR_CC_COLOR_DEFAULT "and just" EZTR_CC_NEWLINE
+        EZTR_CC_COLOR_PINK "200 Rupees" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_EVENT EZTR_CC_END,
         randoScrub
     );
     
@@ -1519,7 +1726,8 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         true,
-        "\xBF",
+        EZTR_CC_SFX "|39|8CI'll sell you a " EZTR_CC_COLOR_GREEN "Green Potion" EZTR_CC_COLOR_DEFAULT " for" 
+        EZTR_CC_NEWLINE EZTR_CC_COLOR_PINK "40 Rupees" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_EVENT2 EZTR_CC_END,
         randoScrub
     );
     
@@ -1532,7 +1740,8 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         true,
-        "\xBF",
+        EZTR_CC_SFX "|39|8CI'll sell you a " EZTR_CC_COLOR_GREEN "Green Potion" EZTR_CC_COLOR_DEFAULT " for" 
+        EZTR_CC_NEWLINE EZTR_CC_COLOR_PINK "40 Rupees" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_EVENT2 EZTR_CC_END,
         randoScrub
     );
     
@@ -1545,7 +1754,9 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         true,
-        "\xBF",
+        EZTR_CC_SFX "|3A|D2Don't you need any " EZTR_CC_COLOR_BLUE "Blue Potion" EZTR_CC_COLOR_DEFAULT " in" EZTR_CC_NEWLINE
+        "case you get cursed?" EZTR_CC_NEWLINE
+        "One drink is " EZTR_CC_COLOR_PINK "100 Rupees" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_EVENT EZTR_CC_END,
         randoScrub
     );
     
@@ -1558,7 +1769,8 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         true,
-        "\xBF",
+        EZTR_CC_SFX "|39|8CI'll sell you one " EZTR_CC_COLOR_BLUE "Blue Potion" EZTR_CC_COLOR_DEFAULT " for" EZTR_CC_NEWLINE
+        EZTR_CC_COLOR_PINK "100 Rupees" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_EVENT EZTR_CC_END,
         randoScrub
     );
     
@@ -1571,7 +1783,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         true,
-        "..." EZTR_CC_END "",
+        "..." EZTR_CC_END,
         NULL
     );
     
@@ -1584,7 +1796,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         true,
-        "" EZTR_CC_SFX "|29|13Hoo-whine." EZTR_CC_NEWLINE "How can any of us win against..." EZTR_CC_NEWLINE "" EZTR_CC_COLOR_BLUE "blue dog" EZTR_CC_COLOR_DEFAULT "..." EZTR_CC_END "",
+         EZTR_CC_SFX "|29|13Hoo-whine." EZTR_CC_NEWLINE "How can any of us win against..." EZTR_CC_NEWLINE EZTR_CC_COLOR_BLUE "blue dog" EZTR_CC_COLOR_DEFAULT "..." EZTR_CC_END,
         NULL
     );
     
@@ -1597,7 +1809,7 @@ EZTR_ON_INIT void init_text() {
     //     EZTR_NO_VALUE,
     //     EZTR_NO_VALUE,
     //     false,
-    //     "Use the " EZTR_CC_COLOR_RED "!hint" EZTR_CC_COLOR_DEFAULT " command to hint" EZTR_CC_NEWLINE "for an item!" EZTR_CC_END "",
+    //     "Use the " EZTR_CC_COLOR_RED "!hint" EZTR_CC_COLOR_DEFAULT " command to hint" EZTR_CC_NEWLINE "for an item!" EZTR_CC_END,
     //     NULL
     // );
     
@@ -1740,6 +1952,130 @@ EZTR_ON_INIT void init_text() {
         randoTingle
     );
 
+    // Bomb Shop Powder Keg Goron (talks about the Powder Keg too much)
+    EZTR_Basic_ReplaceText(
+        0x0664,
+        EZTR_STANDARD_TEXT_BOX_I,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        EZTR_CC_SFX "|38|FCHullo. Did ya come to buy a" EZTR_CC_NEWLINE
+        "Powder Keg?" EZTR_CC_CONTINUE EZTR_CC_END,
+        randoBombShopGoronNonGoronGreeting
+    );
+
+    EZTR_Basic_ReplaceText(
+        0x0665,
+        EZTR_STANDARD_TEXT_BOX_I,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "..This is just between us, but I" EZTR_CC_NEWLINE
+        "have a huge bomb that this shop" EZTR_CC_NEWLINE
+        "doesn't even carry." EZTR_CC_CONTINUE EZTR_CC_END,
+        randoBombShopGoronNonGoronSecret
+    );
+
+    EZTR_Basic_ReplaceText(
+        0x066C,
+        EZTR_STANDARD_TEXT_BOX_I,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        EZTR_CC_SFX "|3A|BBLook, I'd like you to buy my bomb," EZTR_CC_NEWLINE
+        "too, but it's just too heavy for" EZTR_CC_NEWLINE
+        "you to carry." EZTR_CC_NEWLINE
+        EZTR_CC_DELAY "|00|04" EZTR_CC_QUICKTEXT_ENABLE "Sorry." EZTR_CC_QUICKTEXT_DISABLE EZTR_CC_END,
+        randoBombShopGoronNonGoronHeavy
+    );
+
+    EZTR_Basic_ReplaceText(
+        0x067B,
+        EZTR_STANDARD_TEXT_BOX_I,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        EZTR_CC_SFX "|38|FC" EZTR_CC_QUICKTEXT_ENABLE "Oh! Of all places!" EZTR_CC_QUICKTEXT_DISABLE EZTR_CC_NEWLINE
+        EZTR_CC_CARRIAGE_RETURN EZTR_CC_CARRIAGE_RETURN
+        EZTR_CC_BOX_BREAK2
+        "You're a Goron, so you can carry" EZTR_CC_NEWLINE
+        EZTR_CC_COLOR_RED "Powder Kegs" EZTR_CC_COLOR_DEFAULT ", right?" EZTR_CC_CONTINUE EZTR_CC_END,
+        randoBombShopGoronGreeting
+    );
+
+    EZTR_Basic_ReplaceText(
+        0x0682,
+        EZTR_STANDARD_TEXT_BOX_II,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "Then I'll sell you a " EZTR_CC_COLOR_RED "Powder Keg" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END,
+        randoBombShopGoronWhatSell
+    );
+    
+    EZTR_Basic_ReplaceText(
+        0x066E,
+        EZTR_STANDARD_TEXT_BOX_I,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        EZTR_CC_SFX "|38|FC" EZTR_CC_QUICKTEXT_ENABLE "Oh! Of all places!" EZTR_CC_QUICKTEXT_DISABLE EZTR_CC_NEWLINE
+        EZTR_CC_CARRIAGE_RETURN EZTR_CC_CARRIAGE_RETURN
+        EZTR_CC_BOX_BREAK2
+        "You're a Goron, so you can carry" EZTR_CC_NEWLINE
+        EZTR_CC_COLOR_RED "Powder Kegs" EZTR_CC_COLOR_DEFAULT ", right?" EZTR_CC_CONTINUE EZTR_CC_END,
+        randoBombShopGoronGreeting
+    );
+
+    EZTR_Basic_ReplaceText(
+        0x066F,
+        EZTR_STANDARD_TEXT_BOX_I,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "So, won't ya buy a " EZTR_CC_COLOR_RED "Powder Keg" EZTR_CC_NEWLINE
+        EZTR_CC_COLOR_DEFAULT "for " EZTR_CC_COLOR_PINK "50 Rupees" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_CONTINUE EZTR_CC_END,
+        randoBombShopGoronIsSell
+    );
+
+    EZTR_Basic_ReplaceText(
+        0x0675,
+        EZTR_STANDARD_TEXT_BOX_I,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        EZTR_CC_SFX "|3A|BB" EZTR_CC_COLOR_RED "Powder Kegs" EZTR_CC_COLOR_DEFAULT " made by my" EZTR_CC_NEWLINE
+        "instructor are extremely powerful." EZTR_CC_NEWLINE
+        EZTR_CC_CARRIAGE_RETURN EZTR_CC_BOX_BREAK2
+        "Come back and see me if you run" EZTR_CC_NEWLINE
+        "out." EZTR_CC_END,
+        randoBombShopGoronHasSell
+    );
+
     // Custom Text IDs
     EZTR_Basic_AddCustomText(
         EZTR_HNAME(Rando_Send_Item),
@@ -1802,7 +2138,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You mastered the " EZTR_CC_COLOR_RED "Spin Attack" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You mastered the " EZTR_CC_COLOR_RED "Spin Attack" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
@@ -1855,7 +2191,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got the " EZTR_CC_COLOR_RED "Kokiri Sword" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got the " EZTR_CC_COLOR_RED "Kokiri Sword" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
@@ -1868,7 +2204,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got a " EZTR_CC_COLOR_RED "Bombchu Bag" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got a " EZTR_CC_COLOR_RED "Bombchu Bag" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
@@ -1882,7 +2218,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         false,
         "You got the " EZTR_CC_COLOR_ORANGE "Clock Town" EZTR_CC_NEWLINE
-        EZTR_CC_COLOR_RED "Stray Fairy" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        EZTR_CC_COLOR_RED "Stray Fairy" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
@@ -1947,7 +2283,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got the " EZTR_CC_COLOR_PINK "Woodfall " EZTR_CC_COLOR_RED "Boss Key" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got the " EZTR_CC_COLOR_PINK "Woodfall " EZTR_CC_COLOR_RED "Boss Key" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
@@ -1960,7 +2296,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got the " EZTR_CC_COLOR_GREEN "Snowhead " EZTR_CC_COLOR_RED "Boss Key" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got the " EZTR_CC_COLOR_GREEN "Snowhead " EZTR_CC_COLOR_RED "Boss Key" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
@@ -1973,7 +2309,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got the " EZTR_CC_COLOR_BLUE "Great Bay " EZTR_CC_COLOR_RED "Boss Key" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got the " EZTR_CC_COLOR_BLUE "Great Bay " EZTR_CC_COLOR_RED "Boss Key" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
@@ -1986,7 +2322,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got the " EZTR_CC_COLOR_YELLOW "Stone Tower " EZTR_CC_COLOR_RED "Boss Key" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got the " EZTR_CC_COLOR_YELLOW "Stone Tower " EZTR_CC_COLOR_RED "Boss Key" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
@@ -1999,7 +2335,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got the " EZTR_CC_COLOR_PINK "Woodfall " EZTR_CC_COLOR_RED "Small Key" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got the " EZTR_CC_COLOR_PINK "Woodfall " EZTR_CC_COLOR_RED "Small Key" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
@@ -2025,7 +2361,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got the " EZTR_CC_COLOR_BLUE "Great Bay " EZTR_CC_COLOR_RED "Small Key" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got the " EZTR_CC_COLOR_BLUE "Great Bay " EZTR_CC_COLOR_RED "Small Key" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
@@ -2051,7 +2387,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got the " EZTR_CC_COLOR_PINK "Woodfall " EZTR_CC_COLOR_RED "Map" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got the " EZTR_CC_COLOR_PINK "Woodfall " EZTR_CC_COLOR_RED "Map" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
@@ -2064,7 +2400,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got the " EZTR_CC_COLOR_GREEN "Snowhead " EZTR_CC_COLOR_RED "Map" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got the " EZTR_CC_COLOR_GREEN "Snowhead " EZTR_CC_COLOR_RED "Map" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
@@ -2077,7 +2413,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got the " EZTR_CC_COLOR_BLUE "Great Bay " EZTR_CC_COLOR_RED "Map" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got the " EZTR_CC_COLOR_BLUE "Great Bay " EZTR_CC_COLOR_RED "Map" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
@@ -2090,7 +2426,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got the " EZTR_CC_COLOR_YELLOW "Stone Tower " EZTR_CC_COLOR_RED "Map" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got the " EZTR_CC_COLOR_YELLOW "Stone Tower " EZTR_CC_COLOR_RED "Map" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
@@ -2103,7 +2439,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got the " EZTR_CC_COLOR_PINK "Woodfall " EZTR_CC_COLOR_RED "Compass" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got the " EZTR_CC_COLOR_PINK "Woodfall " EZTR_CC_COLOR_RED "Compass" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
@@ -2116,7 +2452,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got the " EZTR_CC_COLOR_GREEN "Snowhead " EZTR_CC_COLOR_RED "Compass" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got the " EZTR_CC_COLOR_GREEN "Snowhead " EZTR_CC_COLOR_RED "Compass" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
@@ -2129,7 +2465,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got the " EZTR_CC_COLOR_BLUE "Great Bay " EZTR_CC_COLOR_RED "Compass" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got the " EZTR_CC_COLOR_BLUE "Great Bay " EZTR_CC_COLOR_RED "Compass" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
@@ -2142,7 +2478,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got the " EZTR_CC_COLOR_YELLOW "Stone Tower " EZTR_CC_COLOR_RED "Compass" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got the " EZTR_CC_COLOR_YELLOW "Stone Tower " EZTR_CC_COLOR_RED "Compass" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
@@ -2181,7 +2517,7 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You are a" EZTR_CC_COLOR_RED "FOOL" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You are a" EZTR_CC_COLOR_RED "FOOL" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
@@ -2230,19 +2566,6 @@ EZTR_ON_INIT void init_text() {
     );
     
     EZTR_Basic_AddCustomText(
-        EZTR_HNAME(Rando_Scrub),
-        EZTR_STANDARD_TEXT_BOX_II,
-        0,
-        EZTR_ICON_NO_ICON,
-        EZTR_NO_VALUE,
-        EZTR_NO_VALUE,
-        EZTR_NO_VALUE,
-        false,
-        "\xBF",
-        randoScrub
-    );
-    
-    EZTR_Basic_AddCustomText(
         EZTR_HNAME(Rando_Milk_Bar),
         EZTR_STANDARD_TEXT_BOX_II,
         0,
@@ -2277,7 +2600,8 @@ EZTR_ON_INIT void init_text() {
         EZTR_NO_VALUE,
         EZTR_NO_VALUE,
         false,
-        "You got the" EZTR_CC_COLOR_RED " Hidden Owl Statue" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_NEWLINE "You can now " EZTR_CC_NEWLINE "" EZTR_CC_COLOR_RED "Index Warp" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END "",
+        "You got the" EZTR_CC_COLOR_RED " Hidden Owl Statue" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_NEWLINE
+        "You can now " EZTR_CC_NEWLINE EZTR_CC_COLOR_RED "Index Warp" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
