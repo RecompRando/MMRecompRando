@@ -116,8 +116,17 @@ EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Bombchu_Bag);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Magic);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_SpinAttack);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_DoubleDefense);
-EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Songs);
-EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Souls);
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Time); // Songs
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Healing);
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Epona);
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Soaring);
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Storms);
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Sonata);
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Lullaby);
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Nova);
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Elegy);
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Oath);
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Souls); // collectables
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Frogs);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_CTSF); // stray fairies
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_WFSF);
@@ -149,8 +158,6 @@ EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Moon_Child_Return);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Tingle); // Shops
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Shop);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Shop_Buying);
-EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Scrub);
-EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Milk_Bar);
 
 // Get info from Rando to replace the text with item class colour, player name and item name
 EZTR_MSG_CALLBACK(randoAPSend) {
@@ -2278,19 +2285,6 @@ EZTR_ON_INIT void init_text() {
     );
     
     EZTR_Basic_AddCustomText(
-        EZTR_HNAME(Rando_GI_Songs),
-        EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
-        0,
-        EZTR_ICON_NO_ICON,
-        EZTR_NO_VALUE,
-        EZTR_NO_VALUE,
-        EZTR_NO_VALUE,
-        false,
-        "\xBF",
-        randoGISongs
-    );
-    
-    EZTR_Basic_AddCustomText(
         EZTR_HNAME(Rando_GI_Magic),
         EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
         0,
@@ -2740,19 +2734,6 @@ EZTR_ON_INIT void init_text() {
     );
     
     EZTR_Basic_AddCustomText(
-        EZTR_HNAME(Rando_Milk_Bar),
-        EZTR_STANDARD_TEXT_BOX_II,
-        0,
-        EZTR_ICON_NO_ICON,
-        EZTR_NO_VALUE,
-        EZTR_NO_VALUE,
-        EZTR_NO_VALUE,
-        false,
-        "\xBF",
-        randoMilkBar
-    );
-    
-    EZTR_Basic_AddCustomText(
         EZTR_HNAME(Rando_GI_OwlStatue),
         EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
         0,
@@ -2776,6 +2757,137 @@ EZTR_ON_INIT void init_text() {
         false,
         "You got the" EZTR_CC_COLOR_RED " Hidden Owl Statue" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_NEWLINE
         "You can now " EZTR_CC_NEWLINE EZTR_CC_COLOR_RED "Index Warp" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
+        NULL
+    );
+
+    // Songs
+    EZTR_Basic_AddCustomText(
+        EZTR_HNAME(Rando_GI_Time),
+        EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        false,
+        "You learned the " EZTR_CC_COLOR_LIGHTBLUE "Song of Time" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
+        NULL
+    );
+
+    EZTR_Basic_AddCustomText(
+        EZTR_HNAME(Rando_GI_Healing),
+        EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        false,
+        "You learned the " EZTR_CC_COLOR_PINK "Song of Healing" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
+        NULL
+    );
+
+    EZTR_Basic_AddCustomText(
+        EZTR_HNAME(Rando_GI_Epona),
+        EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        false,
+        "You learned the " EZTR_CC_COLOR_ORANGE "Epona's Song" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
+        NULL
+    );
+
+    EZTR_Basic_AddCustomText(
+        EZTR_HNAME(Rando_GI_Soaring),
+        EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        false,
+        "You learned the " EZTR_CC_COLOR_BLUE "Song of Soaring" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
+        NULL
+    );
+
+    EZTR_Basic_AddCustomText(
+        EZTR_HNAME(Rando_GI_Storms),
+        EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        false,
+        "You learned the " EZTR_CC_COLOR_SILVER "Song of Storms" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
+        NULL
+    );
+
+    EZTR_Basic_AddCustomText(
+        EZTR_HNAME(Rando_GI_Sonata),
+        EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        false,
+        "You learned the " EZTR_CC_COLOR_GREEN "Sonata of Awakening" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
+        NULL
+    );
+
+    EZTR_Basic_AddCustomText(
+        EZTR_HNAME(Rando_GI_Lullaby),
+        EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        false,
+        "You learned the " EZTR_CC_COLOR_RED "Goron Lullaby" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
+        NULL
+    );
+
+    EZTR_Basic_AddCustomText(
+        EZTR_HNAME(Rando_GI_Nova),
+        EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        false,
+        "You learned the " EZTR_CC_COLOR_BLUE "New Wave Bossa Nova" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
+        NULL
+    );
+
+    EZTR_Basic_AddCustomText(
+        EZTR_HNAME(Rando_GI_Elegy),
+        EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        false,
+        "You learned the " EZTR_CC_COLOR_ORANGE "Elegy of Emptiness" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
+        NULL
+    );
+    
+    EZTR_Basic_AddCustomText(
+        EZTR_HNAME(Rando_GI_Oath),
+        EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        false,
+        "You learned the " EZTR_CC_COLOR_PINK "Oath to Order" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
     
@@ -2846,14 +2958,14 @@ EZTR_ON_INIT void init_text() {
     sGetItemTable_ap[GI_OWL_IKANA_CANYON - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_Self_Item));
     sGetItemTable_ap[GI_OWL_STONE_TOWER - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_Self_Item));
     sGetItemTable_ap[GI_OWL_HIDDEN - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_Self_Item));
-    sGetItemTable_ap[GI_SONG_TIME - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Songs)); // Songs
-    sGetItemTable_ap[GI_SONG_HEALING - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Songs));
-    sGetItemTable_ap[GI_SONG_EPONA - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Songs));
-    sGetItemTable_ap[GI_SONG_SOARING - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Songs));
-    sGetItemTable_ap[GI_SONG_STORMS - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Songs));
-    sGetItemTable_ap[GI_SONG_SONATA - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Songs));
-    sGetItemTable_ap[GI_SONG_LULLABY - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Songs));
-    sGetItemTable_ap[GI_SONG_NOVA - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Songs));
-    sGetItemTable_ap[GI_SONG_ELEGY - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Songs));
-    sGetItemTable_ap[GI_SONG_OATH - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Songs));
+    sGetItemTable_ap[GI_SONG_TIME - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Time)); // Songs
+    sGetItemTable_ap[GI_SONG_HEALING - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Healing));
+    sGetItemTable_ap[GI_SONG_EPONA - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Epona));
+    sGetItemTable_ap[GI_SONG_SOARING - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Soaring));
+    sGetItemTable_ap[GI_SONG_STORMS - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Storms));
+    sGetItemTable_ap[GI_SONG_SONATA - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Sonata));
+    sGetItemTable_ap[GI_SONG_LULLABY - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Lullaby));
+    sGetItemTable_ap[GI_SONG_NOVA - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Nova));
+    sGetItemTable_ap[GI_SONG_ELEGY - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Elegy));
+    sGetItemTable_ap[GI_SONG_OATH - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Oath));
 }
