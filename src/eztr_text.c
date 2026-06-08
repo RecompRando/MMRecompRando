@@ -906,7 +906,8 @@ void strayFairyMsg(EZTR_MsgBuffer* buf, u8 type, u8 count, u8 required) {
         EZTR_MsgSContent_Snprintf(
             flavor_text,
             128,
-            "Head to the " EZTR_CC_COLOR_PINK "Great Fairy " EZTR_CC_COLOR_DEFAULT "for your" EZTR_CC_NEWLINE "reward if you haven't already." EZTR_CC_END
+            "Head to the " EZTR_CC_COLOR_PINK "Great Fairy " EZTR_CC_NEWLINE
+            EZTR_CC_COLOR_DEFAULT "for your reward." EZTR_CC_END
         );
     } else {
         u8 remaining = required - count;
@@ -1016,7 +1017,8 @@ void skullTokenMsg(EZTR_MsgBuffer* buf, u8 type, u8 count, u8 required) {
         EZTR_MsgSContent_Snprintf(
             flavor_text,
             128,
-            "Head to the %m Spider House" EZTR_CC_COLOR_DEFAULT "for your" EZTR_CC_NEWLINE "reward!" EZTR_CC_END,
+            "Head to the %m Spider House" EZTR_CC_COLOR_DEFAULT EZTR_CC_NEWLINE
+            "for your reward!" EZTR_CC_END,
             type_str
         );
     } else {
