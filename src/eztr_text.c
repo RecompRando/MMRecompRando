@@ -1171,7 +1171,7 @@ EZTR_MSG_CALLBACK(randoLotterySignHint) {
         
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
-        "          Lottery Shop"
+        "          Lottery Shop" EZTR_CC_NEWLINE
         "Grand Prize:" EZTR_CC_NEWLINE
         "%c%m" EZTR_CC_NEWLINE
         EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END,
