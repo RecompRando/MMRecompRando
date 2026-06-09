@@ -1230,13 +1230,13 @@ EZTR_MSG_CALLBACK(randoLotteryNPCHint) {
 
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
-        "Would you like the chance to buy"
+        "Would you like the chance to buy" EZTR_CC_NEWLINE
         "your dreams for " EZTR_CC_COLOR_PINK "10 Rupees" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_NEWLINE
         EZTR_CC_CARRIAGE_RETURN EZTR_CC_BOX_BREAK2
         "Pick any three numbers, and if" EZTR_CC_NEWLINE
         "those are picked, you'll win" EZTR_CC_NEWLINE
         "%c%m"
-        EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END,
+        EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_EVENT EZTR_CC_END,
         getAPItemColor(lotteryItem),
         formatted_item_name,
         formatted_player_name
