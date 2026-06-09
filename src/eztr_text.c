@@ -1693,6 +1693,80 @@ EZTR_MSG_CALLBACK(randoBombShopGoronHasSell) {
     randomizedKegGoronItem = false;
 }
 
+// Gossip Stones
+EZTR_MSG_CALLBACK(randoGossips) {
+    REPY_FN_SETUP_RANDO;
+
+    REPY_FN_SET_U16("textId", textId);
+
+    REPY_FN_EXEC_CACHE(
+        rando_get_gossip_hint,
+        "hint = recomp_data.ctx.slot_data['hints'][str(textId)]\n"
+        "item_name = hint['item']\n"
+        "location_name = hint['location']\n"
+        "location_id = hint['location_id']\n"
+        "from_player = hint['from_player']\n"
+        "to_player = hint['to_player']\n"
+        "filled = hint['filled']\n"
+    );
+
+    bool hint_exists = REPY_FN_GET_BOOL("filled");
+    if (!hint_exists) {
+        // do something (put seeded filler text based on textid?)
+    }
+
+    char* location_name = REPY_FN_GET_STR("location_name");
+
+    char* item_name = REPY_FN_GET_STR("item_name");
+
+    u32 from_player_id = REPY_FN_GET_U32("from_player");
+    char* from_player;
+    rando_get_player_name(from_player_id, &from_player);
+    
+    u32 to_player_id = REPY_FN_GET_U32("to_player");
+    char* to_player;
+    rando_get_player_name(to_player_id, &to_player);
+
+    // Moon Gossip Stone Text
+    if (textId >= 0x2103 && textId <= 0x2116) {
+        if (from_player_id == to_player_id) {
+            EZTR_MsgSContent_Sprintf(
+                buf->data.content,
+                "It seems " EZTR_CC_COLOR_RED "%s" EZTR_CC_COLOR_DEFAULT " was at" EZTR_CC_NEWLINE
+                EZTR_CC_COLOR_LIGHTBLUE "%s" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END,
+                item_name,
+                location_name
+            );
+        } else {
+            EZTR_MsgSContent_Sprintf(
+                buf->data.content,
+                "It seems " EZTR_CC_COLOR_BLUE "%s" EZTR_CC_COLOR_DEFAULT " had " EZTR_CC_COLOR_RED "%s" EZTR_CC_COLOR_DEFAULT EZTR_CC_NEWLINE
+                "at " EZTR_CC_COLOR_LIGHTBLUE "%s" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END,
+                from_player,
+                item_name,
+                location_name
+            );
+        }
+    }
+
+    // this would be handled better in mod code using the glue function, but location_id may be far too large
+    // exact copy of rando_broadcast_location_hint_player() from glue
+    REPY_FN_EXEC_CACHE(
+        py_rando_broadcast_gossip_hint,
+        "msg_func = recomp_data.ctx.send_msgs([{\"cmd\": \"CreateHints\",\n"
+        "                                       \"locations\": [location_id],\n"
+        "                                       \"player\": from_player}])\n"
+        "RecompClient.run_async_task_once(msg_func)\n"
+    );
+
+    recomp_free(location_name);
+    recomp_free(item_name);
+    recomp_free(from_player);
+    recomp_free(to_player);
+
+    REPY_FN_CLEANUP;
+}
+
 // Replacements of existing IDs
 EZTR_ON_INIT void init_text() {
     EZTR_Basic_ReplaceText(
@@ -2258,6 +2332,25 @@ EZTR_ON_INIT void init_text() {
         "out." EZTR_CC_END,
         randoBombShopGoronHasSell
     );
+    
+    
+    // Gossip Stones
+    // TODO: extend the bounds of this to all gossip stones (currently only clear moon)
+    for (int gossip_index = 0x2103; gossip_index <= 0x2116; gossip_index++) {
+        EZTR_Basic_ReplaceText(
+            gossip_index,
+            EZTR_STANDARD_TEXT_BOX_I, // normally EZTR_TRANSLUSCENT_BLUE_TEXT_BOX
+            0,
+            EZTR_ICON_NO_ICON,
+            EZTR_NO_VALUE,
+            EZTR_NO_VALUE,
+            EZTR_NO_VALUE,
+            false,
+            EZTR_CC_END,
+            randoGossips
+        );
+    }
+
 
     // Custom Text IDs
     EZTR_Basic_AddCustomText(
