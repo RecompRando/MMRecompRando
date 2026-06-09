@@ -1175,7 +1175,7 @@ EZTR_MSG_CALLBACK(randoLotterySignHint) {
         buf->data.content,
         "          Lottery Shop" EZTR_CC_NEWLINE
         "Grand Prize:" EZTR_CC_NEWLINE
-        "%c%m" EZTR_CC_NEWLINE
+        "%c%m"
         EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END,
         getAPItemColor(lotteryItem),
         formatted_item_name,
@@ -1235,7 +1235,7 @@ EZTR_MSG_CALLBACK(randoLotteryNPCHint) {
         EZTR_CC_CARRIAGE_RETURN EZTR_CC_BOX_BREAK2
         "Pick any three numbers, and if" EZTR_CC_NEWLINE
         "those are picked, you'll win" EZTR_CC_NEWLINE
-        "%c%m" EZTR_CC_NEWLINE
+        "%c%m"
         EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END,
         getAPItemColor(lotteryItem),
         formatted_item_name,
