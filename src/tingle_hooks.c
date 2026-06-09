@@ -27,3 +27,10 @@ RECOMP_PATCH s32 EnBal_CheckIfMapUnlocked(EnBal* this, PlayState* play) {
 
 RECOMP_PATCH void EnBal_UnlockSelectedAreaMap(EnBal* this) {
 }
+
+s16 currentTingle;
+
+RECOMP_HOOK("EnBal_HandleConversation")
+void WhoIsThisTingle(EnBal* this, PlayState* play) {
+    currentTingle = this->locationMapId;
+}
