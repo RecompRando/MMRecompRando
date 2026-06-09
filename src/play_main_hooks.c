@@ -663,6 +663,7 @@ bool rando_met_all_goal();
 
 bool last_deathlink_status;
 
+bool inCredits;
 s16 savedSceneId;
 
 RECOMP_CALLBACK("*", recomp_on_play_main)
@@ -673,6 +674,9 @@ void update_rando(PlayState* play) {
 
     gPlay = play;
     savedSceneId = play->sceneId;
+
+    MessageContext* msgCtx = &play->msgCtx;
+    inCredits = msgCtx->textIsCredits; // dumb
 
     // @glue push the interpreter on the stack to reduce lag from deactivations
     REPY_PushInterpreter(rando_interp);

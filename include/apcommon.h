@@ -316,6 +316,7 @@ extern GetItemId noShuffleList[];
 extern PlayState* gPlay;
 extern bool saveOpened;
 extern bool playing;
+extern bool inCredits;
 
 extern bool justDied;
 
