@@ -62,7 +62,7 @@ RECOMP_PATCH void EnKusa_DropCollectible(EnKusa* this, PlayState* play) {
     u32* kusaLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
     bool* kusaDropped = z64recomp_get_extended_actor_data(&this->actor, actorDroppedExtension);
 
-    if (rando_get_slotdata_u32("grasssanity") && !rando_location_is_checked(*kusaLocation) && !(*kusaDropped)) {
+    if (rando_get_slotdata_u32("grasssanity") && rando_location_exists(*kusaLocation) && !rando_location_is_checked(*kusaLocation) && !(*kusaDropped)) {
         collectible = func_800A8150(KUSA_GET_PARAM_FC(&this->actor));
         collectableParams = KUSA_GET_COLLECTIBLE_ID(&this->actor);
         Item_RandoDropCollectible(play, &this->actor.world.pos, (collectableParams << 8) | collectible, *kusaLocation);
