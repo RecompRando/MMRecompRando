@@ -2651,6 +2651,10 @@ EZTR_ON_INIT void init_text() {
     // Gossip Stones
     // hopefully this covers all the gossip stones properly and doesn't crash (it'll probably crash on some)
     for (int gossip_index = 0x20B0; gossip_index <= 0x2116; gossip_index++) {
+        // ignore "time remaining" message that appears when hitting gossip stones
+        if (gossip_index == 0x20D2) {
+            continue;
+        }
         EZTR_Basic_ReplaceText(
             gossip_index,
             EZTR_STANDARD_TEXT_BOX_I, // normally EZTR_TRANSLUSCENT_BLUE_TEXT_BOX
