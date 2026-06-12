@@ -12,8 +12,7 @@
 
 extern GetItemEntryAP sGetItemTable_ap[];
 
-u8 getAPItemColor(u32 location) {
-    u32 type = rando_get_location_type(location);
+u8 getAPItemColor(u32 type) {
     if (type & 0b001) {
         return 0x05; // EZTR_CC_COLOR_LIGHTBLUE (progression - purple)
     } else if (type & 0b010) {
@@ -23,6 +22,11 @@ u8 getAPItemColor(u32 location) {
     } else {
         return 0x07; // EZTR_CC_COLOR_SILVER (filler - grey)
     }
+}
+
+u8 getAPLocationItemColor(u32 location) {
+    u32 type = rando_get_location_type(location);
+    return getAPItemColor(type);
 }
 
 void sanitizeRandoText(char* rando_string) {
@@ -174,7 +178,7 @@ EZTR_MSG_CALLBACK(randoAPSend) {
         buf->data.content,
         "You found " EZTR_CC_COLOR_RED "%s" EZTR_CC_COLOR_DEFAULT "'s" EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         player_name,
-        getAPItemColor(location),
+        getAPLocationItemColor(location),
         item_name
     );
     
@@ -192,7 +196,7 @@ EZTR_MSG_CALLBACK(randoAPSelf) {
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
         "You found your" EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
-        getAPItemColor(location),
+        getAPLocationItemColor(location),
         item_name
     );
     
@@ -209,7 +213,7 @@ EZTR_MSG_CALLBACK(randoGIOwlStatue) {
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
         "You can now soar to the" EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
-        getAPItemColor(location),
+        getAPLocationItemColor(location),
         item_name
     );
     
@@ -226,7 +230,7 @@ EZTR_MSG_CALLBACK(randoGISongs) {
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
         "You learned the " EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
-        getAPItemColor(location),
+        getAPLocationItemColor(location),
         item_name
     );
     
@@ -260,7 +264,7 @@ EZTR_MSG_CALLBACK(randoGISouls) {
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
         "You found the" EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
-        getAPItemColor(location),
+        getAPLocationItemColor(location),
         item_name
     );
     
@@ -278,7 +282,7 @@ EZTR_MSG_CALLBACK(randoGIFrogs) {
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
         "You found the %c%s" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
-        getAPItemColor(location),
+        getAPLocationItemColor(location),
         item_name
     );
     
@@ -613,7 +617,7 @@ EZTR_MSG_CALLBACK(randoScrub) {
         "For " EZTR_CC_COLOR_PINK "%d Rupees" EZTR_CC_COLOR_DEFAULT ", I'm selling"
         EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_EVENT EZTR_CC_END,
         price,
-        getAPItemColor(scrubLocation),
+        getAPLocationItemColor(scrubLocation),
         item_name,
         formatted_player_name
     );
@@ -721,7 +725,7 @@ EZTR_MSG_CALLBACK(randoScrubNotSelling) {
         "For " EZTR_CC_COLOR_PINK "%d Rupees" EZTR_CC_COLOR_DEFAULT ", I'm selling"
         EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "%m%m" EZTR_CC_EVENT EZTR_CC_END,
         price,
-        getAPItemColor(scrubLocation),
+        getAPLocationItemColor(scrubLocation),
         item_name,
         formatted_player_name,
         extra_text
@@ -1177,7 +1181,7 @@ EZTR_MSG_CALLBACK(randoLotterySignHint) {
         "Grand Prize:" EZTR_CC_NEWLINE
         "%c%m"
         EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_END,
-        getAPItemColor(lotteryItem),
+        getAPLocationItemColor(lotteryItem),
         formatted_item_name,
         formatted_player_name
     );
@@ -1237,7 +1241,7 @@ EZTR_MSG_CALLBACK(randoLotteryNPCHint) {
         "those are picked, you'll win" EZTR_CC_NEWLINE
         "%c%m"
         EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_EVENT EZTR_CC_END,
-        getAPItemColor(lotteryItem),
+        getAPLocationItemColor(lotteryItem),
         formatted_item_name,
         formatted_player_name
     );
@@ -1336,10 +1340,10 @@ EZTR_MSG_CALLBACK(randoGrave1Hint) {
         "Those who defeat the" EZTR_CC_NEWLINE
         "evil will find" EZTR_CC_NEWLINE
         "%c%m%m" EZTR_CC_END,
-        getAPItemColor(location1),
+        getAPLocationItemColor(location1),
         formatted_item_name,
         formatted_player_name,
-        getAPItemColor(location2),
+        getAPLocationItemColor(location2),
         formatted_item_name2,
         formatted_player_name2
     );
@@ -1397,7 +1401,7 @@ EZTR_MSG_CALLBACK(randoGrave2Hint) {
         "Those who possess eyes that can"
         EZTR_CC_NEWLINE "see the truth will find"
         EZTR_CC_NEWLINE "%c%m%m" EZTR_CC_END,
-        getAPItemColor(location),
+        getAPLocationItemColor(location),
         formatted_item_name,
         formatted_player_name
     );
@@ -1453,7 +1457,7 @@ EZTR_MSG_CALLBACK(randoGrave3Hint) {
         "Bringing light to the darkness"
         EZTR_CC_NEWLINE "will reveal to you"
         EZTR_CC_NEWLINE "%c%m%m" EZTR_CC_END,
-        getAPItemColor(location),
+        getAPLocationItemColor(location),
         formatted_item_name,
         formatted_player_name
     );
@@ -1497,7 +1501,7 @@ EZTR_MSG_CALLBACK(randoBombShopGoronNonGoronGreeting) {
         buf->data.content,
         EZTR_CC_SFX "|38|FCHullo. Did ya come to buy a" EZTR_CC_NEWLINE
         "%c%s%m" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_CONTINUE EZTR_CC_END,
-        getAPItemColor(LOCATION_POWDER_KEG_GORON),
+        getAPLocationItemColor(LOCATION_POWDER_KEG_GORON),
         item_name,
         formatted_player_name
     );
@@ -1540,7 +1544,7 @@ EZTR_MSG_CALLBACK(randoBombShopGoronNonGoronHeavy) {
         "too, but it's just too heavy for" EZTR_CC_NEWLINE
         "you to carry." EZTR_CC_NEWLINE
         EZTR_CC_DELAY "|00|04" EZTR_CC_QUICKTEXT_ENABLE "Sorry." EZTR_CC_QUICKTEXT_DISABLE EZTR_CC_END,
-        getAPItemColor(LOCATION_POWDER_KEG_GORON)
+        getAPLocationItemColor(LOCATION_POWDER_KEG_GORON)
     );
 }
 
@@ -1582,7 +1586,7 @@ EZTR_MSG_CALLBACK(randoBombShopGoronGreeting) {
         "%m%c%s" EZTR_CC_COLOR_DEFAULT "," EZTR_CC_NEWLINE
         "right?" EZTR_CC_CONTINUE EZTR_CC_END,
         formatted_player_name,
-        getAPItemColor(LOCATION_POWDER_KEG_GORON),
+        getAPLocationItemColor(LOCATION_POWDER_KEG_GORON),
         item_name
     );
 }
@@ -1621,7 +1625,7 @@ EZTR_MSG_CALLBACK(randoBombShopGoronWhatSell) {
         "Then I'll sell you %m" EZTR_CC_NEWLINE
         "%c%s" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END,
         formatted_player_name,
-        getAPItemColor(LOCATION_POWDER_KEG_GORON),
+        getAPLocationItemColor(LOCATION_POWDER_KEG_GORON),
         item_name
     );
 }
@@ -1665,7 +1669,7 @@ EZTR_MSG_CALLBACK(randoBombShopGoronIsSell) {
         "%c%s" EZTR_CC_NEWLINE
         EZTR_CC_COLOR_DEFAULT "for " EZTR_CC_COLOR_PINK "%d Rupees" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_CONTINUE EZTR_CC_END,
         formatted_player_name,
-        getAPItemColor(LOCATION_POWDER_KEG_GORON),
+        getAPLocationItemColor(LOCATION_POWDER_KEG_GORON),
         item_name,
         price
     );
@@ -1707,12 +1711,36 @@ EZTR_MSG_CALLBACK(randoGossips) {
         "location_id = hint['location_id']\n"
         "from_player = hint['from_player']\n"
         "to_player = hint['to_player']\n"
+        "type = hint['type']\n"
         "filled = hint['filled']\n"
     );
 
     bool hint_exists = REPY_FN_GET_BOOL("filled");
+    
+    // place random junk hints when a hint isn't assigned
     if (!hint_exists) {
-        // do something (put seeded filler text based on textid?)
+        u32 seed = rando_get_random_seed() * textId;
+        u32 selection = Rand_ZeroOne_Variable(&seed) * HINT_NUM_JUNK;
+        // u32 selection = Rand_ZeroOne() * HINT_NUM_JUNK; // true random rather than seeded random
+        char* text;
+        switch (selection) {
+            case 1:
+                text = "They say that " EZTR_CC_COLOR_GREEN "frog is king" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END;
+                break;
+            case 0:
+            default:
+                text = "Use the " EZTR_CC_COLOR_RED "!hint" EZTR_CC_COLOR_DEFAULT " command to hint" EZTR_CC_NEWLINE
+                        "for an item!" EZTR_CC_END;
+                break;
+        }
+
+        EZTR_MsgSContent_Sprintf(
+            buf->data.content,
+            "%m" EZTR_CC_END,
+            text
+        );
+
+        return;
     }
 
     char* location_name = REPY_FN_GET_STR("location_name");
