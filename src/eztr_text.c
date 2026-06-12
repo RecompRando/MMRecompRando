@@ -113,6 +113,25 @@ void Post_Message_OpenText() {
     // }
 }
 
+// u16 savedPress;
+
+// RECOMP_HOOK("Message_Update")
+// void skip_credits(PlayState* play) {
+//     MessageContext* msgCtx = &play->msgCtx;
+//     Input* controller = CONTROLLER1(&play->state);
+
+//     savedPress = controller->press.button;
+//     controller->press.button |= BTN_A;
+// }
+
+// RECOMP_HOOK_RETURN("Message_Update")
+// void fix_inputs() {
+//     PlayState* play = gPlay;
+//     MessageContext* msgCtx = &play->msgCtx;
+//     Input* controller = CONTROLLER1(&play->state);
+//     controller->press.button = savedPress;
+// }
+
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Send_Item); // "You sent [player] their [item]"
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Self_Item); // "You found your [item]"
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Kokiri_Sword);
@@ -1697,6 +1716,8 @@ EZTR_MSG_CALLBACK(randoBombShopGoronHasSell) {
     randomizedKegGoronItem = false;
 }
 
+#include "hints.h"
+
 // Gossip Stones
 EZTR_MSG_CALLBACK(randoGossips) {
     REPY_FN_SETUP_RANDO;
@@ -1707,6 +1728,7 @@ EZTR_MSG_CALLBACK(randoGossips) {
         rando_get_gossip_hint,
         "hint = recomp_data.ctx.slot_data['hints'][str(textId)]\n"
         "item_name = hint['item']\n"
+        "item_type = hint['item_type']\n"
         "location_name = hint['location']\n"
         "location_id = hint['location_id']\n"
         "from_player = hint['from_player']\n"
@@ -1744,16 +1766,22 @@ EZTR_MSG_CALLBACK(randoGossips) {
     }
 
     char* location_name = REPY_FN_GET_STR("location_name");
+    sanitizeRandoText(location_name);
 
     char* item_name = REPY_FN_GET_STR("item_name");
+    sanitizeRandoText(item_name);
+    
+    u32 item_type = REPY_FN_GET_U32("item_type");
 
     u32 from_player_id = REPY_FN_GET_U32("from_player");
     char* from_player;
     rando_get_player_name(from_player_id, &from_player);
+    sanitizeRandoText(from_player);
     
     u32 to_player_id = REPY_FN_GET_U32("to_player");
     char* to_player;
     rando_get_player_name(to_player_id, &to_player);
+    sanitizeRandoText(to_player);
 
     // Moon Gossip Stone Text
     if (textId >= 0x2103 && textId <= 0x2116) {
@@ -1775,6 +1803,124 @@ EZTR_MSG_CALLBACK(randoGossips) {
                 location_name
             );
         }
+    }
+
+    u32 type = REPY_FN_GET_U32("type");
+    char non_local_player[256];
+    char non_local_world[256];
+
+    // "initialize" with a blank/generic string (replace if needed for certain hints)
+    EZTR_MsgSContent_Snprintf(
+        non_local_player,
+        256,
+        EZTR_CC_END
+    );
+    EZTR_MsgSContent_Snprintf(
+        non_local_world,
+        256,
+        EZTR_CC_END
+    );
+    if (from_player_id != to_player_id) { // non-local hint
+        if (from_player_id == rando_get_own_slot_id()) { // item is in our world, hinting for someone else
+            EZTR_MsgSContent_Snprintf(
+                non_local_player,
+                256,
+                EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT "'s " EZTR_CC_END,
+                to_player
+            );
+        } else { // our item is in someone else's world
+            EZTR_MsgSContent_Snprintf(
+                non_local_world,
+                256,
+                EZTR_CC_NEWLINE "in " EZTR_CC_COLOR_BLUE "%s" EZTR_CC_COLOR_DEFAULT "'s world" EZTR_CC_END,
+                from_player
+            );
+        }
+    }
+
+    switch (type) {
+        case HINT_TYPE_DEKU:
+            // simple
+            EZTR_MsgSContent_Sprintf(
+                buf->data.content,
+                "The " EZTR_CC_COLOR_RED "mask of scrubs" EZTR_CC_COLOR_DEFAULT " can be found%m at" EZTR_CC_NEWLINE
+                EZTR_CC_COLOR_LIGHTBLUE "%s" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END,
+                non_local_world,
+                location_name
+            );
+            break;
+        case HINT_TYPE_BEAVERS:
+            // complex
+            REPY_FN_EXEC_CACHE(
+                rando_get_beaver_extra_hint,
+                "extra_hint = recomp_data.ctx.slot_data['hints'][str(textId)]['extra']\n"
+                "extra_item_name = extra_hint['item']\n"
+                "extra_item_type = extra_hint['item_type']\n"
+                "extra_item_player = extra_hint['player']\n"
+                "extra_item_location_id = extra_hint['location_id']\n"
+            );
+
+            char* extra_item_name = REPY_FN_GET_STR("extra_item_name");
+            u32 extra_item_type = REPY_FN_GET_U32("extra_item_type");
+            
+            u32 extra_item_player = REPY_FN_GET_U32("extra_item_player");
+            char* extra_player_name;
+            rando_get_player_name(extra_item_player, &extra_player_name);
+
+            char non_local_player2[128];
+            if (extra_item_player != rando_get_own_slot_id()) {
+                EZTR_MsgSContent_Snprintf(
+                    non_local_player2,
+                    128,
+                    EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT "'s " EZTR_CC_END,
+                    extra_player_name
+                );
+            } else {
+                EZTR_MsgSContent_Snprintf(
+                    non_local_player2,
+                    128,
+                    EZTR_CC_END
+                );
+            }
+
+            EZTR_MsgSContent_Sprintf(
+                buf->data.content,
+                "The " EZTR_CC_COLOR_RED "wretched aquatic mammals" EZTR_CC_COLOR_DEFAULT " offer" EZTR_CC_NEWLINE
+                "%m%c%s" EZTR_CC_COLOR_DEFAULT " and" EZTR_CC_NEWLINE
+                "%m%c%s" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END,
+                non_local_player,
+                getAPItemColor(item_type),
+                item_name,
+                non_local_player2,
+                getAPItemColor(extra_item_type),
+                extra_item_name
+            );
+
+            REPY_FN_EXEC_CACHE(
+                py_rando_broadcast_beaver_gossip_hint,
+                "msg_func = recomp_data.ctx.send_msgs([{\"cmd\": \"CreateHints\",\n"
+                "                                       \"locations\": [location_id, extra_item_location_id],\n"
+                "                                       \"player\": from_player}])\n"
+                "RecompClient.run_async_task_once(msg_func)\n"
+            );
+
+            recomp_free(extra_item_name);
+            recomp_free(extra_player_name);
+            break;
+        case HINT_TYPE_NONE:
+        default:
+            // generic (possibly placeholder) hint
+            EZTR_MsgSContent_Sprintf(
+                buf->data.content,
+                "%c%s" EZTR_CC_COLOR_DEFAULT " can be found%m at" EZTR_CC_NEWLINE
+                EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT "%m." EZTR_CC_END,
+                getAPItemColor(item_type),
+                item_name,
+                non_local_player,
+                location_name,
+                non_local_world
+            );
+            break;
     }
 
     // this would be handled better in mod code using the glue function, but location_id may be far too large
@@ -2363,8 +2509,8 @@ EZTR_ON_INIT void init_text() {
     
     
     // Gossip Stones
-    // TODO: extend the bounds of this to all gossip stones (currently only clear moon)
-    for (int gossip_index = 0x2103; gossip_index <= 0x2116; gossip_index++) {
+    // hopefully this covers all the gossip stones properly and doesn't crash (it'll probably crash on some)
+    for (int gossip_index = 0x20B0; gossip_index <= 0x2116; gossip_index++) {
         EZTR_Basic_ReplaceText(
             gossip_index,
             EZTR_STANDARD_TEXT_BOX_I, // normally EZTR_TRANSLUSCENT_BLUE_TEXT_BOX
