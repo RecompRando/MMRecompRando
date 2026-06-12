@@ -1,6 +1,6 @@
 // helpers for hints
 
-#define HINT_NUM_JUNK 4
+#define HINT_NUM_JUNK 5
 
 typedef enum {
 	HINT_TYPE_NONE,

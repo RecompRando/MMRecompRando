@@ -1728,10 +1728,10 @@ EZTR_MSG_CALLBACK(randoGossips) {
         bool custom_text = false;
         char* text;
         switch (selection) {
-            case 1:
+            case 1: // frog is king
                 text = "They say that " EZTR_CC_COLOR_GREEN "frog is king" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END;
                 break;
-            case 2:
+            case 2: // player isn't doing enough
                 REPY_FN_SET_U32("seed", seed);
                 REPY_FN_EXEC_CACHE(
                     rando_get_random_player_for_junk_hint,
@@ -1778,7 +1778,7 @@ EZTR_MSG_CALLBACK(randoGossips) {
 
                 custom_text = true;
                 break;
-            case 3:
+            case 3: // loss
                 // since %m doesn't accept pipe inputs, we need to use custom text for this
                 EZTR_MsgSContent_NoPipe_Sprintf(
                     buf->data.content,
@@ -1788,7 +1788,94 @@ EZTR_MSG_CALLBACK(randoGossips) {
                 );
                 custom_text = true;
                 break;
-            case 0:
+            case 4: // display random fake(?) bomber's code
+                EZTR_MsgBuffer_SetTextBoxDisplayIcon(buf, EZTR_ICON_BOMBERS_NOTEBOOK);
+                custom_text = true;
+                
+                // convert bomber's code to 5 digit number
+                u16 real_code = 0;
+                for (int i = 0; i < ARRAY_COUNT(gSaveContext.save.saveInfo.bomberCode); i++) {
+                    real_code = (real_code * 10) + gSaveContext.save.saveInfo.bomberCode[i];
+                }
+
+                // this is what the actual game does to generate the bomber's code
+                s32 randBombers;
+                bool digit_used;
+                s16 digit_iter;
+                s16 i = 1;
+                
+                s8 fakeBombersCode[5];
+
+                do {
+                    randBombers = Rand_S16Offset(0, 6);
+                } while ((randBombers <= 0) || (randBombers >= 6));
+
+                fakeBombersCode[0] = randBombers;
+
+                while (i != 5) {
+                    digit_used = false;
+
+                    do {
+                        randBombers = Rand_S16Offset(0, 6);
+                    } while ((randBombers <= 0) || (randBombers >= 6));
+
+                    digit_iter = 0;
+                    do {
+                        if (randBombers == fakeBombersCode[digit_iter]) {
+                            digit_used = true;
+                        }
+                        digit_iter++;
+                    } while (digit_iter < i);
+
+                    if (digit_used == false) {
+                        fakeBombersCode[i] = randBombers;
+                        i++;
+                    }
+                }
+
+                u16 fake_code = 0;
+                for (int i = 0; i < ARRAY_COUNT(fakeBombersCode); i++) {
+                    fake_code = (fake_code * 10) + fakeBombersCode[i];
+                }
+
+                char* random_connector;
+
+                s16 random_connector_choice = Rand_S16Offset(0, 5);
+                switch (random_connector_choice) {
+                    default:
+                    case 0:
+                        random_connector = "might" EZTR_CC_NEWLINE "be" EZTR_CC_END;
+                        break;
+                    case 1:
+                        random_connector = "is" EZTR_CC_NEWLINE "possibly " EZTR_CC_END;
+                        break;
+                    case 2:
+                        random_connector = "could" EZTR_CC_NEWLINE "be " EZTR_CC_END;
+                        break;
+                    case 3:
+                        random_connector = "probably" EZTR_CC_NEWLINE "isn't " EZTR_CC_END;
+                        break;
+                    case 4:
+                        random_connector = "would" EZTR_CC_NEWLINE EZTR_CC_COLOR_RED "never" EZTR_CC_COLOR_DEFAULT " be " EZTR_CC_END;
+                        break;
+                }
+
+                if (fake_code == real_code) {
+                    EZTR_MsgBuffer_SetTextBoxDisplayIcon(buf, EZTR_ICON_EXCLAMATION_MARK);
+                    random_connector = "is" EZTR_CC_NEWLINE "in fact ";
+                    break;
+                }
+
+                EZTR_MsgSContent_Sprintf(
+                    buf->data.content,
+                    "The " EZTR_CC_COLOR_BLUE "Bomber's Secret Code" EZTR_CC_COLOR_DEFAULT " %m"
+                    EZTR_CC_COLOR_RED "%d" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END,
+                    random_connector,
+                    fake_code
+                );
+
+                break;
+            case 0: // use the !hint command!
             default:
                 text = "Use the " EZTR_CC_COLOR_RED "!hint" EZTR_CC_COLOR_DEFAULT " command to hint" EZTR_CC_NEWLINE
                         "for an item!" EZTR_CC_END;
@@ -1962,14 +2049,14 @@ EZTR_MSG_CALLBACK(randoGossips) {
             break;
         case HINT_TYPE_NONE:
         default:
-            // generic (possibly placeholder) hint (doesn't properly account for item not being local)
+            // generic (possibly placeholder) hint
             EZTR_MsgSContent_Sprintf(
                 buf->data.content,
-                "%c%s" EZTR_CC_COLOR_DEFAULT " can be found%m at" EZTR_CC_NEWLINE
+                "%m%c%s" EZTR_CC_COLOR_DEFAULT " can be found at" EZTR_CC_NEWLINE
                 EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT "%m." EZTR_CC_END,
+                non_local_player,
                 getAPItemColor(item_type),
                 item_name,
-                non_local_player,
                 location_name,
                 non_local_world
             );
