@@ -1950,9 +1950,19 @@ EZTR_MSG_CALLBACK(randoGossips) {
             recomp_free(extra_item_name);
             recomp_free(extra_player_name);
             break;
+        case HINT_TYPE_ANJU_KAFEI:
+            EZTR_MsgSContent_Sprintf(
+                buf->data.content,
+                "A " EZTR_CC_COLOR_RED "couple's reunion" EZTR_CC_COLOR_DEFAULT " provides" EZTR_CC_NEWLINE
+                "%m%c%s" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END,
+                non_local_player,
+                getAPItemColor(item_type),
+                item_name
+            );
+            break;
         case HINT_TYPE_NONE:
         default:
-            // generic (possibly placeholder) hint
+            // generic (possibly placeholder) hint (doesn't properly account for item not being local)
             EZTR_MsgSContent_Sprintf(
                 buf->data.content,
                 "%c%s" EZTR_CC_COLOR_DEFAULT " can be found%m at" EZTR_CC_NEWLINE

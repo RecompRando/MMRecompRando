@@ -18,4 +18,5 @@ typedef enum {
     HINT_TYPE_HD_3,
     HINT_TYPE_DP_3,
     HINT_TYPE_BEAVERS,
+    HINT_TYPE_ANJU_KAFEI,
 } APHintType;
