@@ -1778,6 +1778,16 @@ EZTR_MSG_CALLBACK(randoGossips) {
 
                 custom_text = true;
                 break;
+            case 3:
+                // since %m doesn't accept pipe inputs, we need to use custom text for this
+                EZTR_MsgSContent_NoPipe_Sprintf(
+                    buf->data.content,
+                    EZTR_CC_QUICKTEXT_ENABLE
+                    "              |  ||" EZTR_CC_NEWLINE
+                    "              ||  |_" EZTR_CC_END
+                );
+                custom_text = true;
+                break;
             case 0:
             default:
                 text = "Use the " EZTR_CC_COLOR_RED "!hint" EZTR_CC_COLOR_DEFAULT " command to hint" EZTR_CC_NEWLINE
