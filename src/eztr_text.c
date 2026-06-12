@@ -113,25 +113,6 @@ void Post_Message_OpenText() {
     // }
 }
 
-// u16 savedPress;
-
-// RECOMP_HOOK("Message_Update")
-// void skip_credits(PlayState* play) {
-//     MessageContext* msgCtx = &play->msgCtx;
-//     Input* controller = CONTROLLER1(&play->state);
-
-//     savedPress = controller->press.button;
-//     controller->press.button |= BTN_A;
-// }
-
-// RECOMP_HOOK_RETURN("Message_Update")
-// void fix_inputs() {
-//     PlayState* play = gPlay;
-//     MessageContext* msgCtx = &play->msgCtx;
-//     Input* controller = CONTROLLER1(&play->state);
-//     controller->press.button = savedPress;
-// }
-
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Send_Item); // "You sent [player] their [item]"
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Self_Item); // "You found your [item]"
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Kokiri_Sword);
@@ -1744,10 +1725,58 @@ EZTR_MSG_CALLBACK(randoGossips) {
         u32 seed = rando_get_random_seed() * textId;
         u32 selection = Rand_ZeroOne_Variable(&seed) * HINT_NUM_JUNK;
         // u32 selection = Rand_ZeroOne() * HINT_NUM_JUNK; // true random rather than seeded random
+        bool custom_text = false;
         char* text;
         switch (selection) {
             case 1:
                 text = "They say that " EZTR_CC_COLOR_GREEN "frog is king" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END;
+                break;
+            case 2:
+                REPY_FN_SET_U32("seed", seed);
+                REPY_FN_EXEC_CACHE(
+                    rando_get_random_player_for_junk_hint,
+                    "import random\n"
+                    "random.seed(seed + textId)\n"
+                    "player_names = dict(recomp_data.ctx.player_names)\n"
+                    "player_names.pop(0)\n" // remove the "Archipelago" player (even though its funny)
+                    "player_choice = random.choice(list(player_names.items()))\n"
+                    "player_slot = player_choice[0]\n"
+                    "player_name = player_choice[1]\n"
+                    "num_players = len(player_names)\n"
+                );
+
+                u32 random_slot = REPY_FN_GET_U32("player_slot");
+                if (random_slot == rando_get_own_slot_id()) {
+                    u32 num_players = REPY_FN_GET_U32("num_players");
+                    if (num_players == 1) {
+                        EZTR_MsgSContent_Sprintf(
+                            buf->data.content,
+                            "It seems that " EZTR_CC_COLOR_RED "you" EZTR_CC_COLOR_DEFAULT " aren't playing" EZTR_CC_NEWLINE
+                            "through this rando well enough." EZTR_CC_END
+                        );
+                    } else {
+                        EZTR_MsgSContent_Sprintf(
+                            buf->data.content,
+                            "It seems that " EZTR_CC_COLOR_RED "you" EZTR_CC_COLOR_DEFAULT " aren't pulling" EZTR_CC_NEWLINE
+                            "your weight in this multiworld." EZTR_CC_END
+                        );
+                    }
+                } else {
+                    char* player_name = REPY_FN_GET_STR("player_name");
+                    sanitizeRandoText(player_name);
+
+                    EZTR_MsgSContent_Sprintf(
+                        buf->data.content,
+                        "It seems that " EZTR_CC_COLOR_RED "%s" EZTR_CC_COLOR_DEFAULT EZTR_CC_NEWLINE
+                        "isn't pulling their weight in this" EZTR_CC_NEWLINE
+                        "multiworld." EZTR_CC_END,
+                        player_name
+                    );
+
+                    recomp_free(player_name);
+                }
+
+                custom_text = true;
                 break;
             case 0:
             default:
@@ -1756,11 +1785,15 @@ EZTR_MSG_CALLBACK(randoGossips) {
                 break;
         }
 
-        EZTR_MsgSContent_Sprintf(
-            buf->data.content,
-            "%m" EZTR_CC_END,
-            text
-        );
+        if (!custom_text) {
+            EZTR_MsgSContent_Sprintf(
+                buf->data.content,
+                "%m" EZTR_CC_END,
+                text
+            );
+        }
+
+        REPY_FN_CLEANUP;
 
         return;
     }
