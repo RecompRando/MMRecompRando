@@ -7,7 +7,9 @@
 
 #include "modding.h"
 
-#define MAX_OPTIONS 64
+// Raised from 64 to fit the full MM option set since its such a chonker.
+#define MAX_OPTIONS 96
+#define MAX_TABS 16
 
 typedef enum {
     OPTION_BOOL,
@@ -27,6 +29,7 @@ typedef struct {
     RecompuiResource input_element;
     void* data;
     char* option_id;
+    const char* description;
     bool is_callback;
     union {
         bool_callback_t* bool_callback;
@@ -40,6 +43,16 @@ typedef struct {
     const char* id;
     const char* name;
 } EnumOptionValue;
+
+// Forward declaration so RandoTab can hold a back-pointer to its menu.
+typedef struct RandoYamlConfigMenu RandoYamlConfigMenu;
+
+typedef struct {
+    RandoYamlConfigMenu* menu;  
+    u32                  index;  
+    RecompuiResource     button; 
+    RecompuiResource     panel;  
+} RandoTab;
 
 typedef enum {
     RANDO_ACCESSABILITY_FULL = 0,
@@ -114,17 +127,27 @@ typedef enum {
     RANDO_DEATH_BEHAVIOR_MAX = 0xFFFFFFFF
 } RandoDeathBehavior;
 
-typedef struct {
+struct RandoYamlConfigMenu {
     RecompuiContext context;
     UiFrame frame;
     RecompuiResource header;
     RecompuiResource header_label;
     RecompuiResource generate_button;
+    RecompuiResource export_button;
     RecompuiResource body;
+    RecompuiResource option_column;
+    RecompuiResource description_pane;
     RandoOptionData all_options[MAX_OPTIONS];
     u32 num_options;
     RecompuiResource back_button;
-} RandoYamlConfigMenu;
+
+    // Tab support.
+    RecompuiResource tab_bar;          // horizontal row of tab buttons in header
+    RandoTab         tabs[MAX_TABS];
+    u32              num_tabs;
+    u32              active_tab;
+    RecompuiResource current_body;     // panel currently receiving new options
+};
 
 extern RandoYamlConfigMenu yaml_config_menu;
 
