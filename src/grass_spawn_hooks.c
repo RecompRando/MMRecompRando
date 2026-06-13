@@ -36,7 +36,7 @@ u32 ObjGrass_GetLocation(ObjGrassElement* grass) {
     /* Adjust the current scene */
     PlayState* play = gPlay;
     s16 sceneId = play->sceneId;
-    
+
     // handle grottos
     if (sceneId == SCENE_KAKUSIANA) {
         sceneId = getCurrentGrotto(play);
@@ -64,8 +64,11 @@ void OnObjGrass_Init(Actor* thisx, PlayState* play) {
 
 RECOMP_HOOK("ObjGrass_DropCollectible")
 void ObjGrass_ReplaceCollectible(ObjGrassElement* grassElem, PlayState* play) {
-    if (rando_get_slotdata_u32("grasssanity") && !rando_location_is_checked(LOCATION_GRASS(grassElem))) {
-        Item_RandoDropCollectible(play, &grassElem->pos, ITEM00_APITEM, LOCATION_GRASS(grassElem));
+    u32 location = LOCATION_GRASS(grassElem);
+    if (rando_get_slotdata_u32("grasssanity")
+        && rando_location_exists(location)
+        && !rando_location_is_checked(location)) {
+        Item_RandoDropCollectible(play, &grassElem->pos, ITEM00_APITEM, location);
         grassElem->dropTable = 0x10; // disable further drops
     }
 }
@@ -74,12 +77,12 @@ ObjGrassCarry* carriedGrass;
 
 void ObjGrassCarry_DrawRando(Actor* this, PlayState* play);
 
-RECOMP_HOOK("ObjGrassCarry_Main") 
+RECOMP_HOOK("ObjGrassCarry_Main")
 void OnObjGrassCarry_Main(ObjGrassCarry* this, PlayState* play) {
     carriedGrass = this;
 }
 
-RECOMP_HOOK_RETURN("ObjGrassCarry_Main") 
+RECOMP_HOOK_RETURN("ObjGrassCarry_Main")
 void AfterObjGrassCarry_Main() {
     if (Actor_HasParent(&carriedGrass->actor, gPlay) && rando_get_slotdata_u32("grasssanity")) {
         carriedGrass->actor.draw = ObjGrassCarry_DrawRando;
@@ -93,11 +96,14 @@ void OnObjGrassCarry_Fall(ObjGrassCarry* this, PlayState* play) {
 
 RECOMP_PATCH void ObjGrassCarry_DropCollectible(Vec3f* pos, s16 dropTable, PlayState* play) {
     ObjGrassElement* grassElem = carriedGrass->grassElem;
-    if (rando_get_slotdata_u32("grasssanity") && !rando_location_is_checked(LOCATION_GRASS(grassElem))) {
-        Item_RandoDropCollectible(play, pos, ITEM00_APITEM, LOCATION_GRASS(grassElem));
+    u32 location = LOCATION_GRASS(grassElem);
+    if (rando_get_slotdata_u32("grasssanity")
+        && rando_location_exists(location)
+        && !rando_location_is_checked(location)) {
+        Item_RandoDropCollectible(play, pos, ITEM00_APITEM, location);
         return;
     }
-    
+
     if ((dropTable & 0x10) == 0) {
         Item_DropCollectibleRandom(play, NULL, pos, dropTable * 0x10);
     }

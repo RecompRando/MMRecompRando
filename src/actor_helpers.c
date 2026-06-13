@@ -146,10 +146,39 @@ RECOMP_PATCH void Actor_SpawnSetupActors(PlayState* play, ActorContext* actorCtx
     }
 }
 
+// will remove above for this later
+// #define LOCATION_ACTOR (AP_PREFIX_ENEMY_DROP + (actor->id << 16) + (play->sceneId << 8) + (play->roomCtx.curRoom.num << 4) + actorListIndex) /* uses addition due to overlaps when or'ing */
+
+// RECOMP_IMPORT("ProxyMM_ActorListIndex", s32 GetActorListIndex(Actor* actor));
+
+// RECOMP_CALLBACK("*", recomp_after_actor_init)
+// void AfterActorInit(PlayState* play, Actor* actor) {
+//     u32* actorLocation;
+//     bool* actorDropped;
+    
+//     s32 actorListIndex = GetActorListIndex(actor);
+
+//     // @rando assign a generic location to every valid actor
+//     if (actor != NULL) {
+//         actorLocation = z64recomp_get_extended_actor_data(actor, actorLocationExtension);
+//         // ignore actors that already had a location assigned to them
+//         if (!(*actorLocation)) {
+//             *actorLocation = LOCATION_ACTOR;
+//             actorDropped = z64recomp_get_extended_actor_data(actor, actorDroppedExtension);
+//             *actorDropped = false;
+//         }
+//     }
+
+//     if (actorListIndex == -1) {
+//         // Spawned outside of an ActorList command
+//     }
+// }
+
 RECOMP_CALLBACK("*", recomp_should_actor_init)
 void Rando_ShouldActorInit(PlayState* play, Actor* actor, bool* should) {
     if(actor == NULL) return;
     if(gSaveContext.gameMode != GAMEMODE_NORMAL) return;
+    // if(gSaveContext.gameMode != GAMEMODE_NORMAL || inCredits) return; // leaving this on in the credits is funny
 
     // recomp_printf("actor id: 0x%02X 0x%06X %d\n", actor->id, AP_ITEM_PREFIX_SOUL_BOSS | actor->id, rando_has_item(AP_ITEM_PREFIX_SOUL_BOSS | actor->id));
     switch (actor->id) {

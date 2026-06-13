@@ -54,7 +54,7 @@ RECOMP_IMPORT("*", ActorExtensionId actor_transform_id(Actor* actor));
 Gfx* GenericGrass_DrawRandoColored(PlayState* play, Gfx* original, Gfx* gfx, u8 alpha, u32 location) {
     Color_RGB8 color;
     
-    if (!get_rando_color(&color, location)) {
+    if (!rando_location_exists(location) || !get_rando_color(&color, location)) {
         gDPSetPrimColor(gfx++, 0, 0, 255, 255, 255, alpha);
         gSPDisplayList(gfx++, original);
         return gfx;

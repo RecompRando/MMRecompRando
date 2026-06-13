@@ -46,7 +46,7 @@ RECOMP_PATCH void func_80A5BD14(EnKusa2* this, PlayState* play, s32 arg2) {
         //     currentGrassLocation = LOCATION_KEATON_GRASS_INCREMENTAL;
         // }
 
-        if (rando_get_slotdata_u32("grasssanity") && !rando_location_is_checked(currentGrassLocation)) {
+        if (rando_get_slotdata_u32("grasssanity") && rando_location_exists(currentGrassLocation) && !rando_location_is_checked(currentGrassLocation)) {
             Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, currentGrassLocation);
         } else {
             Item_DropCollectible(play, &this->actor.world.pos, D_80A5EB24[kusa2->unk_1BC]);

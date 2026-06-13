@@ -48,7 +48,7 @@ void onPlayInit(GameState* thisx) {
     PlayState* play = (PlayState*)thisx;
     gPlay = play;
 
-    if(gSaveContext.gameMode != GAMEMODE_NORMAL) return;
+    if(gSaveContext.gameMode != GAMEMODE_NORMAL || inCredits) return;
     
     switch (gSaveContext.save.entrance) {
         // change the intro cutscene where you fall down into a new cycle
