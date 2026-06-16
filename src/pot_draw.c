@@ -84,7 +84,7 @@ void GenericPot_DrawRando(PlayState* play, u32 location, u8 potType) {
             pot_side_tex = pot_spider_side;
             pot_top_tex = pot_spider_top;
             break;
-        default:
+        default: {
             u32 item_type = rando_get_location_type(location);
             if (!rando_get_location_has_local_item(location)) {
                 if (item_type & RANDO_ITEM_CLASS_PROGRESSION ||
@@ -107,6 +107,7 @@ void GenericPot_DrawRando(PlayState* play, u32 location, u8 potType) {
                     drawOriginal = true;
                 }
             }
+        }
     }
 
     if (getItem >= GI_BOSS_SOUL_ODOLWA && getItem <= GI_ABSURD_GENERIC) {
@@ -163,7 +164,7 @@ RECOMP_PATCH void ObjTsubo_Draw(Actor* thisx, PlayState* play2) {
 
     // if (!rando_get_slotdata_u32("potsanity") || (rando_location_is_checked(*potLocation) && !(*potDropped)) ||
     //     (OBJ_TSUBO_PFE00(thisx) && ((func_800A8150(OBJ_TSUBO_P003F(thisx)) != ITEM00_FLEXIBLE)) && !rando_get_slotdata_u32("fairysanity"))) { // stray fairies
-    if (!rando_get_slotdata_u32("potsanity") || (rando_location_is_checked(*potLocation) && !(*potDropped)) || !rando_get_camc_enabled()) {
+    if (!rando_get_slotdata_u32("potsanity") || !rando_location_exists(*potLocation) || (rando_location_is_checked(*potLocation) && !(*potDropped)) || !rando_get_camc_enabled()) {
         Gfx_DrawDListOpa(play, sPotTypeData[OBJ_TSUBO_GET_TYPE(thisx)].modelDL);
         return;
     }
@@ -175,7 +176,7 @@ RECOMP_PATCH void ObjTsubo_Draw(Actor* thisx, PlayState* play2) {
 RECOMP_PATCH void EnTuboTrap_Draw(Actor* thisx, PlayState* play) {
     u32* potLocation = z64recomp_get_extended_actor_data(thisx, actorLocationExtension);
     
-    if (!rando_get_slotdata_u32("potsanity") || rando_location_is_checked(*potLocation) || !rando_get_camc_enabled()) {
+    if (!rando_get_slotdata_u32("potsanity") || !rando_location_exists(*potLocation) || rando_location_is_checked(*potLocation) || !rando_get_camc_enabled()) {
         Gfx_DrawDListOpa(play, gameplay_dangeon_keep_DL_017EA0);
         return;
     }
@@ -231,7 +232,7 @@ RECOMP_PATCH void ObjFlowerpot_Draw(Actor* thisx, PlayState* play) {
 
         Color_RGB8 color;
         u32* potLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
-        if (rando_get_slotdata_u32("potsanity") && !rando_location_is_checked(*potLocation) && get_rando_color(&color, *potLocation)) {
+        if (rando_get_slotdata_u32("potsanity") && rando_location_exists(*potLocation) && !rando_location_is_checked(*potLocation) && get_rando_color(&color, *potLocation)) {
             gDPSetPrimColor(POLY_OPA_DISP++, 0, 0, color.r, color.g, color.b, 255);
             gSPDisplayList(POLY_OPA_DISP++, randoFlowerPotLeavesDL);
         } else {

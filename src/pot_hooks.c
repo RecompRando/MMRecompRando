@@ -85,7 +85,7 @@ void OnObjTsubo_Init(Actor* thisx, PlayState* play) {
 RECOMP_PATCH void func_8092762C(ObjTsubo* this, PlayState* play) {
     u32* potLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
     bool* potDropped = z64recomp_get_extended_actor_data(&this->actor, actorDroppedExtension);
-    if (rando_get_slotdata_u32("potsanity") && !rando_location_is_checked(*potLocation) && !(*potDropped)) {
+    if (rando_get_slotdata_u32("potsanity") && rando_location_exists(*potLocation) && !rando_location_is_checked(*potLocation) && !(*potDropped)) {
         Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *potLocation);
         *potDropped = true;
         return;
@@ -100,7 +100,7 @@ RECOMP_PATCH void func_80927690(ObjTsubo* this, PlayState* play) {
     s32 itemDrop;
     u32* potLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
     bool* potDropped = z64recomp_get_extended_actor_data(&this->actor, actorDroppedExtension);
-    if (rando_get_slotdata_u32("potsanity") && !rando_location_is_checked(*potLocation) && !(*potDropped)) {
+    if (rando_get_slotdata_u32("potsanity") && rando_location_exists(*potLocation) && !rando_location_is_checked(*potLocation) && !(*potDropped)) {
         itemDrop = func_800A8150(OBJ_TSUBO_P003F(&this->actor));
         // recomp_printf("pot location 0x%06X\n", *potLocation);
         // recomp_printf("drop 0x%02X 0x%02X\n", OBJ_TSUBO_PFE00(&this->actor), itemDrop);
@@ -136,7 +136,7 @@ RECOMP_PATCH void EnTuboTrap_DropCollectible(EnTuboTrap* this, PlayState* play) 
     s32 dropItem00Id = func_800A8150(itemParam);
     
     u32* potLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
-    if (rando_get_slotdata_u32("potsanity") && !rando_location_is_checked(*potLocation)) {
+    if (rando_get_slotdata_u32("potsanity") && rando_location_exists(*potLocation) && !rando_location_is_checked(*potLocation)) {
         Item_RandoDropCollectible(play, &this->actor.world.pos, ((this->actor.params & 0x7F) << 8) | dropItem00Id, *potLocation);
         return;
     }
@@ -156,7 +156,7 @@ void OnObjFlowerpot_Init(Actor* thisx, PlayState* play) {
 // can technically be made into a hook
 RECOMP_PATCH void func_80A1B914(ObjFlowerpot* this, PlayState* play) {
     u32* potLocation = z64recomp_get_extended_actor_data(&this->actor, actorLocationExtension);
-    if (rando_get_slotdata_u32("potsanity") && !rando_location_is_checked(*potLocation)) {
+    if (rando_get_slotdata_u32("potsanity") && rando_location_exists(*potLocation) && !rando_location_is_checked(*potLocation)) {
         Item_RandoDropCollectible(play, &this->actor.world.pos, ITEM00_APITEM, *potLocation);
         return;
     }
