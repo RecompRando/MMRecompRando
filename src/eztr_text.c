@@ -1875,6 +1875,54 @@ EZTR_MSG_CALLBACK(randoGossips) {
                 );
 
                 break;
+            case 5: // Special Shoutouts
+                text = "They say " EZTR_CC_COLOR_RED "Special Shoutouts " EZTR_CC_COLOR_DEFAULT "are" EZTR_CC_NEWLINE
+                        "given to those who play the" EZTR_CC_NEWLINE
+                        EZTR_CC_COLOR_RED "piano " EZTR_CC_COLOR_DEFAULT "during these cutscenes." EZTR_CC_END;
+                break;
+            case 6: // dude
+                text = "dude" EZTR_CC_END;
+                break;
+            case 7: // Odolwa rolling
+                text = "They say " EZTR_CC_COLOR_RED "Odolwa " EZTR_CC_COLOR_DEFAULT "can't " EZTR_CC_COLOR_LIGHTBLUE "Watch for" EZTR_CC_NEWLINE
+                        "Rolling Rocks " EZTR_CC_COLOR_DEFAULT "in 0.5 " EZTR_CC_BTN_A " presses." EZTR_CC_END;
+                break;
+            case 8: // Keaton
+                text = "Hee-hee-ho! Hello, child." EZTR_CC_NEWLINE
+                        "If you are attempting to read hints," EZTR_CC_NEWLINE
+                        "try somewhere else." EZTR_CC_END;
+                break;
+            case 9: // Go Mode
+                text = "They say your " EZTR_CC_COLOR_RED "GO MODE " EZTR_CC_COLOR_DEFAULT "item is" EZTR_CC_NEWLINE
+                        "always in a " EZTR_CC_COLOR_LIGHTBLUE "Sphere 0 " EZTR_CC_COLOR_DEFAULT "location." EZTR_CC_END;
+                break;
+            case 10: // Konami Code
+                text = EZTR_CC_BTN_CUP " " EZTR_CC_BTN_CUP " " EZTR_CC_BTN_CDOWN " " EZTR_CC_BTN_CDOWN " " EZTR_CC_BTN_CLEFT " " EZTR_CC_BTN_CRIGHT " " EZTR_CC_BTN_CLEFT " " EZTR_CC_BTN_CRIGHT " " EZTR_CC_BTN_B " " EZTR_CC_BTN_A " " EZTR_CC_COLOR_RED "START" EZTR_CC_END;
+                break;
+            case 11: // Another castle
+                text = "Sorry " EZTR_CC_COLOR_RED EZTR_CC_NAME EZTR_CC_COLOR_DEFAULT ", but your" EZTR_CC_NEWLINE
+                        "hint is in another Gossip Stone." EZTR_CC_END;
+                break;
+            case 12: // [Player_Name] reportedly forgot
+                text = EZTR_CC_COLOR_RED EZTR_CC_NAME EZTR_CC_COLOR_DEFAULT " reportedly forgot" EZTR_CC_NEWLINE
+                        "to claim the " EZTR_CC_COLOR_RED "Great Fairy " EZTR_CC_COLOR_DEFAULT "reward" EZTR_CC_NEWLINE
+                        "before playing the " EZTR_CC_COLOR_LIGHTBLUE "Song of Time" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END;
+                break;
+            case 13: // IT'S PIKACHU!
+                text = "IT'S" EZTR_CC_COLOR_YELLOW "PIKACHU" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END;
+                break;
+            case 14: // Every hour...
+                text = "Every sixty seconds in " EZTR_CC_COLOR_RED "Termina" EZTR_CC_COLOR_DEFAULT "," EZTR_CC_NEWLINE
+                        "a minute passes." EZTR_CC_END;
+                break;
+            case 15: // Stay hydrated
+                text = "Hey " EZTR_CC_NAME "!" EZTR_CC_NEWLINE
+                        "Remember to " EZTR_CC_COLOR_BLUE "stay hydrated" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END;
+                break;
+            case 16: // Lottery Shop Sign
+                text = "The sign outside the " EZTR_CC_COLOR_RED "Lottery Shop" EZTR_CC_NEWLINE
+                        "tells you what the prize is!" EZTR_CC_END;
+                break;
             case 0: // use the !hint command!
             default:
                 text = "Use the " EZTR_CC_COLOR_RED "!hint" EZTR_CC_COLOR_DEFAULT " command to hint" EZTR_CC_NEWLINE
