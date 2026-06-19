@@ -113,6 +113,25 @@ void Post_Message_OpenText() {
     // }
 }
 
+// u16 savedPress;
+
+// RECOMP_HOOK("Message_Update")
+// void skip_credits(PlayState* play) {
+//     MessageContext* msgCtx = &play->msgCtx;
+//     Input* controller = CONTROLLER1(&play->state);
+
+//     savedPress = controller->press.button;
+//     controller->press.button |= BTN_A;
+// }
+
+// RECOMP_HOOK_RETURN("Message_Update")
+// void fix_inputs() {
+//     PlayState* play = gPlay;
+//     MessageContext* msgCtx = &play->msgCtx;
+//     Input* controller = CONTROLLER1(&play->state);
+//     controller->press.button = savedPress;
+// }
+
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Send_Item); // "You sent [player] their [item]"
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Self_Item); // "You found your [item]"
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Kokiri_Sword);
@@ -1701,6 +1720,8 @@ EZTR_MSG_CALLBACK(randoBombShopGoronHasSell) {
 
 // Gossip Stones
 EZTR_MSG_CALLBACK(randoGossips) {
+    recomp_printf("textId 0x%04X\n", textId);
+    
     REPY_FN_SETUP_RANDO;
 
     REPY_FN_SET_U16("textId", textId);
@@ -1844,7 +1865,7 @@ EZTR_MSG_CALLBACK(randoGossips) {
                 switch (random_connector_choice) {
                     default:
                     case 0:
-                        random_connector = "might" EZTR_CC_NEWLINE "be" EZTR_CC_END;
+                        random_connector = "might" EZTR_CC_NEWLINE "be " EZTR_CC_END;
                         break;
                     case 1:
                         random_connector = "is" EZTR_CC_NEWLINE "possibly " EZTR_CC_END;
