@@ -347,6 +347,8 @@ def apworld(c: Context, apworld_path: str = None, output_path: str = None, name:
     For more information see https://github.com/ArchipelagoMW/Archipelago/blob/main/docs/apworld%20specification.md#build-apworlds-launcher-component
     """
 
+    print_task_header("Packaging APWorld(s)..")
+
     if apworld_path:
         apworlds = [Path(apworld_path)]
     else:
@@ -355,24 +357,25 @@ def apworld(c: Context, apworld_path: str = None, output_path: str = None, name:
     if output_path:
         apworlds_folder = Path(output_path)
     else:
-        apworlds_folder = p.build_dir.joinpath("apworlds")
+        apworlds_folder = p.build_dir
     apworlds_folder.mkdir(parents=True, exist_ok=True)
 
     # TODO: handle manifests like Archipelago's "Build APWorlds" component
-    print_task_header("Packaging APWorld(s)..")
     for apworld in apworlds:
         zip_path = os.path.join(apworlds_folder, apworld.name + ".apworld")
+        print_job_header(f"Writing to {zip_path}")
         with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
             for file in apworld.rglob("*"):
+                print_fl(f"APWorld Injection: '{file}' as '{Path(apworld.name + ".apworld", apworld.name, file.relative_to(apworld, walk_up=True))}'")
                 zf.write(file, Path(apworld.name, file.relative_to(apworld, walk_up=True)))
 
 
 @task (
-    pre=[download, extract, makefile, toml, nrm, cmake, build, thunderstore]
+    pre=[download, extract, makefile, toml, nrm, cmake, build, thunderstore, apworld]
 )
 def all(c: Context):
     """
-    Shortcut for `./modbuild.py download extract makefile nrm cmake build thunderstore`.
+    Shortcut for `./modbuild.py download extract makefile nrm cmake build thunderstore apworld`.
     
     In effect, run all declared jobs.
     """
