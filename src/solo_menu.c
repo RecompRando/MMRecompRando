@@ -62,15 +62,17 @@ void selectEntry(u32 index) {
 
     if (index < solo_menu.entry_list_size) {
         char label_buffer[128];
-        char text_buffer[64];
-        
-        rando_solo_get_generation_date(index, text_buffer, sizeof(text_buffer));
+        char* text_buffer;
+
+        rando_solo_get_generation_date(index, &text_buffer);
         sprintf(label_buffer, "Generated: %s\n", text_buffer);
         recompui_set_text(solo_menu.details_time, label_buffer);
+        recomp_free(text_buffer);
 
-        rando_solo_get_seed_name(index, text_buffer, sizeof(text_buffer));
+        rando_solo_get_seed_name(index, &text_buffer);
         sprintf(label_buffer, "Seed: %s\n", text_buffer);
         recompui_set_text(solo_menu.details_seedname, label_buffer);
+        recomp_free(text_buffer);
         
         recompui_set_nav(solo_menu.start_button, NAVDIRECTION_LEFT, solo_menu.entry_list[index].entry_button);
     }
@@ -134,9 +136,10 @@ void createSoloListEntry(SeedEntry* entry, u32 index) {
     recompui_set_opacity(cur_button, 0.0f);
     recompui_register_callback(cur_button, entrySelectedHandler, (void*)index);
 
-    char datestr[64];
-    rando_solo_get_generation_date(index, datestr, sizeof(datestr));
+    char* datestr;
+    rando_solo_get_generation_date(index, &datestr);
     RecompuiResource cur_label = recompui_create_label(solo_menu.context, cur_container, datestr, LABELSTYLE_NORMAL);
+    recomp_free(datestr);
     entry->entry_label = cur_label;
     recompui_set_font_size(cur_label, 20.0f, UNIT_DP);
 
@@ -150,9 +153,7 @@ void createSoloList() {
         clearSoloList();
     }
 
-    u8* save_path = recomp_get_save_file_path();
-    rando_scan_solo_seeds(save_path);
-    recomp_free(save_path);
+    rando_scan_solo_seeds();
     solo_menu.entry_list_size = rando_solo_count();
     if (solo_menu.entry_list_size != 0) {
         solo_menu.entry_list = (SeedEntry*)recomp_alloc(sizeof(solo_menu.entry_list[0]) * solo_menu.entry_list_size);
@@ -201,7 +202,8 @@ static void backPressed(RecompuiResource resource, const RecompuiEventData* data
 
 static void startPressed(RecompuiResource resource, const RecompuiEventData* data, void* userdata) {
     if (data->type == UI_EVENT_CLICK) {
-        if (rando_init_solo(solo_menu.selected_entry)) {
+        char* error_msg;
+        if (rando_init_solo(solo_menu.selected_entry, &error_msg)) {
             recomp_printf("Started successfully\n");
             recompui_hide_context(solo_menu.context);
             randoStart(false);
@@ -210,8 +212,10 @@ static void startPressed(RecompuiResource resource, const RecompuiEventData* dat
             recomp_printf("Failed to start solo\n");
             recompui_close_context(solo_menu.context);
             randoEmitErrorNotification("Failed to load seed, file may be corrupted");
+            randoEmitErrorNotification(error_msg); // show error message in more detail
             recompui_open_context(solo_menu.context);
         }
+        recomp_free(error_msg);
     }
 }
 
