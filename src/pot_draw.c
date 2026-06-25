@@ -12,19 +12,13 @@
 #include "overlays/actors/ovl_En_Tubo_Trap/z_en_tubo_trap.h"
 #include "overlays/actors/ovl_Obj_Flowerpot/z_obj_flowerpot.h"
 
-typedef struct {
-    /* 0x00 */ s16 objectId;
-    /* 0x04 */ f32 scale;
-    /* 0x08 */ Gfx* modelDL;
-    /* 0x0C */ Gfx* shardDL;
-    /* 0x10 */ s16 radius;
-    /* 0x12 */ s16 height;
-    /* 0x14 */ ObjTsuboUnkFunc breakPot1;
-    /* 0x18 */ ObjTsuboUnkFunc breakPot2;
-    /* 0x1C */ ObjTsuboUnkFunc breakPot3;
-} ObjTsuboData; // size = 0x20
-
-extern ObjTsuboData sPotTypeData[4];
+// reflects sPotTypeData, but using that causes a really weird edge case crash
+Gfx* potTypeDL[] = {
+    gameplay_dangeon_keep_DL_017EA0,
+    gMagicPotDL,
+    gPotDL,
+    gameplay_dangeon_keep_DL_017EA0
+};
 
 void GenericPot_DrawRando(PlayState* play, u32 location, u8 potType) {
     TexturePtr pot_side_tex;
@@ -124,7 +118,7 @@ void GenericPot_DrawRando(PlayState* play, u32 location, u8 potType) {
     }
 
     if (drawOriginal) {
-        Gfx_DrawDListOpa(play, sPotTypeData[potType].modelDL);
+        Gfx_DrawDListOpa(play, potTypeDL[potType]);
         return;
     }
 
@@ -165,7 +159,7 @@ RECOMP_PATCH void ObjTsubo_Draw(Actor* thisx, PlayState* play2) {
     // if (!rando_get_slotdata_u32("potsanity") || (rando_location_is_checked(*potLocation) && !(*potDropped)) ||
     //     (OBJ_TSUBO_PFE00(thisx) && ((func_800A8150(OBJ_TSUBO_P003F(thisx)) != ITEM00_FLEXIBLE)) && !rando_get_slotdata_u32("fairysanity"))) { // stray fairies
     if (!rando_get_slotdata_u32("potsanity") || !rando_location_exists(*potLocation) || (rando_location_is_checked(*potLocation) && !(*potDropped)) || !rando_get_camc_enabled()) {
-        Gfx_DrawDListOpa(play, sPotTypeData[OBJ_TSUBO_GET_TYPE(thisx)].modelDL);
+        Gfx_DrawDListOpa(play, potTypeDL[OBJ_TSUBO_GET_TYPE(thisx)]);
         return;
     }
 
