@@ -411,6 +411,20 @@ gossip_stones = {
         "extra": {},
         "filled": False,
     },
+    # Swamp Spider House
+    0x20C7: {
+        "name": "Swamp Spider House Gossip Stone",
+        "item": "",
+        "item_type": 0,
+        "location": "",
+        "location_id": "",
+        "from_player": "",
+        "to_player": "",
+        "region": "",
+        "type": HintEnum.NONE.value,
+        "extra": {},
+        "filled": False,
+    },
     # Road to Ikana
     0x20B5: {
         "name": "Road to Ikana Outside Graveyard Gossip Stone",
