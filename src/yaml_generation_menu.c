@@ -52,9 +52,10 @@ RandoOptionData* randoAllocateOption(RandoYamlConfigMenu* menu, const char* opti
     return ret;
 }
 
+// probably delete these printfs ?
 void* rando_yaml_printf_pfn(void* dst, const char* fmt, size_t size) {
     (void)dst;
-    rando_yaml_puts(fmt, size);
+    // rando_yaml_puts(fmt, size);
     return (void*)1;
 }
 
@@ -69,73 +70,135 @@ RECOMP_EXPORT int rando_yaml_printf(const char* fmt, ...) {
     return ret;
 }
 
+void randoYAMLCreate(RandoYamlConfigMenu* menu, bool place_in_archipelago) {
+    REPY_FN_SETUP_RANDO;
+
+    REPY_FN_IMPORT("rando_solo");
+
+    REPY_FN_EXEC_CACHE(
+        py_rando_setup_solo_yaml,
+        "import yaml\n"
+        "output_options = recomp_data.solo_yaml_options\n" // has to be in a module to make it usable by callbacks
+    );
+
+    // Iterate over the options and write their values into the yaml.
+    for (u32 i = 0; i < menu->num_options; i++) {
+        RandoOptionData* option = &menu->all_options[i];
+        if (!option->is_callback) {
+            REPY_FN_SET_STR("option_id", option->option_id);
+            switch (option->type) {
+                case OPTION_BOOL:
+                    // rando_yaml_printf("  %s:\n    %s: 1\n", option->option_id, recompui_get_input_value_u32(option->input_element) ? "true" : "false");
+                    REPY_FN_SET_BOOL("value", recompui_get_input_value_u32(option->input_element));
+                    break;
+                case OPTION_RADIO:
+                    EnumOptionValue* enum_options = (EnumOptionValue*)option->data;
+                    // rando_yaml_printf("  %s:\n    %s: 1\n", option->option_id, enum_options[recompui_get_input_value_u32(option->input_element)].id);
+                    REPY_FN_SET_STR("value", enum_options[recompui_get_input_value_u32(option->input_element)].id);
+                    break;
+                case OPTION_INT_SLIDER:
+                    // TODO replace this with recompui_get_input_value_s32 when it gets added
+                    // rando_yaml_printf("  %s:\n    %d: 1\n", option->option_id, (s32)recompui_get_input_value_float(option->input_element));
+                    REPY_FN_SET_S32("value", (s32)recompui_get_input_value_float(option->input_element));
+                    break;
+                case OPTION_FLOAT_SLIDER:
+                    // rando_yaml_printf("  %s:\n    %f: 1\n", option->option_id, recompui_get_input_value_float(option->input_element));
+                    REPY_FN_SET_F32("value", recompui_get_input_value_float(option->input_element)); // assuming f32 = float
+                    break;
+            }
+            REPY_FN_EXEC_CACHE(
+                py_rando_set_yaml_option,
+                "output_options[option_id] = value\n"
+            );
+        }
+        else {
+            switch (option->type) {
+                case OPTION_BOOL:
+                    option->bool_callback((bool)recompui_get_input_value_u32(option->input_element));
+                    break;
+                case OPTION_RADIO:
+                    option->bool_callback(recompui_get_input_value_u32(option->input_element));
+                    break;
+                case OPTION_INT_SLIDER:
+                    // TODO replace this with recompui_get_input_value_s32 when it gets added
+                    option->int_callback((s32)recompui_get_input_value_float(option->input_element));
+                    break;
+                case OPTION_FLOAT_SLIDER:
+                    option->float_callback(recompui_get_input_value_float(option->input_element));
+                    break;
+            }
+        }
+    }
+
+    recomp_printf("finished setting yaml options\n");
+
+    if (place_in_archipelago) {
+        REPY_FN_EXEC_CACHE(
+            py_rando_write_solo_yaml_to_players,
+            "rando_solo.clear_players_folder()\n"
+            "output_dir = recomp_data.mod_data_path.joinpath('Archipelago', 'local', 'Players', 'solo.yaml')\n"
+            "output_file = output_dir.open('w')\n"
+            "rando_solo.populate_yaml_header(output_file)\n"
+            "yaml.dump({recomp_data.game_name: output_options}, output_file)\n"
+            "recomp_data.last_generated_yaml_location = output_dir\n"
+        );
+    } else {
+        REPY_FN_EXEC_CACHE(
+            py_rando_write_yaml_to_mod_data,
+            "from datetime import datetime\n"
+            "current_datetime = datetime.now().strftime('%d-%m-%Y_%H-%M-%S')\n"
+            "file_name = f'AP_Recomp_{current_datetime}.yaml'\n"
+            "output_dir = recomp_data.mod_data_path.joinpath('solo_yamls', file_name)\n"
+            "output_file = output_dir.open('w')\n"
+            "rando_solo.populate_yaml_header(output_file)\n"
+            "yaml.dump({recomp_data.game_name: output_options}, output_file)\n"
+            "recomp_data.last_generated_yaml_location = output_dir\n"
+        );
+    }
+    
+    REPY_FN_CLEANUP;
+}
 
 // Stub: writes the configured YAML to disk without generating a seed.
 // this still needs to be implemented once the export path is decided.
 void randoYAMLExportCallback(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
     RandoYamlConfigMenu* menu = (RandoYamlConfigMenu*)userdata;
     if (data->type == UI_EVENT_CLICK) {
+        REPY_FN_SETUP_RANDO;
+
+        randoYAMLCreate(menu, false);
+
+        REPY_FN_EVAL_CACHE_STR(
+            py_rando_create_yaml_export_notification,
+            "f'Wrote YAML file to {recomp_data.last_generated_yaml_location}.'",
+            output_dir
+        );
+        
         // The notification opens its own UI context, so this one must be closed first.
         recompui_close_context(menu->context);
-        randoEmitNormalNotification("Export not yet implemented.");
+        randoEmitNormalNotification(output_dir);
         recompui_open_context(menu->context);
+        
+        // Return to start menu
+        recompui_hide_context(yaml_config_menu.context);
+        is_generate_menu_shown = false;
+        // Close the start menu context temporarily so that the solo context can be opened.
+        recompui_close_context(yaml_config_menu.context);
+        randoShowSoloMenu();
+        // Reopen the start menu context.
+        recompui_open_context(yaml_config_menu.context);
+        
+        recomp_free(output_dir);
+        REPY_FN_CLEANUP;
     }
 }
 
 void randoYAMLGenerateCallback(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
     RandoYamlConfigMenu* menu = (RandoYamlConfigMenu*)userdata;
     if (data->type == UI_EVENT_CLICK) {
-        rando_yaml_init();
-        rando_yaml_printf("name: Player\n");
-        rando_yaml_printf("game: Majora's Mask Recompiled\n");
-        rando_yaml_printf("requires:\n  version: %s\n", "0.4.5"); // TODO hook this up to the mod version?
-        rando_yaml_printf("Majora's Mask Recompiled:\n");
-
-        // Iterate over the options and write their values into the yaml.
-        for (u32 i = 0; i < menu->num_options; i++) {
-            RandoOptionData* option = &menu->all_options[i];
-            if (!option->is_callback) {
-                switch (option->type) {
-                    case OPTION_BOOL:
-                        rando_yaml_printf("  %s:\n    %s: 1\n", option->option_id, recompui_get_input_value_u32(option->input_element) ? "true" : "false");
-                        break;
-                    case OPTION_RADIO:
-                        {
-                            EnumOptionValue* enum_options = (EnumOptionValue*)option->data;
-                            rando_yaml_printf("  %s:\n    %s: 1\n", option->option_id, enum_options[recompui_get_input_value_u32(option->input_element)].id);
-                        }
-                        break;
-                    case OPTION_INT_SLIDER:
-                        // TODO replace this with recompui_get_input_value_s32 when it gets added
-                        rando_yaml_printf("  %s:\n    %d: 1\n", option->option_id, (s32)recompui_get_input_value_float(option->input_element));
-                        break;
-                    case OPTION_FLOAT_SLIDER:
-                        rando_yaml_printf("  %s:\n    %f: 1\n", option->option_id, recompui_get_input_value_float(option->input_element));
-                        break;
-                }
-            }
-            else {
-                switch (option->type) {
-                    case OPTION_BOOL:
-                        option->bool_callback((bool)recompui_get_input_value_u32(option->input_element));
-                        break;
-                    case OPTION_RADIO:
-                        option->bool_callback(recompui_get_input_value_u32(option->input_element));
-                        break;
-                    case OPTION_INT_SLIDER:
-                        // TODO replace this with recompui_get_input_value_s32 when it gets added
-                        option->int_callback((s32)recompui_get_input_value_float(option->input_element));
-                        break;
-                    case OPTION_FLOAT_SLIDER:
-                        option->float_callback(recompui_get_input_value_float(option->input_element));
-                        break;
-                }
-            }
-        }
-
-        unsigned char* save_path = recomp_get_save_file_path();
-        rando_yaml_finalize(save_path);
-        recomp_free(save_path);
+        REPY_FN_SETUP_RANDO;
+        
+        randoYAMLCreate(menu, true);
 
         if (rando_solo_generate()) {
             recompui_hide_context(yaml_config_menu.context);
@@ -151,6 +214,8 @@ void randoYAMLGenerateCallback(RecompuiResource button, const RecompuiEventData*
             randoEmitErrorNotification("Failed to generate. Please report the settings you used to the developers.");
             recompui_open_context(yaml_config_menu.context);
         }
+
+        REPY_FN_CLEANUP;
     }
 }
 
@@ -330,13 +395,23 @@ RandoOptionData* randoCreateFloatSliderOption(RandoYamlConfigMenu* menu, const c
     return option_data;
 }
 
+// TODO: update colors mod to remove the need for this
 void tunicColorCallback(bool enabled) {
     if (enabled) {
+        REPY_FN_SETUP_RANDO;
         u32 link_color = Rand_Next();
-        u32 link_red = (link_color >> 24) & 0xFF;
-        u32 link_green = (link_color >> 16) & 0xFF;
-        u32 link_blue = (link_color >> 8) & 0xFF;
-        rando_yaml_printf("  link_tunic_color:\n    [%d, %d, %d]\n", link_red, link_green, link_blue);
+        // u32 link_red = (link_color >> 24) & 0xFF;
+        // u32 link_green = (link_color >> 16) & 0xFF;
+        // u32 link_blue = (link_color >> 8) & 0xFF;
+        // rando_yaml_printf("  link_tunic_color:\n    [%d, %d, %d]\n", link_red, link_green, link_blue);
+        REPY_FN_SET_U32("link_red", (link_color >> 24) & 0xFF);
+        REPY_FN_SET_U32("link_green", (link_color >> 16) & 0xFF);
+        REPY_FN_SET_U32("link_blue", (link_color >> 8) & 0xFF);
+        REPY_FN_EXEC_CACHE(
+            py_rando_set_tunic_yaml,
+            "recomp_data.solo_yaml_options['link_tunic_color'] = [link_red, link_green, link_blue]"
+        );
+        REPY_FN_CLEANUP;
     }
 }
 
@@ -573,14 +648,14 @@ void randoCreateYamlConfigMenu() {
             REPY_FN_IF_CACHE(py_rando_get_option_type, "option_type == 'Choice'") {
                 REPY_FN_EXEC_CACHE(
                     py_rando_get_choice_option_info,
-                    "choices_len = len(option_info['choices'])\n"
+                    "num_choices = len(option_info['choices'])\n"
                     "option_default = option_info['default']\n"
                 );
 
-                u32 choices_len = REPY_FN_GET_U32("choices_len");
+                u32 num_choices = REPY_FN_GET_U32("num_choices");
                 u32 option_default = REPY_FN_GET_U32("option_default");
 
-                EnumOptionValue option_choices[choices_len];
+                EnumOptionValue* option_choices = recomp_alloc(sizeof(EnumOptionValue) * num_choices);
                 int index = 0;
                 
                 REPY_FN_FOREACH_CACHE(py_rando_options_populate_choices, "choice", "option_info['choices'].items()") {
@@ -605,7 +680,7 @@ void randoCreateYamlConfigMenu() {
                     option_name,
                     option_description,
                     option_choices,
-                    ARRAY_COUNT(option_choices),
+                    num_choices,
                     option_default
                 );
             } REPY_FN_ELIF_CACHE(py_rando_get_option_type, "option_type == 'Range'") {
@@ -659,17 +734,29 @@ void randoCreateYamlConfigMenu() {
     randoBeginTab(&yaml_config_menu, "Starting Items");
     randoTabPlaceholder(&yaml_config_menu, "Item list not yet loaded.");
 
-    // Tricks tab (filled by the apworld SoonTM; empty for now).
-    randoBeginTab(&yaml_config_menu, "Tricks");
-    randoTabPlaceholder(&yaml_config_menu, "No tricks are available for this game yet.");
+    // REPY_FN_FOREACH_CACHE(py_rando_fill_items_from_apworld, "item_name", "recomp_data.item_names") {
+    //     char* item_name = REPY_FN_GET_STR("item_name");
+    //     randoTabPlaceholder(&yaml_config_menu, item_name);
+    //     recomp_free(item_name);
+    // }
 
-    // Glitches tab (filled by the apworld; empty for now).
-    randoBeginTab(&yaml_config_menu, "Glitches");
-    randoTabPlaceholder(&yaml_config_menu, "No glitches are available for this game yet.");
+    // // Tricks tab (filled by the apworld SoonTM; empty for now).
+    // randoBeginTab(&yaml_config_menu, "Tricks");
+    // randoTabPlaceholder(&yaml_config_menu, "No tricks are available for this game yet.");
+
+    // // Glitches tab (filled by the apworld; empty for now).
+    // randoBeginTab(&yaml_config_menu, "Glitches");
+    // randoTabPlaceholder(&yaml_config_menu, "No glitches are available for this game yet.");
 
     // Excluded Locations tab (populated by the location-list glue).
     randoBeginTab(&yaml_config_menu, "Excluded Locations");
     randoTabPlaceholder(&yaml_config_menu, "Location list not yet loaded.");
+
+    // REPY_FN_FOREACH_CACHE(py_rando_fill_locations_from_apworld, "location_name", "recomp_data.location_names") {
+    //     char* location_name = REPY_FN_GET_STR("location_name");
+    //     randoTabPlaceholder(&yaml_config_menu, location_name);
+    //     recomp_free(location_name);
+    // }
 
     // Show the first tab by default.
     randoSelectTab(&yaml_config_menu, 0);

@@ -328,7 +328,7 @@ class MMRWorld(World):
 
         if not self.options.shuffle_great_fairy_rewards.value:
             self.place("North Clock Town Great Fairy Reward", "Progressive Magic")
-            self.place("North Clock Town Great Fairy Reward (Has Transformation Mask)", "Great Fairy Mask")
+            self.place("North Clock Town Great Fairy Reward (Has Transformation Mask)", "Great Fairy's Mask")
             self.place("Woodfall Great Fairy Reward", "Great Spin Attack")
             self.place("Snowhead Great Fairy Reward", "Progressive Magic")
             self.place("Great Bay Great Fairy Reward", "Double Defense")
