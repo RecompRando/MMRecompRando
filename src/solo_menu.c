@@ -3,6 +3,7 @@
 
 #include "apcommon.h"
 #include "solo_menu.h"
+#include "import_menu.h"
 
 RandoSoloMenu solo_menu;
 
@@ -186,6 +187,17 @@ void createSoloList() {
     }
 }
 
+static void importPressed(RecompuiResource resource, const RecompuiEventData* data, void* userdata) {
+    if (data->type == UI_EVENT_CLICK) {
+        recompui_hide_context(solo_menu.context);
+        // Close the solo context so the import context can be opened.
+        recompui_close_context(solo_menu.context);
+        randoShowImportMenu();
+        // Reopen the solo context.
+        recompui_open_context(solo_menu.context);
+    }
+}
+
 static void newSeedPressed(RecompuiResource resource, const RecompuiEventData* data, void* userdata) {
     if (data->type == UI_EVENT_CLICK) {
         recompui_hide_context(solo_menu.context);
@@ -348,6 +360,11 @@ void randoCreateSoloMenu() {
     solo_menu.new_seed_button = recompui_create_button(solo_menu.context, solo_menu.footer, "New Session", BUTTONSTYLE_SECONDARY);
     recompui_set_width(solo_menu.new_seed_button, 300.0f, UNIT_DP);
     recompui_register_callback(solo_menu.new_seed_button, newSeedPressed, NULL);
+
+    solo_menu.import_button = recompui_create_button(solo_menu.context, solo_menu.footer, "Import Yaml", BUTTONSTYLE_SECONDARY);
+    recompui_set_width(solo_menu.import_button, 300.0f, UNIT_DP);
+    recompui_set_margin_left(solo_menu.import_button, 12.0f, UNIT_DP);
+    recompui_register_callback(solo_menu.import_button, importPressed, NULL);
 
     // Create the back button, parenting it to the root with absolute positioning.
     solo_menu.back_button = recompui_create_button(solo_menu.context, solo_menu.frame.root, "Back", BUTTONSTYLE_SECONDARY);

@@ -15,6 +15,22 @@ bool randoGenerateMenuOpen() {
 
 RandoYamlConfigMenu yaml_config_menu;
 
+typedef struct {
+    RecompuiResource button;
+    char*            name;
+    bool             excluded;
+} ExcludedLocation;
+static ExcludedLocation* rando_excluded_locations = NULL;
+static u32 rando_num_excluded_locations = 0;
+
+typedef struct {
+    RecompuiResource button;
+    char*            name;
+    bool             selected;
+} StartingItem;
+static StartingItem* rando_starting_items = NULL;
+static u32 rando_num_starting_items = 0;
+
 static void backPressed(RecompuiResource resource, const RecompuiEventData* data, void* userdata) {
     if (data->type == UI_EVENT_CLICK) {
         recompui_hide_context(yaml_config_menu.context);
@@ -131,6 +147,30 @@ void randoYAMLCreate(RandoYamlConfigMenu* menu, bool place_in_archipelago) {
     }
 
     recomp_printf("finished setting yaml options\n");
+
+    REPY_FN_EXEC_CACHE(py_rando_init_excluded, "excluded = []\n");
+    for (u32 i = 0; i < rando_num_excluded_locations; i++) {
+        if (rando_excluded_locations[i].excluded) {
+            REPY_FN_SET_STR("loc_name", rando_excluded_locations[i].name);
+            REPY_FN_EXEC_CACHE(py_rando_append_excluded, "excluded.append(loc_name)\n");
+        }
+    }
+    REPY_FN_EXEC_CACHE(py_rando_set_excluded,
+        "if excluded:\n"
+        "    output_options['exclude_locations'] = excluded\n"
+    );
+
+    REPY_FN_EXEC_CACHE(py_rando_init_start_inventory, "start_inv = {}\n");
+    for (u32 i = 0; i < rando_num_starting_items; i++) {
+        if (rando_starting_items[i].selected) {
+            REPY_FN_SET_STR("item_name", rando_starting_items[i].name);
+            REPY_FN_EXEC_CACHE(py_rando_append_start_inventory, "start_inv[item_name] = 1\n");
+        }
+    }
+    REPY_FN_EXEC_CACHE(py_rando_set_start_inventory,
+        "if start_inv:\n"
+        "    output_options['start_inventory'] = start_inv\n"
+    );
 
     if (place_in_archipelago) {
         REPY_FN_EXEC_CACHE(
@@ -423,12 +463,19 @@ static RecompuiColor tab_inactive_color = {255, 255, 255, 110};
 // Panel that section buttons parent into; set by randoBeginTab.
 static RecompuiResource rando_current_panel = 0;
 
+// Per-tab flag: hide the description pane when this tab is active (for list
+// tabs like Starting Items / Excluded Locations that don't use descriptions).
+static bool rando_tab_hide_description[MAX_TABS];
+
 static void randoSelectTab(RandoYamlConfigMenu* menu, u32 index) {
     for (u32 i = 0; i < menu->num_tabs; i++) {
         bool active = (i == index);
         recompui_set_display(menu->tabs[i].panel, active ? DISPLAY_BLOCK : DISPLAY_NONE);
         recompui_set_color(menu->tabs[i].button, active ? &tab_active_color : &tab_inactive_color);
     }
+    bool hide_desc = rando_tab_hide_description[index];
+    recompui_set_display(menu->description_pane, hide_desc ? DISPLAY_NONE : DISPLAY_BLOCK);
+    recompui_set_flex_basis(menu->option_column, hide_desc ? 100.0f : 72.0f, UNIT_PERCENT);
     menu->active_tab = index;
 }
 
@@ -474,6 +521,141 @@ static void randoTabPlaceholder(RandoYamlConfigMenu* menu, const char* text) {
 // once at startup and shown/hidden, so YAML output is unaffected hopefully.
 static RandoSection rando_sections[MAX_SECTIONS];
 static u32 rando_num_sections = 0;
+
+static void excludedLocationSetText(ExcludedLocation* loc) {
+    char buf[128];
+    buf[0] = '[';
+    buf[1] = loc->excluded ? 'X' : ' ';
+    buf[2] = ']';
+    buf[3] = ' ';
+    u32 i = 0;
+    while (loc->name[i] != '\0' && i < sizeof(buf) - 5) {
+        buf[4 + i] = loc->name[i];
+        i++;
+    }
+    buf[4 + i] = '\0';
+    recompui_set_text(loc->button, buf);
+}
+
+static void excludedLocationToggle(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
+    if (data->type == UI_EVENT_CLICK) {
+        ExcludedLocation* loc = (ExcludedLocation*)userdata;
+        loc->excluded = !loc->excluded;
+        excludedLocationSetText(loc);
+    }
+}
+
+static void startingItemSetText(StartingItem* item) {
+    char buf[128];
+    buf[0] = '[';
+    buf[1] = item->selected ? 'X' : ' ';
+    buf[2] = ']';
+    buf[3] = ' ';
+    u32 i = 0;
+    while (item->name[i] != '\0' && i < sizeof(buf) - 5) {
+        buf[4 + i] = item->name[i];
+        i++;
+    }
+    buf[4 + i] = '\0';
+    recompui_set_text(item->button, buf);
+}
+
+static void startingItemToggle(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
+    if (data->type == UI_EVENT_CLICK) {
+        StartingItem* item = (StartingItem*)userdata;
+        item->selected = !item->selected;
+        startingItemSetText(item);
+    }
+}
+
+// Case-insensitive substring test for the search filters.
+static bool randoStrContainsCI(const char* haystack, const char* needle) {
+    if (needle[0] == '\0') {
+        return true;
+    }
+    for (u32 i = 0; haystack[i] != '\0'; i++) {
+        u32 j = 0;
+        while (haystack[i + j] != '\0' && needle[j] != '\0') {
+            char a = haystack[i + j];
+            char b = needle[j];
+            if (a >= 'A' && a <= 'Z') a += 32;
+            if (b >= 'A' && b <= 'Z') b += 32;
+            if (a != b) break;
+            j++;
+        }
+        if (needle[j] == '\0') {
+            return true;
+        }
+    }
+    return false;
+}
+
+static RecompuiResource rando_excluded_search_input = 0;
+static RecompuiResource rando_starting_search_input = 0;
+
+static void excludedSearchCallback(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
+    if (data->type == UI_EVENT_CLICK) {
+        char* query = recompui_get_input_text(rando_excluded_search_input);
+        for (u32 i = 0; i < rando_num_excluded_locations; i++) {
+            bool match = randoStrContainsCI(rando_excluded_locations[i].name, query);
+            recompui_set_display(rando_excluded_locations[i].button, match ? DISPLAY_BLOCK : DISPLAY_NONE);
+        }
+        recomp_free(query);
+    }
+}
+
+static void startingSearchCallback(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
+    if (data->type == UI_EVENT_CLICK) {
+        char* query = recompui_get_input_text(rando_starting_search_input);
+        for (u32 i = 0; i < rando_num_starting_items; i++) {
+            bool match = randoStrContainsCI(rando_starting_items[i].name, query);
+            recompui_set_display(rando_starting_items[i].button, match ? DISPLAY_BLOCK : DISPLAY_NONE);
+        }
+        recomp_free(query);
+    }
+}
+
+// Builds a pinned search row + an inner scrolling body. The search row stays
+// fixed at the top of the tab while the returned body scrolls. 
+static void randoCreateSearchSection(RandoYamlConfigMenu* menu,
+        void (*callback)(RecompuiResource, const RecompuiEventData*, void*),
+        RecompuiResource* out_input) {
+    // Make the tab panel a column so the search row and scroll body stack.
+    recompui_set_display(menu->current_body, DISPLAY_FLEX);
+    recompui_set_flex_direction(menu->current_body, FLEX_DIRECTION_COLUMN);
+    recompui_set_height(menu->current_body, 100.0f, UNIT_PERCENT);
+
+    // Pinned search row (does not scroll).
+    RecompuiResource search_row = recompui_create_element(menu->context, menu->current_body);
+    recompui_set_display(search_row, DISPLAY_FLEX);
+    recompui_set_flex_direction(search_row, FLEX_DIRECTION_ROW);
+    recompui_set_align_items(search_row, ALIGN_ITEMS_CENTER);
+    recompui_set_gap(search_row, 8.0f, UNIT_DP);
+    recompui_set_padding(search_row, 8.0f, UNIT_DP);
+    recompui_set_flex_grow(search_row, 0.0f);
+    recompui_set_flex_shrink(search_row, 0.0f);
+
+    RecompuiResource input = recompui_create_textinput(menu->context, search_row);
+    recompui_set_flex_grow(input, 1.0f);
+
+    RecompuiResource search_button = recompui_create_button(menu->context, search_row, "Search", BUTTONSTYLE_SECONDARY);
+    recompui_register_callback(search_button, callback, NULL);
+
+    // Inner scrolling body for the entries. Mirrors the solo menu's
+    // list_container: 
+    RecompuiResource scroll_body = recompui_create_element(menu->context, menu->current_body);
+    recompui_set_display(scroll_body, DISPLAY_BLOCK);
+    recompui_set_overflow_y(scroll_body, OVERFLOW_AUTO);
+    recompui_set_flex_grow(scroll_body, 1.0f);
+    recompui_set_flex_shrink(scroll_body, 1.0f);
+    recompui_set_height(scroll_body, 100.0f, UNIT_PERCENT);
+    recompui_set_max_height(scroll_body, 100.0f, UNIT_PERCENT);
+
+    // Entries now parent into the scroll body.
+    menu->current_body = scroll_body;
+
+    *out_input = input;
+}
 
 static void randoSectionSetButtonText(RandoSection* section) {
     char buf[128];
@@ -593,6 +775,8 @@ void randoCreateYamlConfigMenu() {
     recompui_set_flex_basis(yaml_config_menu.option_column, 72.0f, UNIT_PERCENT);
     recompui_set_flex_grow(yaml_config_menu.option_column, 0.0f);
     recompui_set_flex_shrink(yaml_config_menu.option_column, 0.0f);
+    recompui_set_height(yaml_config_menu.option_column, 100.0f, UNIT_PERCENT);
+    recompui_set_max_height(yaml_config_menu.option_column, 100.0f, UNIT_PERCENT);
     recompui_set_padding(yaml_config_menu.option_column, 16.0f, UNIT_DP);
 
     RecompuiColor pane_divider_color = {255, 255, 255, 40};
@@ -609,6 +793,9 @@ void randoCreateYamlConfigMenu() {
     yaml_config_menu.num_options = 0;
     yaml_config_menu.num_tabs = 0;
     rando_num_sections = 0;
+    for (u32 i = 0; i < MAX_TABS; i++) {
+        rando_tab_hide_description[i] = false;
+    }
 
     REPY_FN_SETUP_RANDO;
 
@@ -732,31 +919,78 @@ void randoCreateYamlConfigMenu() {
 
     // Starting Items tab.
     randoBeginTab(&yaml_config_menu, "Starting Items");
-    randoTabPlaceholder(&yaml_config_menu, "Item list not yet loaded.");
+    rando_tab_hide_description[yaml_config_menu.num_tabs - 1] = true;
 
-    // REPY_FN_FOREACH_CACHE(py_rando_fill_items_from_apworld, "item_name", "recomp_data.item_names") {
-    //     char* item_name = REPY_FN_GET_STR("item_name");
-    //     randoTabPlaceholder(&yaml_config_menu, item_name);
-    //     recomp_free(item_name);
-    // }
+    randoCreateSearchSection(&yaml_config_menu, startingSearchCallback, &rando_starting_search_input);
 
-    // // Tricks tab (filled by the apworld SoonTM; empty for now).
-    // randoBeginTab(&yaml_config_menu, "Tricks");
-    // randoTabPlaceholder(&yaml_config_menu, "No tricks are available for this game yet.");
+    REPY_FN_EVAL_CACHE_U32(
+        py_rando_get_item_count,
+        "len(recomp_data.item_names)",
+        num_items
+    );
+
+    rando_starting_items = recomp_alloc(sizeof(StartingItem) * num_items);
+    rando_num_starting_items = num_items;
+
+    u32 item_index = 0;
+    REPY_FN_FOREACH_CACHE(py_rando_fill_items_from_apworld, "item_name", "recomp_data.item_names") {
+        StartingItem* item = &rando_starting_items[item_index++];
+        char* item_name = REPY_FN_GET_STR("item_name");
+
+        size_t len = strlen(item_name);
+        item->name = recomp_alloc(len + 1);
+        Lib_MemCpy(item->name, (void*)item_name, len + 1);
+        recomp_free(item_name);
+
+        item->selected = false;
+        item->button = recompui_create_button(yaml_config_menu.context, yaml_config_menu.current_body, "", BUTTONSTYLE_SECONDARY);
+        recompui_set_display(item->button, DISPLAY_BLOCK);
+        recompui_set_margin_bottom(item->button, 2.0f, UNIT_DP);
+        recompui_register_callback(item->button, startingItemToggle, item);
+        startingItemSetText(item);
+    }
+
+    // Tricks tab (filled by the apworld SoonTM; empty for now).
+    randoBeginTab(&yaml_config_menu, "Tricks");
+    rando_tab_hide_description[yaml_config_menu.num_tabs - 1] = true;
+    randoTabPlaceholder(&yaml_config_menu, "No tricks are available for this game yet.");
 
     // // Glitches tab (filled by the apworld; empty for now).
     // randoBeginTab(&yaml_config_menu, "Glitches");
     // randoTabPlaceholder(&yaml_config_menu, "No glitches are available for this game yet.");
 
-    // Excluded Locations tab (populated by the location-list glue).
+    // Excluded Locations tab.
     randoBeginTab(&yaml_config_menu, "Excluded Locations");
-    randoTabPlaceholder(&yaml_config_menu, "Location list not yet loaded.");
+    rando_tab_hide_description[yaml_config_menu.num_tabs - 1] = true;
 
-    // REPY_FN_FOREACH_CACHE(py_rando_fill_locations_from_apworld, "location_name", "recomp_data.location_names") {
-    //     char* location_name = REPY_FN_GET_STR("location_name");
-    //     randoTabPlaceholder(&yaml_config_menu, location_name);
-    //     recomp_free(location_name);
-    // }
+    randoCreateSearchSection(&yaml_config_menu, excludedSearchCallback, &rando_excluded_search_input);
+
+    REPY_FN_EVAL_CACHE_U32(
+        py_rando_get_location_count,
+        "len(recomp_data.location_names)",
+        num_locations
+    );
+
+    rando_excluded_locations = recomp_alloc(sizeof(ExcludedLocation) * num_locations);
+    rando_num_excluded_locations = num_locations;
+
+    u32 loc_index = 0;
+    REPY_FN_FOREACH_CACHE(py_rando_fill_locations_from_apworld, "location_name", "recomp_data.location_names") {
+        ExcludedLocation* loc = &rando_excluded_locations[loc_index++];
+        char* location_name = REPY_FN_GET_STR("location_name");
+
+        size_t len = strlen(location_name);
+        loc->name = recomp_alloc(len + 1);
+        Lib_MemCpy(loc->name, (void*)location_name, len + 1);
+        recomp_free(location_name);
+
+        loc->excluded = false;
+        loc->button = recompui_create_button(yaml_config_menu.context, yaml_config_menu.current_body, "", BUTTONSTYLE_SECONDARY);
+        recompui_set_display(loc->button, DISPLAY_BLOCK);
+        recompui_set_margin_bottom(loc->button, 2.0f, UNIT_DP);
+        recompui_register_callback(loc->button, excludedLocationToggle, loc);
+        excludedLocationSetText(loc);
+    }
 
     // Show the first tab by default.
     randoSelectTab(&yaml_config_menu, 0);

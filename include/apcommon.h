@@ -378,6 +378,10 @@ void randoCreateYamlConfigMenu();
 void randoShowYamlConfigMenu();
 void randoCreateAPConnectMenu();
 void randoShowAPConnectMenu();
+void randoCreateImportMenu();
+void randoShowImportMenu();
+void randoCreateModCheckMenu();
+bool randoCheckRequiredMods();
 void randoStart(bool multiworld);
 
 void randoScout();
