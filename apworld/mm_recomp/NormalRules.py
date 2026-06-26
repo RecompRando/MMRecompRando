@@ -14402,7 +14402,9 @@ def get_location_rules(player, options, prices, boss_placements):
 
         # Woodfall Stump Rupee
         "Woodfall Stump Rupee":
-            lambda state: state.can_reach("Woodfall", 'Region', player),
+            lambda state: state.can_reach("Woodfall", 'Region', player) and 
+            has_soul_absurd(state, player, options, "Deku Flowers") and
+            state.has("Deku Mask", player),
 
         # Romani Ranch Haystack Rupees
         "Romani Ranch Haystack Rupees (0)":
