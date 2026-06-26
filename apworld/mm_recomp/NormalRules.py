@@ -212,6 +212,12 @@ def can_reach_scarecrow(state, player, options):
         )
     )
 
+def can_scarecrow_spawn(state, player, options, scarecrow):
+    return (
+        not options.scarecrowsanity.value or
+        state.has(scarecrow, player)
+    )
+
 def can_reach_seahorse(state, player, options):
     return (
         has_soul_npc(state, player, options, "Fisherman") and
@@ -2064,13 +2070,13 @@ def get_location_rules(player, options, prices, boss_placements):
         "Twin Islands Ramp Grotto Chest":
             lambda state: (
                 has_soul_absurd(state, player, options, "Grottos") and
-                has_explosives(state, player) 
-                and (
-                        state.has("Goron Mask", player) 
-                    or (
-                        state.has("Hookshot", player) 
-                        and state.has("Twin Islands Scarecrow", player) 
-                        and has_soul_npc(state, player, options, "Scarecrow")
+                has_explosives(state, player) and
+                (
+                    state.has("Goron Mask", player) or
+                    (
+                        state.has("Hookshot", player) and
+                        can_scarecrow_spawn(state, player, options, "Twin Islands Scarecrow") and
+                        has_soul_npc(state, player, options, "Scarecrow")
                     )
                 )
             ),
@@ -2239,8 +2245,8 @@ def get_location_rules(player, options, prices, boss_placements):
             ),
         "Path to Snowhead Scarecrow Pillar HP":
             lambda state: (
-                can_reach_scarecrow(state, player, options) and 
-                state.has("Path to Snowhead Scarecrow", player) and
+                can_reach_scarecrow(state, player, options) and
+                can_scarecrow_spawn(state, player, options, "Path to Snowhead Scarecrow") and
                 state.can_reach("Snowhead", 'Region', player) and 
                 can_use_lens(state, player) and 
                 state.has("Hookshot", player)
@@ -2287,7 +2293,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     ) or 
                     (
                         can_reach_scarecrow(state, player, options) and
-                        state.has("Snowhead Temple Lower Scarecrow", player) and 
+                        can_scarecrow_spawn(state, player, options, "Snowhead Temple Lower Scarecrow") and
                         state.has("Hookshot", player) and 
                         state.has("Progressive Bow", player)
                     ) or 
@@ -2512,8 +2518,8 @@ def get_location_rules(player, options, prices, boss_placements):
         "Great Bay Scarecrow Ledge HP":
             lambda state: (
                 can_plant_beans(state, player, options) and 
-                can_reach_scarecrow(state, player, options) and 
-                state.has("Great Bay Coast Rock Wall Scarecrow", player) and
+                can_reach_scarecrow(state, player, options) and
+                can_scarecrow_spawn(state, player, options, "Great Bay Coast Rock Wall Scarecrow") and
                 state.has("Hookshot", player)
             ),
         "Tingle Great Bay Map Purchase":
@@ -2849,8 +2855,8 @@ def get_location_rules(player, options, prices, boss_placements):
             lambda state: state.has("Hookshot", player),
         "Zora Cape Scarecrow Chest":
             lambda state: (
-                can_reach_scarecrow(state, player, options) and 
-                state.has("Zora Cape Beavers Scarecrow", player) and
+                can_reach_scarecrow(state, player, options) and
+                can_scarecrow_spawn(state, player, options, "Zora Cape Beavers Scarecrow") and
                 state.has("Hookshot", player) and 
                 state.has("Deku Mask", player)
             ),
@@ -6497,7 +6503,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     state.has("Goron Mask", player) or
                     (
                         state.has("Hookshot", player) and
-                        state.has("Twin Islands Scarecrow", player) and
+                        can_scarecrow_spawn(state, player, options, "Twin Islands Scarecrow") and
                         can_reach_scarecrow(state, player, options) and
                         has_soul_npc(state, player, options, "Scarecrow")
                     )
@@ -6513,7 +6519,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     state.has("Goron Mask", player) or
                     (
                         state.has("Hookshot", player) and
-                        state.has("Twin Islands Scarecrow", player) and
+                        can_scarecrow_spawn(state, player, options, "Twin Islands Scarecrow") and
                         can_reach_scarecrow(state, player, options) and
                         has_soul_npc(state, player, options, "Scarecrow")
                     )
@@ -6529,7 +6535,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     state.has("Goron Mask", player) or
                     (
                         state.has("Hookshot", player) and
-                        state.has("Twin Islands Scarecrow", player) and
+                        can_scarecrow_spawn(state, player, options, "Twin Islands Scarecrow") and
                         can_reach_scarecrow(state, player, options) and
                         has_soul_npc(state, player, options, "Scarecrow")
                     )
@@ -6545,7 +6551,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     state.has("Goron Mask", player) or
                     (
                         state.has("Hookshot", player) and
-                        state.has("Twin Islands Scarecrow", player) and
+                        can_scarecrow_spawn(state, player, options, "Twin Islands Scarecrow") and
                         can_reach_scarecrow(state, player, options) and
                         has_soul_npc(state, player, options, "Scarecrow")
                     )
@@ -6561,7 +6567,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     state.has("Goron Mask", player) or
                     (
                         state.has("Hookshot", player) and
-                        state.has("Twin Islands Scarecrow", player) and
+                        can_scarecrow_spawn(state, player, options, "Twin Islands Scarecrow") and
                         can_reach_scarecrow(state, player, options) and
                         has_soul_npc(state, player, options, "Scarecrow")
                     )
@@ -6577,7 +6583,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     state.has("Goron Mask", player) or
                     (
                         state.has("Hookshot", player) and
-                        state.has("Twin Islands Scarecrow", player) and
+                        can_scarecrow_spawn(state, player, options, "Twin Islands Scarecrow") and
                         can_reach_scarecrow(state, player, options) and
                         has_soul_npc(state, player, options, "Scarecrow")
                     )
@@ -6593,7 +6599,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     state.has("Goron Mask", player) or
                     (
                         state.has("Hookshot", player) and
-                        state.has("Twin Islands Scarecrow", player) and
+                        can_scarecrow_spawn(state, player, options, "Twin Islands Scarecrow") and
                         can_reach_scarecrow(state, player, options) and
                         has_soul_npc(state, player, options, "Scarecrow")
                     )
@@ -6609,7 +6615,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     state.has("Goron Mask", player) or
                     (
                         state.has("Hookshot", player) and
-                        state.has("Twin Islands Scarecrow", player) and
+                        can_scarecrow_spawn(state, player, options, "Twin Islands Scarecrow") and
                         can_reach_scarecrow(state, player, options) and
                         has_soul_npc(state, player, options, "Scarecrow")
                     )
@@ -6625,7 +6631,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     state.has("Goron Mask", player) or
                     (
                         state.has("Hookshot", player) and
-                        state.has("Twin Islands Scarecrow", player) and
+                        can_scarecrow_spawn(state, player, options, "Twin Islands Scarecrow") and
                         can_reach_scarecrow(state, player, options) and
                         has_soul_npc(state, player, options, "Scarecrow")
                     )
@@ -6641,7 +6647,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     state.has("Goron Mask", player) or
                     (
                         state.has("Hookshot", player) and
-                        state.has("Twin Islands Scarecrow", player) and
+                        can_scarecrow_spawn(state, player, options, "Twin Islands Scarecrow") and
                         can_reach_scarecrow(state, player, options) and
                         has_soul_npc(state, player, options, "Scarecrow")
                     )
@@ -6657,7 +6663,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     state.has("Goron Mask", player) or
                     (
                         state.has("Hookshot", player) and
-                        state.has("Twin Islands Scarecrow", player) and
+                        can_scarecrow_spawn(state, player, options, "Twin Islands Scarecrow") and
                         can_reach_scarecrow(state, player, options) and
                         has_soul_npc(state, player, options, "Scarecrow")
                     )
@@ -6673,7 +6679,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     state.has("Goron Mask", player) or
                     (
                         state.has("Hookshot", player) and
-                        state.has("Twin Islands Scarecrow", player) and
+                        can_scarecrow_spawn(state, player, options, "Twin Islands Scarecrow") and
                         can_reach_scarecrow(state, player, options) and
                         has_soul_npc(state, player, options, "Scarecrow")
                     )
@@ -6689,7 +6695,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     state.has("Goron Mask", player) or
                     (
                         state.has("Hookshot", player) and
-                        state.has("Twin Islands Scarecrow", player) and
+                        can_scarecrow_spawn(state, player, options, "Twin Islands Scarecrow") and
                         can_reach_scarecrow(state, player, options) and
                         has_soul_npc(state, player, options, "Scarecrow")
                     )
@@ -6705,7 +6711,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     state.has("Goron Mask", player) or
                     (
                         state.has("Hookshot", player) and
-                        state.has("Twin Islands Scarecrow", player) and
+                        can_scarecrow_spawn(state, player, options, "Twin Islands Scarecrow") and
                         can_reach_scarecrow(state, player, options) and
                         has_soul_npc(state, player, options, "Scarecrow")
                     )
@@ -9857,8 +9863,8 @@ def get_location_rules(player, options, prices, boss_placements):
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
                 (
-                    state.has("Hookshot", player) and 
-                    state.has("Snowhead Temple Lower Scarecrow", player) and
+                    state.has("Hookshot", player) and
+                    can_scarecrow_spawn(state, player, options, "Snowhead Temple Lower Scarecrow") and
                     has_soul_npc(state, player, options, "Scarecrow") or
                     can_use_fire_arrows(state, player)
                 )
@@ -9868,7 +9874,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 has_soul_absurd(state, player, options, "Pots") and
                 (
                     state.has("Hookshot", player) and 
-                    state.has("Snowhead Temple Lower Scarecrow", player) and
+                    can_scarecrow_spawn(state, player, options, "Snowhead Temple Lower Scarecrow") and
                     has_soul_npc(state, player, options, "Scarecrow") or
                     can_use_fire_arrows(state, player)
                 )
@@ -11397,7 +11403,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 has_soul_absurd(state, player, options, "Pots") and 
                 state.has("Hookshot", player) and
                 can_reach_scarecrow(state, player, options) and
-                state.has("Road to Ikana Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Road to Ikana Scarecrow") and
                 (
                     can_play_song("Epona's Song", state, player) or
                     can_use_owl(state, player, options, "Ikana Canyon") or
@@ -12101,7 +12107,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Lower Scarecrow Pots (1)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Lower Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Lower Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -12119,7 +12125,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Lower Scarecrow Pots (2)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Lower Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Lower Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -12137,7 +12143,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Lower Scarecrow Pots (3)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Lower Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Lower Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -12155,7 +12161,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Lower Scarecrow Pots (4)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Lower Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Lower Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -12173,7 +12179,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Lower Scarecrow Pots (5)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Lower Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Lower Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -12191,7 +12197,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Lower Scarecrow Pots (6)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Lower Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Lower Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -12209,7 +12215,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Lower Scarecrow Pots (7)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Lower Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Lower Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -12227,7 +12233,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Lower Scarecrow Pots (8)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Lower Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Lower Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -12245,7 +12251,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Lower Scarecrow Pots (9)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Lower Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Lower Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -12263,7 +12269,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Lower Scarecrow Pots (10)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Lower Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Lower Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -12281,7 +12287,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Lower Scarecrow Pots (11)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Lower Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Lower Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -12299,7 +12305,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Lower Scarecrow Pots (12)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Lower Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Lower Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -12319,7 +12325,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Upper Scarecrow Pots (1)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Upper Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Upper Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -12337,7 +12343,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Upper Scarecrow Pots (2)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Upper Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Upper Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -12355,7 +12361,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Upper Scarecrow Pots (3)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Upper Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Upper Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -12373,7 +12379,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Upper Scarecrow Pots (4)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Upper Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Upper Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -12391,7 +12397,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Upper Scarecrow Pots (5)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Upper Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Upper Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -12409,7 +12415,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Upper Scarecrow Pots (6)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Upper Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Upper Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -12427,7 +12433,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Upper Scarecrow Pots (7)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Upper Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Upper Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -12445,7 +12451,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Upper Scarecrow Pots (8)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Upper Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Upper Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -12463,7 +12469,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Upper Scarecrow Pots (9)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Stone Tower Upper Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Stone Tower Upper Scarecrow") and
                 can_reach_scarecrow(state, player, options) and
                 state.has("Hookshot", player) and
                 (
@@ -15193,9 +15199,9 @@ def get_location_rules(player, options, prices, boss_placements):
             (
                 state.has("Goron Mask", player) 
                     or (
-                        state.has("Hookshot", player) 
-                        and state.has("Twin Islands Scarecrow", player) 
-                        and has_soul_npc(state, player, options, "Scarecrow")
+                        state.has("Hookshot", player) and
+                        can_scarecrow_spawn(state, player, options, "Twin Islands Scarecrow") and
+                        has_soul_npc(state, player, options, "Scarecrow")
                     )
             ),
         "Twin Isles Snowballs Near Grotto (2)":
@@ -15203,9 +15209,9 @@ def get_location_rules(player, options, prices, boss_placements):
             (
                 state.has("Goron Mask", player) 
                     or (
-                        state.has("Hookshot", player) 
-                        and state.has("Twin Islands Scarecrow", player) 
-                        and has_soul_npc(state, player, options, "Scarecrow")
+                        state.has("Hookshot", player) and
+                        can_scarecrow_spawn(state, player, options, "Twin Islands Scarecrow") and
+                        has_soul_npc(state, player, options, "Scarecrow")
                     )
             ),
         "Twin Isles Snowballs Near Grotto (3)":
@@ -15213,9 +15219,9 @@ def get_location_rules(player, options, prices, boss_placements):
             (
                 state.has("Goron Mask", player) 
                     or (
-                        state.has("Hookshot", player) 
-                        and state.has("Twin Islands Scarecrow", player) 
-                        and has_soul_npc(state, player, options, "Scarecrow")
+                        state.has("Hookshot", player) and
+                        can_scarecrow_spawn(state, player, options, "Twin Islands Scarecrow") and
+                        has_soul_npc(state, player, options, "Scarecrow")
                     )
             ),
         # Goron Village Snowballs
@@ -17074,8 +17080,8 @@ def get_location_rules(player, options, prices, boss_placements):
             lambda state: (
                 state.has("Small Key (Snowhead)", player, 1) and
                 (
-                state.has("Hookshot", player) and 
-                state.has("Snowhead Temple Lower Scarecrow", player) and
+                state.has("Hookshot", player) and
+                can_scarecrow_spawn(state, player, options, "Snowhead Temple Lower Scarecrow") and
                 has_soul_npc(state, player, options, "Scarecrow") or
                 can_use_fire_arrows(state, player)
                 )
@@ -17086,7 +17092,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.has("Small Key (Snowhead)", player, 1) and
                 (
                 state.has("Hookshot", player) and 
-                state.has("Snowhead Temple Lower Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Snowhead Temple Lower Scarecrow") and
                 has_soul_npc(state, player, options, "Scarecrow") or
                 can_use_fire_arrows(state, player)
                 )
@@ -17097,7 +17103,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.has("Small Key (Snowhead)", player, 1) and
                 (
                 state.has("Hookshot", player) and 
-                state.has("Snowhead Temple Lower Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Snowhead Temple Lower Scarecrow") and
                 has_soul_npc(state, player, options, "Scarecrow") or
                 can_use_fire_arrows(state, player)
                 )
@@ -17107,7 +17113,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.has("Small Key (Snowhead)", player, 1) and
                 (
                 state.has("Hookshot", player) and 
-                state.has("Snowhead Temple Lower Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Snowhead Temple Lower Scarecrow") and
                 has_soul_npc(state, player, options, "Scarecrow") or
                 can_use_fire_arrows(state, player)
                 )
@@ -17117,7 +17123,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.has("Small Key (Snowhead)", player, 1) and
                 (
                 state.has("Hookshot", player) and 
-                state.has("Snowhead Temple Lower Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Snowhead Temple Lower Scarecrow") and
                 has_soul_npc(state, player, options, "Scarecrow") or
                 can_use_fire_arrows(state, player)
                 )
@@ -17127,7 +17133,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.has("Small Key (Snowhead)", player, 1) and
                 (
                 state.has("Hookshot", player) and 
-                state.has("Snowhead Temple Lower Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Snowhead Temple Lower Scarecrow") and
                 has_soul_npc(state, player, options, "Scarecrow") or
                 can_use_fire_arrows(state, player)
                 )
@@ -17137,7 +17143,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.has("Small Key (Snowhead)", player, 1) and
                 (
                 state.has("Hookshot", player) and 
-                state.has("Snowhead Temple Lower Scarecrow", player) and
+                can_scarecrow_spawn(state, player, options, "Snowhead Temple Lower Scarecrow") and
                 has_soul_npc(state, player, options, "Scarecrow") or
                 can_use_fire_arrows(state, player)
                 )
@@ -18580,9 +18586,9 @@ def get_location_rules(player, options, prices, boss_placements):
                 and (
                     state.has("Goron Mask", player) 
                     or (
-                        state.has("Hookshot", player) 
-                        and state.has("Twin Islands Scarecrow", player) 
-                        and has_soul_npc(state, player, options, "Scarecrow")
+                        state.has("Hookshot", player) and
+                        can_scarecrow_spawn(state, player, options, "Twin Islands Scarecrow") and
+                        has_soul_npc(state, player, options, "Scarecrow")
                     )
                 )
             ),
@@ -19783,7 +19789,7 @@ def get_location_rules(player, options, prices, boss_placements):
                         state.has("Small Key (Snowhead)", player, 2) and 
                         state.has("Hookshot", player) and 
                         can_reach_scarecrow(state, player, options) and
-                        state.has("Snowhead Temple Lower Scarecrow", player)
+                        can_scarecrow_spawn(state, player, options, "Snowhead Temple Lower Scarecrow")
                     )
                 )
             ),
@@ -20153,7 +20159,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     (
                         state.has("Hookshot", player) and
                         has_soul_npc(state, player, options, "Scarecrow") and
-                        state.has("Twin Islands Scarecrow", player)
+                        can_scarecrow_spawn(state, player, options, "Twin Islands Scarecrow")
                     )
                 )
             ),
