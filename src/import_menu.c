@@ -8,16 +8,6 @@ RandoImportMenu import_menu;
 
 static const RecompuiColor DividerColor = { 255, 255, 255, 25 };
 
-static const char* IMPORT_FOLDER_HINT =
-    "To import settings, place .yaml files in:\n"
-    "~/AppData/Local/Zelda64Recompiled/mod_data/mm_recomp_rando/settings";
-
-// Glue functions (implemented Python-side, mirroring the solo-seed functions).
-void rando_scan_import_yamls();
-u32  rando_import_count();
-void rando_import_get_name(u32 index, char** out_str);
-bool rando_import_generate(u32 index, char** error_msg);
-
 static void clearImportList() {
     for (u32 i = 0; i < import_menu.entry_list_size; i++) {
         ImportEntry* entry = &import_menu.entry_list[i];
@@ -127,8 +117,8 @@ static void buildImportList() {
         clearImportList();
     }
 
-    rando_scan_import_yamls();
-    u32 count = rando_import_count();
+    rando_solo_scan_yamls();
+    u32 count = rando_solo_yaml_count();
     if (count > MAX_IMPORT_ENTRIES) {
         count = MAX_IMPORT_ENTRIES;
     }
@@ -136,7 +126,7 @@ static void buildImportList() {
 
     for (u32 i = 0; i < count; i++) {
         ImportEntry* entry = &import_menu.entry_list[i];
-        rando_import_get_name(i, &entry->filename);
+        rando_solo_yaml_get_name(i, &entry->filename);
         entry->hovered = false;
         createImportEntry(entry, i);
 
@@ -163,8 +153,23 @@ static void generatePressed(RecompuiResource resource, const RecompuiEventData* 
         if (import_menu.selected_entry >= import_menu.entry_list_size) {
             return;
         }
-        char* error_msg;
-        if (rando_import_generate(import_menu.selected_entry, &error_msg)) {
+
+        REPY_FN_SETUP_RANDO;
+
+        REPY_FN_IMPORT("rando_solo");
+        REPY_FN_SET_U32("selection", import_menu.selected_entry);
+        
+        REPY_FN_EXEC_CACHE(
+            py_rando_write_selected_yaml_to_players,
+            "import shutil\n"
+            "rando_solo.clear_players_folder()\n"
+            "selected_file = recomp_data.solo_yamls[selection]\n"
+            "print(selected_file)\n"
+            "output_dir = recomp_data.mod_data_path.joinpath('Archipelago', 'local', 'Players')\n"
+            "shutil.copy2(selected_file, output_dir)\n"
+        );
+
+        if (rando_solo_generate()) {
             recompui_hide_context(import_menu.context);
             recompui_close_context(import_menu.context);
             randoShowSoloMenu();
@@ -172,10 +177,11 @@ static void generatePressed(RecompuiResource resource, const RecompuiEventData* 
         }
         else {
             recompui_close_context(import_menu.context);
-            randoEmitErrorNotification(error_msg);
+            randoEmitErrorNotification("Failed to generate. Please report the settings you used to the developers.");
             recompui_open_context(import_menu.context);
         }
-        recomp_free(error_msg);
+
+        REPY_FN_CLEANUP;
     }
 }
 
@@ -221,7 +227,10 @@ void randoCreateImportMenu() {
     recompui_set_border_bottom_width(import_menu.header, 1.1f, UNIT_DP);
     recompui_set_border_bottom_color(import_menu.header, &DividerColor);
 
+    REPY_FN_SETUP_RANDO;
+
     import_menu.header_label = recompui_create_label(import_menu.context, import_menu.header, "Import Settings", LABELSTYLE_LARGE);
+    recompui_set_text_align(import_menu.header_label, TEXT_ALIGN_CENTER);
 
     import_menu.generate_button = recompui_create_button(import_menu.context, import_menu.header, "Generate", BUTTONSTYLE_PRIMARY);
     recompui_register_callback(import_menu.generate_button, generatePressed, NULL);
@@ -251,24 +260,35 @@ void randoCreateImportMenu() {
     recompui_set_border_top_width(import_menu.footer, 1.1f, UNIT_DP);
     recompui_set_border_top_color(import_menu.footer, &DividerColor);
 
-    import_menu.path_label = recompui_create_label(import_menu.context, import_menu.footer, IMPORT_FOLDER_HINT, LABELSTYLE_NORMAL);
+    REPY_FN_EVAL_CACHE_STR(
+        py_rando_create_yaml_import_hint,
+        // showing the whole folder path would overflow, so we shorten it here
+        // though, this may cause confusion if the user doesn't know this folder is in their OS's AppData equivalent (or portable location)
+        "f'To import settings, place .yaml files in:\\n~/mod_data/{recomp_data.recomp_mod_id}/solo_yamls'",
+        import_folder_hint
+    );
+
+    import_menu.path_label = recompui_create_label(import_menu.context, import_menu.footer, import_folder_hint, LABELSTYLE_NORMAL);
     recompui_set_text_align(import_menu.path_label, TEXT_ALIGN_CENTER);
     recompui_set_margin_bottom(import_menu.path_label, 8.0f, UNIT_DP);
 
     import_menu.refresh_button = recompui_create_button(import_menu.context, import_menu.footer, "Refresh", BUTTONSTYLE_SECONDARY);
     recompui_set_width(import_menu.refresh_button, 240.0f, UNIT_DP);
+    recompui_set_text_align(import_menu.refresh_button, TEXT_ALIGN_CENTER);
     recompui_register_callback(import_menu.refresh_button, refreshPressed, NULL);
 
     import_menu.back_button = recompui_create_button(import_menu.context, import_menu.frame.root, "Back", BUTTONSTYLE_SECONDARY);
     recompui_set_position(import_menu.back_button, POSITION_ABSOLUTE);
     recompui_set_left(import_menu.back_button, 64.0f, UNIT_DP);
     recompui_set_top(import_menu.back_button, 32.0f, UNIT_DP);
+    recompui_set_text_align(import_menu.back_button, TEXT_ALIGN_CENTER);
     recompui_register_callback(import_menu.back_button, backPressed, NULL);
 
     import_menu.entry_list_size = 0;
     import_menu.selected_entry = 0;
 
     recompui_close_context(import_menu.context);
+    REPY_FN_CLEANUP;
 }
 
 void randoShowImportMenu() {
@@ -278,10 +298,3 @@ void randoShowImportMenu() {
 
     recompui_show_context(import_menu.context);
 }
-
-// Placeholder bodies so the menu links without the python glue. Replace these
-// with the real glue implementations because chances are I am gonna break something again. 
-void rando_scan_import_yamls() {}
-u32 rando_import_count() { return 0; }
-void rando_import_get_name(u32 index, char** out_str) { *out_str = recomp_alloc(1); (*out_str)[0] = '\0'; }
-bool rando_import_generate(u32 index, char** error_msg) { *error_msg = recomp_alloc(1); (*error_msg)[0] = '\0'; return 0; }
