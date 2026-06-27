@@ -14,6 +14,35 @@ void func_80B97708(EnZot *this, PlayState *play);
 void func_80B965D0(EnZot *this, PlayState *play);
 void func_80B96D4C(EnZot *this);
 
+// fix pot game zora working incorrectly when pot souls are enabled
+EnZot* sEnZot;
+bool EnZot_HadPotSoulOnInit;
+
+RECOMP_HOOK("EnZot_Init")
+void onEnZot_Init(Actor* thisx, PlayState* play2) {
+    EnZot_HadPotSoulOnInit = rando_has_item(AP_ITEM_PREFIX_SOUL_ABSURD | ACTOR_OBJ_TSUBO);
+}
+
+RECOMP_HOOK("func_80B96CE4")
+void EnZot_FixSoullessPotGame(EnZot* this) {
+    sEnZot = this;
+    if (rando_get_slotdata_u32("absurd_souls") && !EnZot_HadPotSoulOnInit) {
+        for (int i = 0; i < ARRAY_COUNT(this->unk_2D8); i++) {
+            this->unk_2D8[i] = (Actor*)1; // any non NULL Actor* value
+        }
+    }
+}
+
+RECOMP_HOOK_RETURN("func_80B96CE4")
+void EnZot_ResetSoullessPotGame() {
+    EnZot* this = sEnZot;
+    if (rando_get_slotdata_u32("absurd_souls") && !EnZot_HadPotSoulOnInit) {
+        for (int i = 0; i < ARRAY_COUNT(this->unk_2D8); i++) {
+            this->unk_2D8[i] = NULL; // reset pot actor to NULL after the count occurs
+        }
+    }
+}
+
 // TODO: continue text to get rid of 10 rupees
 void EnZot_GiveRandoItem(EnZot* this, PlayState* play) {
     if (Actor_HasParent(&this->actor, play)) {
