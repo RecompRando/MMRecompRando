@@ -75,29 +75,31 @@ def can_get_cow_milk(state, player, options):
     return (
         has_soul_misc(state, player, options, "Cows") and
         has_soul_absurd(state, player, options, "Grottos") and
-        has_bottle(state, player) and 
-        can_play_song("Epona's Song", state, player) and 
+        has_bottle(state, player) and
+        can_play_song("Epona's Song", state, player) and
         (
             has_explosives(state, player) or
-            can_use_powder_keg(state, player, options) or 
+            can_use_powder_keg(state, player, options) or
             state.has("Hookshot", player) or
             (
-                has_soul_npc(state, player, options, "Barten") and 
+                has_soul_npc(state, player, options, "Barten") and
                 state.has("Romani's Mask", player)
             ) or
             (
-                state.has("Gibdo Mask", player) and 
+                state.has("Gibdo Mask", player) and
                 has_soul_npc(state, player, options, "Gibdos") and
-                has_bottle(state, player) and 
-                can_plant_beans(state, player, options) and 
-                state.can_reach("Twin Islands Hot Water Grotto Chest", "Location", player) or 
-                can_use_light_arrows(state, player) and 
+                has_bottle(state, player) and
+                can_plant_beans(state, player, options) and
+                state.can_reach("Twin Islands Hot Water Grotto Chest", "Location", player)
+            ) or
+            (
+                can_use_light_arrows(state, player) and
                 (
-                    state.can_reach("Twin Islands Hot Water Grotto Chest", "Location", player) or 
+                    state.can_reach("Twin Islands Hot Water Grotto Chest", "Location", player) or
                     (
-                        state.has("Goron Mask", player) and 
+                        state.has("Goron Mask", player) and
                         can_use_lens(state, player)
-                    ) or 
+                    ) or
                     state.can_reach("Ikana Well Invisible Chest", "Location", player)
                 )
             )
@@ -351,7 +353,7 @@ def has_all_scarecrows(state, player, options, goal_type="majora"):
     scarecrow_count = 0
     scarecrows = [
         "Clock Town Trading Post Scarecrow",
-        "Astral Observatory Scarecrow"
+        "Astral Observatory Scarecrow",
         "Mountain Village Rooftop Scarecrow",
         "Mountain Village Spring Rooftop Scarecrow",
         "Path to Snowhead Scarecrow",
@@ -1409,22 +1411,22 @@ def get_location_rules(player, options, prices, boss_placements):
             ),
         "Termina Gossip Stones HP":
             lambda state: (
+                has_soul_absurd(state, player, options, "Grottos") and
                 (
-                    has_soul_absurd(state, player, options, "Grottos") and
-                    has_explosives(state, player) or 
+                    has_explosives(state, player) or
                     state.has("Goron Mask", player)
-                ) and 
+                ) and
                 (
                     (
-                        state.has("Deku Mask", player) and 
+                        state.has("Deku Mask", player) and
                         can_play_song("Sonata of Awakening", state, player)
-                    ) or 
+                    ) or
                     (
-                        state.has("Goron Mask", player) and 
+                        state.has("Goron Mask", player) and
                         can_play_song("Goron Lullaby", state, player)
-                    ) or 
+                    ) or
                     (
-                        state.has("Zora Mask", player) and 
+                        state.has("Zora Mask", player) and
                         can_play_song("New Wave Bossa Nova", state, player)
                     )
                 )
@@ -1551,22 +1553,24 @@ def get_location_rules(player, options, prices, boss_placements):
             lambda state: (
                 has_soul_absurd(state, player, options, "Grottos") and
                 (
-                    state.has("Deku Mask", player) and
-                    has_hard_projectiles(state, player)
-                ) or
-                (
-                    has_bottle(state, player) and
-                    has_soul_npc(state, player, options, "Kotake")
-                ) or
-                (
-                    state.has("Pictograph Box", player) and
-                    has_soul_npc(state, player, options, "Swamp Tourist Guide")
+                    (
+                        state.has("Deku Mask", player) and
+                        has_hard_projectiles(state, player)
+                    ) or
+                    (
+                        has_bottle(state, player) and
+                        has_soul_npc(state, player, options, "Kotake")
+                    ) or
+                    (
+                        state.has("Pictograph Box", player) and
+                        has_soul_npc(state, player, options, "Swamp Tourist Guide")
+                    )
                 )
             ),
         "Southern Swamp Song Tablet":
             lambda state: (
                 has_soul_absurd(state, player, options, "Deku Flowers") and
-                state.has("Deku Mask", player),
+                state.has("Deku Mask", player)
             ),
             
         "Southern Swamp Day 2 Grotto Chest":
@@ -2083,6 +2087,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Twin Islands Goron Elder Request":
             lambda state: (
                 state.has("Goron Mask", player) and 
+                has_soul_npc(state, player, options, "Goron Elder") and 
                 (
                     can_use_fire_arrows(state, player) or 
                     (
@@ -2103,19 +2108,19 @@ def get_location_rules(player, options, prices, boss_placements):
             lambda state: (
                 has_soul_absurd(state, player, options, "Grottos") and
                 (
-                    has_explosives(state, player) and 
-                    can_use_fire_arrows(state, player)
-                ) or 
-                (
-                    can_use_lens(state, player) and 
-                    has_bottle(state, player) and 
-                    state.has("Goron Mask", player) and 
-                    has_explosives(state, player)
-                ) or 
-                (
-                    can_clear_snowhead(state, player, boss_placements) or 
                     (
-                        state.can_reach("Ikana Well Invisible Chest", "Location", player) and 
+                        has_explosives(state, player) and
+                        can_use_fire_arrows(state, player)
+                    ) or
+                    (
+                        can_use_lens(state, player) and
+                        has_bottle(state, player) and
+                        state.has("Goron Mask", player) and
+                        has_explosives(state, player)
+                    ) or
+                    can_clear_snowhead(state, player, boss_placements) or
+                    (
+                        state.can_reach("Ikana Well Invisible Chest", "Location", player) and
                         can_play_song("Song of Soaring", state, player) and
                         options.owlsanity.value and
                         can_use_owl(state, player, options, "Mountain Village")
@@ -2321,8 +2326,10 @@ def get_location_rules(player, options, prices, boss_placements):
         "Snowhead Temple Bridge Room Freezard Chest":
             lambda state: (
                 has_soul_enemy(state, player, options, "Freezard") and
-                can_use_fire_arrows(state, player) or 
-                state.has("Hookshot", player)
+                (
+                    can_use_fire_arrows(state, player) or
+                    state.has("Hookshot", player)
+                )
             ),
         "Snowhead Temple Basement Switch Chest SF":
             lambda state: True,    
@@ -2395,10 +2402,12 @@ def get_location_rules(player, options, prices, boss_placements):
             lambda state: (
                 has_soul_enemy(state, player, options, "Wizrobe") and
                 (
-                    state.has("Small Key (Snowhead)", player, 2) and 
-                    has_explosives(state, player)
-                ) or 
-                can_use_fire_arrows(state, player)
+                    (
+                        state.has("Small Key (Snowhead)", player, 2) and
+                        has_explosives(state, player)
+                    ) or
+                    can_use_fire_arrows(state, player)
+                )
             ),
         "Snowhead Temple Main Room Wall Chest SF":
             lambda state: (
@@ -12082,26 +12091,34 @@ def get_location_rules(player, options, prices, boss_placements):
         "Stone Tower Climb Pots (1)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Hookshot", player) and  
+                state.has("Hookshot", player) and
                 (
-                    can_play_song("Elegy of Emptiness", state, player) and 
-                    state.has("Goron Mask", player) and 
-                    state.has("Zora Mask", player)
-                ) or
-                state.has("Stone Tower Owl Statue", player) and 
-                can_play_song("Song of Soaring", state, player)
+                    (
+                        can_play_song("Elegy of Emptiness", state, player) and
+                        state.has("Goron Mask", player) and
+                        state.has("Zora Mask", player)
+                    ) or
+                    (
+                        state.has("Stone Tower Owl Statue", player) and
+                        can_play_song("Song of Soaring", state, player)
+                    )
+                )
             ),
         "Stone Tower Climb Pots (2)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots") and
-                state.has("Hookshot", player) and  
+                state.has("Hookshot", player) and
                 (
-                    can_play_song("Elegy of Emptiness", state, player) and 
-                    state.has("Goron Mask", player) and 
-                    state.has("Zora Mask", player)
-                ) or
-                state.has("Stone Tower Owl Statue", player) and 
-                can_play_song("Song of Soaring", state, player)
+                    (
+                        can_play_song("Elegy of Emptiness", state, player) and
+                        state.has("Goron Mask", player) and
+                        state.has("Zora Mask", player)
+                    ) or
+                    (
+                        state.has("Stone Tower Owl Statue", player) and
+                        can_play_song("Song of Soaring", state, player)
+                    )
+                )
             ),
             #Stone Tower Lower Scarecrow Pots            
         "Stone Tower Lower Scarecrow Pots (1)":
@@ -13232,7 +13249,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 has_soul_absurd(state, player, options, "Pots") and
                 (options.majora_remains_required.value == 0 or has_enough_remains(state, player, options.majora_remains_required.value)) and
                 (options.majora_masks_required.value == 0 or has_enough_masks(state, player, options.majora_masks_required.value)) and
-                (not options.majora_star_fox.value == 0 or has_star_fox(state, player, options, "majora")) and
+                (not options.majora_star_fox.value or has_star_fox(state, player, options, "majora")) and
                 has_soul_npc(state, player, options, "Moon Kids") and
                 has_soul_boss(state, player, options, "Majora") and
                 can_smack_hard(state, player)
@@ -13242,7 +13259,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 has_soul_absurd(state, player, options, "Pots") and
                 (options.majora_remains_required.value == 0 or has_enough_remains(state, player, options.majora_remains_required.value)) and
                 (options.majora_masks_required.value == 0 or has_enough_masks(state, player, options.majora_masks_required.value)) and
-                (not options.majora_star_fox.value == 0 or has_star_fox(state, player, options, "majora")) and
+                (not options.majora_star_fox.value or has_star_fox(state, player, options, "majora")) and
                 has_soul_npc(state, player, options, "Moon Kids") and
                 has_soul_boss(state, player, options, "Majora") and
                 can_smack_hard(state, player)
@@ -15615,15 +15632,120 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.can_reach("Swamp Spider House", 'Region', player)
             ),
         "Twin Isles Hot Spring Water Grotto Bomb Boulders (0)":
-            lambda state: state.can_reach("Twin Islands Hot Water Grotto Chest", "Location", player),
+            lambda state: (
+                has_soul_absurd(state, player, options, "Grottos") and
+                (
+                    (
+                        has_explosives(state, player) and
+                        can_use_fire_arrows(state, player)
+                    ) or
+                    (
+                        can_use_lens(state, player) and
+                        has_bottle(state, player) and
+                        state.has("Goron Mask", player) and
+                        has_explosives(state, player)
+                    ) or
+                    can_clear_snowhead(state, player, boss_placements) or
+                    (
+                        state.can_reach("Ikana Well Invisible Chest", "Location", player) and
+                        can_play_song("Song of Soaring", state, player) and
+                        options.owlsanity.value and
+                        can_use_owl(state, player, options, "Mountain Village")
+                    )
+                )
+            ),
         "Twin Isles Hot Spring Water Grotto Bomb Boulders (1)":
-            lambda state: state.can_reach("Twin Islands Hot Water Grotto Chest", "Location", player),     
+            lambda state: (
+                has_soul_absurd(state, player, options, "Grottos") and
+                (
+                    (
+                        has_explosives(state, player) and
+                        can_use_fire_arrows(state, player)
+                    ) or
+                    (
+                        can_use_lens(state, player) and
+                        has_bottle(state, player) and
+                        state.has("Goron Mask", player) and
+                        has_explosives(state, player)
+                    ) or
+                    can_clear_snowhead(state, player, boss_placements) or
+                    (
+                        state.can_reach("Ikana Well Invisible Chest", "Location", player) and
+                        can_play_song("Song of Soaring", state, player) and
+                        options.owlsanity.value and
+                        can_use_owl(state, player, options, "Mountain Village")
+                    )
+                )
+            ),    
         "Twin Isles Hot Spring Water Grotto Bomb Boulders (2)":
-            lambda state: state.can_reach("Twin Islands Hot Water Grotto Chest", "Location", player),
+            lambda state: (
+                has_soul_absurd(state, player, options, "Grottos") and
+                (
+                    (
+                        has_explosives(state, player) and
+                        can_use_fire_arrows(state, player)
+                    ) or
+                    (
+                        can_use_lens(state, player) and
+                        has_bottle(state, player) and
+                        state.has("Goron Mask", player) and
+                        has_explosives(state, player)
+                    ) or
+                    can_clear_snowhead(state, player, boss_placements) or
+                    (
+                        state.can_reach("Ikana Well Invisible Chest", "Location", player) and
+                        can_play_song("Song of Soaring", state, player) and
+                        options.owlsanity.value and
+                        can_use_owl(state, player, options, "Mountain Village")
+                    )
+                )
+            ),
         "Twin Isles Hot Spring Water Grotto Bomb Boulders (3)":
-            lambda state: state.can_reach("Twin Islands Hot Water Grotto Chest", "Location", player),
+            lambda state: (
+                has_soul_absurd(state, player, options, "Grottos") and
+                (
+                    (
+                        has_explosives(state, player) and
+                        can_use_fire_arrows(state, player)
+                    ) or
+                    (
+                        can_use_lens(state, player) and
+                        has_bottle(state, player) and
+                        state.has("Goron Mask", player) and
+                        has_explosives(state, player)
+                    ) or
+                    can_clear_snowhead(state, player, boss_placements) or
+                    (
+                        state.can_reach("Ikana Well Invisible Chest", "Location", player) and
+                        can_play_song("Song of Soaring", state, player) and
+                        options.owlsanity.value and
+                        can_use_owl(state, player, options, "Mountain Village")
+                    )
+                )
+            ),
         "Twin Isles Hot Spring Water Grotto Bomb Boulders (4)":
-            lambda state: state.can_reach("Twin Islands Hot Water Grotto Chest", "Location", player),                   
+            lambda state: (
+                has_soul_absurd(state, player, options, "Grottos") and
+                (
+                    (
+                        has_explosives(state, player) and
+                        can_use_fire_arrows(state, player)
+                    ) or
+                    (
+                        can_use_lens(state, player) and
+                        has_bottle(state, player) and
+                        state.has("Goron Mask", player) and
+                        has_explosives(state, player)
+                    ) or
+                    can_clear_snowhead(state, player, boss_placements) or
+                    (
+                        state.can_reach("Ikana Well Invisible Chest", "Location", player) and
+                        can_play_song("Song of Soaring", state, player) and
+                        options.owlsanity.value and
+                        can_use_owl(state, player, options, "Mountain Village")
+                    )
+                )
+            ),                 
                
         # Goron Shrine Rocks
         "Goron Shrine Rocks (0)":
@@ -16899,7 +17021,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 (
                     state.has("Goron Mask", player) or
                     can_use_light_arrows(state, player)
-                ),
+                )
             ),
         "Stone Tower Temple Eyegore Room Crates (2)":
             lambda state: (
