@@ -1883,8 +1883,7 @@ EZTR_MSG_CALLBACK(randoGossips) {
 
                 if (fake_code == real_code) {
                     EZTR_MsgBuffer_SetTextBoxDisplayIcon(buf, EZTR_ICON_EXCLAMATION_MARK);
-                    random_connector = "is" EZTR_CC_NEWLINE "in fact ";
-                    break;
+                    random_connector = "is" EZTR_CC_NEWLINE "in fact " EZTR_CC_END;
                 }
 
                 EZTR_MsgSContent_Sprintf(
