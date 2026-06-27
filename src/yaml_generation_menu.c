@@ -836,7 +836,10 @@ void randoCreateYamlConfigMenu() {
                 REPY_FN_EXEC_CACHE(
                     py_rando_get_choice_option_info,
                     "num_choices = len(option_info['choices'])\n"
-                    "option_default = option_info['default']\n"
+                    // the following is a mess because choices might be offset from what the ui interprets
+                    // i.e. {'choices': {'normal': 1, 'no_logic': 4}, 'default': 1} choosing 'no_logic' rather than 'normal'
+                    "default_choice = list(option_info['choices'].keys())[list(option_info['choices'].values()).index(option_info['default'])]\n"
+                    "option_default = list(option_info['choices'].keys()).index(default_choice)\n"
                 );
 
                 u32 num_choices = REPY_FN_GET_U32("num_choices");
