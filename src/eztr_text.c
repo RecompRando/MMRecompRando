@@ -1092,34 +1092,34 @@ EZTR_MSG_CALLBACK(randoPictograph) {
     char* picture_type;
 
     if (Snap_CheckFlag(PICTO_VALID_MONKEY)) {
-        picture_type = " " EZTR_CC_COLOR_RED "picture of a monkey" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+        picture_type = "picture of a monkey" EZTR_CC_END;
     } else if (Snap_CheckFlag(PICTO_VALID_BIG_OCTO)) {
-        picture_type = " " EZTR_CC_COLOR_RED "picture of a Big Octo" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+        picture_type = "picture of a Big Octo" EZTR_CC_END;
     } else if (Snap_CheckFlag(PICTO_VALID_SCARECROW)) {
-        picture_type = " " EZTR_CC_COLOR_RED "picture of a scarecrow" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+        picture_type = "picture of a scarecrow" EZTR_CC_END;
     } else if (Snap_CheckFlag(PICTO_VALID_TINGLE)) {
-        picture_type = " " EZTR_CC_COLOR_RED "picture of Tingle" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+        picture_type = "picture of Tingle" EZTR_CC_END;
     } else if (Snap_CheckFlag(PICTO_VALID_DEKU_KING)) {
-        picture_type = " " EZTR_CC_COLOR_RED "picture of the Deku King" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+        picture_type = "picture of the Deku King" EZTR_CC_END;
     } else if (Snap_CheckFlag(PICTO_VALID_PIRATE_GOOD)) {
-        picture_type = " " EZTR_CC_COLOR_RED "good picture of a pirate" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+        picture_type = "good picture of a pirate" EZTR_CC_END;
     } else if (Snap_CheckFlag(PICTO_VALID_PIRATE_TOO_FAR)) {
-        picture_type = " " EZTR_CC_COLOR_RED "bad picture of a pirate" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+        picture_type = "bad picture of a pirate" EZTR_CC_END;
     } else if (Snap_CheckFlag(PICTO_VALID_LULU_HEAD)) {
         if (Snap_CheckFlag(PICTO_VALID_LULU_RIGHT_ARM) && Snap_CheckFlag(PICTO_VALID_LULU_LEFT_ARM)) {
-            picture_type = " " EZTR_CC_COLOR_RED "good picture of Lulu" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+            picture_type = "good picture of Lulu" EZTR_CC_END;
         } else {
-            picture_type = " " EZTR_CC_COLOR_RED "bad picture of Lulu" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+            picture_type = "bad picture of Lulu" EZTR_CC_END;
         }
     } else if (Snap_CheckFlag(PICTO_VALID_IN_SWAMP)) {
-        picture_type = " " EZTR_CC_COLOR_RED "picture of the swamp" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+        picture_type = "picture of the swamp" EZTR_CC_END;
     } else {
-        picture_type = EZTR_CC_END;
+        picture_type = "picture" EZTR_CC_END;
     }
 
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
-        "Keep this %m" EZTR_CC_COLOR_RED "picture" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN EZTR_CC_NEWLINE
+        "Keep this " EZTR_CC_COLOR_RED "%m" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN EZTR_CC_NEWLINE
         EZTR_CC_NEWLINE EZTR_CC_TWO_CHOICE
         "Yes" EZTR_CC_NEWLINE
         "No" EZTR_CC_END,
@@ -1720,7 +1720,7 @@ EZTR_MSG_CALLBACK(randoBombShopGoronHasSell) {
 
 // Gossip Stones
 EZTR_MSG_CALLBACK(randoGossips) {
-    recomp_printf("textId 0x%04X\n", textId);
+    // recomp_printf("textId 0x%04X\n", textId);
     
     REPY_FN_SETUP_RANDO;
 
