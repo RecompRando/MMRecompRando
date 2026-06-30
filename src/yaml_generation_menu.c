@@ -15,21 +15,44 @@ bool randoGenerateMenuOpen() {
 
 RandoYamlConfigMenu yaml_config_menu;
 
-typedef struct {
-    RecompuiResource button;
-    char*            name;
-    bool             excluded;
-} ExcludedLocation;
-static ExcludedLocation* rando_excluded_locations = NULL;
-static u32 rando_num_excluded_locations = 0;
+typedef enum {
+    LIST_EMIT_SEQUENCE, 
+    LIST_EMIT_DICT_ONES 
+} RandoListEmitKind;
 
+// A single toggleable entry in a list.
 typedef struct {
     RecompuiResource button;
     char*            name;
-    bool             selected;
-} StartingItem;
-static StartingItem* rando_starting_items = NULL;
-static u32 rando_num_starting_items = 0;
+    bool             checked;  // excluded / selected -> unified as "checked"
+} RandoListEntry;
+typedef struct {
+    RandoListEntry*   entries;
+    u32               num_entries;
+    RecompuiResource  search_input;
+    const char*       yaml_key;   
+    RandoListEmitKind emit_kind;
+} RandoList;
+
+#define MAX_LISTS 8
+static RandoList  rando_lists[MAX_LISTS];
+static u32        rando_num_lists = 0;
+
+// Allocate a new empty list registry slot.
+static RandoList* randoAllocList(const char* yaml_key, RandoListEmitKind emit_kind) {
+    if (rando_num_lists >= MAX_LISTS) {
+        recomp_printf("Max rando lists reached, increase MAX_LISTS in \"yaml_generation_menu.c\"\n");
+        *(volatile int*)0 = 0;
+        return NULL;
+    }
+    RandoList* list = &rando_lists[rando_num_lists++];
+    list->entries = NULL;
+    list->num_entries = 0;
+    list->search_input = 0;
+    list->yaml_key = yaml_key;
+    list->emit_kind = emit_kind;
+    return list;
+}
 
 static void backPressed(RecompuiResource resource, const RecompuiEventData* data, void* userdata) {
     if (data->type == UI_EVENT_CLICK) {
@@ -148,29 +171,41 @@ void randoYAMLCreate(RandoYamlConfigMenu* menu, bool place_in_archipelago) {
 
     recomp_printf("finished setting yaml options\n");
 
-    REPY_FN_EXEC_CACHE(py_rando_init_excluded, "excluded = []\n");
-    for (u32 i = 0; i < rando_num_excluded_locations; i++) {
-        if (rando_excluded_locations[i].excluded) {
-            REPY_FN_SET_STR("loc_name", rando_excluded_locations[i].name);
-            REPY_FN_EXEC_CACHE(py_rando_append_excluded, "excluded.append(loc_name)\n");
+    // Emit every registered toggle-list generically, using each list's emit kind.
+    for (u32 l = 0; l < rando_num_lists; l++) {
+        RandoList* list = &rando_lists[l];
+        if (list->yaml_key == NULL) {
+            continue;
         }
-    }
-    REPY_FN_EXEC_CACHE(py_rando_set_excluded,
-        "if excluded:\n"
-        "    output_options['exclude_locations'] = excluded\n"
-    );
+        REPY_FN_SET_STR("list_key", list->yaml_key);
 
-    REPY_FN_EXEC_CACHE(py_rando_init_start_inventory, "start_inv = {}\n");
-    for (u32 i = 0; i < rando_num_starting_items; i++) {
-        if (rando_starting_items[i].selected) {
-            REPY_FN_SET_STR("item_name", rando_starting_items[i].name);
-            REPY_FN_EXEC_CACHE(py_rando_append_start_inventory, "start_inv[item_name] = 1\n");
+        if (list->emit_kind == LIST_EMIT_SEQUENCE) {
+            REPY_FN_EXEC_CACHE(py_rando_list_init_seq, "list_acc = []\n");
+            for (u32 i = 0; i < list->num_entries; i++) {
+                if (list->entries[i].checked) {
+                    REPY_FN_SET_STR("entry_name", list->entries[i].name);
+                    REPY_FN_EXEC_CACHE(py_rando_list_append_seq, "list_acc.append(entry_name)\n");
+                }
+            }
+            REPY_FN_EXEC_CACHE(py_rando_list_set_seq,
+                "if list_acc:\n"
+                "    output_options[list_key] = list_acc\n"
+            );
+        }
+        else { // LIST_EMIT_DICT_ONES
+            REPY_FN_EXEC_CACHE(py_rando_list_init_dict, "list_acc = {}\n");
+            for (u32 i = 0; i < list->num_entries; i++) {
+                if (list->entries[i].checked) {
+                    REPY_FN_SET_STR("entry_name", list->entries[i].name);
+                    REPY_FN_EXEC_CACHE(py_rando_list_append_dict, "list_acc[entry_name] = 1\n");
+                }
+            }
+            REPY_FN_EXEC_CACHE(py_rando_list_set_dict,
+                "if list_acc:\n"
+                "    output_options[list_key] = list_acc\n"
+            );
         }
     }
-    REPY_FN_EXEC_CACHE(py_rando_set_start_inventory,
-        "if start_inv:\n"
-        "    output_options['start_inventory'] = start_inv\n"
-    );
 
     if (place_in_archipelago) {
         REPY_FN_EXEC_CACHE(
@@ -522,49 +557,27 @@ static void randoTabPlaceholder(RandoYamlConfigMenu* menu, const char* text) {
 static RandoSection rando_sections[MAX_SECTIONS];
 static u32 rando_num_sections = 0;
 
-static void excludedLocationSetText(ExcludedLocation* loc) {
+// Render an entry's button label as "[X] Name" / "[ ] Name".
+static void randoListEntrySetText(RandoListEntry* entry) {
     char buf[128];
     buf[0] = '[';
-    buf[1] = loc->excluded ? 'X' : ' ';
+    buf[1] = entry->checked ? 'X' : ' ';
     buf[2] = ']';
     buf[3] = ' ';
     u32 i = 0;
-    while (loc->name[i] != '\0' && i < sizeof(buf) - 5) {
-        buf[4 + i] = loc->name[i];
+    while (entry->name[i] != '\0' && i < sizeof(buf) - 5) {
+        buf[4 + i] = entry->name[i];
         i++;
     }
     buf[4 + i] = '\0';
-    recompui_set_text(loc->button, buf);
+    recompui_set_text(entry->button, buf);
 }
 
-static void excludedLocationToggle(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
+static void randoListEntryToggle(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
     if (data->type == UI_EVENT_CLICK) {
-        ExcludedLocation* loc = (ExcludedLocation*)userdata;
-        loc->excluded = !loc->excluded;
-        excludedLocationSetText(loc);
-    }
-}
-
-static void startingItemSetText(StartingItem* item) {
-    char buf[128];
-    buf[0] = '[';
-    buf[1] = item->selected ? 'X' : ' ';
-    buf[2] = ']';
-    buf[3] = ' ';
-    u32 i = 0;
-    while (item->name[i] != '\0' && i < sizeof(buf) - 5) {
-        buf[4 + i] = item->name[i];
-        i++;
-    }
-    buf[4 + i] = '\0';
-    recompui_set_text(item->button, buf);
-}
-
-static void startingItemToggle(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
-    if (data->type == UI_EVENT_CLICK) {
-        StartingItem* item = (StartingItem*)userdata;
-        item->selected = !item->selected;
-        startingItemSetText(item);
+        RandoListEntry* entry = (RandoListEntry*)userdata;
+        entry->checked = !entry->checked;
+        randoListEntrySetText(entry);
     }
 }
 
@@ -590,26 +603,15 @@ static bool randoStrContainsCI(const char* haystack, const char* needle) {
     return false;
 }
 
-static RecompuiResource rando_excluded_search_input = 0;
-static RecompuiResource rando_starting_search_input = 0;
-
-static void excludedSearchCallback(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
+// Single generic search callback. The list is passed via userdata, so there's no
+// longer one callback per list.
+static void randoListSearchCallback(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
     if (data->type == UI_EVENT_CLICK) {
-        char* query = recompui_get_input_text(rando_excluded_search_input);
-        for (u32 i = 0; i < rando_num_excluded_locations; i++) {
-            bool match = randoStrContainsCI(rando_excluded_locations[i].name, query);
-            recompui_set_display(rando_excluded_locations[i].button, match ? DISPLAY_BLOCK : DISPLAY_NONE);
-        }
-        recomp_free(query);
-    }
-}
-
-static void startingSearchCallback(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
-    if (data->type == UI_EVENT_CLICK) {
-        char* query = recompui_get_input_text(rando_starting_search_input);
-        for (u32 i = 0; i < rando_num_starting_items; i++) {
-            bool match = randoStrContainsCI(rando_starting_items[i].name, query);
-            recompui_set_display(rando_starting_items[i].button, match ? DISPLAY_BLOCK : DISPLAY_NONE);
+        RandoList* list = (RandoList*)userdata;
+        char* query = recompui_get_input_text(list->search_input);
+        for (u32 i = 0; i < list->num_entries; i++) {
+            bool match = randoStrContainsCI(list->entries[i].name, query);
+            recompui_set_display(list->entries[i].button, match ? DISPLAY_BLOCK : DISPLAY_NONE);
         }
         recomp_free(query);
     }
@@ -617,9 +619,7 @@ static void startingSearchCallback(RecompuiResource button, const RecompuiEventD
 
 // Builds a pinned search row + an inner scrolling body. The search row stays
 // fixed at the top of the tab while the returned body scrolls. 
-static void randoCreateSearchSection(RandoYamlConfigMenu* menu,
-        void (*callback)(RecompuiResource, const RecompuiEventData*, void*),
-        RecompuiResource* out_input) {
+static void randoCreateSearchSection(RandoYamlConfigMenu* menu, RandoList* list) {
     // Make the tab panel a column so the search row and scroll body stack.
     recompui_set_display(menu->current_body, DISPLAY_FLEX);
     recompui_set_flex_direction(menu->current_body, FLEX_DIRECTION_COLUMN);
@@ -639,7 +639,7 @@ static void randoCreateSearchSection(RandoYamlConfigMenu* menu,
     recompui_set_flex_grow(input, 1.0f);
 
     RecompuiResource search_button = recompui_create_button(menu->context, search_row, "Search", BUTTONSTYLE_SECONDARY);
-    recompui_register_callback(search_button, callback, NULL);
+    recompui_register_callback(search_button, randoListSearchCallback, list);
 
     // Inner scrolling body for the entries. Mirrors the solo menu's
     // list_container: 
@@ -654,8 +654,30 @@ static void randoCreateSearchSection(RandoYamlConfigMenu* menu,
     // Entries now parent into the scroll body.
     menu->current_body = scroll_body;
 
-    *out_input = input;
+    list->search_input = input;
 }
+
+#define RANDO_BUILD_LIST(menu_ptr, list_ptr, count_cache, count_expr, foreach_cache, foreach_var, foreach_expr) \
+    do {                                                                                       \
+        REPY_FN_EVAL_CACHE_U32(count_cache, count_expr, _rando_list_count);                    \
+        (list_ptr)->entries = recomp_alloc(sizeof(RandoListEntry) * _rando_list_count);        \
+        (list_ptr)->num_entries = _rando_list_count;                                           \
+        u32 _rando_list_index = 0;                                                             \
+        REPY_FN_FOREACH_CACHE(foreach_cache, foreach_var, foreach_expr) {                      \
+            RandoListEntry* _entry = &(list_ptr)->entries[_rando_list_index++];                \
+            char* _name = REPY_FN_GET_STR(foreach_var);                                        \
+            size_t _len = strlen(_name);                                                       \
+            _entry->name = recomp_alloc(_len + 1);                                             \
+            Lib_MemCpy(_entry->name, (void*)_name, _len + 1);                                  \
+            recomp_free(_name);                                                                \
+            _entry->checked = false;                                                           \
+            _entry->button = recompui_create_button((menu_ptr)->context, (menu_ptr)->current_body, "", BUTTONSTYLE_SECONDARY); \
+            recompui_set_display(_entry->button, DISPLAY_BLOCK);                               \
+            recompui_set_margin_bottom(_entry->button, 2.0f, UNIT_DP);                         \
+            recompui_register_callback(_entry->button, randoListEntryToggle, _entry);          \
+            randoListEntrySetText(_entry);                                                     \
+        }                                                                                      \
+    } while (0)
 
 static void randoSectionSetButtonText(RandoSection* section) {
     char buf[128];
@@ -924,34 +946,12 @@ void randoCreateYamlConfigMenu() {
     randoBeginTab(&yaml_config_menu, "Starting Items");
     rando_tab_hide_description[yaml_config_menu.num_tabs - 1] = true;
 
-    randoCreateSearchSection(&yaml_config_menu, startingSearchCallback, &rando_starting_search_input);
+    RandoList* starting_items_list = randoAllocList("start_inventory", LIST_EMIT_DICT_ONES);
+    randoCreateSearchSection(&yaml_config_menu, starting_items_list);
 
-    REPY_FN_EVAL_CACHE_U32(
-        py_rando_get_item_count,
-        "len(recomp_data.item_names)",
-        num_items
-    );
-
-    rando_starting_items = recomp_alloc(sizeof(StartingItem) * num_items);
-    rando_num_starting_items = num_items;
-
-    u32 item_index = 0;
-    REPY_FN_FOREACH_CACHE(py_rando_fill_items_from_apworld, "item_name", "recomp_data.item_names") {
-        StartingItem* item = &rando_starting_items[item_index++];
-        char* item_name = REPY_FN_GET_STR("item_name");
-
-        size_t len = strlen(item_name);
-        item->name = recomp_alloc(len + 1);
-        Lib_MemCpy(item->name, (void*)item_name, len + 1);
-        recomp_free(item_name);
-
-        item->selected = false;
-        item->button = recompui_create_button(yaml_config_menu.context, yaml_config_menu.current_body, "", BUTTONSTYLE_SECONDARY);
-        recompui_set_display(item->button, DISPLAY_BLOCK);
-        recompui_set_margin_bottom(item->button, 2.0f, UNIT_DP);
-        recompui_register_callback(item->button, startingItemToggle, item);
-        startingItemSetText(item);
-    }
+    RANDO_BUILD_LIST(&yaml_config_menu, starting_items_list,
+        py_rando_get_item_count, "len(recomp_data.item_names)",
+        py_rando_fill_items_from_apworld, "item_name", "recomp_data.item_names");
 
     // Tricks tab (filled by the apworld SoonTM; empty for now).
     randoBeginTab(&yaml_config_menu, "Tricks");
@@ -966,34 +966,12 @@ void randoCreateYamlConfigMenu() {
     randoBeginTab(&yaml_config_menu, "Excluded Locations");
     rando_tab_hide_description[yaml_config_menu.num_tabs - 1] = true;
 
-    randoCreateSearchSection(&yaml_config_menu, excludedSearchCallback, &rando_excluded_search_input);
+    RandoList* excluded_locations_list = randoAllocList("exclude_locations", LIST_EMIT_SEQUENCE);
+    randoCreateSearchSection(&yaml_config_menu, excluded_locations_list);
 
-    REPY_FN_EVAL_CACHE_U32(
-        py_rando_get_location_count,
-        "len(recomp_data.location_names)",
-        num_locations
-    );
-
-    rando_excluded_locations = recomp_alloc(sizeof(ExcludedLocation) * num_locations);
-    rando_num_excluded_locations = num_locations;
-
-    u32 loc_index = 0;
-    REPY_FN_FOREACH_CACHE(py_rando_fill_locations_from_apworld, "location_name", "recomp_data.location_names") {
-        ExcludedLocation* loc = &rando_excluded_locations[loc_index++];
-        char* location_name = REPY_FN_GET_STR("location_name");
-
-        size_t len = strlen(location_name);
-        loc->name = recomp_alloc(len + 1);
-        Lib_MemCpy(loc->name, (void*)location_name, len + 1);
-        recomp_free(location_name);
-
-        loc->excluded = false;
-        loc->button = recompui_create_button(yaml_config_menu.context, yaml_config_menu.current_body, "", BUTTONSTYLE_SECONDARY);
-        recompui_set_display(loc->button, DISPLAY_BLOCK);
-        recompui_set_margin_bottom(loc->button, 2.0f, UNIT_DP);
-        recompui_register_callback(loc->button, excludedLocationToggle, loc);
-        excludedLocationSetText(loc);
-    }
+    RANDO_BUILD_LIST(&yaml_config_menu, excluded_locations_list,
+        py_rando_get_location_count, "len(recomp_data.location_names)",
+        py_rando_fill_locations_from_apworld, "location_name", "recomp_data.location_names");
 
     // Show the first tab by default.
     randoSelectTab(&yaml_config_menu, 0);
