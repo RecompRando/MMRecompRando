@@ -16,13 +16,15 @@ typedef enum {
     OPTION_BOOL,
     OPTION_RADIO,
     OPTION_INT_SLIDER,
-    OPTION_FLOAT_SLIDER
+    OPTION_FLOAT_SLIDER,
+    OPTION_LIST // list/set/dict options
 } RandoOptionType;
 
 typedef void (bool_callback_t)(bool value);
 typedef void (radio_callback_t)(u32 value);
 typedef void (int_callback_t)(int value);
 typedef void (float_callback_t)(float value);
+typedef void (list_callback_t)(); // unsure what the value is
 
 typedef struct {
     RandoOptionType type;
@@ -37,13 +39,32 @@ typedef struct {
         radio_callback_t* radio_callback;
         int_callback_t* int_callback;
         float_callback_t* float_callback;
+        list_callback_t* list_callback;
     };
 } RandoOptionData;
 
 typedef struct {
-    const char* id;
-    const char* name;
+    char* id;
+    char* name;
 } EnumOptionValue;
+
+typedef enum {
+    LIST_STANDARD, // outputs as-is within the YAML (applies to OptionList/OptionSet)
+    LIST_DICT_ONES // outputs as "entry": 1, used almost exclusively by "Starting Items" (ItemDict) for now
+} RandoListCategory;
+
+typedef struct {
+    RecompuiResource button;
+    char* name;
+    bool checked;
+} RandoListEntry;
+
+typedef struct {
+    RandoListCategory type;
+    RecompuiResource  search_input;
+    RandoListEntry* entries;
+    u32 num_entries;
+} RandoListOption;
 
 // Forward declaration so RandoTab can hold a back-pointer to its menu.
 typedef struct RandoYamlConfigMenu RandoYamlConfigMenu;
@@ -58,7 +79,7 @@ typedef struct {
 typedef struct {
     RecompuiResource button;
     RecompuiResource wrapper;
-    const char*      title;
+    char*      title;
     bool             open;
 } RandoSection;
 
