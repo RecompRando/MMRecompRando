@@ -657,25 +657,32 @@ static void randoCreateSearchSection(RandoYamlConfigMenu* menu, RandoList* list)
     list->search_input = input;
 }
 
+static void randoListAllocEntries(RandoList* list, u32 count) {
+    list->entries = recomp_alloc(sizeof(RandoListEntry) * count);
+    list->num_entries = count;
+}
+static void randoListInitEntry(RandoYamlConfigMenu* menu, RandoListEntry* entry, const char* name) {
+    size_t len = strlen(name);
+    entry->name = recomp_alloc(len + 1);
+    Lib_MemCpy(entry->name, (void*)name, len + 1);
+
+    entry->checked = false;
+    entry->button = recompui_create_button(menu->context, menu->current_body, "", BUTTONSTYLE_SECONDARY);
+    recompui_set_display(entry->button, DISPLAY_BLOCK);
+    recompui_set_margin_bottom(entry->button, 2.0f, UNIT_DP);
+    recompui_register_callback(entry->button, randoListEntryToggle, entry);
+    randoListEntrySetText(entry);
+}
+// Work that magic Hyped. I was getting build errors when I tried converting this. 
 #define RANDO_BUILD_LIST(menu_ptr, list_ptr, count_cache, count_expr, foreach_cache, foreach_var, foreach_expr) \
     do {                                                                                       \
         REPY_FN_EVAL_CACHE_U32(count_cache, count_expr, _rando_list_count);                    \
-        (list_ptr)->entries = recomp_alloc(sizeof(RandoListEntry) * _rando_list_count);        \
-        (list_ptr)->num_entries = _rando_list_count;                                           \
+        randoListAllocEntries((list_ptr), _rando_list_count);                                  \
         u32 _rando_list_index = 0;                                                             \
         REPY_FN_FOREACH_CACHE(foreach_cache, foreach_var, foreach_expr) {                      \
-            RandoListEntry* _entry = &(list_ptr)->entries[_rando_list_index++];                \
             char* _name = REPY_FN_GET_STR(foreach_var);                                        \
-            size_t _len = strlen(_name);                                                       \
-            _entry->name = recomp_alloc(_len + 1);                                             \
-            Lib_MemCpy(_entry->name, (void*)_name, _len + 1);                                  \
+            randoListInitEntry((menu_ptr), &(list_ptr)->entries[_rando_list_index++], _name);  \
             recomp_free(_name);                                                                \
-            _entry->checked = false;                                                           \
-            _entry->button = recompui_create_button((menu_ptr)->context, (menu_ptr)->current_body, "", BUTTONSTYLE_SECONDARY); \
-            recompui_set_display(_entry->button, DISPLAY_BLOCK);                               \
-            recompui_set_margin_bottom(_entry->button, 2.0f, UNIT_DP);                         \
-            recompui_register_callback(_entry->button, randoListEntryToggle, _entry);          \
-            randoListEntrySetText(_entry);                                                     \
         }                                                                                      \
     } while (0)
 
