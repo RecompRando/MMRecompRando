@@ -1956,12 +1956,16 @@ EZTR_MSG_CALLBACK(randoGossips) {
                 text = "The sign outside the " EZTR_CC_COLOR_RED "Lottery Shop" EZTR_CC_NEWLINE
                         "tells you what the prize is!" EZTR_CC_END;
                 break;
-            case 17: // Player forgot to check [unchecked location]
+            case 17: // Player reportedly forgot unchecked location
                 REPY_FN_EXEC_CACHE(
                     rando_get_random_unchecked_location_for_junk_hint,
                     "import random\n"
-                    "location = random.choice(list(recomp_data.ctx.missing_locations))\n"
-                    "location_name = recomp_data.ctx.location_names[recomp_data.ctx.game][location]\n"
+                    "missing_locations = list(recomp_data.ctx.missing_locations)\n"
+                    "if missing_locations:\n"
+                    "   location = random.choice(missing_locations)\n"
+                    "   location_name = recomp_data.ctx.location_names[recomp_data.ctx.game][location]\n"
+                    "else:\n" // failsafe if all locations have been checked
+                    "   location_name = 'if they were already finished'\n"
                     "num_players = len(recomp_data.ctx.player_names) - 1\n" // check if this is a solo world (-1 to remove Archipelago)
                 );
 
