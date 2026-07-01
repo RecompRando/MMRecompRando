@@ -1929,7 +1929,8 @@ EZTR_MSG_CALLBACK(randoGossips) {
                         "always in a " EZTR_CC_COLOR_LIGHTBLUE "Sphere 0 " EZTR_CC_COLOR_DEFAULT "location." EZTR_CC_END;
                 break;
             case 10: // Konami Code
-                text = EZTR_CC_BTN_CUP " " EZTR_CC_BTN_CUP " " EZTR_CC_BTN_CDOWN " " EZTR_CC_BTN_CDOWN " " EZTR_CC_BTN_CLEFT " " EZTR_CC_BTN_CRIGHT " " EZTR_CC_BTN_CLEFT " " EZTR_CC_BTN_CRIGHT " " EZTR_CC_BTN_B " " EZTR_CC_BTN_A " " EZTR_CC_COLOR_RED "START" EZTR_CC_END;
+                text = EZTR_CC_BTN_CUP EZTR_CC_BTN_CUP EZTR_CC_BTN_CDOWN EZTR_CC_BTN_CDOWN EZTR_CC_BTN_CLEFT EZTR_CC_BTN_CRIGHT EZTR_CC_BTN_CLEFT EZTR_CC_BTN_CRIGHT
+                        EZTR_CC_BTN_B EZTR_CC_BTN_A EZTR_CC_COLOR_RED "START" EZTR_CC_END;
                 break;
             case 11: // Another castle
                 text = "Sorry " EZTR_CC_COLOR_RED EZTR_CC_NAME EZTR_CC_COLOR_DEFAULT ", but your" EZTR_CC_NEWLINE
@@ -1949,11 +1950,51 @@ EZTR_MSG_CALLBACK(randoGossips) {
                 break;
             case 15: // Stay hydrated
                 text = "Hey " EZTR_CC_NAME "!" EZTR_CC_NEWLINE
-                        "Remember to " EZTR_CC_COLOR_BLUE "stay hydrated" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END;
+                        "Remember to " EZTR_CC_COLOR_LIGHTBLUE "stay hydrated" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END;
                 break;
             case 16: // Lottery Shop Sign
                 text = "The sign outside the " EZTR_CC_COLOR_RED "Lottery Shop" EZTR_CC_NEWLINE
                         "tells you what the prize is!" EZTR_CC_END;
+                break;
+            case 17: // Player forgot to check [unchecked location]
+                REPY_FN_EXEC_CACHE(
+                    rando_get_random_unchecked_location_for_junk_hint,
+                    "import random\n"
+                    "location = random.choice(list(recomp_data.ctx.missing_locations))\n"
+                    "location_name = recomp_data.ctx.location_names[recomp_data.ctx.game][location]\n"
+                    "num_players = len(recomp_data.ctx.player_names) - 1\n" // check if this is a solo world (-1 to remove Archipelago)
+                );
+
+                char* location_name = REPY_FN_GET_STR("location_name");
+                sanitizeRandoText(location_name); // shouldn't really affect anything, but just to be safe
+
+                if (REPY_FN_GET_U32("num_players") == 1) { // solo world
+                    // Use In-Game name for solo worlds
+                    EZTR_MsgSContent_Sprintf(
+                        buf->data.content,
+                        EZTR_CC_COLOR_RED EZTR_CC_NAME EZTR_CC_COLOR_DEFAULT " reportedly forgot to check" EZTR_CC_NEWLINE
+                        EZTR_CC_COLOR_RED "%s" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END,
+                        location_name
+                    );
+                } else {
+                    // Use Archipelago player name in multiworlds (more than one player)
+                    char* player_name;
+                    rando_get_own_slot_name(&player_name);
+                    sanitizeRandoText(player_name);
+                    
+                    EZTR_MsgSContent_Sprintf(
+                        buf->data.content,
+                        EZTR_CC_COLOR_RED "%s" EZTR_CC_COLOR_DEFAULT " reportedly forgot to check" EZTR_CC_NEWLINE
+                        EZTR_CC_COLOR_RED "%s" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END,
+                        player_name,
+                        location_name
+                    );
+                    
+                    recomp_free(player_name);
+                }
+
+                recomp_free(location_name);
+                custom_text = true;
                 break;
             case 0: // use the !hint command!
             default:
