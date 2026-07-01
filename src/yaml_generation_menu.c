@@ -27,7 +27,7 @@ static void backPressed(RecompuiResource resource, const RecompuiEventData* data
     }
 }
 
-RandoOptionData* randoAllocateOption(RandoYamlConfigMenu* menu, const char* option_id) {
+RandoOptionData* randoAllocateOption(RandoYamlConfigMenu* menu, const char* option_id, const char* option_description) {
     // Get a new option data element and increate the option count.
     RandoOptionData* ret = &menu->all_options[menu->num_options++];
 
@@ -41,15 +41,21 @@ RandoOptionData* randoAllocateOption(RandoYamlConfigMenu* menu, const char* opti
     // Copy the option_id into the returned option.
     size_t option_id_len = strlen(option_id);
     ret->option_id = recomp_alloc(option_id_len + 1);
-    ret->is_callback = false;
     Lib_MemCpy(ret->option_id, (void*)option_id, option_id_len + 1);
+    
+    size_t option_description_len = strlen(option_description);
+    ret->description = recomp_alloc(option_description_len + 1);
+    Lib_MemCpy(ret->description, (void*)option_description, option_description_len + 1);
+    
+    ret->is_callback = false;
 
     return ret;
 }
 
+// probably delete these printfs ?
 void* rando_yaml_printf_pfn(void* dst, const char* fmt, size_t size) {
     (void)dst;
-    rando_yaml_puts(fmt, size);
+    // rando_yaml_puts(fmt, size);
     return (void*)1;
 }
 
@@ -64,73 +70,175 @@ RECOMP_EXPORT int rando_yaml_printf(const char* fmt, ...) {
     return ret;
 }
 
+void randoYAMLCreate(RandoYamlConfigMenu* menu, bool place_in_archipelago) {
+    REPY_FN_SETUP_RANDO;
+
+    REPY_FN_IMPORT("rando_solo");
+
+    REPY_FN_EXEC_CACHE(
+        py_rando_setup_solo_yaml,
+        "import yaml\n"
+        "output_options = recomp_data.solo_yaml_options\n" // has to be in a module to make it usable by callbacks
+    );
+
+    // Iterate over the options and write their values into the yaml.
+    for (u32 i = 0; i < menu->num_options; i++) {
+        RandoOptionData* option = &menu->all_options[i];
+        if (!option->is_callback) {
+            REPY_FN_SET_STR("option_id", option->option_id);
+            switch (option->type) {
+                case OPTION_BOOL:
+                    // rando_yaml_printf("  %s:\n    %s: 1\n", option->option_id, recompui_get_input_value_u32(option->input_element) ? "true" : "false");
+                    REPY_FN_SET_BOOL("value", recompui_get_input_value_u32(option->input_element));
+                    break;
+                case OPTION_RADIO:
+                    { // fixes warning
+                        EnumOptionValue* enum_options = (EnumOptionValue*)option->data;
+                        // rando_yaml_printf("  %s:\n    %s: 1\n", option->option_id, enum_options[recompui_get_input_value_u32(option->input_element)].id);
+                        REPY_FN_SET_STR("value", enum_options[recompui_get_input_value_u32(option->input_element)].id);
+                    }
+                    break;
+                case OPTION_INT_SLIDER:
+                    // TODO replace this with recompui_get_input_value_s32 when it gets added
+                    // rando_yaml_printf("  %s:\n    %d: 1\n", option->option_id, (s32)recompui_get_input_value_float(option->input_element));
+                    REPY_FN_SET_S32("value", (s32)recompui_get_input_value_float(option->input_element));
+                    break;
+                case OPTION_FLOAT_SLIDER:
+                    // rando_yaml_printf("  %s:\n    %f: 1\n", option->option_id, recompui_get_input_value_float(option->input_element));
+                    REPY_FN_SET_F32("value", recompui_get_input_value_float(option->input_element)); // assuming f32 = float
+                    break;
+                case OPTION_LIST:
+                    { // fixes warning
+                        RandoListOption* list_data = (RandoListOption*)option->data;
+                        switch (list_data->type) {
+                            case LIST_STANDARD:
+                                { // fixes warning
+                                    REPY_FN_EXEC_CACHE(
+                                        py_rando_setup_output_list,
+                                        "value = []"
+                                    );
+                                    for (u32 i = 0; i < list_data->num_entries; i++) {
+                                        if (list_data->entries[i].checked) {
+                                            REPY_FN_SET_STR("entry_name", list_data->entries[i].name);
+                                            REPY_FN_EXEC_CACHE(py_rando_output_list_append, "value.append(entry_name)");
+                                        }
+                                    }
+                                }
+                                break;
+                            case LIST_DICT_ONES:
+                                { // fixes warning
+                                    REPY_FN_EXEC_CACHE(
+                                        py_rando_setup_output_dict_ones,
+                                        "value = {}"
+                                    );
+                                    for (u32 i = 0; i < list_data->num_entries; i++) {
+                                        if (list_data->entries[i].checked) {
+                                            REPY_FN_SET_STR("entry_name", list_data->entries[i].name);
+                                            REPY_FN_EXEC_CACHE(py_rando_output_list_dict_one, "value[entry_name] = 1");
+                                        }
+                                    }
+                                }
+                                break;
+                        }
+                    }
+                    break;
+            }
+            REPY_FN_EXEC_CACHE(
+                py_rando_set_yaml_option,
+                "output_options[option_id] = value\n"
+            );
+        }
+        else {
+            switch (option->type) {
+                case OPTION_BOOL:
+                    option->bool_callback((bool)recompui_get_input_value_u32(option->input_element));
+                    break;
+                case OPTION_RADIO:
+                    option->bool_callback(recompui_get_input_value_u32(option->input_element));
+                    break;
+                case OPTION_INT_SLIDER:
+                    // TODO replace this with recompui_get_input_value_s32 when it gets added
+                    option->int_callback((s32)recompui_get_input_value_float(option->input_element));
+                    break;
+                case OPTION_FLOAT_SLIDER:
+                    option->float_callback(recompui_get_input_value_float(option->input_element));
+                    break;
+                case OPTION_LIST:
+                    option->list_callback();
+                    break;
+            }
+        }
+    }
+
+    recomp_printf("finished setting yaml options\n");
+
+    REPY_FN_EXEC_CACHE(
+        py_rando_write_yaml_to_mod_data,
+        "from datetime import datetime\n"
+        "current_datetime = datetime.now().strftime('%d-%m-%Y_%H-%M-%S')\n"
+        "file_name = f'AP_Recomp_{current_datetime}.yaml'\n"
+        "output_dir = recomp_data.mod_data_path.joinpath('solo_yamls', file_name)\n"
+        "output_file = output_dir.open('w')\n"
+        "rando_solo.populate_yaml_header(output_file)\n"
+        "yaml.dump({recomp_data.game_name: output_options}, output_file)\n"
+        "recomp_data.last_generated_yaml_location = output_dir\n"
+    );
+
+    if (place_in_archipelago) {
+        REPY_FN_EXEC_CACHE(
+            py_rando_write_solo_yaml_to_players,
+            "rando_solo.clear_players_folder()\n"
+            "output_dir = recomp_data.mod_data_path.joinpath('Archipelago', 'local', 'Players', 'solo.yaml')\n"
+            "output_file = output_dir.open('w')\n"
+            "rando_solo.populate_yaml_header(output_file)\n"
+            "yaml.dump({recomp_data.game_name: output_options}, output_file)\n"
+            "recomp_data.last_generated_yaml_location = output_dir\n"
+        );
+    }
+    
+    REPY_FN_CLEANUP;
+}
 
 // Stub: writes the configured YAML to disk without generating a seed.
 // this still needs to be implemented once the export path is decided.
 void randoYAMLExportCallback(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
     RandoYamlConfigMenu* menu = (RandoYamlConfigMenu*)userdata;
     if (data->type == UI_EVENT_CLICK) {
+        REPY_FN_SETUP_RANDO;
+
+        randoYAMLCreate(menu, false);
+
+        REPY_FN_EVAL_CACHE_STR(
+            py_rando_create_yaml_export_notification,
+            "f'Wrote YAML file to {recomp_data.last_generated_yaml_location}.'",
+            output_dir
+        );
+        
         // The notification opens its own UI context, so this one must be closed first.
         recompui_close_context(menu->context);
-        randoEmitNormalNotification("Export not yet implemented.");
+        randoEmitNormalNotification(output_dir);
         recompui_open_context(menu->context);
+        
+        // Return to start menu
+        recompui_hide_context(yaml_config_menu.context);
+        is_generate_menu_shown = false;
+        // Close the start menu context temporarily so that the solo context can be opened.
+        recompui_close_context(yaml_config_menu.context);
+        randoShowSoloMenu();
+        // Reopen the start menu context.
+        recompui_open_context(yaml_config_menu.context);
+        
+        recomp_free(output_dir);
+        REPY_FN_CLEANUP;
     }
 }
 
 void randoYAMLGenerateCallback(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
     RandoYamlConfigMenu* menu = (RandoYamlConfigMenu*)userdata;
     if (data->type == UI_EVENT_CLICK) {
-        rando_yaml_init();
-        rando_yaml_printf("name: Player\n");
-        rando_yaml_printf("game: Majora's Mask Recompiled\n");
-        rando_yaml_printf("requires:\n  version: %s\n", "0.4.5"); // TODO hook this up to the mod version?
-        rando_yaml_printf("Majora's Mask Recompiled:\n");
-
-        // Iterate over the options and write their values into the yaml.
-        for (u32 i = 0; i < menu->num_options; i++) {
-            RandoOptionData* option = &menu->all_options[i];
-            if (!option->is_callback) {
-                switch (option->type) {
-                    case OPTION_BOOL:
-                        rando_yaml_printf("  %s:\n    %s: 1\n", option->option_id, recompui_get_input_value_u32(option->input_element) ? "true" : "false");
-                        break;
-                    case OPTION_RADIO:
-                        {
-                            EnumOptionValue* enum_options = (EnumOptionValue*)option->data;
-                            rando_yaml_printf("  %s:\n    %s: 1\n", option->option_id, enum_options[recompui_get_input_value_u32(option->input_element)].id);
-                        }
-                        break;
-                    case OPTION_INT_SLIDER:
-                        // TODO replace this with recompui_get_input_value_s32 when it gets added
-                        rando_yaml_printf("  %s:\n    %d: 1\n", option->option_id, (s32)recompui_get_input_value_float(option->input_element));
-                        break;
-                    case OPTION_FLOAT_SLIDER:
-                        rando_yaml_printf("  %s:\n    %f: 1\n", option->option_id, recompui_get_input_value_float(option->input_element));
-                        break;
-                }
-            }
-            else {
-                switch (option->type) {
-                    case OPTION_BOOL:
-                        option->bool_callback((bool)recompui_get_input_value_u32(option->input_element));
-                        break;
-                    case OPTION_RADIO:
-                        option->bool_callback(recompui_get_input_value_u32(option->input_element));
-                        break;
-                    case OPTION_INT_SLIDER:
-                        // TODO replace this with recompui_get_input_value_s32 when it gets added
-                        option->int_callback((s32)recompui_get_input_value_float(option->input_element));
-                        break;
-                    case OPTION_FLOAT_SLIDER:
-                        option->float_callback(recompui_get_input_value_float(option->input_element));
-                        break;
-                }
-            }
-        }
-
-        unsigned char* save_path = recomp_get_save_file_path();
-        rando_yaml_finalize(save_path);
-        recomp_free(save_path);
+        REPY_FN_SETUP_RANDO;
+        
+        randoYAMLCreate(menu, true);
 
         if (rando_solo_generate()) {
             recompui_hide_context(yaml_config_menu.context);
@@ -146,6 +254,8 @@ void randoYAMLGenerateCallback(RecompuiResource button, const RecompuiEventData*
             randoEmitErrorNotification("Failed to generate. Please report the settings you used to the developers.");
             recompui_open_context(yaml_config_menu.context);
         }
+
+        REPY_FN_CLEANUP;
     }
 }
 
@@ -207,135 +317,8 @@ char* randoFormatOptionName(EnumOptionValue* option) {
     }
 }
 
-// Option descriptions, keyed by option_id from the apworld's Options.py
-// I think to move these to the apworld, we replace the body of
-// randoLookupDescription with a glue call (e.g. rando_option_get_description) right Hyped?.
-typedef struct {
-    const char* id;
-    const char* description;
-} RandoOptionDescription;
-
-static const RandoOptionDescription rando_option_descriptions[] = {
-    // General
-    { "accessibility", "Full requires every location be reachable. Minimal only requires the goal be reachable." },
-    { "logic_difficulty", "Logic difficulty used when generating. No Logic places items with no reachability guarantees." },
-    { "camc", "Chest appearance matches its contents." },
-    { "magic_is_a_trap", "Preserves the vanilla bug where certain magic items work without magic, until you first receive magic. No logical implications." },
-    { "hint_percentage", "Percentage of gossip stones that give useful hints for items in the multiworld." },
-    { "damage_multiplier", "Adjusts the amount of damage taken. One-Hit KO kills on any hit." },
-    { "death_behavior", "What happens on death. Fast speeds up the cutscene; Moon Crash restarts the current cycle." },
-    { "death_link", "Share deaths with other players in the multiworld." },
-
-    // Goals
-    { "completion_goal", "Requires 100% of all collectibles, with a special flag associated with it." },
-    { "moon_remains_required", "Boss Remains required to reach the Moon after playing Oath to Order." },
-    { "moon_masks_required", "Masks required to reach the Moon after playing Oath to Order." },
-    { "moon_star_fox", "Require Keaton, Scents, Bremen, Bunny and Gero masks to reach the Moon." },
-    { "moon_owls_required", "Owl Statues required to reach the Moon after playing Oath to Order." },
-    { "moon_scarecrows_required", "Scarecrows required to reach the Moon after playing Oath to Order." },
-    { "moon_frogs_required", "Frogs required to reach the Moon after playing Oath to Order." },
-    { "moon_items_required", "Trade items required to reach the Moon after playing Oath to Order." },
-    { "majora_remains_required", "Boss Remains required to fight Majora." },
-    { "majora_masks_required", "Masks required to fight Majora." },
-    { "majora_star_fox", "Require Keaton, Scents, Bremen, Bunny and Gero masks to fight Majora." },
-    { "majora_owls_required", "Owl Statues required to fight Majora." },
-    { "majora_scarecrows_required", "Scarecrows required to fight Majora." },
-    { "majora_frogs_required", "Frogs required to fight Majora." },
-    { "majora_items_required", "Trade items required to fight Majora." },
-
-    // Starting Items
-    { "ocarinaless", "Start without an Ocarina, shuffling it into the pool. Has the effect of sped-up time." },
-    { "timeless", "Start without the Song of Time, shuffling it into the pool." },
-    { "swordless", "Start without a sword, and shuffle an extra Progressive Sword into the pool." },
-    { "shieldless", "Start without a shield, and shuffle an extra Progressive Shield into the pool." },
-    { "start_with_soaring", "Start with the Song of Soaring." },
-    { "starting_hearts", "Heart quarters Link starts with. Below 12, extra heart items are shuffled into the pool." },
-    { "starting_hearts_are_containers_or_pieces", "Whether starting hearts shuffle in as Heart Containers (plus remainder as Pieces) or all as Heart Pieces." },
-    { "start_with_consumables", "Start with basic consumables (99 rupees, 10 deku sticks, 20 deku nuts)." },
-    { "permanent_chateau_romani", "Chateau Romani stays even after a reset." },
-    { "start_with_inverted_time", "Time starts inverted at Day 1, even after a reset." },
-    { "receive_filled_wallets", "Receive wallets pre-filled (not including the starting wallet)." },
-
-    // Shuffle
-    { "dungeon_entrance_rando", "Randomize dungeons amongst themselves." },
-    { "boss_entrance_rando", "Randomize bosses amongst themselves." },
-    { "dungeon_chaining", "With dungeon and boss entrance rando on, allow dungeons to lead into each other or only have bosses." },
-    { "shuffle_regional_maps", "Shuffle every regional map from Tingle: vanilla, in the starting inventory, or anywhere." },
-    { "shuffle_boss_remains", "Where Boss Remains appear: vanilla, anywhere in any world, or shuffled among the bosses." },
-    { "remains_allow_boss_warps", "Keep the vanilla ability to warp to a dungeon's boss by holding its remains. The remains check also opens its warp." },
-    { "shuffle_spiderhouse_reward", "Shuffle the Mask of Truth from the Southern Spider House and the Wallet Upgrade from the Ocean Spider House." },
-    { "required_skull_tokens", "Gold Skulltula Tokens needed for each Spider House reward. All 30 per house are shuffled in regardless." },
-    { "skullsanity", "What gold skulltulas give: vanilla tokens, anything anywhere, or remove the swamphouse from generation." },
-    { "shopsanity", "Whether shops and their items are shuffled. Advanced also shuffles night and spring variant shops." },
-    { "scrubsanity", "Shuffle Business Scrub purchases." },
-    { "shop_prices", "How expensive main-shop items are: vanilla, free, cheap, expensive, or offensive. No effect if shopsanity is off." },
-    { "cowsanity", "Shuffle Cows." },
-    { "shuffle_great_fairy_rewards", "Shuffle Great Fairy rewards." },
-    { "required_stray_fairies", "Stray Fairies needed for each Great Fairy reward (excludes North Clock Town). All 15 per dungeon are shuffled in regardless." },
-    { "fairysanity", "Shuffle Stray Fairies into the pool." },
-    { "keysanity", "Shuffle Small Keys into the pool instead of their vanilla locations." },
-    { "bosskeysanity", "Shuffle Boss Keys into the pool instead of their vanilla locations." },
-    { "curiostity_shop_trades", "Shuffle the rupees given for trading bottled items at the Curiosity Shop." },
-    { "intro_checks", "Shuffle the checks normally found before the Clock Tower. A way back is added via the stone door in the Clock Tower interior." },
-
-    // Sanity
-    { "grasssanity", "How grass is shuffled: all, all except Termina Field, grotto/cave only, or dungeon only." },
-    { "potsanity", "Shuffle pots into the pool." },
-    { "hitsanity", "Shuffle hit-spot items into the pool." },
-    { "rocksanity", "Shuffle rock items into the pool." },
-    { "soilsanity", "Shuffle soil items into the pool." },
-    { "rupeesanity", "Shuffle freestanding rupees into the pool." },
-    { "invisisanity", "Shuffle invisible rupees into the pool." },
-    { "snowsanity", "Shuffle snowball items into the pool." },
-    { "woodsanity", "Shuffle wooden items into the pool." },
-    { "realfairysanity", "Shuffle gossip, butterfly, and freestanding fairies." },
-    { "iciclesanity", "Shuffle icicle items into the pool." },
-    { "scarecrowsanity", "The scarecrow rewards an item when spawned." },
-    { "hivesanity", "Shuffle hive items into the pool." },
-    { "notebooksanity", "Shuffle Notebook entries as items." },
-    { "owlsanity", "Shuffle Owl Statues as items." },
-    { "frogsanity", "Shuffle the four frogs as items." },
-    { "treesanity", "Trees and bushes drop shuffled items." },
-    { "flowersanity", "Deku Flowers give shuffled items when entered." },
-    { "signsanity", "Square signposts give shuffled items when cut." },
-    { "websanity", "Burning spider webs gives shuffled items." },
-    { "oneoffs", "One-off locations like skull kid pictures and bombable walls give shuffled items." },
-
-    // Souls
-    { "boss_souls", "Add souls for main bosses (Odolwa, Goht, Gyorg, Twinmold, optionally Majora). They won't spawn without their soul." },
-    { "npc_souls", "Add souls for NPCs such as Anju, Romani, and Kamaro. They won't spawn without their soul." },
-    { "enemy_souls", "Add souls for basic enemies such as Wolfos and Peahat. They won't spawn without their soul." },
-    { "misc_souls", "Add souls for Cows, Gold Skulltulas, and Keaton. They won't spawn without their soul." },
-    { "utility_souls", "Add souls for utility items like Postboxes. They won't spawn without their soul." },
-    { "absurd_souls", "Add souls for absurd things like rocks, songwall, and grass. They won't spawn without their soul." },
-};
-
-static bool randoStrEq(const char* a, const char* b) {
-    u32 i = 0;
-    while (a[i] != '\0' && b[i] != '\0') {
-        if (a[i] != b[i]) {
-            return false;
-        }
-        i++;
-    }
-    return a[i] == b[i];
-}
-
-static const char* randoLookupDescription(const char* option_id) {
-    if (option_id == NULL || option_id[0] == '\0') {
-        return "";
-    }
-    for (u32 i = 0; i < ARRAY_COUNT(rando_option_descriptions); i++) {
-        if (randoStrEq(option_id, rando_option_descriptions[i].id)) {
-            return rando_option_descriptions[i].description;
-        }
-    }
-    return "";
-}
-
 // Sets the description pane to a given option's description on focus/hover.
-static const char* rando_default_description = "";
-static void randoOptionFocusHandler(RecompuiResource resource, const RecompuiEventData* event, void* userdata) {
+void randoOptionFocusHandler(RecompuiResource resource, const RecompuiEventData* event, void* userdata) {
     RandoOptionData* option = (RandoOptionData*)userdata;
     bool show = false;
     switch (event->type) {
@@ -344,25 +327,18 @@ static void randoOptionFocusHandler(RecompuiResource resource, const RecompuiEve
         default: return;
     }
     if (show) {
-        const char* text = option->description ? option->description : rando_default_description;
+        const char* text = option->description ? option->description : "";
         recompui_set_text(yaml_config_menu.description_pane, text);
     }
 }
 
-// Common tail for the create helpers: stores the description and wires the
-// focus/hover handler that drives the description pane.
-static void randoFinishOption(RandoOptionData* option, const char* description) {
-    option->description = description;
-    recompui_register_callback(option->input_element, randoOptionFocusHandler, option);
-}
-
-RandoOptionData* randoCreateRadioOption(RandoYamlConfigMenu* menu, const char* option_id, const char* display_name,
+RandoOptionData* randoCreateRadioOption(RandoYamlConfigMenu* menu, const char* option_id, const char* display_name, const char* option_description,
     EnumOptionValue* options, unsigned long num_options, u32 default_value) {
     RecompuiResource radio_area = randoYAMLCreateMenuEntryArea(menu->context, menu->current_body);
 
     randoYAMLCreateSettingLabel(menu->context, radio_area, display_name);
 
-    RandoOptionData* option_data = randoAllocateOption(menu, option_id);
+    RandoOptionData* option_data = randoAllocateOption(menu, option_id, option_description);
 
     // Copy the and format the options into an array to pass as the option list for the radio.
     char** option_names = recomp_alloc(sizeof(char*) * num_options);
@@ -385,17 +361,17 @@ RandoOptionData* randoCreateRadioOption(RandoYamlConfigMenu* menu, const char* o
     option_data->root_element = radio_area;
     option_data->input_element = radio;
     option_data->data = options;
-    randoFinishOption(option_data, randoLookupDescription(option_id));
+    recompui_register_callback(option_data->input_element, randoOptionFocusHandler, option_data);
     return option_data;
 }
 
 static char* rando_bool_prop_names[] = {"Off", "On"};
-RandoOptionData* randoCreateBoolPropOption(RandoYamlConfigMenu* menu, const char* option_id, const char* display_name, bool default_value) {
+RandoOptionData* randoCreateBoolPropOption(RandoYamlConfigMenu* menu, const char* option_id, const char* display_name, const char* option_description, bool default_value) {
     RecompuiResource radio_area = randoYAMLCreateMenuEntryArea(menu->context, menu->current_body);
 
     randoYAMLCreateSettingLabel(menu->context, radio_area, display_name);
 
-    RandoOptionData* option_data = randoAllocateOption(menu, option_id);
+    RandoOptionData* option_data = randoAllocateOption(menu, option_id, option_description);
 
     RecompuiResource radio = recompui_create_labelradio(menu->context, radio_area, (const char**) rando_bool_prop_names, 2);
     recompui_set_input_value_u32(radio, (u32)default_value);
@@ -403,12 +379,12 @@ RandoOptionData* randoCreateBoolPropOption(RandoYamlConfigMenu* menu, const char
     option_data->type = OPTION_BOOL;
     option_data->root_element = radio_area;
     option_data->input_element = radio;
-    randoFinishOption(option_data, randoLookupDescription(option_id));
+    recompui_register_callback(option_data->input_element, randoOptionFocusHandler, option_data);
     return option_data;
 }
 
-RandoOptionData* randoCreateCallbackBoolPropOption(RandoYamlConfigMenu* menu, const char* display_name, bool default_value, bool_callback_t* callback) {
-    RandoOptionData* option = randoCreateBoolPropOption(menu, "", display_name, default_value);
+RandoOptionData* randoCreateCallbackBoolPropOption(RandoYamlConfigMenu* menu, const char* display_name, const char* option_description, bool default_value, bool_callback_t* callback) {
+    RandoOptionData* option = randoCreateBoolPropOption(menu, "", display_name, option_description, default_value);
     option->is_callback = true;
     option->bool_callback = callback;
     return option;
@@ -422,13 +398,13 @@ void randoYAMLSliderCallback(RecompuiResource labelenum, const RecompuiEventData
     }
 }
 
-RandoOptionData* randoCreateIntSliderOption(RandoYamlConfigMenu* menu, const char* option_id, const char* display_name,
+RandoOptionData* randoCreateIntSliderOption(RandoYamlConfigMenu* menu, const char* option_id, const char* display_name, const char* option_description,
     s32 min, s32 max, s32 step, s32 default_value) {
     RecompuiResource slider_area = randoYAMLCreateMenuEntryArea(menu->context, menu->current_body);
 
     randoYAMLCreateSettingLabel(menu->context, slider_area, display_name);
 
-    RandoOptionData* option_data = randoAllocateOption(menu, option_id);
+    RandoOptionData* option_data = randoAllocateOption(menu, option_id, option_description);
 
     RecompuiResource slider = recompui_create_slider(menu->context, slider_area, SLIDERTYPE_INTEGER, (float)min, (float)max, (float)step, (float)default_value);
     recompui_set_max_width(slider, 600.0f, UNIT_DP);
@@ -436,17 +412,17 @@ RandoOptionData* randoCreateIntSliderOption(RandoYamlConfigMenu* menu, const cha
     option_data->type = OPTION_INT_SLIDER;
     option_data->root_element = slider_area;
     option_data->input_element = slider;
-    randoFinishOption(option_data, randoLookupDescription(option_id));
+    recompui_register_callback(option_data->input_element, randoOptionFocusHandler, option_data);
     return option_data;
 }
 
-RandoOptionData* randoCreateFloatSliderOption(RandoYamlConfigMenu* menu, const char* option_id, const char* display_name,
+RandoOptionData* randoCreateFloatSliderOption(RandoYamlConfigMenu* menu, const char* option_id, const char* display_name, const char* option_description,
     float min, float max, float step, float default_value) {
     RecompuiResource slider_area = randoYAMLCreateMenuEntryArea(menu->context, menu->current_body);
 
     randoYAMLCreateSettingLabel(menu->context, slider_area, display_name);
 
-    RandoOptionData* option_data = randoAllocateOption(menu, option_id);
+    RandoOptionData* option_data = randoAllocateOption(menu, option_id, option_description);
 
     RecompuiResource slider = recompui_create_slider(menu->context, slider_area, SLIDERTYPE_NUMBER, min, max, step, default_value);
     recompui_set_max_width(slider, 600.0f, UNIT_DP);
@@ -454,124 +430,121 @@ RandoOptionData* randoCreateFloatSliderOption(RandoYamlConfigMenu* menu, const c
     option_data->type = OPTION_FLOAT_SLIDER;
     option_data->root_element = slider_area;
     option_data->input_element = slider;
-    randoFinishOption(option_data, randoLookupDescription(option_id));
+    recompui_register_callback(option_data->input_element, randoOptionFocusHandler, option_data);
     return option_data;
 }
 
+void randoCreateSearchSection(RandoYamlConfigMenu* menu, RandoListOption* list);
+void randoListEntrySetText(RandoListEntry* entry);
+void randoListEntryToggle(RecompuiResource button, const RecompuiEventData* data, void* userdata);
+
+void randoListInitEntry(RandoYamlConfigMenu* menu, RandoListEntry* entry, const char* name) {
+    RecompuiColor transparent_color = {0, 0, 0, 0};
+
+    size_t len = strlen(name);
+    entry->name = recomp_alloc(len + 1);
+    Lib_MemCpy(entry->name, (void*)name, len + 1);
+
+    entry->checked = false;
+    entry->button = recompui_create_button(menu->context, menu->current_body, "", BUTTONSTYLE_SECONDARY);
+    recompui_set_display(entry->button, DISPLAY_BLOCK);
+    recompui_set_padding(entry->button, 4.0f, UNIT_DP);
+    recompui_set_margin_bottom(entry->button, 2.0f, UNIT_DP);
+    recompui_set_background_color(entry->button, &transparent_color);
+    recompui_set_border_color(entry->button, &transparent_color);
+    recompui_register_callback(entry->button, randoListEntryToggle, entry);
+    randoListEntrySetText(entry);
+}
+
+RandoOptionData* randoCreateListOption(RandoYamlConfigMenu* menu, const char* option_id, const char* list_var, RandoListCategory type) {
+    RandoOptionData* option_data = randoAllocateOption(menu, option_id, ""); // no need for option descriptions (they don't fit)
+
+    option_data->type = OPTION_LIST;
+    option_data->data = recomp_alloc(sizeof(RandoListOption));
+    RandoListOption* list_data = (RandoListOption*)option_data->data;
+    list_data->type = type;
+
+    REPY_FN_SETUP_RANDO;
+    
+    REPY_FN_SET_STR("list_var", list_var);
+
+    REPY_FN_EXEC_CACHE(
+        py_rando_setup_list_element,
+        "exec(f'list_elem = {list_var}')\n"
+        "list_length = len(list_elem)\n"
+    );
+
+    u32 list_length = REPY_FN_GET_U32("list_length");
+
+    list_data->entries = recomp_alloc(sizeof(RandoListEntry) * list_length);
+    list_data->num_entries = list_length;
+
+    randoCreateSearchSection(&yaml_config_menu, list_data);
+
+    u32 item_index = 0;
+    REPY_FN_FOREACH_CACHE(py_rando_fill_items_from_apworld, "entry", "list_elem") {
+        char* entry = REPY_FN_GET_STR("entry");
+        randoListInitEntry(&yaml_config_menu, &list_data->entries[item_index++], entry);
+        recomp_free(entry);
+    }
+
+    REPY_FN_CLEANUP;
+
+    return option_data;
+}
+
+// TODO: update colors mod to remove the need for this
 void tunicColorCallback(bool enabled) {
     if (enabled) {
+        REPY_FN_SETUP_RANDO;
         u32 link_color = Rand_Next();
-        u32 link_red = (link_color >> 24) & 0xFF;
-        u32 link_green = (link_color >> 16) & 0xFF;
-        u32 link_blue = (link_color >> 8) & 0xFF;
-        rando_yaml_printf("  link_tunic_color:\n    [%d, %d, %d]\n", link_red, link_green, link_blue);
+        // u32 link_red = (link_color >> 24) & 0xFF;
+        // u32 link_green = (link_color >> 16) & 0xFF;
+        // u32 link_blue = (link_color >> 8) & 0xFF;
+        // rando_yaml_printf("  link_tunic_color:\n    [%d, %d, %d]\n", link_red, link_green, link_blue);
+        REPY_FN_SET_U32("link_red", (link_color >> 24) & 0xFF);
+        REPY_FN_SET_U32("link_green", (link_color >> 16) & 0xFF);
+        REPY_FN_SET_U32("link_blue", (link_color >> 8) & 0xFF);
+        REPY_FN_EXEC_CACHE(
+            py_rando_set_tunic_yaml,
+            "recomp_data.solo_yaml_options['link_tunic_color'] = [link_red, link_green, link_blue]"
+        );
+        REPY_FN_CLEANUP;
     }
 }
 
-static EnumOptionValue rando_accessibility_options[] = {
-    { "locations", "Full" },
-    { "minimal", NULL }
-};
-
-static EnumOptionValue rando_logic_difficulty_options[] = {
-    // { "easy", NULL },
-    { "normal", NULL },
-    // { "obscure_glitchless", NULL },
-    // { "glitched", NULL },
-    { "no_logic", NULL },
-};
-
-static EnumOptionValue rando_starting_hearts_type_options[] = {
-    { "containers", NULL },
-    { "pieces", NULL },
-};
-
-static EnumOptionValue rando_shuffle_regional_maps_options[] = {
-    { "vanilla", NULL },
-    { "starting", NULL },
-    { "anywhere", NULL },
-};
-
-static EnumOptionValue rando_shuffle_boss_remains_options[] = {
-    { "vanilla", NULL },
-    { "anywhere", NULL },
-    { "bosses", NULL },
-};
-
-static EnumOptionValue shop_prices_options[] = {
-    { "vanilla", NULL },
-    { "free", NULL },
-    { "cheap", NULL },
-    { "expensive", NULL },
-    { "offensive", NULL },
-};
-
-static EnumOptionValue rando_skullsanity_options[] = {
-    { "vanilla", NULL },
-    { "anything", NULL },
-    { "ignore", NULL },
-};
-
-static EnumOptionValue rando_shopsanity_options[] = {
-    { "vanilla", NULL },
-    { "enabled", NULL },
-    { "advanced", NULL },
-};
-
-static EnumOptionValue rando_damage_multiplier_options[] = {
-    { "half", NULL },
-    { "normal", NULL },
-    { "double", NULL },
-    { "quad", NULL },
-    { "ohko", "One-Hit KO" },
-};
-
-static EnumOptionValue rando_death_behavior_options[] = {
-    { "vanilla", NULL }, 
-    { "fast", NULL },
-    { "instant", NULL },
-    { "moon_crash", NULL },
-};
-
-static EnumOptionValue rando_grasssanity_options[] = {
-    { "off", NULL },
-    { "normal", NULL },
-    { "no_termina_field", "No Termina" },
-    { "grotto_and_cave_only", "Grotto/Cave" },
-    { "dungeon_only", "Dungeons" },
-};
-
-static EnumOptionValue rando_boss_souls_options[] = {
-    { "false", "Off" },
-    { "true", "On" },
-    { "true_include_majora", "On (Include Majora)" },
-};
-
 // Tabs: one button in the header bar, one body panel. Only the active panel.
 
-static RecompuiColor tab_active_color   = {255, 255, 255, 255};
-static RecompuiColor tab_inactive_color = {255, 255, 255, 110};
+RecompuiColor tab_active_color   = {255, 255, 255, 255};
+RecompuiColor tab_inactive_color = {255, 255, 255, 110};
 
 // Panel that section buttons parent into; set by randoBeginTab.
-static RecompuiResource rando_current_panel = 0;
+RecompuiResource rando_current_panel = 0;
 
-static void randoSelectTab(RandoYamlConfigMenu* menu, u32 index) {
+// Per-tab flag: hide the description pane when this tab is active (for list
+// tabs like Starting Items / Excluded Locations that don't use descriptions).
+bool rando_tab_hide_description[MAX_TABS];
+
+void randoSelectTab(RandoYamlConfigMenu* menu, u32 index) {
     for (u32 i = 0; i < menu->num_tabs; i++) {
         bool active = (i == index);
         recompui_set_display(menu->tabs[i].panel, active ? DISPLAY_BLOCK : DISPLAY_NONE);
         recompui_set_color(menu->tabs[i].button, active ? &tab_active_color : &tab_inactive_color);
     }
+    bool hide_desc = rando_tab_hide_description[index];
+    recompui_set_display(menu->description_pane, hide_desc ? DISPLAY_NONE : DISPLAY_BLOCK);
+    recompui_set_flex_basis(menu->option_column, hide_desc ? 100.0f : 72.0f, UNIT_PERCENT);
     menu->active_tab = index;
 }
 
-static void randoTabButtonCallback(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
+void randoTabButtonCallback(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
     if (data->type == UI_EVENT_CLICK) {
         RandoTab* tab = (RandoTab*)userdata;
         randoSelectTab(tab->menu, tab->index);
     }
 }
 
-static RecompuiResource randoBeginTab(RandoYamlConfigMenu* menu, const char* label) {
+RecompuiResource randoBeginTab(RandoYamlConfigMenu* menu, const char* label) {
     if (menu->num_tabs >= MAX_TABS) {
         recomp_printf("Max rando tabs reached, increase MAX_TABS in \"yaml_generation.h\"\n");
         *(volatile int*)0 = 0;
@@ -597,25 +570,117 @@ static RecompuiResource randoBeginTab(RandoYamlConfigMenu* menu, const char* lab
     return tab->panel;
 }
 
-static void randoTabPlaceholder(RandoYamlConfigMenu* menu, const char* text) {
+void randoTabPlaceholder(RandoYamlConfigMenu* menu, const char* text) {
     RecompuiResource label = recompui_create_label(menu->context, menu->current_body, text, LABELSTYLE_NORMAL);
     recompui_set_padding(label, 24.0f, UNIT_DP);
 }
 
 // Collapsible section: a button toggling a wrapper of options. Options are built
 // once at startup and shown/hidden, so YAML output is unaffected hopefully.
-#define MAX_SECTIONS 16
-typedef struct {
-    RecompuiResource button;
-    RecompuiResource wrapper;
-    const char*      title;
-    bool             open;
-} RandoSection;
-static RandoSection rando_sections[MAX_SECTIONS];
-static u32 rando_num_sections = 0;
+RandoSection rando_sections[MAX_SECTIONS];
+u32 rando_num_sections = 0;
 
-static void randoSectionSetButtonText(RandoSection* section) {
-    char buf[64];
+// Render an entry's button label as "[X] Name" / "[ ] Name".
+void randoListEntrySetText(RandoListEntry* entry) {
+    char buf[128];
+    buf[0] = '[';
+    buf[1] = entry->checked ? 'X' : ' ';
+    buf[2] = ']';
+    buf[3] = ' ';
+    u32 i = 0;
+    while (entry->name[i] != '\0' && i < sizeof(buf) - 5) {
+        buf[4 + i] = entry->name[i];
+        i++;
+    }
+    buf[4 + i] = '\0';
+    recompui_set_text(entry->button, buf);
+}
+
+void randoListEntryToggle(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
+    if (data->type == UI_EVENT_CLICK) {
+        RandoListEntry* entry = (RandoListEntry*)userdata;
+        entry->checked = !entry->checked;
+        randoListEntrySetText(entry);
+    }
+}
+
+// Case-insensitive substring test for the search filters.
+bool randoStrContainsCI(const char* haystack, const char* needle) {
+    if (needle[0] == '\0') {
+        return true;
+    }
+    for (u32 i = 0; haystack[i] != '\0'; i++) {
+        u32 j = 0;
+        while (haystack[i + j] != '\0' && needle[j] != '\0') {
+            char a = haystack[i + j];
+            char b = needle[j];
+            if (a >= 'A' && a <= 'Z') a += 32;
+            if (b >= 'A' && b <= 'Z') b += 32;
+            if (a != b) break;
+            j++;
+        }
+        if (needle[j] == '\0') {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Single generic search callback. The list is passed via userdata.
+void randoListSearchCallback(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
+    if (data->type == UI_EVENT_CLICK) {
+        RandoListOption* list = (RandoListOption*)userdata;
+        char* query = recompui_get_input_text(list->search_input);
+        for (u32 i = 0; i < list->num_entries; i++) {
+            bool match = randoStrContainsCI(list->entries[i].name, query);
+            recompui_set_display(list->entries[i].button, match ? DISPLAY_BLOCK : DISPLAY_NONE);
+        }
+        recomp_free(query);
+    }
+}
+
+// Builds a pinned search row + an inner scrolling body. The search row stays
+// fixed at the top of the tab while the returned body scrolls. 
+void randoCreateSearchSection(RandoYamlConfigMenu* menu, RandoListOption* list) {
+    // Make the tab panel a column so the search row and scroll body stack.
+    recompui_set_display(menu->current_body, DISPLAY_FLEX);
+    recompui_set_flex_direction(menu->current_body, FLEX_DIRECTION_COLUMN);
+    recompui_set_height(menu->current_body, 100.0f, UNIT_PERCENT);
+
+    // Pinned search row (does not scroll).
+    RecompuiResource search_row = recompui_create_element(menu->context, menu->current_body);
+    recompui_set_display(search_row, DISPLAY_FLEX);
+    recompui_set_flex_direction(search_row, FLEX_DIRECTION_ROW);
+    recompui_set_align_items(search_row, ALIGN_ITEMS_CENTER);
+    recompui_set_gap(search_row, 8.0f, UNIT_DP);
+    recompui_set_padding(search_row, 8.0f, UNIT_DP);
+    recompui_set_flex_grow(search_row, 0.0f);
+    recompui_set_flex_shrink(search_row, 0.0f);
+
+    RecompuiResource input = recompui_create_textinput(menu->context, search_row);
+    recompui_set_flex_grow(input, 1.0f);
+
+    RecompuiResource search_button = recompui_create_button(menu->context, search_row, "Search", BUTTONSTYLE_SECONDARY);
+    recompui_register_callback(search_button, randoListSearchCallback, list);
+
+    // Inner scrolling body for the entries. Mirrors the solo menu's
+    // list_container: 
+    RecompuiResource scroll_body = recompui_create_element(menu->context, menu->current_body);
+    recompui_set_display(scroll_body, DISPLAY_BLOCK);
+    recompui_set_overflow_y(scroll_body, OVERFLOW_AUTO);
+    recompui_set_flex_grow(scroll_body, 1.0f);
+    recompui_set_flex_shrink(scroll_body, 1.0f);
+    recompui_set_height(scroll_body, 100.0f, UNIT_PERCENT);
+    recompui_set_max_height(scroll_body, 100.0f, UNIT_PERCENT);
+
+    // Entries now parent into the scroll body.
+    menu->current_body = scroll_body;
+
+    list->search_input = input;
+}
+
+void randoSectionSetButtonText(RandoSection* section) {
+    char buf[128];
     buf[0] = section->open ? '-' : '+';
     buf[1] = ' ';
     u32 i = 0;
@@ -627,7 +692,7 @@ static void randoSectionSetButtonText(RandoSection* section) {
     recompui_set_text(section->button, buf);
 }
 
-static void randoSectionToggleCallback(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
+void randoSectionToggleCallback(RecompuiResource button, const RecompuiEventData* data, void* userdata) {
     if (data->type == UI_EVENT_CLICK) {
         RandoSection* section = (RandoSection*)userdata;
         section->open = !section->open;
@@ -636,9 +701,13 @@ static void randoSectionToggleCallback(RecompuiResource button, const RecompuiEv
     }
 }
 
-static void randoBeginSection(RandoYamlConfigMenu* menu, const char* title) {
+void randoBeginSection(RandoYamlConfigMenu* menu, const char* title) {
     RandoSection* section = &rando_sections[rando_num_sections++];
-    section->title = title;
+    
+    size_t title_len = strlen(title);
+    section->title = recomp_alloc(title_len + 1);
+    Lib_MemCpy(section->title, (void*)title, title_len + 1);
+
     section->open = false;
 
     section->button = recompui_create_button(menu->context, rando_current_panel, title, BUTTONSTYLE_SECONDARY);
@@ -692,7 +761,7 @@ void randoCreateYamlConfigMenu() {
     RecompuiResource header_top = recompui_create_element(yaml_config_menu.context, yaml_config_menu.header);
     recompui_set_display(header_top, DISPLAY_FLEX);
     recompui_set_flex_direction(header_top, FLEX_DIRECTION_ROW);
-    recompui_set_justify_content(header_top, JUSTIFY_CONTENT_SPACE_BETWEEN);
+    recompui_set_justify_content(header_top, JUSTIFY_CONTENT_SPACE_EVENLY);
     recompui_set_align_items(header_top, ALIGN_ITEMS_CENTER);
 
     yaml_config_menu.header_label = recompui_create_label(yaml_config_menu.context, header_top, "Randomizer Settings", LABELSTYLE_LARGE);
@@ -728,6 +797,8 @@ void randoCreateYamlConfigMenu() {
     recompui_set_flex_basis(yaml_config_menu.option_column, 72.0f, UNIT_PERCENT);
     recompui_set_flex_grow(yaml_config_menu.option_column, 0.0f);
     recompui_set_flex_shrink(yaml_config_menu.option_column, 0.0f);
+    recompui_set_height(yaml_config_menu.option_column, 100.0f, UNIT_PERCENT);
+    recompui_set_max_height(yaml_config_menu.option_column, 100.0f, UNIT_PERCENT);
     recompui_set_padding(yaml_config_menu.option_column, 16.0f, UNIT_DP);
 
     RecompuiColor pane_divider_color = {255, 255, 255, 40};
@@ -736,124 +807,162 @@ void randoCreateYamlConfigMenu() {
     recompui_set_flex_basis(yaml_config_menu.description_pane, 28.0f, UNIT_PERCENT);
     recompui_set_flex_grow(yaml_config_menu.description_pane, 1.0f);
     recompui_set_flex_shrink(yaml_config_menu.description_pane, 1.0f);
-    recompui_set_padding(yaml_config_menu.description_pane, 20.0f, UNIT_DP);
+    recompui_set_padding(yaml_config_menu.description_pane, 16.0f, UNIT_DP);
     recompui_set_border_left_width(yaml_config_menu.description_pane, 1.1f, UNIT_DP);
     recompui_set_border_color(yaml_config_menu.description_pane, &pane_divider_color);
+    recompui_set_font_size(yaml_config_menu.description_pane, 18.0f, UNIT_DP);
 
     yaml_config_menu.num_options = 0;
     yaml_config_menu.num_tabs = 0;
     rando_num_sections = 0;
+    for (u32 i = 0; i < MAX_TABS; i++) {
+        rando_tab_hide_description[i] = false;
+    }
+
+    REPY_FN_SETUP_RANDO;
 
     // General tab.
     randoBeginTab(&yaml_config_menu, "General");
 
-    randoBeginSection(&yaml_config_menu, "General");
-    randoCreateRadioOption(&yaml_config_menu, "accessibility", "Accessibility:", rando_accessibility_options, ARRAY_COUNT(rando_accessibility_options), RANDO_ACCESSABILITY_FULL);
-    randoCreateRadioOption(&yaml_config_menu, "logic_difficulty", "Logic Difficulty:", rando_logic_difficulty_options, ARRAY_COUNT(rando_logic_difficulty_options), RANDO_LOGIC_DIFFICULTY_NORMAL);
-    randoCreateBoolPropOption(&yaml_config_menu, "camc", "Chests Match Contents:", true);
-    randoCreateBoolPropOption(&yaml_config_menu, "magic_is_a_trap", "Magic is a Trap:", false);
-    randoCreateIntSliderOption(&yaml_config_menu, "hint_percentage", "Useful Hint Percentage:", 0, 100, 1, 70);
-    randoCreateRadioOption(&yaml_config_menu, "damage_multiplier", "Damage Multiplier:", rando_damage_multiplier_options, ARRAY_COUNT(rando_damage_multiplier_options), RANDO_DAMAGE_MULITPLIER_NORMAL);
-    randoCreateRadioOption(&yaml_config_menu, "death_behavior", "Death Behavior:", rando_death_behavior_options, ARRAY_COUNT(rando_death_behavior_options), RANDO_DEATH_BEHAVIOR_VANILLA);
-    randoCreateBoolPropOption(&yaml_config_menu, "death_link", "Death Link:", false);
-    randoCreateCallbackBoolPropOption(&yaml_config_menu, "Randomize Tunic Color:", true, tunicColorCallback)
-        ->description = "Randomize the color of Link's tunic.";
+    REPY_FN_FOREACH_CACHE(py_rando_fill_options_from_group, "option_group", "recomp_data.options.items()") {
+        REPY_FN_EXEC_CACHE(
+            py_rando_grab_option_groups,
+            "option_group_name, options = option_group\n"
+        );
 
-    randoBeginSection(&yaml_config_menu, "Goals");
-    randoCreateBoolPropOption(&yaml_config_menu, "completion_goal", "Completion Goal (100%):", false);
-    randoCreateIntSliderOption(&yaml_config_menu, "moon_remains_required", "Moon: Boss Remains Required:", 0, 4, 1, 4);
-    randoCreateIntSliderOption(&yaml_config_menu, "moon_masks_required", "Moon: Masks Required:", 0, 24, 1, 0);
-    randoCreateBoolPropOption(&yaml_config_menu, "moon_star_fox", "Moon: Star Fox Masks:", false);
-    randoCreateIntSliderOption(&yaml_config_menu, "moon_owls_required", "Moon: Owls Required:", 0, 10, 1, 0);
-    randoCreateIntSliderOption(&yaml_config_menu, "moon_scarecrows_required", "Moon: Scarecrows Required:", 0, 14, 1, 0);
-    randoCreateIntSliderOption(&yaml_config_menu, "moon_frogs_required", "Moon: Frogs Required:", 0, 5, 1, 0);
-    randoCreateIntSliderOption(&yaml_config_menu, "moon_items_required", "Moon: Trade Items Required:", 0, 48, 1, 0);
-    randoCreateIntSliderOption(&yaml_config_menu, "majora_remains_required", "Majora: Boss Remains Required:", 0, 4, 1, 4);
-    randoCreateIntSliderOption(&yaml_config_menu, "majora_masks_required", "Majora: Masks Required:", 0, 24, 1, 0);
-    randoCreateBoolPropOption(&yaml_config_menu, "majora_star_fox", "Majora: Star Fox Masks:", false);
-    randoCreateIntSliderOption(&yaml_config_menu, "majora_owls_required", "Majora: Owls Required:", 0, 10, 1, 0);
-    randoCreateIntSliderOption(&yaml_config_menu, "majora_scarecrows_required", "Majora: Scarecrows Required:", 0, 17, 1, 0);
-    randoCreateIntSliderOption(&yaml_config_menu, "majora_frogs_required", "Majora: Frogs Required:", 0, 5, 1, 0);
-    randoCreateIntSliderOption(&yaml_config_menu, "majora_items_required", "Majora: Trade Items Required:", 0, 29, 1, 0);
+        // only separate options into sections if there's more than the default "Game Options" and "Item & Location Options" group
+        REPY_FN_IF_CACHE(py_rando_option_groups_actually_exist, "len(recomp_data.options) > 2 and option_group_name != 'Item & Location Options'") {
+            char* option_group_name;
+            option_group_name = REPY_FN_GET_STR("option_group_name");
+            randoBeginSection(&yaml_config_menu, option_group_name);
+            recomp_free(option_group_name);
+        }
 
-    randoBeginSection(&yaml_config_menu, "Shuffle");
-    randoCreateBoolPropOption(&yaml_config_menu, "dungeon_entrance_rando", "Dungeon Entrance Rando:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "boss_entrance_rando", "Boss Entrance Rando:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "dungeon_chaining", "Dungeon Chaining:", false);
-    randoCreateRadioOption(&yaml_config_menu, "shuffle_regional_maps", "Shuffle Regional Maps:", rando_shuffle_regional_maps_options, ARRAY_COUNT(rando_shuffle_regional_maps_options), RANDO_SHUFFLE_REGIONAL_MAPS_VANILLA);
-    randoCreateRadioOption(&yaml_config_menu, "shuffle_boss_remains", "Shuffle Boss Remains:", rando_shuffle_boss_remains_options, ARRAY_COUNT(rando_shuffle_boss_remains_options), RANDO_SHUFFLE_BOSS_REMAINS_VANILLA);
-    randoCreateBoolPropOption(&yaml_config_menu, "remains_allow_boss_warps", "Warp to Bosses Using Remains:", true);
-    randoCreateBoolPropOption(&yaml_config_menu, "shuffle_spiderhouse_reward", "Shuffle Spiderhouse Rewards:", false);
-    randoCreateIntSliderOption(&yaml_config_menu, "required_skull_tokens", "Required Skulltula Tokens:", 0, 30, 1, 30);
-    randoCreateRadioOption(&yaml_config_menu, "skullsanity", "Skull-Sanity Mode:", rando_skullsanity_options, ARRAY_COUNT(rando_skullsanity_options), RANDO_SKULLSANITY_VANILLA);
-    randoCreateRadioOption(&yaml_config_menu, "shopsanity", "Shop-Sanity Mode:", rando_shopsanity_options, ARRAY_COUNT(rando_shopsanity_options), RANDO_SHOPSANITY_VANILLA);
-    randoCreateBoolPropOption(&yaml_config_menu, "scrubsanity", "Scrub-Sanity:", false);
-    randoCreateRadioOption(&yaml_config_menu, "shop_prices", "Shop Prices:", shop_prices_options, ARRAY_COUNT(shop_prices_options), RANDO_SHOP_PRICES_VANILLA);
-    randoCreateBoolPropOption(&yaml_config_menu, "cowsanity", "Cow-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "shuffle_great_fairy_rewards", "Shuffle Great Fairy Rewards:", false);
-    randoCreateIntSliderOption(&yaml_config_menu, "required_stray_fairies", "Required Stray Fairies:", 0, 15, 1, 15);
-    randoCreateBoolPropOption(&yaml_config_menu, "fairysanity", "Fairy-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "keysanity", "Key-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "bosskeysanity", "Boss-Key-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "curiostity_shop_trades", "Curiosity Shop Trades:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "intro_checks", "Intro Checks:", false);
+        REPY_FN_FOREACH_CACHE(py_rando_fill_options, "option", "options.items()") {
+            REPY_FN_EXEC_CACHE(
+                py_rando_grab_initial_option_info,
+                "option_id, option_info = option\n"
+                "option_type = option_info['type']\n"
+                "option_name_colon = option_info['name'] + ':'\n" // yes this is dumb
+                "option_description = option_info['description'].lstrip()\n" // lstrip just for the accessibility option having a leading newline
+            );
 
-    randoBeginSection(&yaml_config_menu, "Sanity");
-    randoCreateRadioOption(&yaml_config_menu, "grasssanity", "Grass-Sanity:", rando_grasssanity_options, ARRAY_COUNT(rando_grasssanity_options), 0);
-    randoCreateBoolPropOption(&yaml_config_menu, "potsanity", "Pot-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "hitsanity", "Hit-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "rocksanity", "Rock-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "soilsanity", "Soil-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "rupeesanity", "Rupee-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "invisisanity", "Invisi-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "snowsanity", "Snow-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "woodsanity", "Wood-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "realfairysanity", "Real-Fairy-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "iciclesanity", "Icicle-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "scarecrowsanity", "Scarecrow-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "hivesanity", "Hive-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "notebooksanity", "Notebook-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "owlsanity", "Owl-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "frogsanity", "Frog-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "treesanity", "Tree-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "flowersanity", "Flower-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "signsanity", "Sign-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "websanity", "Web-Sanity:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "oneoffs", "One-Off Locations:", false);
+            char* option_id;
+            char* option_name;
+            char* option_description;
+            option_id = REPY_FN_GET_STR("option_id");
+            option_name = REPY_FN_GET_STR("option_name_colon");
+            option_description = REPY_FN_GET_STR("option_description");
 
-    randoBeginSection(&yaml_config_menu, "Souls");
-    randoCreateRadioOption(&yaml_config_menu, "boss_souls", "Boss Souls:", rando_boss_souls_options, ARRAY_COUNT(rando_boss_souls_options), 0);
-    randoCreateBoolPropOption(&yaml_config_menu, "npc_souls", "NPC Souls:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "enemy_souls", "Enemy Souls:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "misc_souls", "Misc Souls:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "utility_souls", "Utility Souls:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "absurd_souls", "Absurd Souls:", false);
+            REPY_FN_IF_CACHE(py_rando_get_option_type, "option_type == 'Choice'") {
+                REPY_FN_EXEC_CACHE(
+                    py_rando_get_choice_option_info,
+                    "num_choices = len(option_info['choices'])\n"
+                    // the following is a mess because choices might be offset from what the ui interprets
+                    // i.e. {'choices': {'normal': 1, 'no_logic': 4}, 'default': 1} choosing 'no_logic' rather than 'normal'
+                    "default_choice = list(option_info['choices'].keys())[list(option_info['choices'].values()).index(option_info['default'])]\n"
+                    "option_default = list(option_info['choices'].keys()).index(default_choice)\n"
+                );
+
+                u32 num_choices = REPY_FN_GET_U32("num_choices");
+                u32 option_default = REPY_FN_GET_U32("option_default");
+
+                EnumOptionValue* option_choices = recomp_alloc(sizeof(EnumOptionValue) * num_choices);
+                int index = 0;
+                
+                REPY_FN_FOREACH_CACHE(py_rando_options_populate_choices, "choice", "option_info['choices'].items()") {
+                    // we could get the actual numerical value of the choices here as well,
+                    // but since the generator converts the string to a number anyways we let it handle that
+                    REPY_FN_EXEC_CACHE(
+                        py_rando_get_choice_option_names,
+                        "choice_id = choice[0]\n"
+                        "choice_name = choice_id.replace('_', ' ').title()\n" // the .title() part is a bit redundant since its displayed in all caps
+                    );
+
+                    // these get freed in the randoCreateRadioOption function (hopefully)
+                    option_choices[index].id = REPY_FN_GET_STR("choice_id");
+                    option_choices[index].name = REPY_FN_GET_STR("choice_name");
+
+                    index++;
+                }
+                
+                randoCreateRadioOption(
+                    &yaml_config_menu,
+                    option_id,
+                    option_name,
+                    option_description,
+                    option_choices,
+                    num_choices,
+                    option_default
+                );
+            } REPY_FN_ELIF_CACHE(py_rando_get_option_type, "option_type == 'Range'") {
+                REPY_FN_EXEC_CACHE(
+                    py_rando_grab_range_option_info,
+                    "range_start = option_info['range_start']\n"
+                    "range_end = option_info['range_end']\n"
+                    "option_default = option_info['default']\n"
+                );
+
+                u32 range_start = REPY_FN_GET_U32("range_start");
+                u32 range_end = REPY_FN_GET_U32("range_end");
+                u32 option_default = REPY_FN_GET_U32("option_default");
+                
+                randoCreateIntSliderOption(
+                    &yaml_config_menu,
+                    option_id,
+                    option_name,
+                    option_description,
+                    range_start,
+                    range_end,
+                    1,
+                    option_default
+                );
+            } REPY_FN_ELIF_CACHE(py_rando_get_option_type, "option_type == 'Toggle' or option_type == 'DefaultOnToggle'") {
+                REPY_FN_EVAL_CACHE_U32(
+                    py_rando_get_toggle_option_default,
+                    "option_info['default']",
+                    option_default
+                );
+                
+                randoCreateBoolPropOption(
+                    &yaml_config_menu,
+                    option_id,
+                    option_name,
+                    option_description,
+                    option_default
+                );
+            }
+
+            recomp_free(option_id);
+            recomp_free(option_name);
+            recomp_free(option_description);
+        }
+    }
+
+    // lol
+    randoCreateCallbackBoolPropOption(&yaml_config_menu, "Randomize Tunic Color:", "Randomize the color of Link's tunic.", true, tunicColorCallback);
 
     // Starting Items tab.
     randoBeginTab(&yaml_config_menu, "Starting Items");
-    randoCreateBoolPropOption(&yaml_config_menu, "ocarinaless", "Start Ocarinaless:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "timeless", "Start Timeless:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "swordless", "Start Swordless:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "shieldless", "Start Shieldless:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "start_with_soaring", "Start with Song of Soaring:", true);
-    randoCreateIntSliderOption(&yaml_config_menu, "starting_hearts", "Starting Heart Segments:", 4, 12, 1, 12);
-    randoCreateRadioOption(&yaml_config_menu, "starting_hearts_are_containers_or_pieces", "Unused Starting Hearts Distributed as:", rando_starting_hearts_type_options, ARRAY_COUNT(rando_starting_hearts_type_options), RANDO_STARTING_HEARTS_ARE_CONTAINERS);
-    randoCreateBoolPropOption(&yaml_config_menu, "start_with_consumables", "Start With Consumables:", true);
-    randoCreateBoolPropOption(&yaml_config_menu, "permanent_chateau_romani", "Permanent Chateau Romani:", true);
-    randoCreateBoolPropOption(&yaml_config_menu, "start_with_inverted_time", "Reset With Inverted Time:", false);
-    randoCreateBoolPropOption(&yaml_config_menu, "receive_filled_wallets", "Receive Filled Wallets:", true);
+    rando_tab_hide_description[yaml_config_menu.num_tabs - 1] = true;
+    
+    randoCreateListOption(&yaml_config_menu, "start_inventory_from_pool", "recomp_data.item_names", LIST_DICT_ONES); // TODO: handle item groups correctly
 
-    // Tricks tab (filled by the apworld SoonTM; empty for now).
-    randoBeginTab(&yaml_config_menu, "Tricks");
-    randoTabPlaceholder(&yaml_config_menu, "No tricks are available for this game yet.");
-
-    // Glitches tab (filled by the apworld; empty for now).
-    randoBeginTab(&yaml_config_menu, "Glitches");
-    randoTabPlaceholder(&yaml_config_menu, "No glitches are available for this game yet.");
-
-    // Excluded Locations tab (populated by the location-list glue).
+    // Excluded Locations tab.
     randoBeginTab(&yaml_config_menu, "Excluded Locations");
-    randoTabPlaceholder(&yaml_config_menu, "Location list not yet loaded.");
+    rando_tab_hide_description[yaml_config_menu.num_tabs - 1] = true;
+    
+    randoCreateListOption(&yaml_config_menu, "exclude_locations", "recomp_data.location_names", LIST_STANDARD); // TODO: handle location groups correctly
+
+    // TODO: add everything needed to get these to work (elements are in option.valid_keys)
+    // Tricks tab (filled by the apworld SoonTM; empty for now).
+    // randoBeginTab(&yaml_config_menu, "Tricks");
+    // rando_tab_hide_description[yaml_config_menu.num_tabs - 1] = true;
+    // randoTabPlaceholder(&yaml_config_menu, "No tricks are available for this game yet.");
+
+    // // Glitches tab (filled by the apworld; empty for now).
+    // randoBeginTab(&yaml_config_menu, "Glitches");
+    // randoTabPlaceholder(&yaml_config_menu, "No glitches are available for this game yet.");
 
     // Show the first tab by default.
     randoSelectTab(&yaml_config_menu, 0);
@@ -869,6 +978,7 @@ void randoCreateYamlConfigMenu() {
     recompui_set_nav(yaml_config_menu.all_options[0].input_element, NAVDIRECTION_UP, yaml_config_menu.generate_button);
 
     recompui_close_context(yaml_config_menu.context);
+    REPY_FN_CLEANUP;
 }
 
 void randoShowYamlConfigMenu() {

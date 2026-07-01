@@ -2,6 +2,8 @@
 #include "global.h"
 
 extern Gfx gameplay_dangeon_keep_DL_017EA0[];
+extern Gfx gMagicPotDL[];
+extern Gfx gPotDL[];
 
 // custom DL
 extern Gfx randoPotDL[];

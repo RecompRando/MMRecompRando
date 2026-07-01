@@ -1,5 +1,6 @@
 #include "apcommon.h"
 #include "apconnect_menu.h"
+#include "mod_check_menu.h"
 #include "recompconfig.h"
 #include "recomputils.h"
 #include "rando_glue.h"
@@ -15,7 +16,9 @@ static void connectPressed(RecompuiResource resource, const RecompuiEventData* d
         bool success = rando_init(server_text, slot_text, password_text, &connection_failed_msg);
 
         if (success) {
-            randoStart(true);
+            if (!randoCheckRequiredMods()) {
+                randoStart(true);
+            }
             recompui_hide_context(connect_menu.context);
             recompui_close_context(connect_menu.context);
             randoEmitNormalNotification("Successfully connected");

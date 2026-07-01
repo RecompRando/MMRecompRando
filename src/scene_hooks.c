@@ -42,13 +42,14 @@ u32 reverseERLookup(u32 placements, u32 index) {
 }
 
 extern s16 savedSceneId;
+extern u8 justLoadedOwlSave;
 
 RECOMP_HOOK("Play_Init")
 void onPlayInit(GameState* thisx) {
     PlayState* play = (PlayState*)thisx;
     gPlay = play;
 
-    if(gSaveContext.gameMode != GAMEMODE_NORMAL || inCredits) return;
+    if(gSaveContext.gameMode != GAMEMODE_NORMAL || justLoadedOwlSave || inCredits) return;
     
     switch (gSaveContext.save.entrance) {
         // change the intro cutscene where you fall down into a new cycle
@@ -174,6 +175,7 @@ RECOMP_HOOK_RETURN("Play_Init")
 void postPlayInit() {
     // send the current scene id to datastorage
     rando_datastorage_replace_u32("scene", (u32)gPlay->sceneId);
+    justLoadedOwlSave = false;
 }
 
 // returns a fake sceneId based on different parameters

@@ -389,6 +389,15 @@ void rando_handle_autosaves(PlayState* play) {
     rando_save_current_state(gSaveContext.fileNum + 2);
 }
 
+u8 justLoadedOwlSave;
+
+// RECOMP_HOOK("Sram_OpenSave")
+RECOMP_CALLBACK("*", recomp_on_load_save) // functionally equivalent
+void rando_load_save() {
+    recomp_printf("loaded save\n");
+    justLoadedOwlSave = gSaveContext.save.isOwlSave; // will be 1 for owl, and 2 for autosave
+}
+
 ItemId randoConvertItemId(u32 ap_item_id) {
     ap_item_id &= 0xFFFFFF;
 

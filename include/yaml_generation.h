@@ -10,18 +10,21 @@
 // Raised from 64 to fit the full MM option set since its such a chonker.
 #define MAX_OPTIONS 96
 #define MAX_TABS 16
+#define MAX_SECTIONS 16
 
 typedef enum {
     OPTION_BOOL,
     OPTION_RADIO,
     OPTION_INT_SLIDER,
-    OPTION_FLOAT_SLIDER
+    OPTION_FLOAT_SLIDER,
+    OPTION_LIST // list/set/dict options
 } RandoOptionType;
 
 typedef void (bool_callback_t)(bool value);
 typedef void (radio_callback_t)(u32 value);
 typedef void (int_callback_t)(int value);
 typedef void (float_callback_t)(float value);
+typedef void (list_callback_t)(); // unsure what the value is
 
 typedef struct {
     RandoOptionType type;
@@ -29,20 +32,39 @@ typedef struct {
     RecompuiResource input_element;
     void* data;
     char* option_id;
-    const char* description;
+    char* description;
     bool is_callback;
     union {
         bool_callback_t* bool_callback;
         radio_callback_t* radio_callback;
         int_callback_t* int_callback;
         float_callback_t* float_callback;
+        list_callback_t* list_callback;
     };
 } RandoOptionData;
 
 typedef struct {
-    const char* id;
-    const char* name;
+    char* id;
+    char* name;
 } EnumOptionValue;
+
+typedef enum {
+    LIST_STANDARD, // outputs as-is within the YAML (applies to OptionList/OptionSet)
+    LIST_DICT_ONES // outputs as "entry": 1, used almost exclusively by "Starting Items" (ItemDict) for now
+} RandoListCategory;
+
+typedef struct {
+    RecompuiResource button;
+    char* name;
+    bool checked;
+} RandoListEntry;
+
+typedef struct {
+    RandoListCategory type;
+    RecompuiResource  search_input;
+    RandoListEntry* entries;
+    u32 num_entries;
+} RandoListOption;
 
 // Forward declaration so RandoTab can hold a back-pointer to its menu.
 typedef struct RandoYamlConfigMenu RandoYamlConfigMenu;
@@ -54,78 +76,12 @@ typedef struct {
     RecompuiResource     panel;  
 } RandoTab;
 
-typedef enum {
-    RANDO_ACCESSABILITY_FULL = 0,
-    RANDO_ACCESSABILITY_MINIMAL = 1,
-    RANDO_ACCESSABILITY_MAX = 0xFFFFFFFF,
-} RandoAccessability;
-
-typedef enum {
-    //~ RANDO_LOGIC_DIFFICULTY_EASY = 0,
-    RANDO_LOGIC_DIFFICULTY_NORMAL = 0,
-    RANDO_LOGIC_DIFFICULTY_NO_LOGIC = 1,
-    RANDO_LOGIC_DIFFICULTY_MAX = 0xFFFFFFFF
-} RandoLogicDifficulty;
-
-typedef enum {
-    RANDO_STARTING_HEARTS_ARE_CONTAINERS = 0,
-    RANDO_STARTING_HEARTS_ARE_PIECES = 1,
-    RANDO_STARTING_HEARTS_ARE_MAX = 0xFFFFFFFF
-} RandoStartingHeartsAreContainersOrPieces;
-
-typedef enum {
-    RANDO_SHUFFLE_REGIONAL_MAPS_VANILLA = 0,
-    RANDO_SHUFFLE_REGIONAL_MAPS_STARTING = 1,
-    RANDO_SHUFFLE_REGIONAL_MAPS_ANYWHERE = 2,
-    RANDO_SHUFFLE_REGIONAL_MAPS_MAX = 0xFFFFFFFF
-} RandoShuffleRegionalMaps;
-
-typedef enum {
-    RANDO_SHUFFLE_BOSS_REMAINS_VANILLA = 0,
-    RANDO_SHUFFLE_BOSS_REMAINS_ANYWHERE = 1,
-    RANDO_SHUFFLE_BOSS_REMAINS_BOSSES = 2,
-    RANDO_SHUFFLE_BOSS_REMAINS_MAX = 0xFFFFFFFF
-} RandoShuffleBossRemains;
-
-typedef enum {
-    RANDO_SKULLSANITY_VANILLA = 0,
-    RANDO_SKULLSANITY_ANYTHING = 1,
-    RANDO_SKULLSANITY_IGNORE = 2,
-    RANDO_SKULLSANITY_MAX = 0xFFFFFFFF
-} RandoSkullSanity;
-
-typedef enum {
-    RANDO_SHOP_PRICES_VANILLA = 0,
-    RANDO_SHOP_PRICES_FREE = 1,
-    RANDO_SHOP_PRICES_CHEAP = 2,
-    RANDO_SHOP_PRICES_EXPENSIVE = 3,
-    RANDO_SHOP_PRICES_OFFENSIVE = 4,
-    RANDO_SHOP_PRICES_MAX = 0xFFFFFFFF
-} RandoShopPrices;
-
-typedef enum {
-    RANDO_SHOPSANITY_VANILLA = 0,
-    RANDO_SHOPSANITY_ENABLED = 1,
-    RANDO_SHOPSANITY_ADVANCED = 2,
-    RANDO_SHOPSANITY_MAX = 0xFFFFFFFF
-} RandoShopSanity;
-
-typedef enum {
-    RANDO_DAMAGE_MULITPLIER_HALF = 0,
-    RANDO_DAMAGE_MULITPLIER_NORMAL = 1,
-    RANDO_DAMAGE_MULITPLIER_DOUBLE = 2,
-    RANDO_DAMAGE_MULITPLIER_QUAD = 3,
-    RANDO_DAMAGE_MULITPLIER_ONE_HIT_KO = 4,
-    RANDO_DAMAGE_MULITPLIER_MAX = 0xFFFFFFFF
-} RandoDamageMultiplier;
-
-typedef enum {
-    RANDO_DEATH_BEHAVIOR_VANILLA = 0,
-    RANDO_DEATH_BEHAVIOR_FAST = 1,
-    RANDO_DEATH_BEHAVIOR_INSTANT = 2,
-    RANDO_DEATH_BEHAVIOR_MOON_CRASH = 3,
-    RANDO_DEATH_BEHAVIOR_MAX = 0xFFFFFFFF
-} RandoDeathBehavior;
+typedef struct {
+    RecompuiResource button;
+    RecompuiResource wrapper;
+    char*      title;
+    bool             open;
+} RandoSection;
 
 struct RandoYamlConfigMenu {
     RecompuiContext context;

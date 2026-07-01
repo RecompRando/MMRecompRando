@@ -113,6 +113,25 @@ void Post_Message_OpenText() {
     // }
 }
 
+// u16 savedPress;
+
+// RECOMP_HOOK("Message_Update")
+// void skip_credits(PlayState* play) {
+//     MessageContext* msgCtx = &play->msgCtx;
+//     Input* controller = CONTROLLER1(&play->state);
+
+//     savedPress = controller->press.button;
+//     controller->press.button |= BTN_A;
+// }
+
+// RECOMP_HOOK_RETURN("Message_Update")
+// void fix_inputs() {
+//     PlayState* play = gPlay;
+//     MessageContext* msgCtx = &play->msgCtx;
+//     Input* controller = CONTROLLER1(&play->state);
+//     controller->press.button = savedPress;
+// }
+
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Send_Item); // "You sent [player] their [item]"
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_Self_Item); // "You found your [item]"
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Kokiri_Sword);
@@ -1073,34 +1092,34 @@ EZTR_MSG_CALLBACK(randoPictograph) {
     char* picture_type;
 
     if (Snap_CheckFlag(PICTO_VALID_MONKEY)) {
-        picture_type = " " EZTR_CC_COLOR_RED "picture of a monkey" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+        picture_type = "picture of a monkey" EZTR_CC_END;
     } else if (Snap_CheckFlag(PICTO_VALID_BIG_OCTO)) {
-        picture_type = " " EZTR_CC_COLOR_RED "picture of a Big Octo" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+        picture_type = "picture of a Big Octo" EZTR_CC_END;
     } else if (Snap_CheckFlag(PICTO_VALID_SCARECROW)) {
-        picture_type = " " EZTR_CC_COLOR_RED "picture of a scarecrow" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+        picture_type = "picture of a scarecrow" EZTR_CC_END;
     } else if (Snap_CheckFlag(PICTO_VALID_TINGLE)) {
-        picture_type = " " EZTR_CC_COLOR_RED "picture of Tingle" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+        picture_type = "picture of Tingle" EZTR_CC_END;
     } else if (Snap_CheckFlag(PICTO_VALID_DEKU_KING)) {
-        picture_type = " " EZTR_CC_COLOR_RED "picture of the Deku King" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+        picture_type = "picture of the Deku King" EZTR_CC_END;
     } else if (Snap_CheckFlag(PICTO_VALID_PIRATE_GOOD)) {
-        picture_type = " " EZTR_CC_COLOR_RED "good picture of a pirate" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+        picture_type = "good picture of a pirate" EZTR_CC_END;
     } else if (Snap_CheckFlag(PICTO_VALID_PIRATE_TOO_FAR)) {
-        picture_type = " " EZTR_CC_COLOR_RED "bad picture of a pirate" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+        picture_type = "bad picture of a pirate" EZTR_CC_END;
     } else if (Snap_CheckFlag(PICTO_VALID_LULU_HEAD)) {
         if (Snap_CheckFlag(PICTO_VALID_LULU_RIGHT_ARM) && Snap_CheckFlag(PICTO_VALID_LULU_LEFT_ARM)) {
-            picture_type = " " EZTR_CC_COLOR_RED "good picture of Lulu" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+            picture_type = "good picture of Lulu" EZTR_CC_END;
         } else {
-            picture_type = " " EZTR_CC_COLOR_RED "bad picture of Lulu" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+            picture_type = "bad picture of Lulu" EZTR_CC_END;
         }
     } else if (Snap_CheckFlag(PICTO_VALID_IN_SWAMP)) {
-        picture_type = " " EZTR_CC_COLOR_RED "picture of the swamp" EZTR_CC_COLOR_DEFAULT EZTR_CC_END;
+        picture_type = "picture of the swamp" EZTR_CC_END;
     } else {
-        picture_type = EZTR_CC_END;
+        picture_type = "picture" EZTR_CC_END;
     }
 
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
-        "Keep this %m" EZTR_CC_COLOR_RED "picture" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN EZTR_CC_NEWLINE
+        "Keep this " EZTR_CC_COLOR_RED "%m" EZTR_CC_COLOR_DEFAULT "?" EZTR_CC_COLOR_GREEN EZTR_CC_NEWLINE
         EZTR_CC_NEWLINE EZTR_CC_TWO_CHOICE
         "Yes" EZTR_CC_NEWLINE
         "No" EZTR_CC_END,
@@ -1701,6 +1720,8 @@ EZTR_MSG_CALLBACK(randoBombShopGoronHasSell) {
 
 // Gossip Stones
 EZTR_MSG_CALLBACK(randoGossips) {
+    // recomp_printf("textId 0x%04X\n", textId);
+    
     REPY_FN_SETUP_RANDO;
 
     REPY_FN_SET_U16("textId", textId);
@@ -1844,7 +1865,7 @@ EZTR_MSG_CALLBACK(randoGossips) {
                 switch (random_connector_choice) {
                     default:
                     case 0:
-                        random_connector = "might" EZTR_CC_NEWLINE "be" EZTR_CC_END;
+                        random_connector = "might" EZTR_CC_NEWLINE "be " EZTR_CC_END;
                         break;
                     case 1:
                         random_connector = "is" EZTR_CC_NEWLINE "possibly " EZTR_CC_END;
@@ -1862,8 +1883,7 @@ EZTR_MSG_CALLBACK(randoGossips) {
 
                 if (fake_code == real_code) {
                     EZTR_MsgBuffer_SetTextBoxDisplayIcon(buf, EZTR_ICON_EXCLAMATION_MARK);
-                    random_connector = "is" EZTR_CC_NEWLINE "in fact ";
-                    break;
+                    random_connector = "is" EZTR_CC_NEWLINE "in fact " EZTR_CC_END;
                 }
 
                 EZTR_MsgSContent_Sprintf(
