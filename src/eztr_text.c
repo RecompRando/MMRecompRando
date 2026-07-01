@@ -1921,12 +1921,12 @@ EZTR_MSG_CALLBACK(randoGossips) {
                 break;
             case 11: // Another castle
                 text = "Sorry " EZTR_CC_COLOR_RED EZTR_CC_NAME EZTR_CC_COLOR_DEFAULT ", but your" EZTR_CC_NEWLINE
-                        "hint is in another Gossip Stone." EZTR_CC_END;
+                        "hint is on another Gossip Stone." EZTR_CC_END;
                 break;
-            case 12: // [Player_Name] reportedly forgot
-                text = EZTR_CC_COLOR_RED EZTR_CC_NAME EZTR_CC_COLOR_DEFAULT " reportedly forgot" EZTR_CC_NEWLINE
-                        "to claim the " EZTR_CC_COLOR_RED "Great Fairy " EZTR_CC_COLOR_DEFAULT "reward" EZTR_CC_NEWLINE
-                        "before playing the " EZTR_CC_COLOR_LIGHTBLUE "Song of Time" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END;
+            case 12: // Real Zelda players
+                text = "They say that players who select" EZTR_CC_NEWLINE
+                        "the " EZTR_CC_COLOR_RED "HOLD " EZTR_CC_COLOR_DEFAULT "option for " EZTR_CC_COLOR_RED "Z TARGETING" EZTR_CC_NEWLINE
+                        EZTR_CC_COLOR_DEFAULT "are the real " EZTR_CC_COLOR_DEFAULT "Zelda players!" EZTR_CC_END;
                 break;
             case 13: // IT'S PIKACHU!
                 text = "IT'S" EZTR_CC_COLOR_YELLOW "PIKACHU" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END;
