@@ -3067,7 +3067,7 @@ EZTR_ON_INIT void init_text() {
     );
     
     EZTR_Basic_AddCustomText(
-        EZTR_HNAME(Rando_GI_GBMap),
+        EZTR_HNAME(Rando_GI_STMap),
         EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
         0,
         EZTR_ICON_DUNGEON_MAP,
@@ -3119,7 +3119,7 @@ EZTR_ON_INIT void init_text() {
     );
     
     EZTR_Basic_AddCustomText(
-        EZTR_HNAME(Rando_GI_GBCompass),
+        EZTR_HNAME(Rando_GI_STCompass),
         EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
         0,
         EZTR_ICON_COMPASS,
