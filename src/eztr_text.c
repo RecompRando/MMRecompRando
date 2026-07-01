@@ -894,26 +894,38 @@ EZTR_MSG_CALLBACK(randoMilkBar) {
     recomp_free(player_name2);
 }
 
-#define DUNGEON_WOODFALL 1
-#define DUNGEON_SNOWHEAD 2
-#define DUNGEON_GREATBAY 3
-#define DUNGEON_STONETOWER 4
+u16 savedDungeonIndex;
+bool changedDungeonIndex;
+
+// unsure if handling this dungeon change like this is a problem
+RECOMP_HOOK_RETURN("Message_CloseTextbox")
+void Message_RestoreDungeon() {
+    if (changedDungeonIndex) {
+        gSaveContext.dungeonIndex = savedDungeonIndex;
+        changedDungeonIndex = false;
+    }
+}
+
 #define LOCATION_GREAT_FAIRY(type) (0x030000 | type)
-void strayFairyMsg(EZTR_MsgBuffer* buf, u8 type, u8 count, u8 required) {
+void strayFairyMsg(EZTR_MsgBuffer* buf, DungeonIndex type, u8 count, u8 required) {
     char* type_str;
-    u32 reward_location = LOCATION_GREAT_FAIRY(type);
+    u32 reward_location = LOCATION_GREAT_FAIRY(type + 1);
+
+    savedDungeonIndex = gSaveContext.dungeonIndex;
+    gSaveContext.dungeonIndex = type;
+    changedDungeonIndex = true;
 
     switch (type) {
-        case DUNGEON_WOODFALL:
+        case DUNGEON_INDEX_WOODFALL_TEMPLE:
             type_str = EZTR_CC_COLOR_PINK "Woodfall" EZTR_CC_END;
             break;
-        case DUNGEON_SNOWHEAD:
+        case DUNGEON_INDEX_SNOWHEAD_TEMPLE:
             type_str = EZTR_CC_COLOR_GREEN "Snowhead" EZTR_CC_END;
             break;
-        case DUNGEON_GREATBAY:
+        case DUNGEON_INDEX_GREAT_BAY_TEMPLE:
             type_str = EZTR_CC_COLOR_BLUE "Great Bay" EZTR_CC_END;
             break;
-        case DUNGEON_STONETOWER:
+        case DUNGEON_INDEX_STONE_TOWER_TEMPLE:
             type_str = EZTR_CC_COLOR_YELLOW "Stone Tower" EZTR_CC_END;
             break;
     }
@@ -960,28 +972,28 @@ EZTR_MSG_CALLBACK(WoodfallStrayFairyCount) {
     u8 fairy_count = rando_has_item(AP_ITEM_ID_STRAY_FAIRY_WOODFALL);
     u8 fairy_required = rando_get_slotdata_u32("required_stray_fairies");
     
-    strayFairyMsg(buf, DUNGEON_WOODFALL, fairy_count, fairy_required);
+    strayFairyMsg(buf, DUNGEON_INDEX_WOODFALL_TEMPLE, fairy_count, fairy_required);
 }
 
 EZTR_MSG_CALLBACK(SnowheadStrayFairyCount) {
     u8 fairy_count = rando_has_item(AP_ITEM_ID_STRAY_FAIRY_SNOWHEAD);
     u8 fairy_required = rando_get_slotdata_u32("required_stray_fairies");
         
-    strayFairyMsg(buf, DUNGEON_SNOWHEAD, fairy_count, fairy_required);
+    strayFairyMsg(buf, DUNGEON_INDEX_SNOWHEAD_TEMPLE, fairy_count, fairy_required);
 }
 
 EZTR_MSG_CALLBACK(GreatBayStrayFairyCount) {
     u8 fairy_count = rando_has_item(AP_ITEM_ID_STRAY_FAIRY_GREATBAY);
     u8 fairy_required = rando_get_slotdata_u32("required_stray_fairies");
         
-    strayFairyMsg(buf, DUNGEON_GREATBAY, fairy_count, fairy_required);
+    strayFairyMsg(buf, DUNGEON_INDEX_GREAT_BAY_TEMPLE, fairy_count, fairy_required);
 }
 
 EZTR_MSG_CALLBACK(StoneTowerStrayFairyCount) {
     u8 fairy_count = rando_has_item(AP_ITEM_ID_STRAY_FAIRY_STONETOWER);
     u8 fairy_required = rando_get_slotdata_u32("required_stray_fairies");
         
-    strayFairyMsg(buf, DUNGEON_STONETOWER, fairy_count, fairy_required);
+    strayFairyMsg(buf, DUNGEON_INDEX_STONE_TOWER_TEMPLE, fairy_count, fairy_required);
 }
 
 EZTR_MSG_CALLBACK(SnowheadSmallKeyCount) {
