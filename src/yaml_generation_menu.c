@@ -172,23 +172,23 @@ void randoYAMLCreate(RandoYamlConfigMenu* menu, bool place_in_archipelago) {
 
     recomp_printf("finished setting yaml options\n");
 
+    REPY_FN_EXEC_CACHE(
+        py_rando_write_yaml_to_mod_data,
+        "from datetime import datetime\n"
+        "current_datetime = datetime.now().strftime('%d-%m-%Y_%H-%M-%S')\n"
+        "file_name = f'AP_Recomp_{current_datetime}.yaml'\n"
+        "output_dir = recomp_data.mod_data_path.joinpath('solo_yamls', file_name)\n"
+        "output_file = output_dir.open('w')\n"
+        "rando_solo.populate_yaml_header(output_file)\n"
+        "yaml.dump({recomp_data.game_name: output_options}, output_file)\n"
+        "recomp_data.last_generated_yaml_location = output_dir\n"
+    );
+
     if (place_in_archipelago) {
         REPY_FN_EXEC_CACHE(
             py_rando_write_solo_yaml_to_players,
             "rando_solo.clear_players_folder()\n"
             "output_dir = recomp_data.mod_data_path.joinpath('Archipelago', 'local', 'Players', 'solo.yaml')\n"
-            "output_file = output_dir.open('w')\n"
-            "rando_solo.populate_yaml_header(output_file)\n"
-            "yaml.dump({recomp_data.game_name: output_options}, output_file)\n"
-            "recomp_data.last_generated_yaml_location = output_dir\n"
-        );
-    } else {
-        REPY_FN_EXEC_CACHE(
-            py_rando_write_yaml_to_mod_data,
-            "from datetime import datetime\n"
-            "current_datetime = datetime.now().strftime('%d-%m-%Y_%H-%M-%S')\n"
-            "file_name = f'AP_Recomp_{current_datetime}.yaml'\n"
-            "output_dir = recomp_data.mod_data_path.joinpath('solo_yamls', file_name)\n"
             "output_file = output_dir.open('w')\n"
             "rando_solo.populate_yaml_header(output_file)\n"
             "yaml.dump({recomp_data.game_name: output_options}, output_file)\n"
