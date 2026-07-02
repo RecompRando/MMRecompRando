@@ -14,6 +14,7 @@
 
 #define NOTIFICATION_WIDTH 400.0f
 #define NOTIFICATION_PADDING 12.0f
+#define BODY_PADDING 32.0f
 #define IMG_SIZE 75.0f
 
 RecompuiContext notif_context;
@@ -79,6 +80,18 @@ void setNotificationPosition() {
     }
 }
 
+RECOMP_IMPORT("*", float recomp_get_target_aspect_ratio(float original));
+
+void setNotificationWidth() {
+    float original_aspect_ratio = ((float)SCREEN_WIDTH) / ((float)SCREEN_HEIGHT);
+    float ratio = recomp_get_target_aspect_ratio(original_aspect_ratio);
+    if (randoGenerateMenuOpen()) {
+        recompui_set_width_auto(notif_container);
+    } else {
+        recompui_set_width(notif_container, (RECOMPUI_TOTAL_HEIGHT * ratio) - (BODY_PADDING * 2), UNIT_DP);
+    }
+}
+
 void notificationUpdateCycle() {
     // fade out + remove notifications
     int start_index = notif_head;
@@ -107,15 +120,14 @@ void notificationUpdateCycle() {
         }
     }
 
-    // change notification position
+    // change notification position/width
     recompui_open_context(notif_context);
     setNotificationPosition();
+    setNotificationWidth();
     recompui_close_context(notif_context);
 }
 
 void randoCreateNotificationContainer() {
-    const float body_padding = 32.0f;
-
     // create notification context
     notif_context = recompui_create_context();
     recompui_set_context_captures_input(notif_context, 0);
@@ -132,9 +144,10 @@ void randoCreateNotificationContainer() {
     recompui_set_left(notif_root, 0, UNIT_DP);
     recompui_set_width_auto(notif_root);
     recompui_set_height_auto(notif_root);
-    recompui_set_padding(notif_root, body_padding, UNIT_DP);
+    recompui_set_padding(notif_root, BODY_PADDING, UNIT_DP);
     recompui_set_flex_direction(notif_root, FLEX_DIRECTION_COLUMN);
     recompui_set_justify_content(notif_root, JUSTIFY_CONTENT_CENTER);
+    recompui_set_align_items(notif_root, ALIGN_ITEMS_CENTER);
 
     // create main notification container
     notif_container = recompui_create_element(notif_context, notif_root);
