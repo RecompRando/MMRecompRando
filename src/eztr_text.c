@@ -821,7 +821,7 @@ EZTR_MSG_CALLBACK(randoMilkBar) {
         EZTR_MsgSContent_Snprintf(
             formatted_item_name1,
             128,
-            EZTR_CC_COLOR_GREEN "Regular Milk:" EZTR_CC_END
+            EZTR_CC_COLOR_GREEN "Regular Milk" EZTR_CC_END
         );
     }
 
@@ -837,7 +837,7 @@ EZTR_MSG_CALLBACK(randoMilkBar) {
         EZTR_MsgSContent_Snprintf(
             formatted_item_name2,
             128,
-            EZTR_CC_COLOR_GREEN "Chateau:" EZTR_CC_END
+            EZTR_CC_COLOR_GREEN "Chateau" EZTR_CC_END
         );
     }
 
