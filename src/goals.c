@@ -21,34 +21,27 @@ bool rando_met_masks_condition(u32 required_amount) {
     return maskCount >= required_amount;
 }
 
-bool rando_met_star_fox_condition(u32 required_amount) {
-    u8 starfoxMaskCount = 0;
-    
-    // Check the 5 Star Fox masks
-    if (gSaveContext.save.saveInfo.inventory.items[SLOT_MASK_KEATON] != ITEM_NONE) {
-        starfoxMaskCount++;
+// moon_star_fox / majora_star_fox are Toggle options so if on all 5 are req.
+bool rando_met_star_fox_condition(u32 required) {
+    if (!required) {
+        return true;
     }
-    if (gSaveContext.save.saveInfo.inventory.items[SLOT_MASK_BREMEN] != ITEM_NONE) {
-        starfoxMaskCount++;
-    }
-    if (gSaveContext.save.saveInfo.inventory.items[SLOT_MASK_BUNNY] != ITEM_NONE) {
-        starfoxMaskCount++;
-    }
-    if (gSaveContext.save.saveInfo.inventory.items[SLOT_MASK_SCENTS] != ITEM_NONE) {
-        starfoxMaskCount++;
-    }
-    if (gSaveContext.save.saveInfo.inventory.items[SLOT_MASK_DON_GERO] != ITEM_NONE) {
-        starfoxMaskCount++;
-    }
-    
-    return starfoxMaskCount >= required_amount;
+
+    return (gSaveContext.save.saveInfo.inventory.items[SLOT_MASK_KEATON]   != ITEM_NONE) &&
+           (gSaveContext.save.saveInfo.inventory.items[SLOT_MASK_BREMEN]   != ITEM_NONE) &&
+           (gSaveContext.save.saveInfo.inventory.items[SLOT_MASK_BUNNY]    != ITEM_NONE) &&
+           (gSaveContext.save.saveInfo.inventory.items[SLOT_MASK_SCENTS]   != ITEM_NONE) &&
+           (gSaveContext.save.saveInfo.inventory.items[SLOT_MASK_DON_GERO] != ITEM_NONE);
 }
 
 bool rando_met_scarecrow_condition(u32 required_amount) {
     u8 scarecrowCount = 0;
     
-    // All scarecrow IDs from APworld 
+    // Scarecrow IDs
     static const u32 scarecrowLocations[] = {
+        0x302910,  // Astral Observatory Scarecrow
+        0x303300,  // Zora Hall Pervert Scarecrow
+        0x303400,  // Clock Town Trading Post Scarecrow
         0x305000,  // Mountain Village Rooftop Scarecrow
         0x305A00,  // Mountain Village Spring Rooftop Scarecrow
         0x305B00,  // Path to Snowhead Scarecrow
@@ -89,9 +82,10 @@ bool rando_met_frog_condition(u32 required_amount) {
 
 bool rando_met_owl_condition(u32 required_amount) {
     u8 owlCount = 0;
-    
-    // Count all activated owl statues
-    for (int i = 0; i < 16; i++) {
+
+    // Only the 10 randomized statues count. hitting the hidden
+    // owl inflates the total by one and lets the goal pass early otherwise.
+    for (int i = OWL_WARP_GREAT_BAY_COAST; i <= OWL_WARP_STONE_TOWER; i++) {
         if ((gSaveContext.save.saveInfo.playerData.owlActivationFlags >> i) & 1) {
             owlCount++;
         }
@@ -159,21 +153,25 @@ bool rando_met_majora_condition() {
 
 
 bool rando_met_all_goal() {
+    u32 required_fairies = rando_get_slotdata_u32("required_stray_fairies");
+    u32 required_tokens  = rando_get_slotdata_u32("required_skull_tokens");
+
     return  (rando_get_slotdata_u32("completion_goal")) &&
             rando_met_remains_condition(4) &&           // All 4 remains
-            rando_met_items_condition(30) &&            // All items
+            rando_met_items_condition(29) &&            // All items
             rando_met_masks_condition(24) &&            // All 24 masks
             rando_met_owl_condition(10) &&              // All 10 owls
-            rando_met_scarecrow_condition(14) &&        // All 14 scarecrows
+            rando_met_scarecrow_condition(17) &&        // All 17 scarecrows
             rando_met_frog_condition(5) &&              // All 5 frogs
+            rando_met_star_fox_condition(1) &&          // All 5 Star Fox masks
             // all heart pieces/containers
             gSaveContext.save.saveInfo.playerData.healthCapacity >= 0x140 &&
-            // stray fairies
-            gSaveContext.save.saveInfo.inventory.strayFairies[0] >= 15 &&
-            gSaveContext.save.saveInfo.inventory.strayFairies[1] >= 15 &&
-            gSaveContext.save.saveInfo.inventory.strayFairies[2] >= 15 &&
-            gSaveContext.save.saveInfo.inventory.strayFairies[3] >= 15 &&
-            // skulltulas
-            Inventory_GetSkullTokenCount(SCENE_KINSTA1) >= 30 &&
-            Inventory_GetSkullTokenCount(SCENE_KINDAN2) >= 30;
+            // skulltulas (honour the player choice, don't hardcode 15)
+            gSaveContext.save.saveInfo.inventory.strayFairies[0] >= required_fairies &&
+            gSaveContext.save.saveInfo.inventory.strayFairies[1] >= required_fairies &&
+            gSaveContext.save.saveInfo.inventory.strayFairies[2] >= required_fairies &&
+            gSaveContext.save.saveInfo.inventory.strayFairies[3] >= required_fairies &&
+            // skulltulas (honour the player choice, don't hardcode 30)
+            Inventory_GetSkullTokenCount(SCENE_KINSTA1) >= required_tokens &&
+            Inventory_GetSkullTokenCount(SCENE_KINDAN2) >= required_tokens;
 }

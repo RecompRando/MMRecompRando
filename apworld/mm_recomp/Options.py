@@ -52,7 +52,7 @@ class MoonScarecrowsRequired(Range):
     """Set the amount of scarecrows required to reach the Moon after playing Oath to Order."""
     display_name = "Moon Scarecrows Required"
     range_start = 0
-    range_end = 14
+    range_end = 17
     default = 0
 
 
