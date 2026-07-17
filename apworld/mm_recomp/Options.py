@@ -68,7 +68,7 @@ class MoonItemsRequired(Range):
     """Set the amount of trade items required to reach the Moon after playing Oath to Order."""
     display_name = "Moon Items Required"
     range_start = 0
-    range_end = 48
+    range_end = 29
     default = 0
 
 
