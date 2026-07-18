@@ -3,6 +3,13 @@
 
 #include "apcommon.h"
 
+void randoTriggerVictory(PlayState* play) {
+    gSaveContext.save.entrance = ENTRANCE(TERMINA_FIELD, 0);
+    play->nextEntrance = ENTRANCE(TERMINA_FIELD, 0);
+    gSaveContext.nextCutsceneIndex = 0xFFF7; // this part actually sets the win con cutscene
+    play->transitionTrigger = TRANS_TRIGGER_START;
+}
+
 bool rando_met_remains_condition(u32 required_amount) {
     return ((CHECK_QUEST_ITEM(QUEST_REMAINS_ODOLWA) > 0) +
             (CHECK_QUEST_ITEM(QUEST_REMAINS_GOHT) > 0) +
@@ -153,8 +160,8 @@ bool rando_met_majora_condition() {
 
 
 bool rando_met_all_goal() {
-    u32 required_fairies = rando_get_slotdata_u32("required_stray_fairies");
-    u32 required_tokens  = rando_get_slotdata_u32("required_skull_tokens");
+    s32 required_fairies = (s32)rando_get_slotdata_u32("required_stray_fairies");
+    s32 required_tokens  = (s32)rando_get_slotdata_u32("required_skull_tokens");
 
     return  (rando_get_slotdata_u32("completion_goal")) &&
             rando_met_remains_condition(4) &&           // All 4 remains
