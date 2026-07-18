@@ -7782,17 +7782,17 @@ location_data_table: Dict[str, MMRLocationData] = {
     "Southern Swamp Post Dungeon Witch Pot (1)": MMRLocationData(
         region="Woodfall Temple",
         address=0x200020,
-        can_create=lambda options: pot_enabled(options, is_dungeon=True)
+        can_create=lambda options: pot_enabled(options)
     ),
     "Southern Swamp Post Dungeon Witch Pot (2)": MMRLocationData(
         region="Woodfall Temple",
         address=0x200021,
-        can_create=lambda options: pot_enabled(options, is_dungeon=True)
+        can_create=lambda options: pot_enabled(options)
     ),
     "Southern Swamp Post Dungeon Witch Pot (3)": MMRLocationData(
         region="Woodfall Temple",
         address=0x200022,
-        can_create=lambda options: pot_enabled(options, is_dungeon=True)
+        can_create=lambda options: pot_enabled(options)
     ),
     # Mountain Village Pots
     

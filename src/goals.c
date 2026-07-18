@@ -1,6 +1,5 @@
 #include "modding.h"
 #include "global.h"
-
 #include "apcommon.h"
 
 void randoTriggerVictory(PlayState* play) {
@@ -11,17 +10,22 @@ void randoTriggerVictory(PlayState* play) {
 }
 
 bool rando_met_remains_condition(u32 required_amount) {
-    return ((CHECK_QUEST_ITEM(QUEST_REMAINS_ODOLWA) > 0) +
-            (CHECK_QUEST_ITEM(QUEST_REMAINS_GOHT) > 0) +
-            (CHECK_QUEST_ITEM(QUEST_REMAINS_GYORG) > 0) +
-            (CHECK_QUEST_ITEM(QUEST_REMAINS_TWINMOLD) > 0)) >= required_amount;
+    u8 remainsCount = 0;
+
+    for (int i = 0; i < 4; i++) {
+        if (rando_has_item(GI_REMAINS_ODOLWA + i)) {
+            remainsCount++;
+        }
+    }
+    return remainsCount >= required_amount;
 }
 
 bool rando_met_masks_condition(u32 required_amount) {
     u8 maskCount = 0;
-    
-    for (InventorySlot slot = SLOT_MASK_POSTMAN; slot <= SLOT_MASK_FIERCE_DEITY; slot++) {
-        if (gSaveContext.save.saveInfo.inventory.items[slot] != ITEM_NONE) {
+
+    // GI_MASK_DEKU..GI_MASK_KAFEI is every mask
+    for (u32 id = GI_MASK_DEKU; id <= GI_MASK_KAFEIS_MASK; id++) {
+        if (rando_has_item(id)) {
             maskCount++;
         }
     }
@@ -34,18 +38,23 @@ bool rando_met_star_fox_condition(u32 required) {
         return true;
     }
 
-    return (gSaveContext.save.saveInfo.inventory.items[SLOT_MASK_KEATON]   != ITEM_NONE) &&
-           (gSaveContext.save.saveInfo.inventory.items[SLOT_MASK_BREMEN]   != ITEM_NONE) &&
-           (gSaveContext.save.saveInfo.inventory.items[SLOT_MASK_BUNNY]    != ITEM_NONE) &&
-           (gSaveContext.save.saveInfo.inventory.items[SLOT_MASK_SCENTS]   != ITEM_NONE) &&
-           (gSaveContext.save.saveInfo.inventory.items[SLOT_MASK_DON_GERO] != ITEM_NONE);
+    return rando_has_item(GI_MASK_KEATON) &&
+           rando_has_item(GI_MASK_BREMEN) &&
+           rando_has_item(GI_MASK_BUNNY) &&
+           rando_has_item(GI_MASK_SCENTS) &&
+           rando_has_item(GI_MASK_DON_GERO);
 }
 
 bool rando_met_scarecrow_condition(u32 required_amount) {
     u8 scarecrowCount = 0;
-    
+
+    // Scarecrows only exist as AP items when scarecrowsanity is on.
+    if (!rando_get_slotdata_u32("scarecrowsanity")) {
+        return true;
+    }
+
     // Scarecrow IDs
-    static const u32 scarecrowLocations[] = {
+    u32 scarecrowLocations[] = {
         0x302910,  // Astral Observatory Scarecrow
         0x303300,  // Zora Hall Pervert Scarecrow
         0x303400,  // Clock Town Trading Post Scarecrow
@@ -77,6 +86,11 @@ bool rando_met_scarecrow_condition(u32 required_amount) {
 bool rando_met_frog_condition(u32 required_amount) {
     u8 frogCount = 0;
 
+    // Frogs only exist as AP items when frogsanity is on.
+    if (!rando_get_slotdata_u32("frogsanity")) {
+        return true;
+    }
+
     // frogs are ids 0xFF0000 - 0xFF0004
     for (int i = 0; i < 5; i++) {
         if (rando_has_item(AP_PREFIX_FROGS | i)) {
@@ -90,10 +104,14 @@ bool rando_met_frog_condition(u32 required_amount) {
 bool rando_met_owl_condition(u32 required_amount) {
     u8 owlCount = 0;
 
-    // Only the 10 randomized statues count. hitting the hidden
-    // owl inflates the total by one and lets the goal pass early otherwise.
-    for (int i = OWL_WARP_GREAT_BAY_COAST; i <= OWL_WARP_STONE_TOWER; i++) {
-        if ((gSaveContext.save.saveInfo.playerData.owlActivationFlags >> i) & 1) {
+    // Owl statues only exist as AP items when owlsanity is on.
+    if (!rando_get_slotdata_u32("owlsanity")) {
+        return true;
+    }
+
+    // Counting AP items rather than activations sidesteps hidden owl potentially counting.
+    for (int i = 0; i < 10; i++) {
+        if (rando_has_item(AP_PREFIX_OWLS | i)) {
             owlCount++;
         }
     }
@@ -104,7 +122,7 @@ bool rando_met_items_condition(u32 required_amount) {
     u8 itemCount = 0;
     
     // Trade Items
-    static const u32 tradeItems[] = {
+    u32 tradeItems[] = {
         GI_ROOM_KEY,              // Room Key
         GI_LETTER_TO_MAMA,        // Priority Mail
         GI_LETTER_TO_KAFEI,       // Letter to Kafei
@@ -160,9 +178,6 @@ bool rando_met_majora_condition() {
 
 
 bool rando_met_all_goal() {
-    s32 required_fairies = (s32)rando_get_slotdata_u32("required_stray_fairies");
-    s32 required_tokens  = (s32)rando_get_slotdata_u32("required_skull_tokens");
-
     return  (rando_get_slotdata_u32("completion_goal")) &&
             rando_met_remains_condition(4) &&           // All 4 remains
             rando_met_items_condition(29) &&            // All items
@@ -173,12 +188,16 @@ bool rando_met_all_goal() {
             rando_met_star_fox_condition(1) &&          // All 5 Star Fox masks
             // all heart pieces/containers
             gSaveContext.save.saveInfo.playerData.healthCapacity >= 0x140 &&
-            // skulltulas (honour the player choice, don't hardcode 15)
-            gSaveContext.save.saveInfo.inventory.strayFairies[0] >= required_fairies &&
-            gSaveContext.save.saveInfo.inventory.strayFairies[1] >= required_fairies &&
-            gSaveContext.save.saveInfo.inventory.strayFairies[2] >= required_fairies &&
-            gSaveContext.save.saveInfo.inventory.strayFairies[3] >= required_fairies &&
-            // skulltulas (honour the player choice, don't hardcode 30)
-            Inventory_GetSkullTokenCount(SCENE_KINSTA1) >= required_tokens &&
-            Inventory_GetSkullTokenCount(SCENE_KINDAN2) >= required_tokens;
+            // I don't know what the fuck I was on about when I thought allowing 
+            // players to choose their own '100%' was a good idea.
+            (rando_has_item(AP_ITEM_ID_STRAY_FAIRY_WOODFALL) >= 15) &&
+            (rando_has_item(AP_ITEM_ID_STRAY_FAIRY_SNOWHEAD) >= 15) &&
+            (rando_has_item(AP_ITEM_ID_STRAY_FAIRY_GREATBAY) >= 15) &&
+            (rando_has_item(AP_ITEM_ID_STRAY_FAIRY_STONETOWER) >= 15) &&
+            // see above
+            ((rando_get_slotdata_u32("skullsanity") != 2)
+                ? ((rando_has_item(GI_TRUE_SKULL_TOKEN) >= 30) &&
+                   (rando_has_item(GI_OCEAN_SKULL_TOKEN) >= 30))
+                : ((Inventory_GetSkullTokenCount(SCENE_KINSTA1) >= 30) &&
+                   (Inventory_GetSkullTokenCount(SCENE_KINDAN2) >= 30)));
 }
