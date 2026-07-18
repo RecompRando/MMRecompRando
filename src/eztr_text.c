@@ -2209,6 +2209,27 @@ EZTR_MSG_CALLBACK(randoGossips) {
 // Replacements of existing IDs
 EZTR_ON_INIT void init_text() {
     EZTR_Basic_ReplaceText(
+        0x102F, // GBT Turtle, exiting GBT
+        EZTR_STANDARD_TEXT_BOX_II,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "It is not shameful to retreat. That" EZTR_CC_NEWLINE
+        "in and of itself is a strategy." EZTR_CC_NEWLINE
+        EZTR_CC_CARRIAGE_RETURN
+        EZTR_CC_BOX_BREAK2
+
+        "All right. Shall we go?" EZTR_CC_NEWLINE
+        EZTR_CC_COLOR_GREEN EZTR_CC_NEWLINE
+        EZTR_CC_TWO_CHOICE "Yes" EZTR_CC_NEWLINE
+        "No" EZTR_CC_END,
+        NULL
+    );
+
+    EZTR_Basic_ReplaceText(
         0x13F9, // Night 1 Ikana Gravestone
         EZTR_STANDARD_TEXT_BOX_II,
         0,
