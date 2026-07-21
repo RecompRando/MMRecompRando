@@ -7,116 +7,96 @@
 
 #include "apcommon.h"
 
-extern u8 sPlayerFormItems[];
-extern s16 sEquipState;
-extern s16 sEquipMagicArrowSlotHoldTimer;
-extern s16 sEquipAnimTimer;
+ItemId KaleidoScope_RandoGetNextTradeItem(PauseContext* pauseCtx, ItemId slot, ItemId max) {
+    u32 i, first_i, tradeGIOffset;
+
+    // each trade item has a different offset to convert ItemIds to GetItemIds
+    switch (slot) {
+        case ITEM_MOONS_TEAR:
+            tradeGIOffset = 0x6E;
+            break;
+        case ITEM_ROOM_KEY:
+            tradeGIOffset = 0x73;
+            break;
+        case ITEM_LETTER_TO_KAFEI:
+            tradeGIOffset = 0x7B;
+            break;
+        default:
+            return INV_CONTENT(slot);
+    }
+
+    u32 slotAsGI = slot + tradeGIOffset;
+    u32 maxAsGI = max + tradeGIOffset;
+    
+    // failsafe(?) if there's no item in the slot but we want to cycle to it
+    if (INV_CONTENT(slot) == ITEM_NONE) {
+        for (i = slotAsGI; i <= maxAsGI; ++i) {
+            if (rando_has_item(i)) {
+                return i - tradeGIOffset;
+            }
+        }
+        return INV_CONTENT(slot);
+    } else {
+        first_i = i = INV_CONTENT(slot) + tradeGIOffset; // convert to GI (causes a bug, see rando_has_item later)
+        while (true) { // scary while true loop
+            i++;
+            if (i >= (maxAsGI + 1)) {
+                // if the index flies past the max, set it back to the intial item (original slot item)
+                i = slotAsGI;
+            }
+            if (i == first_i) {
+                // we've done a full cycle,
+                // the player has no other items
+                return i - tradeGIOffset;
+            }
+            // @bug: there is a bug here intentionally left in if you equip swap a bottle over the Moon's Tear slot
+            // we converted ItemIds to GetItemIds as they are the item ids used for the randomizer,
+            // the offset 0x6E used for this conversion works if we're looking at items that would normally be here,
+            // however if a Bottle is here this logic goes awry as the offset does not convert
+            // Bottle ItemIds to Bottle GetItemIds, so it checks against what's actually there, which are Mask GIs
+            // so in practice, if you have an Empty Bottle and try to cycle, you'll get ITEM_BOTTLE + 0x6E + 1,
+            // which ends up being equivalent to GI_MASK_GARO, meaning if you have received Garo Mask in the randomizer
+            // then the bottle will end up cycling to Red Potion (GI_MASK_GARO - 0x6E = ITEM_POTION_RED) and so on
+            if (rando_has_item(i)) {
+                // the player has it, give it to them
+                return i - tradeGIOffset;
+            }
+        }
+    }
+}
+
+void Rando_CylceTradeItem(PauseContext* pauseCtx, ItemId slot, ItemId max) {
+    ItemId current_item = INV_CONTENT(slot);
+    ItemId next_item = KaleidoScope_RandoGetNextTradeItem(pauseCtx, slot, max);
+    if (current_item != next_item) {
+        INV_CONTENT(slot) = next_item;
+        Audio_PlaySfx(NA_SE_SY_CURSOR);
+    }
+}
 
 RECOMP_HOOK("KaleidoScope_UpdateItemCursor")
 void KaleidoScope_CycleItems(PlayState* play) {
     PauseContext* pauseCtx = &play->pauseCtx;
-    MessageContext* msgCtx = &play->msgCtx;
 
-    if ((pauseCtx->state == PAUSE_STATE_MAIN) && (pauseCtx->mainState == PAUSE_MAIN_STATE_IDLE) &&
-        (pauseCtx->pageIndex == PAUSE_ITEM) && !pauseCtx->itemDescriptionOn) {
-        if ((pauseCtx->debugEditor == DEBUG_EDITOR_NONE) && (pauseCtx->state == PAUSE_STATE_MAIN) &&
-            (pauseCtx->mainState == PAUSE_MAIN_STATE_IDLE) &&
-            (CHECK_BTN_ALL(CONTROLLER1(&play->state)->press.button, BTN_L) || CHECK_BTN_ALL(CONTROLLER1(&play->state)->press.button, BTN_A))) {
+    if (pauseCtx->state == PAUSE_STATE_MAIN && pauseCtx->mainState == PAUSE_MAIN_STATE_IDLE &&
+        pauseCtx->pageIndex == PAUSE_ITEM && !pauseCtx->itemDescriptionOn && pauseCtx->debugEditor == DEBUG_EDITOR_NONE &&
+        (CHECK_BTN_ALL(CONTROLLER1(&play->state)->press.button, BTN_L) || CHECK_BTN_ALL(CONTROLLER1(&play->state)->press.button, BTN_A))) {
+        
+        // cycle to the next item in the selected slot
+        bool cycle_attempted = true;
+        if (pauseCtx->cursorSlot[PAUSE_ITEM] == SLOT(ITEM_MOONS_TEAR)) {
+            Rando_CylceTradeItem(pauseCtx, ITEM_MOONS_TEAR, ITEM_DEED_OCEAN);
+        } else if (pauseCtx->cursorSlot[PAUSE_ITEM] == SLOT(ITEM_ROOM_KEY)) {
+            Rando_CylceTradeItem(pauseCtx, ITEM_ROOM_KEY, ITEM_LETTER_MAMA);
+        } else if (pauseCtx->cursorSlot[PAUSE_ITEM] == SLOT(ITEM_LETTER_TO_KAFEI)) {
+            Rando_CylceTradeItem(pauseCtx, ITEM_LETTER_TO_KAFEI, ITEM_PENDANT_OF_MEMORIES);
+        } else {
+            cycle_attempted = false;
+        }
+
+        if (cycle_attempted) {
             // remove the A button press to prevent the item description from showing up
             CONTROLLER1(&play->state)->press.button &= ~BTN_A;
-            int i;
-            int first_i;
-            if (pauseCtx->cursorSlot[PAUSE_ITEM] == SLOT(ITEM_MOONS_TEAR)) {
-                if (INV_CONTENT(ITEM_MOONS_TEAR) == ITEM_NONE) {
-                    u32 i;
-                    for (i = GI_MOONS_TEAR; i <= GI_DEED_OCEAN; ++i) {
-                        if (rando_has_item(i)) {
-                            INV_CONTENT(ITEM_MOONS_TEAR) = i - 0x6E;
-                            Audio_PlaySfx(NA_SE_SY_CURSOR);
-                        }
-                    }
-                } else {
-                    first_i = i = INV_CONTENT(ITEM_MOONS_TEAR) + 0x6E;  // convert to GI
-                    // cycle through the player's moon's tear slot items
-                    while (true) {
-                        ++i;
-                        if (i == (GI_DEED_OCEAN + 1)) {
-                            i = GI_MOONS_TEAR;
-                        }
-                        if (i == first_i) {
-                            // we've done a full cycle,
-                            // the player has no other items
-                            break;
-                        }
-                        if (rando_has_item(i)) {
-                            // the player has it, give it to them
-                            INV_CONTENT(ITEM_MOONS_TEAR) = i - 0x6E;
-                            Audio_PlaySfx(NA_SE_SY_CURSOR);
-                            break;
-                        }
-                    }
-                }
-            } else if (pauseCtx->cursorSlot[PAUSE_ITEM] == SLOT(ITEM_ROOM_KEY)) {
-                if (INV_CONTENT(ITEM_ROOM_KEY) == ITEM_NONE) {
-                    u32 i;
-                    for (i = GI_ROOM_KEY; i <= GI_LETTER_TO_MAMA; ++i) {
-                        if (rando_has_item(i)) {
-                            INV_CONTENT(ITEM_ROOM_KEY) = i - 0x73;
-                            Audio_PlaySfx(NA_SE_SY_CURSOR);
-                        }
-                    }
-                } else {
-                    first_i = i = INV_CONTENT(ITEM_ROOM_KEY) + 0x73;  // convert to GI
-                    // cycle through the player's moon's tear slot items
-                    while (true) {
-                        ++i;
-                        if (i == (GI_LETTER_TO_MAMA + 1)) {
-                            i = GI_ROOM_KEY;
-                        }
-                        if (i == first_i) {
-                            // we've done a full cycle,
-                            // the player has no other items
-                            break;
-                        }
-                        if (rando_has_item(i)) {
-                            // the player has it, give it to them
-                            INV_CONTENT(ITEM_ROOM_KEY) = i - 0x73;
-                            Audio_PlaySfx(NA_SE_SY_CURSOR);
-                            break;
-                        }
-                    }
-                }
-            } else if (pauseCtx->cursorSlot[PAUSE_ITEM] == SLOT(ITEM_LETTER_TO_KAFEI)) {
-                if (INV_CONTENT(ITEM_LETTER_TO_KAFEI) == ITEM_NONE) {
-                    u32 i;
-                    for (i = GI_LETTER_TO_KAFEI; i <= GI_PENDANT_OF_MEMORIES; ++i) {
-                        if (rando_has_item(i)) {
-                            INV_CONTENT(ITEM_LETTER_TO_KAFEI) = i - 0x7B;
-                            Audio_PlaySfx(NA_SE_SY_CURSOR);
-                        }
-                    }
-                } else {
-                    first_i = i = INV_CONTENT(ITEM_LETTER_TO_KAFEI) + 0x7B;  // convert to GI
-                    // cycle through the player's moon's tear slot items
-                    while (true) {
-                        ++i;
-                        if (i == (GI_PENDANT_OF_MEMORIES + 1)) {
-                            i = GI_LETTER_TO_KAFEI;
-                        }
-                        if (i == first_i) {
-                            // we've done a full cycle,
-                            // the player has no other items
-                            break;
-                        }
-                        if (rando_has_item(i)) {
-                            // the player has it, give it to them
-                            INV_CONTENT(ITEM_LETTER_TO_KAFEI) = i - 0x7B;
-                            Audio_PlaySfx(NA_SE_SY_CURSOR);
-                            break;
-                        }
-                    }
-                }
-            }
         }
     }
 }
