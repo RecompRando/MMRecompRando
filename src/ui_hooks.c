@@ -101,6 +101,34 @@ void KaleidoScope_CycleItems(PlayState* play) {
     }
 }
 
+RECOMP_HOOK_RETURN("KaleidoScope_DrawItemSelect")
+void KaleidoScope_DrawCycleItems() {
+    PlayState* play = gPlay;
+    PauseContext* pauseCtx = &play->pauseCtx;
+
+    u32 slot = SLOT(ITEM_MOONS_TEAR);
+    u32 slotX4 = slot * 4;
+
+    OPEN_DISPS(play->state.gfxCtx);
+
+    Gfx_SetupDL42_Opa(play->state.gfxCtx);
+
+    // Increase the size of the selected item
+    // pauseCtx->itemVtx[slotX4 + 0].v.ob[0] = pauseCtx->itemVtx[slotX4 + 2].v.ob[0] =
+    //     pauseCtx->itemVtx[slotX4 + 0].v.ob[0] - 2;
+    // pauseCtx->itemVtx[slotX4 + 1].v.ob[0] = pauseCtx->itemVtx[slotX4 + 3].v.ob[0] =
+    //     pauseCtx->itemVtx[slotX4 + 0].v.ob[0] + 32;
+    // pauseCtx->itemVtx[slotX4 + 0].v.ob[1] = pauseCtx->itemVtx[slotX4 + 1].v.ob[1] =
+    //     pauseCtx->itemVtx[slotX4 + 0].v.ob[1] + 2;
+    // pauseCtx->itemVtx[slotX4 + 2].v.ob[1] = pauseCtx->itemVtx[slotX4 + 3].v.ob[1] =
+    //     pauseCtx->itemVtx[slotX4 + 0].v.ob[1] - 32;
+
+    gSPVertex(POLY_OPA_DISP++, &pauseCtx->itemVtx[slotX4], 4, 0);
+    KaleidoScope_DrawTexQuadRGBA32(play->state.gfxCtx, gItemIcons[ITEM_DEED_LAND], 32, 32, 0);
+
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
 u8 gPlayerFormSlotRestrictions[PLAYER_FORM_MAX][ITEM_NUM_SLOTS] = {
     // PLAYER_FORM_FIERCE_DEITY
     {
