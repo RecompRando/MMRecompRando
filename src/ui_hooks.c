@@ -4,6 +4,7 @@
 #include "recompconfig.h"
 #include "z64player.h"
 #include "overlays/kaleido_scope/ovl_kaleido_scope/z_kaleido_scope.h"
+#include "parameter_static.h"
 
 #include "apcommon.h"
 
@@ -99,6 +100,42 @@ void KaleidoScope_CycleItems(PlayState* play) {
             CONTROLLER1(&play->state)->press.button &= ~BTN_A;
         }
     }
+}
+
+RECOMP_HOOK_RETURN("KaleidoScope_DrawItemSelect")
+void KaleidoScope_DrawCycleItems() {
+    PlayState* play = gPlay;
+    PauseContext* pauseCtx = &play->pauseCtx;
+
+    u32 slot = SLOT(ITEM_MOONS_TEAR);
+    u32 slotX4 = slot * 4;
+    ItemId next_item;
+    
+    static Vtx tradeItem1CycleVtx[4];
+    static Vtx tradeItem2CycleVtx[4];
+    static Vtx tradeItem3CycleVtx[4];
+
+    OPEN_DISPS(play->state.gfxCtx);
+
+    Gfx_SetupDL42_Opa(play->state.gfxCtx);
+    
+    for (u32 vert = 0; vert < 4; vert++) {
+        tradeItem1CycleVtx[vert] = pauseCtx->itemVtx[slotX4 + vert];
+    }
+    
+    //i hate how this looked in the og code man
+    tradeItem1CycleVtx[0].v.ob[0] = tradeItem1CycleVtx[2].v.ob[0] = tradeItem1CycleVtx[0].v.ob[0] - 2;
+    tradeItem1CycleVtx[1].v.ob[0] = tradeItem1CycleVtx[3].v.ob[0] = tradeItem1CycleVtx[0].v.ob[0] + 16; // Image Width
+    tradeItem1CycleVtx[0].v.ob[1] = tradeItem1CycleVtx[1].v.ob[1] = tradeItem1CycleVtx[0].v.ob[1] + 2;
+    tradeItem1CycleVtx[2].v.ob[1] = tradeItem1CycleVtx[3].v.ob[1] = tradeItem1CycleVtx[0].v.ob[1] - 16; // Image Height
+
+    next_item = KaleidoScope_RandoGetNextTradeItem(pauseCtx, ITEM_MOONS_TEAR, ITEM_DEED_OCEAN);
+    if (INV_CONTENT(slot) != next_item) {
+        gSPVertex(POLY_OPA_DISP++, &tradeItem1CycleVtx[0], 4, 0);
+        KaleidoScope_DrawTexQuadRGBA32(play->state.gfxCtx, gItemIcons[next_item], 32, 32, 0);
+    }
+
+    CLOSE_DISPS(play->state.gfxCtx);
 }
 
 u8 gPlayerFormSlotRestrictions[PLAYER_FORM_MAX][ITEM_NUM_SLOTS] = {
