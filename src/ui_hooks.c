@@ -81,11 +81,11 @@ void KaleidoScope_CycleItems(PlayState* play) {
         
         // cycle to the next item in the selected slot
         bool cycle_attempted = true;
-        if (pauseCtx->cursorSlot[PAUSE_ITEM] == SLOT(ITEM_MOONS_TEAR)) {
+        if (pauseCtx->cursorSlot[PAUSE_ITEM] == SLOT_TRADE_DEED) {
             Rando_CylceTradeItem(ITEM_MOONS_TEAR, ITEM_DEED_OCEAN);
-        } else if (pauseCtx->cursorSlot[PAUSE_ITEM] == SLOT(ITEM_ROOM_KEY)) {
+        } else if (pauseCtx->cursorSlot[PAUSE_ITEM] == SLOT_TRADE_KEY_MAMA) {
             Rando_CylceTradeItem(ITEM_ROOM_KEY, ITEM_LETTER_MAMA);
-        } else if (pauseCtx->cursorSlot[PAUSE_ITEM] == SLOT(ITEM_LETTER_TO_KAFEI)) {
+        } else if (pauseCtx->cursorSlot[PAUSE_ITEM] == SLOT_TRADE_COUPLE) {
             Rando_CylceTradeItem(ITEM_LETTER_TO_KAFEI, ITEM_PENDANT_OF_MEMORIES);
         } else {
             cycle_attempted = false;
@@ -117,10 +117,6 @@ RECOMP_HOOK_RETURN("KaleidoScope_DrawItemSelect")
 void KaleidoScope_DrawCycleItems() {
     PlayState* play = gPlay;
     PauseContext* pauseCtx = &play->pauseCtx;
-
-    u16 slot1 = SLOT(ITEM_MOONS_TEAR);
-    u16 slot2 = SLOT(ITEM_ROOM_KEY);
-    u16 slot3 = SLOT(ITEM_LETTER_TO_KAFEI);
     
     ItemId next_item;
     static Vtx tradeItem1CycleVtx[4];
@@ -132,29 +128,29 @@ void KaleidoScope_DrawCycleItems() {
     Gfx_SetupDL42_Opa(play->state.gfxCtx);
     
     for (u8 vert = 0; vert < 4; vert++) {
-        tradeItem1CycleVtx[vert] = pauseCtx->itemVtx[(slot1 * 4) + vert];
-        tradeItem2CycleVtx[vert] = pauseCtx->itemVtx[(slot2 * 4) + vert];
-        tradeItem3CycleVtx[vert] = pauseCtx->itemVtx[(slot3 * 4) + vert];
+        tradeItem1CycleVtx[vert] = pauseCtx->itemVtx[(SLOT_TRADE_DEED * 4) + vert];
+        tradeItem2CycleVtx[vert] = pauseCtx->itemVtx[(SLOT_TRADE_KEY_MAMA * 4) + vert];
+        tradeItem3CycleVtx[vert] = pauseCtx->itemVtx[(SLOT_TRADE_COUPLE * 4) + vert];
     }
     
-    KaleidoScope_ApplyVtxOffset(tradeItem1CycleVtx, pauseCtx, slot1);
-    KaleidoScope_ApplyVtxOffset(tradeItem2CycleVtx, pauseCtx, slot2);
-    KaleidoScope_ApplyVtxOffset(tradeItem3CycleVtx, pauseCtx, slot3);
+    KaleidoScope_ApplyVtxOffset(tradeItem1CycleVtx, pauseCtx, SLOT_TRADE_DEED);
+    KaleidoScope_ApplyVtxOffset(tradeItem2CycleVtx, pauseCtx, SLOT_TRADE_KEY_MAMA);
+    KaleidoScope_ApplyVtxOffset(tradeItem3CycleVtx, pauseCtx, SLOT_TRADE_COUPLE);
 
     next_item = KaleidoScope_RandoGetNextTradeItem(ITEM_MOONS_TEAR, ITEM_DEED_OCEAN);
-    if (INV_CONTENT(slot1) != next_item) {
+    if (INV_CONTENT(ITEM_MOONS_TEAR) != next_item) {
         gSPVertex(POLY_OPA_DISP++, &tradeItem1CycleVtx[0], 4, 0);
         KaleidoScope_DrawTexQuadRGBA32(play->state.gfxCtx, gItemIcons[next_item], 32, 32, 0);
     }
 
     next_item = KaleidoScope_RandoGetNextTradeItem(ITEM_ROOM_KEY, ITEM_LETTER_MAMA);
-    if (INV_CONTENT(slot2) != next_item) {
+    if (INV_CONTENT(ITEM_ROOM_KEY) != next_item) {
         gSPVertex(POLY_OPA_DISP++, &tradeItem2CycleVtx[0], 4, 0);
         KaleidoScope_DrawTexQuadRGBA32(play->state.gfxCtx, gItemIcons[next_item], 32, 32, 0);
     }
 
     next_item = KaleidoScope_RandoGetNextTradeItem(ITEM_LETTER_TO_KAFEI, ITEM_PENDANT_OF_MEMORIES);
-    if (INV_CONTENT(slot3) != next_item) {
+    if (INV_CONTENT(ITEM_LETTER_TO_KAFEI) != next_item) {
         gSPVertex(POLY_OPA_DISP++, &tradeItem3CycleVtx[0], 4, 0);
         KaleidoScope_DrawTexQuadRGBA32(play->state.gfxCtx, gItemIcons[next_item], 32, 32, 0);
     }
