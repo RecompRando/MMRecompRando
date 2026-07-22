@@ -98,13 +98,19 @@ void KaleidoScope_CycleItems(PlayState* play) {
     }
 }
 
-void KaleidoScope_ApplyVtxOffset(Vtx* itemVtx) {
-    itemVtx[0].v.ob[0] += 16;
-    itemVtx[0].v.ob[1] -= 16;
-    itemVtx[0].v.ob[0] = itemVtx[2].v.ob[0] = itemVtx[0].v.ob[0] - 2;
-    itemVtx[1].v.ob[0] = itemVtx[3].v.ob[0] = itemVtx[0].v.ob[0] + 16; // Image Width(?)
-    itemVtx[0].v.ob[1] = itemVtx[1].v.ob[1] = itemVtx[0].v.ob[1] + 2;
-    itemVtx[2].v.ob[1] = itemVtx[3].v.ob[1] = itemVtx[0].v.ob[1] - 16; // Image Height(?)
+void KaleidoScope_ApplyVtxOffset(Vtx* itemVtx, PauseContext* pauseCtx, u16 slot) {
+    // undo the original function making the selected item icon bigger
+    if (pauseCtx->cursorSlot[PAUSE_ITEM] == slot) {
+        itemVtx[0].v.ob[0] = itemVtx[2].v.ob[0] = itemVtx[0].v.ob[0] + 2;
+        itemVtx[1].v.ob[0] = itemVtx[3].v.ob[0] = itemVtx[0].v.ob[0] + 32 - 2;
+        itemVtx[0].v.ob[1] = itemVtx[1].v.ob[1] = itemVtx[0].v.ob[1] - 2;
+        itemVtx[2].v.ob[1] = itemVtx[3].v.ob[1] = itemVtx[0].v.ob[1] - 32 + 2;
+    }
+
+    itemVtx[0].v.ob[0] = itemVtx[2].v.ob[0] = itemVtx[0].v.ob[0] + 16; // Top Left X Offset
+    itemVtx[1].v.ob[0] = itemVtx[3].v.ob[0] = itemVtx[0].v.ob[0] + 16; // Image Width
+    itemVtx[0].v.ob[1] = itemVtx[1].v.ob[1] = itemVtx[0].v.ob[1] - 16; // Top Left Y Offset
+    itemVtx[2].v.ob[1] = itemVtx[3].v.ob[1] = itemVtx[0].v.ob[1] - 16; // Image Height
 }
 
 RECOMP_HOOK_RETURN("KaleidoScope_DrawItemSelect")
@@ -112,9 +118,9 @@ void KaleidoScope_DrawCycleItems() {
     PlayState* play = gPlay;
     PauseContext* pauseCtx = &play->pauseCtx;
 
-    u32 slot1 = SLOT(ITEM_MOONS_TEAR);
-    u32 slot2 = SLOT(ITEM_ROOM_KEY);
-    u32 slot3 = SLOT(ITEM_LETTER_TO_KAFEI);
+    u16 slot1 = SLOT(ITEM_MOONS_TEAR);
+    u16 slot2 = SLOT(ITEM_ROOM_KEY);
+    u16 slot3 = SLOT(ITEM_LETTER_TO_KAFEI);
     
     ItemId next_item;
     static Vtx tradeItem1CycleVtx[4];
@@ -125,15 +131,15 @@ void KaleidoScope_DrawCycleItems() {
 
     Gfx_SetupDL42_Opa(play->state.gfxCtx);
     
-    for (u32 vert = 0; vert < 4; vert++) {
+    for (u8 vert = 0; vert < 4; vert++) {
         tradeItem1CycleVtx[vert] = pauseCtx->itemVtx[(slot1 * 4) + vert];
         tradeItem2CycleVtx[vert] = pauseCtx->itemVtx[(slot2 * 4) + vert];
         tradeItem3CycleVtx[vert] = pauseCtx->itemVtx[(slot3 * 4) + vert];
     }
     
-    KaleidoScope_ApplyVtxOffset(tradeItem1CycleVtx);
-    KaleidoScope_ApplyVtxOffset(tradeItem2CycleVtx);
-    KaleidoScope_ApplyVtxOffset(tradeItem3CycleVtx);
+    KaleidoScope_ApplyVtxOffset(tradeItem1CycleVtx, pauseCtx, slot1);
+    KaleidoScope_ApplyVtxOffset(tradeItem2CycleVtx, pauseCtx, slot2);
+    KaleidoScope_ApplyVtxOffset(tradeItem3CycleVtx, pauseCtx, slot3);
 
     next_item = KaleidoScope_RandoGetNextTradeItem(ITEM_MOONS_TEAR, ITEM_DEED_OCEAN);
     if (INV_CONTENT(slot1) != next_item) {
