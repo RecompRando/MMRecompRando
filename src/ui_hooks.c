@@ -99,6 +99,8 @@ void KaleidoScope_CycleItems(PlayState* play) {
 }
 
 void KaleidoScope_ApplyVtxOffset(Vtx* itemVtx) {
+    itemVtx[0].v.ob[0] += 16;
+    itemVtx[0].v.ob[1] -= 16;
     itemVtx[0].v.ob[0] = itemVtx[2].v.ob[0] = itemVtx[0].v.ob[0] - 2;
     itemVtx[1].v.ob[0] = itemVtx[3].v.ob[0] = itemVtx[0].v.ob[0] + 16; // Image Width(?)
     itemVtx[0].v.ob[1] = itemVtx[1].v.ob[1] = itemVtx[0].v.ob[1] + 2;
