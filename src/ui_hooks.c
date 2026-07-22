@@ -139,6 +139,18 @@ void KaleidoScope_DrawCycleItems() {
         KaleidoScope_DrawTexQuadRGBA32(play->state.gfxCtx, gItemIcons[next_item], 32, 32, 0);
     }
 
+    next_item = KaleidoScope_RandoGetNextTradeItem(ITEM_ROOM_KEY, ITEM_LETTER_MAMA);
+    if (INV_CONTENT(slot1) != next_item) {
+        gSPVertex(POLY_OPA_DISP++, &tradeItem2CycleVtx[0], 4, 0);
+        KaleidoScope_DrawTexQuadRGBA32(play->state.gfxCtx, gItemIcons[next_item], 32, 32, 0);
+    }
+
+    next_item = KaleidoScope_RandoGetNextTradeItem(ITEM_LETTER_TO_KAFEI, ITEM_PENDANT_OF_MEMORIES);
+    if (INV_CONTENT(slot1) != next_item) {
+        gSPVertex(POLY_OPA_DISP++, &tradeItem3CycleVtx[0], 4, 0);
+        KaleidoScope_DrawTexQuadRGBA32(play->state.gfxCtx, gItemIcons[next_item], 32, 32, 0);
+    }
+
     CLOSE_DISPS(play->state.gfxCtx);
 }
 
