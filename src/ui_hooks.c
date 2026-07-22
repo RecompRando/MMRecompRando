@@ -1,14 +1,10 @@
 #include "modding.h"
 #include "global.h"
-#include "recomputils.h"
-#include "recompconfig.h"
-#include "z64player.h"
 #include "overlays/kaleido_scope/ovl_kaleido_scope/z_kaleido_scope.h"
-#include "parameter_static.h"
 
 #include "apcommon.h"
 
-ItemId KaleidoScope_RandoGetNextTradeItem(PauseContext* pauseCtx, ItemId slot, ItemId max) {
+ItemId KaleidoScope_RandoGetNextTradeItem(ItemId slot, ItemId max) {
     u32 i, first_i, tradeGIOffset;
 
     // each trade item has a different offset to convert ItemIds to GetItemIds
@@ -66,9 +62,9 @@ ItemId KaleidoScope_RandoGetNextTradeItem(PauseContext* pauseCtx, ItemId slot, I
     }
 }
 
-void Rando_CylceTradeItem(PauseContext* pauseCtx, ItemId slot, ItemId max) {
+void Rando_CylceTradeItem(ItemId slot, ItemId max) {
     ItemId current_item = INV_CONTENT(slot);
-    ItemId next_item = KaleidoScope_RandoGetNextTradeItem(pauseCtx, slot, max);
+    ItemId next_item = KaleidoScope_RandoGetNextTradeItem(slot, max);
     if (current_item != next_item) {
         INV_CONTENT(slot) = next_item;
         Audio_PlaySfx(NA_SE_SY_CURSOR);
@@ -86,11 +82,11 @@ void KaleidoScope_CycleItems(PlayState* play) {
         // cycle to the next item in the selected slot
         bool cycle_attempted = true;
         if (pauseCtx->cursorSlot[PAUSE_ITEM] == SLOT(ITEM_MOONS_TEAR)) {
-            Rando_CylceTradeItem(pauseCtx, ITEM_MOONS_TEAR, ITEM_DEED_OCEAN);
+            Rando_CylceTradeItem(ITEM_MOONS_TEAR, ITEM_DEED_OCEAN);
         } else if (pauseCtx->cursorSlot[PAUSE_ITEM] == SLOT(ITEM_ROOM_KEY)) {
-            Rando_CylceTradeItem(pauseCtx, ITEM_ROOM_KEY, ITEM_LETTER_MAMA);
+            Rando_CylceTradeItem(ITEM_ROOM_KEY, ITEM_LETTER_MAMA);
         } else if (pauseCtx->cursorSlot[PAUSE_ITEM] == SLOT(ITEM_LETTER_TO_KAFEI)) {
-            Rando_CylceTradeItem(pauseCtx, ITEM_LETTER_TO_KAFEI, ITEM_PENDANT_OF_MEMORIES);
+            Rando_CylceTradeItem(ITEM_LETTER_TO_KAFEI, ITEM_PENDANT_OF_MEMORIES);
         } else {
             cycle_attempted = false;
         }
@@ -129,7 +125,7 @@ void KaleidoScope_DrawCycleItems() {
     tradeItem1CycleVtx[0].v.ob[1] = tradeItem1CycleVtx[1].v.ob[1] = tradeItem1CycleVtx[0].v.ob[1] + 2;
     tradeItem1CycleVtx[2].v.ob[1] = tradeItem1CycleVtx[3].v.ob[1] = tradeItem1CycleVtx[0].v.ob[1] - 16; // Image Height
 
-    next_item = KaleidoScope_RandoGetNextTradeItem(pauseCtx, ITEM_MOONS_TEAR, ITEM_DEED_OCEAN);
+    next_item = KaleidoScope_RandoGetNextTradeItem(ITEM_MOONS_TEAR, ITEM_DEED_OCEAN);
     if (INV_CONTENT(slot) != next_item) {
         gSPVertex(POLY_OPA_DISP++, &tradeItem1CycleVtx[0], 4, 0);
         KaleidoScope_DrawTexQuadRGBA32(play->state.gfxCtx, gItemIcons[next_item], 32, 32, 0);
