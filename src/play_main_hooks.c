@@ -743,6 +743,8 @@ void update_rando(PlayState* play) {
             u32 player = REPY_FN_GET_U32("player");
             u32 item_type = REPY_FN_GET_U32("item_type");
 
+            randoItemGive(item_id);
+
             // note: this could probably be done differently, but partially uses old systems for now
             if (recomp_get_config_u32("enable_notifications") && (player != rando_get_own_slot_id() || recomp_get_config_u32("local_notifications"))) {
                 char* item_name;
@@ -752,9 +754,8 @@ void update_rando(PlayState* play) {
                 randoEmitRecieveNotification(item_name, player_name, randoConvertItemId(item_id), item_type);
                 recomp_free(item_name);
                 recomp_free(player_name);
+                break; // TEMP: due to a crash when displaying too many ui elements, items are processed once per frame
             }
-            randoItemGive(item_id);
-            break; // TEMP: due to a crash when displaying too many ui elements, items are processed once per frame
         }
 
         if (recomp_get_config_u32("deathlink") != last_deathlink_status) {

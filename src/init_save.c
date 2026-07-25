@@ -115,7 +115,9 @@ void Sram_SetInitialWeekEvents(void) {
     // skip initial ikana canyon sharp cs
     SET_WEEKEVENTREG(WEEKEVENTREG_14_02);
 
-    // skip having to rewatch the great bay turtle cutscene
+    // skip having to rewatch the full great bay turtle cutscene
+    SET_WEEKEVENTREG(WEEKEVENTREG_93_08);
+    // keep the turtle raised if cutscene was watched, unless treesanity is enabled to reach the trees
     if(spawnedTurtle && !rando_get_slotdata_u32("treesanity")) {
         SET_WEEKEVENTREG(WEEKEVENTREG_53_20);
     }
