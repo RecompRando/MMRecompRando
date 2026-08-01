@@ -127,6 +127,9 @@ class MMRWorld(World):
         if self.options.start_with_soaring.value:
             mw.push_precollected(self.create_item("Song of Soaring"))
             filler_amount += 1
+
+        if self.options.child_wallet.value:
+            mw.itempool.append(self.create_item("Progressive Wallet"))
         
         if self.options.shuffle_spiderhouse_reward.value:
             mw.itempool.append(self.create_item("Progressive Wallet"))
@@ -877,6 +880,7 @@ class MMRWorld(World):
             "death_behavior": self.options.death_behavior.value,
             "death_link": self.options.death_link.value,
             "camc": self.options.camc.value,
+            "child_wallet": self.options.child_wallet.value,
             "starting_heart_locations": 8 if self.options.starting_hearts_are_containers_or_pieces.value == 1 else starting_containers + starting_pieces + shuffled_containers + shuffled_pieces,
             "majora_remains_required": self.options.majora_remains_required.value,
             "majora_masks_required": self.options.majora_masks_required.value,

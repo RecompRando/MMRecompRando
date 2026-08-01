@@ -127,7 +127,7 @@ def can_get_red_potion(state, player, prices, options):
                 has_soul_npc(state, player, options, "Koume") or
                 (
                     has_soul_npc(state, player, options, "Kotake") and
-                    can_purchase(state, player, prices, SHOP_ID_WITCH_POTION_3)
+                    can_purchase(state, player, prices, options, SHOP_ID_WITCH_POTION_3)
                 ) or
                 (
                     state.can_reach("Clock Town Trading Post Shop Item 1", "Location", player) or
@@ -166,7 +166,7 @@ def can_use_powder_keg(state, player, options):
             (
                 has_soul_npc(state, player, options, "Gatekeeper & Medigoron") and
                 can_use_fire_arrows(state, player) and
-                can_afford_price(state, player, 100)
+                can_afford_price(state, player, options, 100)
             )
         )
     )
@@ -233,20 +233,25 @@ def can_reach_seahorse(state, player, options):
         )
     )
 
-def can_afford_price(state, player, price):
+def can_afford_price(state, player, options, price):
+    # Child's Wallet adds an addional Wallet to the pool we need to account for
+    if options.child_wallet.value:
+        if price > 200:
+            return state.has("Progressive Wallet", player, 3)
+        elif price > 99:
+            return state.has("Progressive Wallet", player, 2)
+        elif price > 0 and options.child_wallet.value:
+            return state.has("Progressive Wallet", player)
+        return True
     if price > 200:
         return state.has("Progressive Wallet", player, 2)
     elif price > 99:
         return state.has("Progressive Wallet", player)
     return True
 
-def can_purchase(state, player, prices, price_index):
+def can_purchase(state, player, prices, options, price_index):
     price = prices[price_index]
-    if price > 200:
-        return state.has("Progressive Wallet", player, 2)
-    elif price > 99:
-        return state.has("Progressive Wallet", player)
-    return True
+    return can_afford_price(state, player, options, price)
 
 def can_get_frog_choir_hp(state, player, options, boss_placements):
     if not state.has("Don Gero's Mask", player):
@@ -884,9 +889,11 @@ def get_location_rules(player, options, prices, boss_placements):
         "Link's Inventory (Kokiri Sword)":
             lambda state: True,
         "Link's Inventory (Hero's Shield)":
-            lambda state: True,  
+            lambda state: True,
+        "Link's Inventory (Child's Wallet)":
+            lambda state: True,
         "Link's Inventory (Heart Item #1)":
-            lambda state: True,    
+            lambda state: True,
         "Link's Inventory (Heart Item #2)":
             lambda state: True,
         "Link's Inventory (Heart Item #3)":
@@ -894,7 +901,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Link's Inventory (Heart Item #4)":
             lambda state: True,
         "Link's Inventory (Heart Item #5)":
-            lambda state: True,    
+            lambda state: True,
         "Link's Inventory (Heart Item #6)":
             lambda state: True,
         "Link's Inventory (Heart Item #7)":
@@ -1098,13 +1105,13 @@ def get_location_rules(player, options, prices, boss_placements):
             lambda state: (
                 has_soul_npc(state, player, options, "Barten") and
                 state.has("Romani's Mask", player) and 
-                can_afford_price(state, player, 40)
+                can_afford_price(state, player, options, 40)
             ),
         "East Clock Town Milk Bar Chateau Romani Purchase":
             lambda state: (
                 has_soul_npc(state, player, options, "Barten") and
                 state.has("Romani's Mask", player) and 
-                can_afford_price(state, player, 200)
+                can_afford_price(state, player, options, 200)
             ),
         "West Clock Town Lottery Any Day":
             lambda state: has_soul_npc(state, player, options, "Lottery"),       
@@ -1143,97 +1150,97 @@ def get_location_rules(player, options, prices, boss_placements):
         "Clock Town Trading Post Shop Item 1":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
-                can_purchase(state, player, prices, SHOP_ID_TRADING_POST_1)
+                can_purchase(state, player, prices, options, SHOP_ID_TRADING_POST_1)
             ),
         "Clock Town Trading Post Shop Item 2":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
-                can_purchase(state, player, prices, SHOP_ID_TRADING_POST_2)
+                can_purchase(state, player, prices, options, SHOP_ID_TRADING_POST_2)
             ),
         "Clock Town Trading Post Shop Item 3":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
-                can_purchase(state, player, prices, SHOP_ID_TRADING_POST_3)
+                can_purchase(state, player, prices, options, SHOP_ID_TRADING_POST_3)
             ),
         "Clock Town Trading Post Shop Item 4":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
-                can_purchase(state, player, prices, SHOP_ID_TRADING_POST_4)
+                can_purchase(state, player, prices, options, SHOP_ID_TRADING_POST_4)
             ),
         "Clock Town Trading Post Shop Item 5":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
-                can_purchase(state, player, prices, SHOP_ID_TRADING_POST_5)
+                can_purchase(state, player, prices, options, SHOP_ID_TRADING_POST_5)
             ),
         "Clock Town Trading Post Shop Item 6":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
-                can_purchase(state, player, prices, SHOP_ID_TRADING_POST_6)
+                can_purchase(state, player, prices, options, SHOP_ID_TRADING_POST_6)
             ),
         "Clock Town Trading Post Shop Item 7":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
-                can_purchase(state, player, prices, SHOP_ID_TRADING_POST_7)
+                can_purchase(state, player, prices, options, SHOP_ID_TRADING_POST_7)
             ),
         "Clock Town Trading Post Shop Item 8":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
-                can_purchase(state, player, prices, SHOP_ID_TRADING_POST_8)
+                can_purchase(state, player, prices, options, SHOP_ID_TRADING_POST_8)
             ),
         "Clock Town Trading Post Shop (Night) Item 1":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
-                can_purchase(state, player, prices, SHOP_ID_TRADING_POST_NIGHT_1)
+                can_purchase(state, player, prices, options, SHOP_ID_TRADING_POST_NIGHT_1)
             ),
         "Clock Town Trading Post Shop (Night) Item 2":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
-                can_purchase(state, player, prices, SHOP_ID_TRADING_POST_NIGHT_2)
+                can_purchase(state, player, prices, options, SHOP_ID_TRADING_POST_NIGHT_2)
             ),
         "Clock Town Trading Post Shop (Night) Item 3":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
-                can_purchase(state, player, prices, SHOP_ID_TRADING_POST_NIGHT_3)
+                can_purchase(state, player, prices, options, SHOP_ID_TRADING_POST_NIGHT_3)
             ),
         "Clock Town Trading Post Shop (Night) Item 4":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
-                can_purchase(state, player, prices, SHOP_ID_TRADING_POST_NIGHT_4)
+                can_purchase(state, player, prices, options, SHOP_ID_TRADING_POST_NIGHT_4)
             ),
         "Clock Town Trading Post Shop (Night) Item 5":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
-                can_purchase(state, player, prices, SHOP_ID_TRADING_POST_NIGHT_5)
+                can_purchase(state, player, prices, options, SHOP_ID_TRADING_POST_NIGHT_5)
             ),
         "Clock Town Trading Post Shop (Night) Item 6":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
-                can_purchase(state, player, prices, SHOP_ID_TRADING_POST_NIGHT_6)
+                can_purchase(state, player, prices, options, SHOP_ID_TRADING_POST_NIGHT_6)
             ),
         "Clock Town Trading Post Shop (Night) Item 7":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
-                can_purchase(state, player, prices, SHOP_ID_TRADING_POST_NIGHT_7)
+                can_purchase(state, player, prices, options, SHOP_ID_TRADING_POST_NIGHT_7)
             ),
         "Clock Town Trading Post Shop (Night) Item 8":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
-                can_purchase(state, player, prices, SHOP_ID_TRADING_POST_NIGHT_8)
+                can_purchase(state, player, prices, options, SHOP_ID_TRADING_POST_NIGHT_8)
             ),
         "Clock Town Bomb Shop Item 1":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
-                can_purchase(state, player, prices, SHOP_ID_BOMB_SHOP_1)
+                can_purchase(state, player, prices, options, SHOP_ID_BOMB_SHOP_1)
             ),
         "Clock Town Bomb Shop Item 2":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
-                can_purchase(state, player, prices, SHOP_ID_BOMB_SHOP_2)
+                can_purchase(state, player, prices, options, SHOP_ID_BOMB_SHOP_2)
             ),
         "Clock Town Bomb Shop Item 3":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
-                can_purchase(state, player, prices, SHOP_ID_BOMB_SHOP_3)
+                can_purchase(state, player, prices, options, SHOP_ID_BOMB_SHOP_3)
             ),
         "Clock Town Bomb Shop Powder Keg Goron":
             lambda state: (
@@ -1244,7 +1251,7 @@ def get_location_rules(player, options, prices, boss_placements):
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
                 state.can_reach("North Clock Town Save Old Lady", "Location", player) and 
-                can_purchase(state, player, prices, SHOP_ID_BOMB_SHOP_3_UPGRADE)
+                can_purchase(state, player, prices, options, SHOP_ID_BOMB_SHOP_3_UPGRADE)
             ),
         "Curiosity Shop Blue Rupee Trade":
             lambda state: (
@@ -1280,7 +1287,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     ) or 
                     (
                         state.has("Romani's Mask", player) and 
-                        can_afford_price(state, player, 200)
+                        can_afford_price(state, player, options, 200)
                     ) or 
                     state.can_reach("Goron Racetrack Prize", "Location", player)
                 )
@@ -1288,13 +1295,13 @@ def get_location_rules(player, options, prices, boss_placements):
         "Curiosity Shop Night 3 (Stop Thief)":
             lambda state: (
                 has_soul_npc(state, player, options, "Curiosity Shop Man") and
-                can_purchase(state, player, prices, SHOP_ID_CURIOSITY_SHOP_MASK) and
+                can_purchase(state, player, prices, options, SHOP_ID_CURIOSITY_SHOP_MASK) and
                 state.can_reach("North Clock Town Save Old Lady", "Location", player)
             ),
         "Curiosity Shop Night 3 Thief Stolen Item":
             lambda state: (
                 has_soul_npc(state, player, options, "Curiosity Shop Man") and
-                can_purchase(state, player, prices, SHOP_ID_CURIOSITY_SHOP_BOMB_BAG)
+                can_purchase(state, player, prices, options, SHOP_ID_CURIOSITY_SHOP_BOMB_BAG)
             ),
         "Stock Pot Inn Reservation":
             lambda state: has_soul_npc(state, player, options, "Anju"),        
@@ -1438,7 +1445,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 has_soul_npc(state, player, options, "Business Scrubs") and
                 has_soul_npc(state, player, options, "Astral Observatory Man") and
                 state.has("Ocarina of Time", player) and
-                can_afford_price(state, player, 100) and
+                can_afford_price(state, player, options, 100) and
                 state.can_reach("Bomber's Hideout Astral Observatory", "Location", player)
             ),
         "Termina Log Bombable Grotto Left Cow":
@@ -1588,17 +1595,17 @@ def get_location_rules(player, options, prices, boss_placements):
                 has_soul_npc(state, player, options, "Kotake") and
                 state.has("Mask of Scents", player) and 
                 has_bottle(state, player) and 
-                can_purchase(state, player, prices, SHOP_ID_WITCH_POTION_1)
+                can_purchase(state, player, prices, options, SHOP_ID_WITCH_POTION_1)
             ),
         "Southern Swamp Witch Shop Item 2":
             lambda state: (
                 has_soul_npc(state, player, options, "Kotake") and
-                can_purchase(state, player, prices, SHOP_ID_WITCH_POTION_2)
+                can_purchase(state, player, prices, options, SHOP_ID_WITCH_POTION_2)
             ),
         "Southern Swamp Witch Shop Item 3":
             lambda state: (
                 has_soul_npc(state, player, options, "Kotake") and
-                can_purchase(state, player, prices, SHOP_ID_WITCH_POTION_3)
+                can_purchase(state, player, prices, options, SHOP_ID_WITCH_POTION_3)
             ),
         "Swamp Spider House First Room Pot Near Entrance Token":
             lambda state: (
@@ -2047,7 +2054,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Mountain Village Smithy Upgrade":
             lambda state: (
                 has_soul_npc(state, player, options, "Mountain Smithy") and
-                can_afford_price(state, player, 100) and 
+                can_afford_price(state, player, options, 100) and 
                 (
                     can_use_fire_arrows(state, player) or 
                     state.can_reach("Twin Islands Hot Water Grotto Chest", "Location", player) or 
@@ -2155,7 +2162,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Goron Village Scrub Purchase":
             lambda state: (
                 has_soul_npc(state, player, options, "Business Scrubs") and
-                can_afford_price(state, player, 200) and 
+                can_afford_price(state, player, options, 200) and 
                 (
                     state.has("Goron Mask", player) or 
                     (
@@ -2195,28 +2202,28 @@ def get_location_rules(player, options, prices, boss_placements):
                 has_soul_npc(state, player, options, "Shop Owners") and
                 (has_soul_npc(state, player, options, "Gatekeeper & Medigoron") or
                 state.has("Goron Mask", player)) and 
-                can_purchase(state, player, prices, SHOP_ID_GORON_SHOP_1)
+                can_purchase(state, player, prices, options, SHOP_ID_GORON_SHOP_1)
             ),
         "Goron Village Shop Item 2":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
                 (has_soul_npc(state, player, options, "Gatekeeper & Medigoron") or
                 state.has("Goron Mask", player)) and 
-                can_purchase(state, player, prices, SHOP_ID_GORON_SHOP_1)
+                can_purchase(state, player, prices, options, SHOP_ID_GORON_SHOP_1)
             ),
         "Goron Village Shop Item 3":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
                 (has_soul_npc(state, player, options, "Gatekeeper & Medigoron") or
                 state.has("Goron Mask", player)) and 
-                can_purchase(state, player, prices, SHOP_ID_GORON_SHOP_1)
+                can_purchase(state, player, prices, options, SHOP_ID_GORON_SHOP_1)
             ),
         "Goron Village Shop (Spring) Item 1":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
                 (has_soul_npc(state, player, options, "Gatekeeper & Medigoron") or
                 state.has("Goron Mask", player)) and 
-                can_purchase(state, player, prices, SHOP_ID_GORON_SHOP_1) and
+                can_purchase(state, player, prices, options, SHOP_ID_GORON_SHOP_1) and
                 can_clear_snowhead(state, player, boss_placements)
             ),
         "Goron Village Shop (Spring) Item 2":
@@ -2224,7 +2231,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 has_soul_npc(state, player, options, "Shop Owners") and
                 (has_soul_npc(state, player, options, "Gatekeeper & Medigoron") or
                 state.has("Goron Mask", player)) and 
-                can_purchase(state, player, prices, SHOP_ID_GORON_SHOP_1) and
+                can_purchase(state, player, prices, options, SHOP_ID_GORON_SHOP_1) and
                 can_clear_snowhead(state, player, boss_placements)
             ),
         "Goron Village Shop (Spring) Item 3":
@@ -2232,7 +2239,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 has_soul_npc(state, player, options, "Shop Owners") and
                 (has_soul_npc(state, player, options, "Gatekeeper & Medigoron") or
                 state.has("Goron Mask", player)) and 
-                can_purchase(state, player, prices, SHOP_ID_GORON_SHOP_1) and
+                can_purchase(state, player, prices, options, SHOP_ID_GORON_SHOP_1) and
                 can_clear_snowhead(state, player, boss_placements)
             ),
         "Goron Village Freestanding HP (Spring)":
@@ -2928,19 +2935,19 @@ def get_location_rules(player, options, prices, boss_placements):
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
                 state.has("Zora Mask", player) and 
-                can_purchase(state, player, prices, SHOP_ID_ZORA_SHOP_1)
+                can_purchase(state, player, prices, options, SHOP_ID_ZORA_SHOP_1)
             ),
         "Zora Hall Shop Item 2":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
                 state.has("Zora Mask", player) and 
-                can_purchase(state, player, prices, SHOP_ID_ZORA_SHOP_2)
+                can_purchase(state, player, prices, options, SHOP_ID_ZORA_SHOP_2)
             ),
         "Zora Hall Shop Item 3":
             lambda state: (
                 has_soul_npc(state, player, options, "Shop Owners") and
                 state.has("Zora Mask", player) and 
-                can_purchase(state, player, prices, SHOP_ID_ZORA_SHOP_3)
+                can_purchase(state, player, prices, options, SHOP_ID_ZORA_SHOP_3)
             ),
 
         "Great Bay Great Fairy Reward":
@@ -3187,7 +3194,7 @@ def get_location_rules(player, options, prices, boss_placements):
             lambda state: (
                 has_soul_npc(state, player, options, "Business Scrubs") and
                 has_bottle(state, player) and 
-                can_afford_price(state, player, 100)
+                can_afford_price(state, player, options, 100)
             ),
         "Ikana Canyon Zora Scrub Trade":
             lambda state: (
@@ -3264,7 +3271,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.has("Gibdo Mask", player) and 
                 has_bottle(state, player) and 
                 (
-                    can_afford_price(state, player, 100) or 
+                    can_afford_price(state, player, options, 100) or 
                     state.has("Mask of Scents", player) and
                     has_soul_npc(state, player, options, "Kotake")
                 )
@@ -8307,7 +8314,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.has("Gibdo Mask", player) and 
                 has_bottle(state, player) and 
                 (
-                    can_afford_price(state, player, 100) or 
+                    can_afford_price(state, player, options, 100) or 
                     state.has("Mask of Scents", player) and
                     has_soul_npc(state, player, options, "Kotake") 
                 )
@@ -8319,7 +8326,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.has("Gibdo Mask", player) and 
                 has_bottle(state, player) and 
                 (
-                    can_afford_price(state, player, 100) or 
+                    can_afford_price(state, player, options, 100) or 
                     state.has("Mask of Scents", player) and
                     has_soul_npc(state, player, options, "Kotake") 
                 )
@@ -11869,7 +11876,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.has("Gibdo Mask", player) and
                 has_bottle(state, player) and
                 (
-                    can_afford_price(state, player, 100) or
+                    can_afford_price(state, player, options, 100) or
                     state.has("Mask of Scents", player)
                 )
             ),
@@ -11880,7 +11887,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.has("Gibdo Mask", player) and
                 has_bottle(state, player) and
                 (
-                    can_afford_price(state, player, 100) or
+                    can_afford_price(state, player, options, 100) or
                     state.has("Mask of Scents", player)
                 )
             ),
@@ -11891,7 +11898,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.has("Gibdo Mask", player) and
                 has_bottle(state, player) and
                 (
-                    can_afford_price(state, player, 100) or
+                    can_afford_price(state, player, options, 100) or
                     state.has("Mask of Scents", player)
                 )
             ),
@@ -11902,7 +11909,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.has("Gibdo Mask", player) and
                 has_bottle(state, player) and
                 (
-                    can_afford_price(state, player, 100) or
+                    can_afford_price(state, player, options, 100) or
                     state.has("Mask of Scents", player)
                 )
             ),
@@ -11913,7 +11920,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.has("Gibdo Mask", player) and
                 has_bottle(state, player) and
                 (
-                    can_afford_price(state, player, 100) or
+                    can_afford_price(state, player, options, 100) or
                     state.has("Mask of Scents", player)
                 )
             ),
@@ -17990,7 +17997,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     ) or
                     (
                         has_soul_npc(state, player, options, "Business Scrubs") and
-                        can_afford_price(state, player, 100)
+                        can_afford_price(state, player, options, 100)
                     )
                 )
             ),
@@ -18006,7 +18013,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     ) or
                     (
                         has_soul_npc(state, player, options, "Business Scrubs") and
-                        can_afford_price(state, player, 100)
+                        can_afford_price(state, player, options, 100)
                     )
                 )
             ),
@@ -18023,7 +18030,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     ) or
                     (
                         has_soul_npc(state, player, options, "Business Scrubs") and
-                        can_afford_price(state, player, 100)
+                        can_afford_price(state, player, options, 100)
                     )
                 )
             ),
@@ -18040,7 +18047,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     ) or
                     (
                         has_soul_npc(state, player, options, "Business Scrubs") and
-                        can_afford_price(state, player, 100)
+                        can_afford_price(state, player, options, 100)
                     )
                 )
             ),
@@ -18057,7 +18064,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     ) or
                     (
                         has_soul_npc(state, player, options, "Business Scrubs") and
-                        can_afford_price(state, player, 100)
+                        can_afford_price(state, player, options, 100)
                     )
                 )
             ),
@@ -18074,7 +18081,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     ) or
                     (
                         has_soul_npc(state, player, options, "Business Scrubs") and
-                        can_afford_price(state, player, 100)
+                        can_afford_price(state, player, options, 100)
                     )
                 )
             ),
@@ -18091,7 +18098,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     ) or
                     (
                         has_soul_npc(state, player, options, "Business Scrubs") and
-                        can_afford_price(state, player, 100)
+                        can_afford_price(state, player, options, 100)
                     )
                 )
             ),
@@ -18108,7 +18115,7 @@ def get_location_rules(player, options, prices, boss_placements):
                     ) or
                     (
                         has_soul_npc(state, player, options, "Business Scrubs") and
-                        can_afford_price(state, player, 100)
+                        can_afford_price(state, player, options, 100)
                     )
                 )
             ),
@@ -18389,7 +18396,7 @@ def get_location_rules(player, options, prices, boss_placements):
         "Notebook Event Received All Night Mask":
             lambda state: (
                 has_soul_npc(state, player, options, "Curiosity Shop Man") and
-                can_purchase(state, player, prices, SHOP_ID_CURIOSITY_SHOP_MASK) and 
+                can_purchase(state, player, prices, options, SHOP_ID_CURIOSITY_SHOP_MASK) and 
                 state.can_reach("North Clock Town Save Old Lady", "Location", player)
             ),
         "Notebook Event Received Blast Mask":
@@ -19956,7 +19963,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 has_bottle(state, player) and 
                 (   
                     (
-                        can_afford_price(state, player, 100) and
+                        can_afford_price(state, player, options, 100) and
                         has_soul_npc(state, player, options, "Business Scrubs")
                     ) or 
                     (
@@ -19974,7 +19981,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 has_bottle(state, player) and 
                 (   
                     (
-                        can_afford_price(state, player, 100) and
+                        can_afford_price(state, player, options, 100) and
                         has_soul_npc(state, player, options, "Business Scrubs")
                     ) or 
                     (
@@ -20484,7 +20491,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 has_bottle(state, player) and
                 (
                     (
-                        can_afford_price(state, player, 100) and
+                        can_afford_price(state, player, options, 100) and
                         has_soul_npc(state, player, options, "Business Scrubs")
                     ) or
                     (
@@ -20503,7 +20510,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 has_bottle(state, player) and
                 (
                     (
-                        can_afford_price(state, player, 100) and
+                        can_afford_price(state, player, options, 100) and
                         has_soul_npc(state, player, options, "Business Scrubs")
                     ) or
                     (
@@ -20522,7 +20529,7 @@ def get_location_rules(player, options, prices, boss_placements):
                 has_bottle(state, player) and
                 (
                     (
-                        can_afford_price(state, player, 100) and
+                        can_afford_price(state, player, options, 100) and
                         has_soul_npc(state, player, options, "Business Scrubs")
                     ) or
                     (

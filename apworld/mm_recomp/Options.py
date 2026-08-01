@@ -171,6 +171,11 @@ class Shieldless(Toggle):
     display_name = "Shieldless"
 
 
+class ChildWallet(Toggle):
+    """Start the game without the initial 99 Rupee Wallet, and shuffle an extra Progressive Wallet into the pool."""
+    display_name = "Shuffle Child Wallet"
+
+
 class StartWithSoaring(DefaultOnToggle):
     """Start the game with Song of Soaring."""
     display_name = "Start With Soaring"
@@ -587,6 +592,7 @@ mm_option_groups = [
         Shieldless,
         StartingHeartQuarters, # change to just hearts
         StartingHeartsAreContainersOrPieces,
+        ChildWallet,
         Ocarinaless,
         Timeless
     ]),
@@ -703,6 +709,7 @@ class MMROptions(PerGameCommonOptions):
     shopsanity: Shopsanity
     scrubsanity: Scrubsanity
     shop_prices: ShopPrices
+    child_wallet: ChildWallet
     cowsanity: Cowsanity
     shuffle_great_fairy_rewards: ShuffleGreatFairyRewards
     required_stray_fairies: RequiredStrayFairies

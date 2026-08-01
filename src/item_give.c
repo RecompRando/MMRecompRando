@@ -2252,6 +2252,7 @@ u8 randoItemGive(u32 gi) {
         }
 
     } else if (item == ITEM_WALLET_ADULT) {
+        bool handledChildWallet = rando_get_save_data_u32("got_child_wallet");
         if (CUR_UPG_VALUE(UPG_WALLET) == 2) {
             // stop sending yourself wallets you freaks
             if (rando_get_slotdata_u32("receive_filled_wallets")) {
@@ -2263,6 +2264,13 @@ u8 randoItemGive(u32 gi) {
             if (rando_get_slotdata_u32("receive_filled_wallets")) {
                 Rupees_ChangeBy(gUpgradeCapacities[UPG_WALLET][2]);
             }
+            return ITEM_NONE;
+        } else if (rando_get_slotdata_u32("child_wallet") && !handledChildWallet) {
+            gUpgradeCapacities[UPG_WALLET][0] = 99;
+            if (rando_get_slotdata_u32("receive_filled_wallets")) {
+                Rupees_ChangeBy(gUpgradeCapacities[UPG_WALLET][0]);
+            }
+            rando_set_save_data_u32("got_child_wallet", true);
             return ITEM_NONE;
         }
         Inventory_ChangeUpgrade(UPG_WALLET, 1);
