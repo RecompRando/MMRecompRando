@@ -1223,6 +1223,121 @@ EZTR_MSG_CALLBACK(randoLotterySignHint) {
     recomp_free(player_name);
 }
 
+EZTR_MSG_CALLBACK(randoGuruGuruHint1) {
+    u32 guruGuruItem = 0x00008C;
+    char* item_name;
+
+    rando_get_location_item_name(guruGuruItem, &item_name);
+    sanitizeRandoText(item_name);
+    
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        EZTR_CC_SFX "|69|59That's why I...That's why I..." EZTR_CC_NEWLINE
+        "That's why I stole it..." EZTR_CC_NEWLINE
+        "%c%s" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_NEWLINE
+        "I stole it." EZTR_CC_EVENT EZTR_CC_END,
+        getAPLocationItemColor(guruGuruItem),
+        item_name
+    );
+    
+    recomp_free(item_name);
+}
+
+EZTR_MSG_CALLBACK(randoGuruGuruHint2) {
+    u32 guruGuruItem = 0x00008C;
+    char* player_name;
+
+    rando_get_location_item_player(guruGuruItem, &player_name);
+    sanitizeRandoText(player_name);
+
+
+    char formatted_player_name[128];
+    if (!rando_get_location_has_local_item(guruGuruItem)) {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT "'s" EZTR_CC_END,
+            player_name
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            EZTR_CC_COLOR_RED "yours" EZTR_CC_COLOR_DEFAULT ""EZTR_CC_END
+        );
+    }
+        
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+        "I wanted it because it was" EZTR_CC_NEWLINE
+        "%m..." EZTR_CC_EVENT EZTR_CC_END,
+        formatted_player_name
+    );
+    
+    recomp_free(player_name);
+}
+
+EZTR_MSG_CALLBACK(randoGormanMilkPurchaseHint) {
+    u32 gormanMilkItem = 0x006792;
+    char* item_name;
+    char* player_name;
+
+    rando_get_location_item_name(gormanMilkItem, &item_name);
+    rando_get_location_item_player(gormanMilkItem, &player_name);
+    sanitizeRandoText(item_name);
+    sanitizeRandoText(player_name);
+
+    char formatted_player_name[128];
+    if (!rando_get_location_has_local_item(gormanMilkItem) && (!rando_location_is_checked(gormanMilkItem))) {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            "for " EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT "'s" EZTR_CC_END,
+            player_name
+        );
+    } else if (rando_location_is_checked(gormanMilkItem)) {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            " will do ya for one" EZTR_CC_COLOR_DEFAULT "" EZTR_CC_END
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            EZTR_CC_END
+        );
+    }
+    char formatted_item_name[128];
+    if (!rando_location_is_checked(gormanMilkItem)) {
+        EZTR_MsgSContent_Snprintf(
+            formatted_item_name,
+            128,
+            "%c%s" EZTR_CC_COLOR_DEFAULT "" EZTR_CC_END,
+            getAPLocationItemColor(gormanMilkItem),
+            item_name
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            formatted_item_name,
+            128,
+            "drink" EZTR_CC_COLOR_DEFAULT "" EZTR_CC_END
+        );
+    }
+        
+    EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+                "" EZTR_CC_COLOR_PINK "50 Rupees" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_NEWLINE 
+                "%m." EZTR_CC_NEWLINE 
+                EZTR_CC_COLOR_GREEN "" EZTR_CC_TWO_CHOICE "I'll buy it" EZTR_CC_NEWLINE "No thanks" EZTR_CC_END "",
+        formatted_player_name,
+        formatted_item_name
+    );
+    
+    recomp_free(player_name);
+    recomp_free(item_name);
+}
+
 EZTR_MSG_CALLBACK(randoLotteryNPCHint) {
     u32 lotteryItem = LOCATION_LOTTERY_SHOP;
     char* item_name;
@@ -2558,6 +2673,45 @@ EZTR_ON_INIT void init_text() {
         "\xBF",
         randoPictograph
     );
+
+    EZTR_Basic_ReplaceText(
+        0x2933, // First text box of Guru Guru Bremen Mask check.
+        EZTR_STANDARD_TEXT_BOX_II,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        false,
+        "\xBF",
+        randoGuruGuruHint1
+    );
+
+    EZTR_Basic_ReplaceText(
+        0x2934, // Second text box of Guru Guru Bremen Mask check.
+        EZTR_STANDARD_TEXT_BOX_II,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        false,
+        "\xBF",
+        randoGuruGuruHint2
+    );
+
+    EZTR_Basic_ReplaceText(
+        0x3466, // Gorman Racetrack Milk Purchase
+        EZTR_STANDARD_TEXT_BOX_II,
+        1,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        50,
+        EZTR_NO_VALUE,
+        true,
+        "\xBF",
+        randoGormanMilkPurchaseHint
+);
     
     EZTR_Basic_ReplaceText(
         0x2B0B,
