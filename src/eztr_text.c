@@ -139,6 +139,8 @@ EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Bombchu_Bag);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Magic);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_SpinAttack);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_DoubleDefense);
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_ChildWallet);
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_DeityWallet);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Time); // Songs
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Healing);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Epona);
@@ -2882,6 +2884,34 @@ EZTR_ON_INIT void init_text() {
         "Enemies now do half as much" EZTR_CC_NEWLINE "damage as before!" EZTR_CC_END,
         NULL
     );
+
+    EZTR_Basic_AddCustomText(
+        EZTR_HNAME(Rando_GI_ChildWallet),
+        EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
+        0,
+        EZTR_ICON_GREEN_RUPEE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        false,
+        "You found the " EZTR_CC_COLOR_RED "Child Wallet" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_NEWLINE 
+        "You can now hold " EZTR_CC_COLOR_RED "99 Rupees" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
+        NULL
+    );
+
+    EZTR_Basic_AddCustomText(
+        EZTR_HNAME(Rando_GI_DeityWallet),
+        EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
+        0,
+        EZTR_ICON_GIANTS_WALLET,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        false,
+        "You found the " EZTR_CC_COLOR_RED "Deity Wallet" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_NEWLINE 
+        "You can now hold " EZTR_CC_COLOR_RED "999 Rupees" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
+        NULL
+    );
     
     EZTR_Basic_AddCustomText(
         EZTR_HNAME(Rando_GI_Souls),
@@ -3474,6 +3504,8 @@ EZTR_ON_INIT void init_text() {
     sGetItemTable_ap[GI_MAGIC_UPGRADE - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Magic));
     sGetItemTable_ap[GI_SPIN_ATTACK - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_SpinAttack));
     sGetItemTable_ap[GI_DEFENSE_DOUBLE - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_DoubleDefense));
+    // sGetItemTable_ap[GI_CHILD_WALLET - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_ChildWallet)); // Wallets
+    // sGetItemTable_ap[GI_DEITY_WALLET - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_DeityWallet));
     sGetItemTable_ap[GI_AP_PROG - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_Send_Item)); // AP Non-local items
     sGetItemTable_ap[GI_AP_FILLER - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_Send_Item));
     sGetItemTable_ap[GI_AP_USEFUL - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_Send_Item));
