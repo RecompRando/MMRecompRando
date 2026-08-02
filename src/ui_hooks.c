@@ -416,3 +416,168 @@ void green_chu_count_return() {
         CUR_CAPACITY(UPG_BOMB_BAG) = oldBombCapacity;
     }
 }
+
+// @rando hide wallet if we have child's wallet
+s16 savedMagicAlpha;
+
+extern u64 gRupeeCounterIconTex[];
+extern u64 gSmallKeyCounterIconTex[];
+extern u64 gGoldSkulltulaCounterIconTex[];
+extern u64 gCounterDigit0Tex[];
+
+#include "rt64_extended_gbi.h"
+void Interface_SetOrthoView(InterfaceContext* interfaceCtx);
+
+// completely copied from Interface_Draw() so we can set the alpha to 0 for the whole rupee/wallet section
+// the part that draws the rupee count wraps around these other counters, so to hide it using hooks
+// we set interfaceCtx->magicAlpha to 0, but as it affects these other counters we draw those normally again
+RECOMP_HOOK("LifeMeter_Draw")
+void Interface_RedrawKeyAndSkullCounts(PlayState* play) {
+    InterfaceContext* interfaceCtx = &play->interfaceCtx;
+    savedMagicAlpha = interfaceCtx->magicAlpha;
+    if (rando_get_slotdata_u32("child_wallet") && !rando_has_item(GI_WALLET_ADULT)) {
+        s16 sp2CA;
+        s16 counterDigits[4];
+
+        OPEN_DISPS(play->state.gfxCtx);
+        
+        // recomp shifts these scissors, so we need to shift them to the correct stuff
+        s32 margin_reduction = 8;
+        // Left align and shift left/down for key count, skulltula count, and rupee count
+        gEXSetViewportAlign(OVERLAY_DISP++, G_EX_ORIGIN_LEFT, -margin_reduction * 4, margin_reduction * 4);
+        gEXSetRectAlign(OVERLAY_DISP++, G_EX_ORIGIN_LEFT, G_EX_ORIGIN_LEFT, -margin_reduction * 4, margin_reduction * 4, -margin_reduction * 4, margin_reduction * 4);
+        
+        Gfx_SetupDL39_Overlay(play->state.gfxCtx);
+
+        switch (play->sceneId) {
+            case SCENE_INISIE_N:
+            case SCENE_INISIE_R:
+            case SCENE_MITURIN:
+            case SCENE_HAKUGIN:
+            case SCENE_SEA:
+                if (DUNGEON_KEY_COUNT(gSaveContext.mapIndex) >= 0) {
+                    // Small Key Icon
+                    gDPPipeSync(OVERLAY_DISP++);
+                    gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 200, 230, 255, interfaceCtx->magicAlpha);
+                    gDPSetEnvColor(OVERLAY_DISP++, 0, 0, 20, 255);
+                    OVERLAY_DISP = Gfx_DrawTexRectIA8(OVERLAY_DISP, gSmallKeyCounterIconTex, 16, 16, 26, 190, 16, 16,
+                                                      1 << 10, 1 << 10);
+
+                    // Small Key Counter
+                    gDPPipeSync(OVERLAY_DISP++);
+                    gDPSetCombineLERP(OVERLAY_DISP++, 0, 0, 0, PRIMITIVE, TEXEL0, 0, PRIMITIVE, 0, 0, 0, 0, PRIMITIVE,
+                                      TEXEL0, 0, PRIMITIVE, 0);
+
+                    counterDigits[2] = 0;
+                    counterDigits[3] = DUNGEON_KEY_COUNT(gSaveContext.mapIndex);
+
+                    while (counterDigits[3] >= 10) {
+                        counterDigits[2]++;
+                        counterDigits[3] -= 10;
+                    }
+
+                    sp2CA = 42;
+
+                    if (counterDigits[2] != 0) {
+                        gDPPipeSync(OVERLAY_DISP++);
+                        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 0, 0, 0, interfaceCtx->magicAlpha);
+
+                        OVERLAY_DISP =
+                            Gfx_DrawTexRectI8(OVERLAY_DISP, (u8*)gCounterDigit0Tex + (8 * 16 * counterDigits[2]), 8, 16,
+                                              43, 191, 8, 16, 1 << 10, 1 << 10);
+
+                        gDPPipeSync(OVERLAY_DISP++);
+                        gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, interfaceCtx->magicAlpha);
+                        gSPTextureRectangle(OVERLAY_DISP++, 168, 760, 200, 824, G_TX_RENDERTILE, 0, 0, 1 << 10,
+                                            1 << 10);
+
+                        sp2CA += 8;
+                    }
+
+                    gDPPipeSync(OVERLAY_DISP++);
+                    gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 0, 0, 0, interfaceCtx->magicAlpha);
+
+                    OVERLAY_DISP = Gfx_DrawTexRectI8(OVERLAY_DISP, (u8*)gCounterDigit0Tex + (8 * 16 * counterDigits[3]),
+                                                     8, 16, sp2CA + 1, 191, 8, 16, 1 << 10, 1 << 10);
+
+                    gDPPipeSync(OVERLAY_DISP++);
+                    gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, interfaceCtx->magicAlpha);
+                    gSPTextureRectangle(OVERLAY_DISP++, sp2CA * 4, 760, (sp2CA * 4) + 0x20, 824, G_TX_RENDERTILE, 0, 0,
+                                        1 << 10, 1 << 10);
+                }
+                break;
+
+            case SCENE_KINSTA1:
+            case SCENE_KINDAN2:
+                // Gold Skulltula Icon
+                gDPPipeSync(OVERLAY_DISP++);
+                gDPSetCombineMode(OVERLAY_DISP++, G_CC_MODULATEIA_PRIM, G_CC_MODULATEIA_PRIM);
+                gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, interfaceCtx->magicAlpha);
+                gDPSetEnvColor(OVERLAY_DISP++, 0, 0, 0, 255);
+                gDPLoadTextureBlock(OVERLAY_DISP++, gGoldSkulltulaCounterIconTex, G_IM_FMT_RGBA, G_IM_SIZ_32b, 24, 24,
+                                    0, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMIRROR | G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK,
+                                    G_TX_NOLOD, G_TX_NOLOD);
+                gSPTextureRectangle(OVERLAY_DISP++, 80, 748, 176, 820, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+
+                // Gold Skulluta Counter
+                gDPPipeSync(OVERLAY_DISP++);
+                gDPSetCombineLERP(OVERLAY_DISP++, 0, 0, 0, PRIMITIVE, TEXEL0, 0, PRIMITIVE, 0, 0, 0, 0, PRIMITIVE,
+                                  TEXEL0, 0, PRIMITIVE, 0);
+
+                counterDigits[2] = 0;
+                counterDigits[3] = Inventory_GetSkullTokenCount(play->sceneId);
+
+                while (counterDigits[3] >= 10) {
+                    counterDigits[2]++;
+                    counterDigits[3] -= 10;
+                }
+
+                sp2CA = 42;
+
+                if (counterDigits[2] != 0) {
+                    gDPPipeSync(OVERLAY_DISP++);
+                    gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 0, 0, 0, interfaceCtx->magicAlpha);
+
+                    OVERLAY_DISP = Gfx_DrawTexRectI8(OVERLAY_DISP, (u8*)gCounterDigit0Tex + (8 * 16 * counterDigits[2]),
+                                                     8, 16, 43, 191, 8, 16, 1 << 10, 1 << 10);
+
+                    gDPPipeSync(OVERLAY_DISP++);
+                    gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, interfaceCtx->magicAlpha);
+                    gSPTextureRectangle(OVERLAY_DISP++, 168, 760, 200, 824, G_TX_RENDERTILE, 0, 0, 1 << 10, 1 << 10);
+
+                    sp2CA += 8;
+                }
+
+                gDPPipeSync(OVERLAY_DISP++);
+                gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 0, 0, 0, interfaceCtx->magicAlpha);
+
+                OVERLAY_DISP = Gfx_DrawTexRectI8(OVERLAY_DISP, (u8*)gCounterDigit0Tex + (8 * 16 * counterDigits[3]), 8,
+                                                 16, sp2CA + 1, 191, 8, 16, 1 << 10, 1 << 10);
+
+                gDPPipeSync(OVERLAY_DISP++);
+                gDPSetPrimColor(OVERLAY_DISP++, 0, 0, 255, 255, 255, interfaceCtx->magicAlpha);
+                gSPTextureRectangle(OVERLAY_DISP++, sp2CA * 4, 760, (sp2CA * 4) + 0x20, 824, G_TX_RENDERTILE, 0, 0,
+                                    1 << 10, 1 << 10);
+                break;
+
+            default:
+                break;
+        }
+        
+        // Left align and shift left/up for life meter
+        gEXSetViewportAlign(OVERLAY_DISP++, G_EX_ORIGIN_LEFT, -margin_reduction * 4, -margin_reduction * 4);
+        gEXSetRectAlign(OVERLAY_DISP++, G_EX_ORIGIN_LEFT, G_EX_ORIGIN_LEFT, -margin_reduction * 4, -margin_reduction * 4, -margin_reduction * 4, -margin_reduction * 4);
+        Interface_SetOrthoView(interfaceCtx);
+
+        CLOSE_DISPS(play->state.gfxCtx);
+        
+        interfaceCtx->magicAlpha = 0; // set alpha to 0 to hide the counters
+    }
+}
+
+RECOMP_HOOK("Magic_DrawMeter")
+void Interface_CleanupWalletHide(PlayState* play) {
+    // reset alpha now that we don't need to hide things anymore
+    InterfaceContext* interfaceCtx = &play->interfaceCtx;
+    interfaceCtx->magicAlpha = savedMagicAlpha;
+}
