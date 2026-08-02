@@ -202,6 +202,18 @@ class ShuffleRegionalMaps(Choice):
     default = 1
 
 
+class ChildWallet(Toggle):
+    """Start the game without the initial 99 Rupee Wallet, and shuffle an extra Progressive Wallet into the pool."""
+    display_name = "Shuffle Child Wallet"
+
+
+class DeityWallet(Toggle):
+    """Add an extra Progressive Wallet into the pool that holds up to 999 rupees.
+    
+    Offsensive Shop Prices will compensate for this increased maximum capacity."""
+    display_name = "Add Deity Wallet"
+
+
 class ShuffleBossRemains(Choice):
     """Choose whether to shuffle the Boss Remains received after beating a boss at the end of a dungeon.
     
@@ -590,6 +602,10 @@ mm_option_groups = [
         Ocarinaless,
         Timeless
     ]),
+    OptionGroup("Extensions", [
+        ChildWallet,
+        DeityWallet,
+    ]),
     OptionGroup("Helpful Starting Items", [
         StartWithSoaring,
         StartWithInvertedTime, # remove option later
@@ -703,6 +719,8 @@ class MMROptions(PerGameCommonOptions):
     shopsanity: Shopsanity
     scrubsanity: Scrubsanity
     shop_prices: ShopPrices
+    child_wallet: ChildWallet
+    deity_wallet: DeityWallet
     cowsanity: Cowsanity
     shuffle_great_fairy_rewards: ShuffleGreatFairyRewards
     required_stray_fairies: RequiredStrayFairies
