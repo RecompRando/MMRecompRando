@@ -1292,14 +1292,8 @@ EZTR_MSG_CALLBACK(randoGormanMilkPurchaseHint) {
         EZTR_MsgSContent_Snprintf(
             formatted_player_name,
             128,
-            "for " EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT "'s" EZTR_CC_END,
+            EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT "'s" EZTR_CC_END,
             player_name
-        );
-    } else if (rando_location_is_checked(gormanMilkItem)) {
-        EZTR_MsgSContent_Snprintf(
-            formatted_player_name,
-            128,
-            " will do ya for one" EZTR_CC_COLOR_DEFAULT "" EZTR_CC_END
         );
     } else {
         EZTR_MsgSContent_Snprintf(
@@ -1309,7 +1303,6 @@ EZTR_MSG_CALLBACK(randoGormanMilkPurchaseHint) {
         );
     }
     char formatted_item_name[128];
-    if (!rando_location_is_checked(gormanMilkItem)) {
         EZTR_MsgSContent_Snprintf(
             formatted_item_name,
             128,
@@ -1317,23 +1310,26 @@ EZTR_MSG_CALLBACK(randoGormanMilkPurchaseHint) {
             getAPLocationItemColor(gormanMilkItem),
             item_name
         );
-    } else {
-        EZTR_MsgSContent_Snprintf(
-            formatted_item_name,
-            128,
-            "drink" EZTR_CC_COLOR_DEFAULT "" EZTR_CC_END
-        );
-    }
-        
-    EZTR_MsgSContent_Sprintf(
+    
+    if (rando_get_slotdata_u32("shopsanity") && (!rando_location_is_checked(gormanMilkItem))) {
+        EZTR_MsgSContent_Sprintf(
         buf->data.content,
-                "" EZTR_CC_COLOR_PINK "50 Rupees" EZTR_CC_COLOR_DEFAULT "%m" EZTR_CC_NEWLINE 
+                "" EZTR_CC_COLOR_PINK "50 Rupees" EZTR_CC_COLOR_DEFAULT " for %m" EZTR_CC_NEWLINE 
                 "%m." EZTR_CC_NEWLINE 
                 EZTR_CC_COLOR_GREEN "" EZTR_CC_TWO_CHOICE "I'll buy it" EZTR_CC_NEWLINE "No thanks" EZTR_CC_END "",
-        formatted_player_name,
-        formatted_item_name
-    );
-    
+            formatted_player_name,
+            formatted_item_name
+        );
+    } else {
+        EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+                "" EZTR_CC_COLOR_PINK "50 Rupees" EZTR_CC_COLOR_DEFAULT " will do ya for one" EZTR_CC_NEWLINE 
+                "drink!" EZTR_CC_NEWLINE 
+                "" EZTR_CC_COLOR_GREEN "" EZTR_CC_TWO_CHOICE "I'll buy it" EZTR_CC_NEWLINE 
+                "No thanks" EZTR_CC_END "",
+            NULL
+        );
+    }
     recomp_free(player_name);
     recomp_free(item_name);
 }
