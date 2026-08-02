@@ -235,15 +235,20 @@ def can_reach_seahorse(state, player, options):
 
 def can_afford_price(state, player, options, price):
     # Child's Wallet adds an addional Wallet to the pool we need to account for
+    # could clean this up a lot more
     if options.child_wallet.value:
-        if price > 200:
+        if price > 500 and options.deity_wallet.value:
+            return state.has("Progressive Wallet", player, 4)
+        elif price > 200:
             return state.has("Progressive Wallet", player, 3)
         elif price > 99:
             return state.has("Progressive Wallet", player, 2)
         elif price > 0 and options.child_wallet.value:
             return state.has("Progressive Wallet", player)
         return True
-    if price > 200:
+    if price > 500 and options.deity_wallet.value:
+        return state.has("Progressive Wallet", player, 3)
+    elif price > 200:
         return state.has("Progressive Wallet", player, 2)
     elif price > 99:
         return state.has("Progressive Wallet", player)

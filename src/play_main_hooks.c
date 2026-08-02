@@ -678,6 +678,7 @@ bool last_deathlink_status;
 bool inCredits;
 s16 savedSceneId;
 extern u16 gUpgradeCapacities[][4];
+extern s16 sRupeeDigitsCount[];
 
 RECOMP_CALLBACK("*", recomp_on_play_main)
 void update_rando(PlayState* play) {
@@ -718,6 +719,10 @@ void update_rando(PlayState* play) {
             rando_send_location(0x0D0000 | GI_WALLET_ADULT);
             if (rando_get_slotdata_u32("child_wallet") && !rando_has_item(GI_WALLET_ADULT)) {
                 gUpgradeCapacities[UPG_WALLET][0] = 0;
+            }
+            if (rando_get_slotdata_u32("deity_wallet")) {
+                gUpgradeCapacities[UPG_WALLET][3] = 999;
+                sRupeeDigitsCount[3] = 3;
             }
 
             for (int i = 0; i < rando_get_slotdata_u32("starting_heart_locations"); ++i)
