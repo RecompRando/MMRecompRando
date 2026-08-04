@@ -2171,6 +2171,20 @@ EZTR_MSG_CALLBACK(randoGossips) {
                 recomp_free(location_name);
                 custom_text = true;
                 break;
+            case 18: // Press the A button
+                text = "Press the " EZTR_CC_BTN_A " button to" EZTR_CC_NEWLINE
+                        "close this text box!" EZTR_CC_END;
+                break;
+            case 19: // C-Up also advances text boxes
+                text = "Did you know you can press " EZTR_CC_BTN_CUP " to" EZTR_CC_NEWLINE
+                        "advance text boxes?" EZTR_CC_NEWLINE
+                        "Try it now!" EZTR_CC_END;
+                break;
+            case 20: // Mega reference without context
+                text = "     " EZTR_CC_BTN_CUP EZTR_CC_NEWLINE
+                        "        " EZTR_CC_BTN_CRIGHT EZTR_CC_NEWLINE
+                        EZTR_CC_BTN_A " " EZTR_CC_BTN_A EZTR_CC_END;
+                break;
             case 0: // use the !hint command!
             default:
                 text = "Use the " EZTR_CC_COLOR_RED "!hint" EZTR_CC_COLOR_DEFAULT " command to hint" EZTR_CC_NEWLINE
