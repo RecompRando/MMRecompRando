@@ -1334,6 +1334,64 @@ EZTR_MSG_CALLBACK(randoGormanMilkPurchaseHint) {
     recomp_free(item_name);
 }
 
+EZTR_MSG_CALLBACK(randoWitchFreeItemHint) {
+    u32 witchFreeItem = GI_POTION_BLUE;
+    char* item_name;
+    char* player_name;
+
+    rando_get_location_item_name(witchFreeItem, &item_name);
+    rando_get_location_item_player(witchFreeItem, &player_name);
+    sanitizeRandoText(item_name);
+    sanitizeRandoText(player_name);
+
+    char formatted_player_name[128];
+    if (!rando_get_location_has_local_item(witchFreeItem) && (!rando_location_is_checked(witchFreeItem))) {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            "" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT "" EZTR_CC_END,
+            player_name
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            "a" EZTR_CC_END
+        );
+    }
+    char formatted_item_name[128];
+        EZTR_MsgSContent_Snprintf(
+            formatted_item_name,
+            128,
+            "%c%s" EZTR_CC_COLOR_DEFAULT "" EZTR_CC_END,
+            getAPLocationItemColor(witchFreeItem),
+            item_name
+        );
+    
+    if (!rando_location_is_checked(witchFreeItem)) {
+        EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+                "What's that? You want %m" EZTR_CC_NEWLINE 
+                "%m, do you?" EZTR_CC_COLOR_DEFAULT EZTR_CC_NEWLINE EZTR_CC_CARRIAGE_RETURN EZTR_CC_BOX_BREAK2
+                "Well, you gave me a mushroom, so" EZTR_CC_NEWLINE 
+                "I'll give you one for free." EZTR_CC_EVENT EZTR_CC_END "",
+            formatted_player_name,
+            formatted_item_name
+        );
+    } else {
+        EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+                "What's that? You want a " EZTR_CC_COLOR_BLUE "Blue" EZTR_CC_COLOR_DEFAULT " will do ya for one" EZTR_CC_NEWLINE 
+                "Potion," EZTR_CC_COLOR_DEFAULT " do you?" EZTR_CC_NEWLINE EZTR_CC_CARRIAGE_RETURN EZTR_CC_BOX_BREAK2
+                "Well, you gave me a mushroom, so" EZTR_CC_NEWLINE 
+                "I'll give you one for free." EZTR_CC_EVENT EZTR_CC_END "",
+            NULL
+        );
+    }
+    recomp_free(player_name);
+    recomp_free(item_name);
+}
+
 EZTR_MSG_CALLBACK(randoLotteryNPCHint) {
     u32 lotteryItem = LOCATION_LOTTERY_SHOP;
     char* item_name;
@@ -2707,7 +2765,7 @@ EZTR_ON_INIT void init_text() {
         true,
         "\xBF",
         randoGormanMilkPurchaseHint
-);
+    );
     
     EZTR_Basic_ReplaceText(
         0x2B0B,
@@ -2735,6 +2793,19 @@ EZTR_ON_INIT void init_text() {
         "\xBF",
         randoShop
     );
+    EZTR_Basic_ReplaceText(
+        0x0881, // Kotake Blue Potion free
+        EZTR_STANDARD_TEXT_BOX_II,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        false,
+        "\xBF",
+        randoWitchFreeItemHint
+    );
+    
 
     // Tingle Text
     // North Clock Town Tingle
