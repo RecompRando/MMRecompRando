@@ -142,7 +142,7 @@ RECOMP_PATCH void EnCow_GiveMilkWait(EnCow* this, PlayState* play) {
         this->actor.parent = NULL;
         this->actionFunc = EnCow_GiveMilkEnd;
     } else {
-        if (rando_location_is_checked(LOCATION_COW) || !rando_cows_enabled()) {
+        if (rando_location_is_checked(LOCATION_COW) || !rando_get_slotdata_u32("cowsanity")) {
             Actor_OfferGetItem(&this->actor, play, GI_MILK, 10000.0f, 100.0f);
         } else {
             Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_COW), LOCATION_COW, 300.0f, 300.0f, true, true);
@@ -155,7 +155,7 @@ RECOMP_PATCH void EnCow_GiveMilk(EnCow* this, PlayState* play) {
         this->actor.flags &= ~ACTOR_FLAG_10000;
         Message_CloseTextbox(play);
         this->actionFunc = EnCow_GiveMilkWait;
-        if (rando_location_is_checked(LOCATION_COW) || !rando_cows_enabled()) {
+        if (rando_location_is_checked(LOCATION_COW) || !rando_get_slotdata_u32("cowsanity")) {
             Actor_OfferGetItem(&this->actor, play, GI_MILK, 10000.0f, 100.0f);
         } else {
             Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_COW), LOCATION_COW, 300.0f, 300.0f, true, true);
@@ -167,7 +167,7 @@ void EnCow_TalkEnd(EnCow* this, PlayState* play);
 
 RECOMP_PATCH void EnCow_CheckForEmptyBottle(EnCow* this, PlayState* play) {
     if ((Message_GetState(&play->msgCtx) == TEXT_STATE_5) && Message_ShouldAdvance(play)) {
-        if (Inventory_HasEmptyBottle() || rando_cows_enabled()) {
+        if (Inventory_HasEmptyBottle() || rando_get_slotdata_u32("cowsanity")) {
             Message_ContinueTextbox(play, 0x32C9); // Text to give milk.
             this->actionFunc = EnCow_GiveMilk;
         } else {

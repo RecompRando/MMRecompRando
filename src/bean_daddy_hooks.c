@@ -61,7 +61,7 @@ RECOMP_PATCH void EnMs_Talk(EnMs* this, PlayState* play) {
                         if (gSaveContext.save.saveInfo.playerData.rupees < 10) {
                             Audio_PlaySfx(NA_SE_SY_ERROR);
                             Message_ContinueTextbox(play, 0x935); // "[...] You don't have enough Rupees."
-                        } else if (AMMO(ITEM_MAGIC_BEANS) >= 20) {
+                        } else if (AMMO(ITEM_MAGIC_BEANS) >= 20 || gSaveContext.save.saveInfo.inventory.items[SLOT_MAGIC_BEANS] == ITEM_NONE) {
                             Audio_PlaySfx(NA_SE_SY_ERROR);
                             Message_ContinueTextbox(play, 0x937); // "[...] You can't carry anymore."
                         } else {

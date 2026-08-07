@@ -110,6 +110,7 @@
 #define LOCATION_SWAMP_GALLERY_PERFECT 0x08011D
 #define LOCATION_BEAN_DADDY 0x0800A5
 #define LOCATION_EVAN_SONG 0x070241
+#define LOCATION_SWAMP_GUIDE_WINNER 0x0701C5
 #define LOCATION_SWAMP_GUIDE_GOOD 0x071C54
 #define LOCATION_SWAMP_GUIDE_OKAY 0x071C52
 
@@ -121,7 +122,6 @@ RECOMP_IMPORT(".", bool rando_get_death_link_pending());
 RECOMP_IMPORT(".", void rando_reset_death_link_pending());
 RECOMP_IMPORT(".", bool rando_get_death_link_enabled());
 RECOMP_IMPORT(".", void rando_send_death_link());
-RECOMP_IMPORT(".", u32 rando_damage_multiplier());
 RECOMP_IMPORT(".", u32 rando_death_behavior());
 RECOMP_IMPORT(".", u32 rando_get_moon_remains_required());
 RECOMP_IMPORT(".", u32 rando_get_majora_remains_required());

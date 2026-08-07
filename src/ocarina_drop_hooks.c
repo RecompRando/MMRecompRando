@@ -11,6 +11,8 @@ struct DmChar02;
 
 #define LOCATION_SOT 0x040067
 
+s16 hasBeenHit = false;
+
 typedef void (*DmChar02ActionFunc)(struct DmChar02*, PlayState*);
 
 typedef struct DmChar02 {
@@ -71,6 +73,11 @@ RECOMP_PATCH void DmChar02_Init(Actor* thisx, PlayState* play) {
     }
 }
 
+// To check if Skull Kid has been hit, which is required to collect the Ocarina of Time and Song of Time locations.
+RECOMP_HOOK("DmStk_ClockTower_StartDropOcarinaCutscene") void DmStk_ClockTower_StartDropOcarinaCutscene_Hook() {
+    hasBeenHit = true;
+}
+
 RECOMP_PATCH void DmChar02_Update(Actor* thisx, PlayState* play) {
     DmChar02* this = THIS;
 
@@ -95,9 +102,9 @@ RECOMP_PATCH void DmChar02_Update(Actor* thisx, PlayState* play) {
     this->actionFunc(this, play);
     if ((this->actor.xzDistToPlayer <= 30.0f) && (fabsf(this->actor.playerHeightRel) <= fabsf(80.0f))) {
         // Audio_PlayFanfare(NA_BGM_GET_SMALL_ITEM);
-        if (!rando_location_is_checked(GI_OCARINA_OF_TIME)) {
+        if ((!rando_location_is_checked(GI_OCARINA_OF_TIME)) && (hasBeenHit == true)) {
             Actor_OfferGetItem(&this->actor, play, GI_OCARINA_OF_TIME, 300.0f, 300.0f);
-        } else if (!rando_location_is_checked(LOCATION_SOT)) {
+        } else if ((!rando_location_is_checked(LOCATION_SOT)) && (hasBeenHit == true)) {
             Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_SOT), LOCATION_SOT, 300.0f, 300.0f, true, true);
         } else {
             Actor_Kill(thisx);

@@ -65,6 +65,20 @@ RECOMP_PATCH void func_80B973BC(EnZot* this, PlayState* play) {
             case 0x1277:
             case 0x1278:
             case 0x1279:
+                if (rando_location_is_checked(LOCATION_ZORA_JAR_GAME)) {
+                    Rupees_ChangeBy(90);
+                    Message_ContinueTextbox(play, 0x1270);
+                    Message_CloseTextbox(play);
+                    func_80B965D0(this, play);
+                    this->actor.flags &= ~ACTOR_FLAG_10000;
+                    this->actor.textId = 0;
+                    this->actionFunc = func_80B97708;
+                    if ((this->actor.csId != CS_ID_NONE) && !(this->unk_2F2 & 1)) {
+                        CutsceneManager_Stop(this->actor.csId);
+                    }
+                    this->unk_2F2 &= ~1;
+                    break;
+                }
                 Message_CloseTextbox(play);
                 func_80B965D0(this, play);
                 this->actor.flags &= ~ACTOR_FLAG_10000;
@@ -75,7 +89,9 @@ RECOMP_PATCH void func_80B973BC(EnZot* this, PlayState* play) {
                 }
                 this->unk_2F2 &= ~1;
                 if (play->msgCtx.currentTextId == 0x126F) {
-                    this->actionFunc = EnZot_GiveRandoItem;
+                    if (rando_get_slotdata_u32("shuffle_zora_pot_game") && !rando_location_is_checked(LOCATION_ZORA_JAR_GAME)) {
+                        this->actionFunc = EnZot_GiveRandoItem;
+                    }
                 }
                 break;
         }
@@ -120,7 +136,10 @@ RECOMP_PATCH void func_80B9854C(EnZot* this, PlayState* play) {
         this->actor.flags |= ACTOR_FLAG_10000;
         Actor_OfferTalkExchange(&this->actor, play, 1000.0f, 1000.0f, PLAYER_IA_MINUS1);
     } else {
-        // Actor_OfferGetItem(&this->actor, play, this->unk_2D4, 10000.0f, 50.0f);
-        Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_ZORA_PICTOGRAPH), LOCATION_ZORA_PICTOGRAPH, 10000.0f, 50.0f, true, true);
+        if (rando_get_slotdata_u32("shuffle_picture_rewards") != 2) {
+            Actor_OfferGetItem(&this->actor, play, this->unk_2D4, 10000.0f, 50.0f);
+        } else {
+            Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_ZORA_PICTOGRAPH), LOCATION_ZORA_PICTOGRAPH, 10000.0f, 50.0f, true, true);
+        }
     }
 }

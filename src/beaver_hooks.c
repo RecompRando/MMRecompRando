@@ -456,7 +456,7 @@ RECOMP_PATCH s32 func_80A9617C(EnAz* this, PlayState* play) {
                     case 0x10F1:
                         SET_WEEKEVENTREG(WEEKEVENTREG_93_01);
                         // if (CHECK_WEEKEVENTREG(WEEKEVENTREG_23_80)) {
-                        if (rando_location_is_checked(LOCATION_BEAVER_BOTTLE)) {
+                        if (rando_location_is_checked(LOCATION_BEAVER_BOTTLE) || rando_get_slotdata_u32("shuffle_beaver_races") == 0) {
                             this->getItemId = GI_RUPEE_RED;
                         } else {
                             this->getItemId = GI_BOTTLE;
@@ -629,7 +629,7 @@ RECOMP_PATCH s32 func_80A9617C(EnAz* this, PlayState* play) {
 
                     case 0x1105:
                         // if (CHECK_WEEKEVENTREG(WEEKEVENTREG_25_01)) {
-                        if (rando_location_is_checked(LOCATION_BEAVER_HP)) {
+                        if (rando_location_is_checked(LOCATION_BEAVER_HP) || rando_get_slotdata_u32("shuffle_beaver_races") != 2){
                             this->getItemId = GI_RUPEE_PURPLE;
                         } else {
                             this->getItemId = GI_HEART_PIECE;
@@ -778,5 +778,11 @@ RECOMP_PATCH void func_80A97AB4(EnAz* this, PlayState* play) {
         case TEXT_STATE_CLOSING:
         default:
             break;
+    }
+}
+
+RECOMP_HOOK_RETURN ("func_80A94B98") void beaver_race_finish() {
+    if (!CHECK_WEEKEVENTREG(WEEKEVENTREG_24_04)) {
+        SET_WEEKEVENTREG(WEEKEVENTREG_24_04);
     }
 }
