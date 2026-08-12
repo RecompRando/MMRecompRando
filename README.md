@@ -63,6 +63,13 @@ Thank you to the original authors of some of the other recomp mods used!
 - ThatHypedPerson (Color Mods)
 - danielryb (Better SoDT, Z-Target Fix, Song Utils)
 
+## Contributing
+
+> [!WARNING]
+> The developers and maintainers of this randomizer, along with the N64 Recompiled community as a whole, disallow any "vibe-coded" contributions to this repository. Any contributions or extra features for this randomizer which are primarily AI generated are not endorsed by us.
+>
+> For more information see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Writing mods
 See [this document](https://hackmd.io/fMDiGEJ9TBSjomuZZOgzNg) for an explanation of the modding framework, including how to write function patches and perform interop between different mods.
 
