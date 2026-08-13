@@ -1333,6 +1333,63 @@ EZTR_MSG_CALLBACK(randoGormanMilkPurchaseHint) {
     recomp_free(player_name);
     recomp_free(item_name);
 }
+//         "" EZTR_CC_SFX "|3A|D2Please! I'll sell you a " EZTR_CC_COLOR_RED "Piece of" EZTR_CC_NEWLINE "Heart" EZTR_CC_COLOR_DEFAULT " if you just keep this place" EZTR_CC_NEWLINE "a secret..." EZTR_CC_EVENT "" EZTR_CC_END "",
+EZTR_MSG_CALLBACK(randoTerminaScrubPurchaseHint) {
+    u32 terminaScrubPurchase = 0x07024C;
+    char* item_name;
+    char* player_name;
+
+    rando_get_location_item_name(terminaScrubPurchase, &item_name);
+    rando_get_location_item_player(terminaScrubPurchase, &player_name);
+    sanitizeRandoText(item_name);
+    sanitizeRandoText(player_name);
+
+    char formatted_player_name[128];
+    if (!rando_get_location_has_local_item(terminaScrubPurchase) && (!rando_location_is_checked(terminaScrubPurchase))) {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            "" EZTR_CC_COLOR_GREEN "%s" EZTR_CC_COLOR_DEFAULT "'s" EZTR_CC_END,
+            player_name
+        );
+    } else {
+        EZTR_MsgSContent_Snprintf(
+            formatted_player_name,
+            128,
+            "a" EZTR_CC_END
+        );
+    }
+    char formatted_item_name[128];
+        EZTR_MsgSContent_Snprintf(
+            formatted_item_name,
+            128,
+            "%c%s" EZTR_CC_COLOR_DEFAULT "" EZTR_CC_END,
+            getAPLocationItemColor(terminaScrubPurchase),
+            item_name
+        );
+    
+    if (!rando_location_is_checked(terminaScrubPurchase)) {
+        EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+            EZTR_CC_SFX "|3A|D2Please! I'll sell you %m" EZTR_CC_NEWLINE
+            "%m" EZTR_CC_COLOR_DEFAULT EZTR_CC_NEWLINE
+            "if you just keep this place a" EZTR_CC_NEWLINE
+            "secret..." EZTR_CC_EVENT "" EZTR_CC_END "",
+            formatted_player_name,
+            formatted_item_name
+        );
+    } else {
+        EZTR_MsgSContent_Sprintf(
+        buf->data.content,
+            EZTR_CC_SFX "|3A|D2Please! I'll sell you a " EZTR_CC_COLOR_RED "Piece of" EZTR_CC_NEWLINE
+            "Heart" EZTR_CC_COLOR_DEFAULT " if you just keep this place" EZTR_CC_NEWLINE
+            "a secret..." EZTR_CC_EVENT "" EZTR_CC_END "",
+            NULL
+        );
+    }
+    recomp_free(player_name);
+    recomp_free(item_name);
+}
 
 EZTR_MSG_CALLBACK(randoWitchFreeItemHint) {
     u32 witchFreeItem = GI_POTION_BLUE;
@@ -3028,6 +3085,20 @@ EZTR_ON_INIT void init_text() {
         "Come back and see me if you run" EZTR_CC_NEWLINE
         "out." EZTR_CC_END,
         randoBombShopGoronHasSell
+    );
+
+// Termina Field Buisness Scrub in hideout 150 rupees or 100 rupees Heart Piece text
+    EZTR_Basic_ReplaceText(
+        0x1631,
+        EZTR_STANDARD_TEXT_BOX_I,
+        0,
+        EZTR_ICON_NO_ICON,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        true,
+        "\xBF",
+        randoTerminaScrubPurchaseHint
     );
     
     
