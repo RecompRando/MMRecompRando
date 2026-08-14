@@ -22,6 +22,38 @@
 
 void DoorWarp1_SetupAction(DoorWarp1* this, DoorWarp1ActionFunc actionFunc);
 
+u32 randoERBossLookup(u8 current) {
+    REPY_FN_SETUP_RANDO;
+
+    REPY_FN_SET_U8("current", current);
+
+    REPY_FN_EXEC_CACHE(
+        rando_get_boss_entrance_rando,
+        "boss_placements = recomp_data.ctx.slot_data[\"boss_regions\"]\n"
+        "real_region = boss_placements[str(current)]"
+    );
+
+    u32 real_region = REPY_FN_GET_U32("real_region");
+    REPY_FN_CLEANUP;
+    
+    return real_region;
+}
+
+bool randoIsDungeonCleared(u8 dungeon) {
+    switch (dungeon) {
+        case DUNGEON_INDEX_WOODFALL_TEMPLE:
+            return CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE);
+        case DUNGEON_INDEX_SNOWHEAD_TEMPLE:
+            return CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_SNOWHEAD_TEMPLE);
+        case DUNGEON_INDEX_GREAT_BAY_TEMPLE:
+            return CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE);
+        case DUNGEON_INDEX_STONE_TOWER_TEMPLE:
+            return CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_STONE_TOWER_TEMPLE);
+        default:
+            return false;
+    }
+}
+
 RECOMP_PATCH s32 func_808B849C(DoorWarp1* this, PlayState* play) {
     s32 ret = 0;
 
@@ -154,8 +186,6 @@ bool shouldOverrideDungeon;
 s32 curBossDungeon;
 static s32 realBossDungeon;
 
-u32 reverseERLookup(u32 placements, u32 index);
-
 RECOMP_HOOK("func_808BA10C")
 void DoorWarp1_BeforeSettingWarp(DoorWarp1* this, PlayState* play) {
     shouldOverrideDungeon = false;
@@ -194,17 +224,7 @@ void DoorWarp1_BeforeSettingWarp(DoorWarp1* this, PlayState* play) {
 
         if (this->unk_202 == 0) {
             shouldOverrideDungeon = true;
-            REPY_FN_SETUP_RANDO;
-
-            REPY_FN_SET_U8("current_boss", current_boss_normal);
-
-            REPY_FN_EXEC_CACHE(
-                rando_get_boss_entrance_rando,
-                "boss_placements = recomp_data.ctx.slot_data[\"boss_regions\"]\n"
-                "real_region = boss_placements[str(current_boss)]"
-            );
-
-            realBossDungeon = REPY_FN_GET_S32("real_region");
+            realBossDungeon = (s32)randoERBossLookup(current_boss_normal);
 
             // swap great bay temple and stone tower ids
             if (realBossDungeon == 2) {
@@ -212,8 +232,6 @@ void DoorWarp1_BeforeSettingWarp(DoorWarp1* this, PlayState* play) {
             } else if (realBossDungeon == 3) {
                 realBossDungeon = 2;
             }
-
-            REPY_FN_CLEANUP;
         }
     }
 }
@@ -321,61 +339,81 @@ void CutsceneCmd_OverrideDestination(PlayState* play, CutsceneContext* csCtx, Cs
     }
 }
 
-// bool temp;
+static bool realDungeonClearState;
 
-// // odolwa
-// RECOMP_HOOK("Boss01_Init")
-// void fakeclear() {
-//     temp = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE);
-//     SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE);
-// }
+// odolwa
+RECOMP_HOOK("Boss01_Init")
+void Boss01_HandleClearState() {
+    realDungeonClearState = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE);
+    CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE);
+    
+    u8 real_region = randoERBossLookup(DUNGEON_INDEX_WOODFALL_TEMPLE);
+    if (randoIsDungeonCleared(real_region)) {
+        SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE);
+    }
+}
 
-// RECOMP_HOOK_RETURN("Boss01_Init")
-// void removeclear() {
-//     if (!temp) {
-//         CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE);
-//     }
-//     SET_WEEKEVENTREG(WEEKEVENTREG_20_01);
-// }
+RECOMP_HOOK_RETURN("Boss01_Init")
+void Boss01_ResetClearState() {
+    if (!realDungeonClearState) {
+        CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_WOODFALL_TEMPLE);
+    }
+    SET_WEEKEVENTREG(WEEKEVENTREG_20_01);
+}
 
-// // gyorg
-// RECOMP_HOOK("BossHakugin_Init")
-// void fakeclear_gh() {
-//     temp = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_SNOWHEAD_TEMPLE);
-//     SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_SNOWHEAD_TEMPLE);
-// }
+// gyorg
+RECOMP_HOOK("BossHakugin_Init")
+void BossHakugin_HandleClearState() {
+    realDungeonClearState = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_SNOWHEAD_TEMPLE);
+    CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_SNOWHEAD_TEMPLE);
+    
+    u8 real_region = randoERBossLookup(DUNGEON_INDEX_SNOWHEAD_TEMPLE);
+    if (randoIsDungeonCleared(real_region)) {
+        SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_SNOWHEAD_TEMPLE);
+    }
+}
 
-// RECOMP_HOOK_RETURN("BossHakugin_Init")
-// void removeclear_gh() {
-//     if (!temp) {
-//         CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_SNOWHEAD_TEMPLE);
-//     }
-// }
+RECOMP_HOOK_RETURN("BossHakugin_Init")
+void BossHakugin_ResetClearState() {
+    if (!realDungeonClearState) {
+        CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_SNOWHEAD_TEMPLE);
+    }
+}
 
-// // gyorg
-// RECOMP_HOOK("Boss03_Init")
-// void fakeclear_gy() {
-//     temp = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE);
-//     SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE);
-// }
+// gyorg
+RECOMP_HOOK("Boss03_Init")
+void Boss03_HandleClearState() {
+    realDungeonClearState = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE);
+    CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE);
+    
+    u8 real_region = randoERBossLookup(DUNGEON_INDEX_GREAT_BAY_TEMPLE);
+    if (randoIsDungeonCleared(real_region)) {
+        SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE);
+    }
+}
 
-// RECOMP_HOOK_RETURN("Boss03_Init")
-// void removeclear_gy() {
-//     if (!temp) {
-//         CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE);
-//     }
-// }
+RECOMP_HOOK_RETURN("Boss03_Init")
+void Boss03_ResetClearState() {
+    if (!realDungeonClearState) {
+        CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_GREAT_BAY_TEMPLE);
+    }
+}
 
-// // twinmold
-// RECOMP_HOOK("Boss02_Init")
-// void fakeclear_t() {
-//     temp = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_STONE_TOWER_TEMPLE);
-//     SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_STONE_TOWER_TEMPLE);
-// }
+// twinmold
+RECOMP_HOOK("Boss02_Init")
+void Boss02_HandleClearState() {
+    realDungeonClearState = CHECK_WEEKEVENTREG(WEEKEVENTREG_CLEARED_STONE_TOWER_TEMPLE);
+    CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_STONE_TOWER_TEMPLE);
+    
+    u8 real_region = randoERBossLookup(DUNGEON_INDEX_STONE_TOWER_TEMPLE);
+    if (randoIsDungeonCleared(real_region)) {
+        SET_WEEKEVENTREG(WEEKEVENTREG_CLEARED_STONE_TOWER_TEMPLE);
+    }
+}
 
-// RECOMP_HOOK_RETURN("Boss02_Init")
-// void removeclear_t() {
-//     if (!temp) {
-//         CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_STONE_TOWER_TEMPLE);
-//     }
-// }
+RECOMP_HOOK_RETURN("Boss02_Init")
+void Boss02_ResetClearState() {
+    if (!realDungeonClearState) {
+        CLEAR_WEEKEVENTREG(WEEKEVENTREG_CLEARED_STONE_TOWER_TEMPLE);
+    }
+}
