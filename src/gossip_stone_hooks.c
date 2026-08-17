@@ -53,6 +53,12 @@ void EnGs_HandleText(EnGs* this, PlayState* play) {
     }
 }
 
+// unset fairy flag on init so they can respawn on reload rather than new cycle
+RECOMP_HOOK("EnGs_Init")
+void OnEnGs_Init(Actor* thisx, PlayState* play) {
+    Flags_UnsetSwitch(play, ENGS_GET_SWITCH_FLAG(thisx));
+}
+
 // randomize fairy
 RECOMP_PATCH void func_8099807C(EnGs* this, PlayState* play) {
     Actor* fairy = NULL;
