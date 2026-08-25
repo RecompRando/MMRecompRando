@@ -110,7 +110,9 @@ void RandoMenu_Main(GameState* thisx) {
         }
         recomp_change_save_file(file_name);
 
-        colors_set_human_tunic(C_TO_PARAMS(rando_get_slotdata_u32("link_tunic_color")));
+        if (recomp_is_dependency_met("mm_recomp_colors") == DEPENDENCY_STATUS_FOUND) {
+            colors_set_human_tunic(C_TO_PARAMS(rando_get_slotdata_u32("link_tunic_color")));
+        }
         Setup_InitImpl(this);
     }
 

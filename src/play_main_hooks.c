@@ -32,6 +32,8 @@ void registerActorExtensions();
 
 PlayState* gPlay;
 
+bool hasBDSoTMod;
+
 RECOMP_CALLBACK("*", recomp_on_init)
 void init_rando()
 {
@@ -44,7 +46,10 @@ void init_rando()
     recomp_set_allow_no_ocarina_tf(true);
     recomp_set_h_and_d_no_sword_fix(true);
 
-    dsot_set_skip_dsot_cutscene(true);
+    if (recomp_is_dependency_met("mm_recomp_better_double_sot") == DEPENDENCY_STATUS_FOUND) {
+        dsot_set_skip_dsot_cutscene(true);
+        hasBDSoTMod = true;
+    }
     registerActorExtensions();
 
     randoCreateNotificationContainer();
@@ -802,7 +807,7 @@ void update_rando(PlayState* play) {
     }
 
     // testing for time skips
-    if (recomp_get_config_u32("skip_time") && CHECK_BTN_ALL(CONTROLLER1(&play->state)->press.button, BTN_L)) {
+    if (hasBDSoTMod && recomp_get_config_u32("skip_time") && CHECK_BTN_ALL(CONTROLLER1(&play->state)->press.button, BTN_L)) {
         // dsot_set_time(play, day, CLOCK_TIME(hour, 0));
         dsot_set_time(play, recomp_get_config_u32("time_day"), CLOCK_TIME(recomp_get_config_u32("time_hour"), 0));
         // macros to maybe use later

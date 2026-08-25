@@ -9,6 +9,9 @@
 ActorExtensionId actorLocationExtension;
 ActorExtensionId actorDroppedExtension;
 
+bool hasActorListIndexMod;
+RECOMP_IMPORT("ProxyMM_ActorListIndex", s32 GetActorListIndex(Actor* actor));
+
 void registerActorExtensions() {
     actorLocationExtension = z64recomp_extend_actor_all(sizeof(u32));
     actorDroppedExtension = z64recomp_extend_actor_all(sizeof(u32));
@@ -16,9 +19,17 @@ void registerActorExtensions() {
     mureIndexExtension = z64recomp_extend_actor(ACTOR_OBJ_MURE, sizeof(u32));
     mure2IndexExtension = z64recomp_extend_actor(ACTOR_OBJ_MURE2, sizeof(u32));
     wonderHitTimerExtension = z64recomp_extend_actor(ACTOR_EN_HIT_TAG, sizeof(u32));
+
+    if (recomp_is_dependency_met("ProxyMM_ActorListIndex") == DEPENDENCY_STATUS_FOUND) {
+        hasActorListIndexMod = true;
+    }
 }
 
 s32 randoGetLoadedActorNumInSameRoom(PlayState* play, Actor* actorIn) {
+    if (recomp_get_config_u32("alternate_actor_id") && hasActorListIndexMod) {
+        return GetActorListIndex(actorIn);
+    }
+    
     u8 actorCat = actorIn->category;
     s8 actorRoom = actorIn->room;
     s16 actorId = actorIn->id;
@@ -41,6 +52,10 @@ s32 randoGetLoadedActorNumInSameRoom(PlayState* play, Actor* actorIn) {
 
 // note: this only works if both actors are in the same category
 s32 randoGetLoadedActorNumInSameRoomExtra(PlayState* play, Actor* actorIn, s16 extraId) {
+    if (recomp_get_config_u32("alternate_actor_id") && hasActorListIndexMod) {
+        return GetActorListIndex(actorIn);
+    }
+    
     u8 actorCat = actorIn->category;
     s8 actorRoom = actorIn->room;
     s16 actorId = actorIn->id;

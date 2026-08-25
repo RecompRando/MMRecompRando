@@ -36,11 +36,8 @@ minimum_recomp_version = "1.2.2"
 # Dependency mods. Each entry is the mod's ID and then an optional minimum version of the dependency mod.
 dependencies = [
     "RecompExternalPython_API:2.0.0",
-    "owls_never_quit:1.0.0",
-    "mm_recomp_better_double_sot:1.0.1",
-    "mm_recomp_colors:0.5.0",
+    "REPY_PopularPythonPackages:1.0.0",
     "MM_EZ_Text_Replacer_API:2.3.0",
-    "REPY_PopularPythonPackages:1.0.0"
 ]
 
 # REPY_PopularPythonPackages found here: https://github.com/LT-Schmiddy/repy_popular_python_packages
@@ -49,7 +46,9 @@ dependencies = [
 # list aren't present. You can query the presence of a given dependency by using `recomp_is_dependency_met` in recomputils.h.
 # Calling a function imported from an optional dependency that isn't present will trigger an error.
 optional_dependencies = [
-
+    "mm_recomp_better_double_sot:1.0.1",
+    "mm_recomp_colors:0.5.0",
+    "ProxyMM_ActorListIndex:0.0.3",
 ]
 
 # Native libraries (e.g. DLLs) and the functions they export.
@@ -125,6 +124,14 @@ description = "Sets whether or not Soul items display as their in-game model or 
 type = "Enum"
 options = [ "Disabled", "Enabled" ]
 default = "Enabled"
+
+[[manifest.config_options]]
+id = "alternate_actor_id"
+name = "(DEBUG) Use Alternate Actor IDs"
+description = "Enable/Disable an alternate set of ids for actors. Will break most checks."
+type = "Enum"
+options = [ "Disabled", "Enabled" ]
+default = "Disabled"
 
 [[manifest.config_options]]
 id = "enemy_drops"
