@@ -141,11 +141,22 @@ def can_get_red_potion(state, player, prices, options):
 
 def can_get_blue_potion(state, player, prices, options):
     return (
-            has_bottle(state, player) and
+        has_bottle(state, player) and
+        (
+            # change this if the "mushroom item" moves to a different option
+            state.can_reach("Southern Swamp Witch Shop Mushroom Item", "Location", player) or
             (
-                state.can_reach("Southern Swamp Witch Shop Item 1", "Location", player) or
-                state.can_reach("Ikana Canyon Scrub Purchase", "Location", player)
+                state.can_reach("Lower Ikana Canyon", "Region", player) and
+                (
+                    options.scrubsanity.value and
+                    state.can_reach("Ikana Canyon Scrub Purchase", "Location", player)
+                ) or
+                (
+                    has_soul_npc(state, player, options, "Business Scrubs") and
+                    can_afford_price(state, player, options, 100)
+                )
             )
+        )
     )
 
 def can_plant_beans(state, player, options):
