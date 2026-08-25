@@ -419,7 +419,7 @@ class Iciclesanity(Toggle):
 
 class Scarecrowsanity(Toggle):
     """Choose whether the scarecrow rewards an item when he is spawned."""
-    display_name = "Scarecrowanity"  
+    display_name = "Scarecrowsanity"
 
 
 class Hivesanity(Toggle):
