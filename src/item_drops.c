@@ -335,6 +335,10 @@ u8 sDropTableAmounts[DROP_TABLE_SIZE * DROP_TABLE_NUMBER] = {
     0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
 };
 
+extern bool hasActorListIndexMod;
+#define ACTOR_LOCATION(actor) (AP_PREFIX_ENEMY_DROP | (play->sceneId << 8) | GetActorListIndex(actor))
+RECOMP_IMPORT("ProxyMM_ActorListIndex", s32 GetActorListIndex(Actor* actor));
+
 RECOMP_PATCH void Item_DropCollectibleRandom(PlayState* play, Actor* fromActor, Vec3f* spawnPos, s16 params) {
     EnItem00* spawnedActor;
     u8 dropId;
@@ -343,12 +347,12 @@ RECOMP_PATCH void Item_DropCollectibleRandom(PlayState* play, Actor* fromActor, 
     s16 param8000 = params & 0x8000;
     u8 dropFlag;
 
-    if (fromActor != NULL) {
-        u32* actorLocation = z64recomp_get_extended_actor_data(fromActor, actorLocationExtension);
+    if (fromActor != NULL && hasActorListIndexMod) {
+        u32 actorLocation = ACTOR_LOCATION(fromActor);
         bool* actorDropped = z64recomp_get_extended_actor_data(fromActor, actorDroppedExtension);
 
-        if (recomp_get_config_u32("enemy_drops") && (*actorLocation & AP_PREFIX_ENEMY_DROP) && !rando_location_is_checked(*actorLocation) && !(*actorDropped)) {
-            Item_RandoDropCollectible(play, &fromActor->world.pos, ITEM00_APITEM, *actorLocation);
+        if (recomp_get_config_u32("enemy_drops") && (actorLocation & AP_PREFIX_ENEMY_DROP) && !rando_location_is_checked(actorLocation) && !(*actorDropped)) {
+            Item_RandoDropCollectible(play, &fromActor->world.pos, ITEM00_APITEM, actorLocation);
             *actorDropped = true;
             return;
         }
