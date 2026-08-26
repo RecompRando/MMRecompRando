@@ -11229,97 +11229,97 @@ location_data_table: Dict[str, MMRLocationData] = {
     ),
 
 
-    # Deku PlayGround Day 1 Rupees
-    "Deku PlayGround Day 1 Rupees (0)": MMRLocationData(
+    # Deku Playground Day 1 Rupees
+    "Deku Playground Day 1 Rupees (0)": MMRLocationData(
         region="Clock Town",
         address=0x171E13,
         can_create=lambda options: options.rupeesanity.value
     ),
-    "Deku PlayGround Day 1 Rupees (1)": MMRLocationData(
+    "Deku Playground Day 1 Rupees (1)": MMRLocationData(
         region="Clock Town",
         address=0x171E10,
         can_create=lambda options: options.rupeesanity.value
     ),
-    "Deku PlayGround Day 1 Rupees (2)": MMRLocationData(
+    "Deku Playground Day 1 Rupees (2)": MMRLocationData(
         region="Clock Town",
         address=0x171E14,
         can_create=lambda options: options.rupeesanity.value
     ),
-    "Deku PlayGround Day 1 Rupees (3)": MMRLocationData(
+    "Deku Playground Day 1 Rupees (3)": MMRLocationData(
         region="Clock Town",
         address=0x171E12,
         can_create=lambda options: options.rupeesanity.value
     ),
-    "Deku PlayGround Day 1 Rupees (4)": MMRLocationData(
+    "Deku Playground Day 1 Rupees (4)": MMRLocationData(
         region="Clock Town",
         address=0x171E11,
         can_create=lambda options: options.rupeesanity.value
     ),
-    "Deku PlayGround Day 1 Rupees (5)": MMRLocationData(
+    "Deku Playground Day 1 Rupees (5)": MMRLocationData(
         region="Clock Town",
         address=0x171E15,
         can_create=lambda options: options.rupeesanity.value
     ),
 
-    # Deku PlayGround Day 2 Rupees
-    "Deku PlayGround Day 2 Rupees (0)": MMRLocationData(
+    # Deku Playground Day 2 Rupees
+    "Deku Playground Day 2 Rupees (0)": MMRLocationData(
         region="Clock Town",
         address=0x171E25,
         can_create=lambda options: options.rupeesanity.value
     ),
-    "Deku PlayGround Day 2 Rupees (1)": MMRLocationData(
+    "Deku Playground Day 2 Rupees (1)": MMRLocationData(
         region="Clock Town",
         address=0x171E21,
         can_create=lambda options: options.rupeesanity.value
     ),
-    "Deku PlayGround Day 2 Rupees (2)": MMRLocationData(
+    "Deku Playground Day 2 Rupees (2)": MMRLocationData(
         region="Clock Town",
         address=0x171E20,
         can_create=lambda options: options.rupeesanity.value
     ),
-    "Deku PlayGround Day 2 Rupees (3)": MMRLocationData(
+    "Deku Playground Day 2 Rupees (3)": MMRLocationData(
         region="Clock Town",
         address=0x171E23,
         can_create=lambda options: options.rupeesanity.value
     ),
-    "Deku PlayGround Day 2 Rupees (4)": MMRLocationData(
+    "Deku Playground Day 2 Rupees (4)": MMRLocationData(
         region="Clock Town",
         address=0x171E24,
         can_create=lambda options: options.rupeesanity.value
     ),
-    "Deku PlayGround Day 2 Rupees (5)": MMRLocationData(
+    "Deku Playground Day 2 Rupees (5)": MMRLocationData(
         region="Clock Town",
         address=0x171E22,
         can_create=lambda options: options.rupeesanity.value
     ),
 
-    # Deku PlayGround Day 3 Rupees
-    "Deku PlayGround Day 3 Rupees (0)": MMRLocationData(
+    # Deku Playground Day 3 Rupees
+    "Deku Playground Day 3 Rupees (0)": MMRLocationData(
         region="Clock Town",
         address=0x171E32,
         can_create=lambda options: options.rupeesanity.value
     ),
-    "Deku PlayGround Day 3 Rupees (1)": MMRLocationData(
+    "Deku Playground Day 3 Rupees (1)": MMRLocationData(
         region="Clock Town",
         address=0x171E31,
         can_create=lambda options: options.rupeesanity.value
     ),
-    "Deku PlayGround Day 3 Rupees (2)": MMRLocationData(
+    "Deku Playground Day 3 Rupees (2)": MMRLocationData(
         region="Clock Town",
         address=0x171E30,
         can_create=lambda options: options.rupeesanity.value
     ),
-    "Deku PlayGround Day 3 Rupees (3)": MMRLocationData(
+    "Deku Playground Day 3 Rupees (3)": MMRLocationData(
         region="Clock Town",
         address=0x171E33,
         can_create=lambda options: options.rupeesanity.value
     ),
-    "Deku PlayGround Day 3 Rupees (4)": MMRLocationData(
+    "Deku Playground Day 3 Rupees (4)": MMRLocationData(
         region="Clock Town",
         address=0x171E35,
         can_create=lambda options: options.rupeesanity.value
     ),
-    "Deku PlayGround Day 3 Rupees (5)": MMRLocationData(
+    "Deku Playground Day 3 Rupees (5)": MMRLocationData(
         region="Clock Town",
         address=0x171E34,
         can_create=lambda options: options.rupeesanity.value
