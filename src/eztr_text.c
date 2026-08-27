@@ -2242,6 +2242,9 @@ EZTR_MSG_CALLBACK(randoGossips) {
                         "        " EZTR_CC_BTN_CRIGHT EZTR_CC_NEWLINE
                         EZTR_CC_BTN_A " " EZTR_CC_BTN_A EZTR_CC_END;
                 break;
+            case 21: // The Game
+                text = "You just lost " EZTR_CC_COLOR_RED "The Game" EZTR_CC_COLOR_DEFAULT "." EZTR_CC_END;
+                break;
             case 0: // use the !hint command!
             default:
                 text = "Use the " EZTR_CC_COLOR_RED "!hint" EZTR_CC_COLOR_DEFAULT " command to hint" EZTR_CC_NEWLINE
