@@ -126,6 +126,14 @@ options = [ "Disabled", "Enabled" ]
 default = "Enabled"
 
 [[manifest.config_options]]
+id = "zora_fins_break_rocks"
+name = "Zora Fins Break Underwater Rocks"
+description = "Allows Zora's fins to break small rocks while underwater, as an alternative to explosives."
+type = "Enum"
+options = [ "Disabled", "Enabled" ]
+default = "Disabled"
+
+[[manifest.config_options]]
 id = "alternate_actor_id"
 name = "(DEBUG) Use Alternate Actor IDs"
 description = "Enable/Disable an alternate set of ids for actors. Will break most checks."

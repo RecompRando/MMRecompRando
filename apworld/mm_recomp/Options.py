@@ -13,6 +13,7 @@ class LogicDifficulty(Choice):
     #option_obscure_glitchless = 2
     #option_glitched = 3
     option_no_logic = 4
+    option_nearly_no_logic = 5
     # ~ alias_baby = option_easy
     default = 1
 

@@ -3355,7 +3355,8 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.has("Gibdo Mask", player) and 
                 has_bottle(state, player) and 
                 (
-                    can_afford_price(state, player, options, 100) or 
+                    can_get_blue_potion(state, player, prices, options) and
+                    can_afford_price(state, player, options, 100) or
                     state.has("Mask of Scents", player) and
                     has_soul_npc(state, player, options, "Kotake")
                 )
@@ -11960,8 +11961,10 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.has("Gibdo Mask", player) and
                 has_bottle(state, player) and
                 (
+                    can_get_blue_potion(state, player, prices, options) and
                     can_afford_price(state, player, options, 100) or
-                    state.has("Mask of Scents", player)
+                    state.has("Mask of Scents", player) and
+                    has_soul_npc(state, player, options, "Kotake")
                 )
             ),
         "Well Left Side Back Room Pots (2)":
@@ -11971,8 +11974,10 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.has("Gibdo Mask", player) and
                 has_bottle(state, player) and
                 (
+                    can_get_blue_potion(state, player, prices, options) and
                     can_afford_price(state, player, options, 100) or
-                    state.has("Mask of Scents", player)
+                    state.has("Mask of Scents", player) and
+                    has_soul_npc(state, player, options, "Kotake")
                 )
             ),
         "Well Left Side Back Room Pots (3)":
@@ -11982,8 +11987,10 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.has("Gibdo Mask", player) and
                 has_bottle(state, player) and
                 (
+                    can_get_blue_potion(state, player, prices, options) and
                     can_afford_price(state, player, options, 100) or
-                    state.has("Mask of Scents", player)
+                    state.has("Mask of Scents", player) and
+                    has_soul_npc(state, player, options, "Kotake")
                 )
             ),
         "Well Left Side Back Room Pots (4)":
@@ -11993,8 +12000,10 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.has("Gibdo Mask", player) and
                 has_bottle(state, player) and
                 (
+                    can_get_blue_potion(state, player, prices, options) and
                     can_afford_price(state, player, options, 100) or
-                    state.has("Mask of Scents", player)
+                    state.has("Mask of Scents", player) and
+                    has_soul_npc(state, player, options, "Kotake")
                 )
             ),
         "Well Left Side Back Room Pots (5)":
@@ -12004,8 +12013,10 @@ def get_location_rules(player, options, prices, boss_placements):
                 state.has("Gibdo Mask", player) and
                 has_bottle(state, player) and
                 (
+                    can_get_blue_potion(state, player, prices, options) and
                     can_afford_price(state, player, options, 100) or
-                    state.has("Mask of Scents", player)
+                    state.has("Mask of Scents", player) and
+                    has_soul_npc(state, player, options, "Kotake")
                 )
             ),
         
