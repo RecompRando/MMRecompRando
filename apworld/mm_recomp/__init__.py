@@ -515,12 +515,12 @@ class MMRWorld(World):
         # ~ if (self.options.logic_difficulty.value == 0):
             # ~ region_rules = get_baby_region_rules(player, options)
             # ~ location_rules = get_baby_location_rules(player, options)
-        if (self.options.logic_difficulty.value == 5):
-            region_rules = get_nearly_region_rules(player, options)
-            location_rules = get_nearly_location_rules(player, options, prices, boss_regions)
-        elif (self.options.logic_difficulty.value == 1):
+        if (self.options.logic_difficulty.value == 1):
             region_rules = get_region_rules(player, options)
             location_rules = get_location_rules(player, options, prices, boss_regions)
+        elif (self.options.logic_difficulty.value == 5):
+            region_rules = get_nearly_region_rules(player, options)
+            location_rules = get_nearly_location_rules(player, options, prices, boss_regions)
 
         for entrance_name, rule in region_rules.items():
             entrance = mw.get_entrance(entrance_name, player)

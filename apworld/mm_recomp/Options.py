@@ -6,7 +6,9 @@ from Options import Choice, Option, DefaultOnToggle, Toggle, Range, OptionList, 
 
 
 class LogicDifficulty(Choice):
-    """Set the logic difficulty used when generating."""
+    """Set the logic difficulty used when generating.
+    
+    For "Nearly No Logic" it is recommended to set "Accessibility" to "Minimal" and "Progression Balancing" to "Disabled"/0."""
     display_name = "Logic Difficulty"
     # ~ option_easy = 0
     option_normal = 1
