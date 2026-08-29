@@ -2,6 +2,54 @@ from .Constants import *
 from .NormalRules import *
 
 
+def has_ocarina_item(state, player):
+    return (
+        state.has("Ocarina of Time", player) or
+        has_bottle(state, player) or
+        state.has("Progressive Bomb Bag", player)
+    )
+
+
+def has_zora_ocarina(state, player):
+    return (
+        state.has("Ocarina of Time", player) or
+        (
+            (
+                has_bottle(state, player) or
+                state.has("Progressive Bomb Bag", player)
+            ) and
+            state.has("Zora Mask", player)
+        )
+    )
+
+
+def has_deku_ocarina(state, player):
+    return (
+        state.has("Ocarina of Time", player) or
+        (
+            (
+                has_bottle(state, player) or
+                state.has("Progressive Bomb Bag", player)
+            ) and
+            state.has("Deku Mask", player) and
+            state.has("Progressive Magic", player)
+        )
+    )
+
+
+def has_goron_ocarina(state, player):
+    return (
+        state.has("Ocarina of Time", player) or
+        (
+            (
+                has_bottle(state, player) or
+                state.has("Progressive Bomb Bag", player)
+            ) and
+            state.has("Goron Mask", player)
+        )
+    )
+
+
 def get_nearly_region_rules(player, options):
     return {
         "Clock Town -> The Moon":
@@ -13,23 +61,22 @@ def get_nearly_region_rules(player, options):
                 (not options.moon_star_fox.value or has_star_fox(state, player, options, "moon")) and
                 has_all_frogs(state, player, options, "moon") and
                 has_all_scarecrows(state, player, options, "moon") and
-                has_all_owls(state, player, options, "moon")
+                has_all_owls(state, player, options, "moon") and
+                has_ocarina_item(state, player)
             ),
         "Woodfall -> Woodfall Temple":
             lambda state: (
                 state.has("Deku Mask", player) and
                 state.has("Sonata of Awakening", player) and
-                (
-                    state.has("Progressive Magic", player) or
-                    state.has("Ocarina of Time", player)
-                )
+                has_deku_ocarina(state, player)
             ),
         "Pirates' Fortress -> Pirates' Fortress Sewers":
             lambda state: True,
         "Zora Cape -> Great Bay Temple":
             lambda state: (
                 state.has("Zora Mask", player) and
-                state.has("New Wave Bossa Nova", player)
+                state.has("New Wave Bossa Nova", player) and
+                has_zora_ocarina(state, player)
             ),
         "Upper Ikana Canyon -> Beneath the Well":
             lambda state: has_soul_npc(state, player, options, "Gibdos"),
@@ -82,12 +129,12 @@ def get_nearly_location_rules(player, options, prices, boss_placements):
         "Clock Tower Happy Mask Salesman #1":
             lambda state: (
                 has_soul_npc(state, player, options, "Happy Mask Salesman") and
-                state.has("Ocarina of Time", player)
+                has_ocarina_item(state, player)
             ),
         "Clock Tower Happy Mask Salesman #2":
             lambda state: (
                 has_soul_npc(state, player, options, "Happy Mask Salesman") and
-                state.has("Ocarina of Time", player)
+                has_ocarina_item(state, player)
             ),
         "Before Clock Town Chest":
             lambda state: True,
@@ -260,7 +307,26 @@ def get_nearly_location_rules(player, options, prices, boss_placements):
         "Termina Healing Kamaro":
             lambda state: has_soul_npc(state, player, options, "Kamaro"),
         "Termina Gossip Stones HP":
-            lambda state: has_soul_absurd(state, player, options, "Grottos"),
+            lambda state: (
+                has_soul_absurd(state, player, options, "Grottos") and
+                (
+                    (
+                        state.has("Deku Mask", player) and
+                        state.has("Sonata of Awakening", player) and
+                        has_deku_ocarina(state, player)
+                    ) or
+                    (
+                        state.has("Goron Mask", player) and
+                        state.has("Goron Lullaby", player) and
+                        has_goron_ocarina(state, player)
+                    ) or
+                    (
+                        state.has("Zora Mask", player) and
+                        state.has("New Wave Bossa Nova", player) and
+                        has_zora_ocarina(state, player)
+                    )
+                )
+            ),
         "Termina Scrub Grotto HP":
             lambda state: (
                 has_soul_absurd(state, player, options, "Grottos") and
@@ -400,7 +466,10 @@ def get_nearly_location_rules(player, options, prices, boss_placements):
         "Deku Palace Bean Grotto Chest":
             lambda state: has_soul_absurd(state, player, options, "Grottos"),
         "Deku Palace Monkey Song":
-            lambda state: has_soul_npc(state, player, options, "Monkey"),
+            lambda state: (
+                has_soul_npc(state, player, options, "Monkey") and
+                has_deku_ocarina(state, player)
+            ),
         "Woodfall Great Fairy Reward":
             lambda state: has_soul_npc(state, player, options, "Great Fairies"),
         "Woodfall Temple Turtle Chest":
@@ -527,7 +596,10 @@ def get_nearly_location_rules(player, options, prices, boss_placements):
                 has_soul_enemy(state, player, options, "Pirate Guards")
             ),
         "Great Bay Baby Zora Song":
-            lambda state: has_soul_npc(state, player, options, "Marine Lab Researcher"),
+            lambda state: (
+                has_soul_npc(state, player, options, "Marine Lab Researcher") and
+                has_zora_ocarina(state, player)
+            ),
         "Great Bay Feeding Lab Fish":
             lambda state: has_soul_npc(state, player, options, "Marine Lab Fish"),
         "Great Bay Fisherman Game":
@@ -772,8 +844,10 @@ def get_nearly_location_rules(player, options, prices, boss_placements):
             lambda state: has_soul_enemy(state, player, options, "Armos"),
         "Stone Tower Temple Air Gust Room Side Chest":
             lambda state: (
-                has_soul_absurd(state, player, options, "Deku Flowers") or
-                has_soul_absurd(state, player, options, "Deku Flowers")
+                (
+                    has_soul_absurd(state, player, options, "Deku Flowers")
+                ) and
+                state.has("Small Key (Stone Tower)", player, 1)
             ),
         "Stone Tower Temple Inverted Eastern Air Gust Room Fire Chest":
             lambda state: has_soul_absurd(state, player, options, "Deku Flowers"),
@@ -5752,19 +5826,40 @@ def get_nearly_location_rules(player, options, prices, boss_placements):
         "Stone Tower Temple Lower Basement Armos Pots (8)":
             lambda state: has_soul_absurd(state, player, options, "Pots"),
         "Stone Tower Temple Right Side Near Locked Door Pots (1)":
-            lambda state: has_soul_absurd(state, player, options, "Pots"),
+            lambda state: (
+                has_soul_absurd(state, player, options, "Pots") and
+                state.has("Small Key (Stone Tower)", player, 1)
+            ),
         "Stone Tower Temple Right Side Near Locked Door Pots (2)":
-            lambda state: has_soul_absurd(state, player, options, "Pots"),
+            lambda state: (
+                has_soul_absurd(state, player, options, "Pots") and
+                state.has("Small Key (Stone Tower)", player, 1)
+            ),
         "Stone Tower Temple Right Side Underwater Pots (1)":
-            lambda state: has_soul_absurd(state, player, options, "Pots"),
+            lambda state: (
+                has_soul_absurd(state, player, options, "Pots") and
+                state.has("Small Key (Stone Tower)", player, 1)
+            ),
         "Stone Tower Temple Right Side Underwater Pots (2)":
-            lambda state: has_soul_absurd(state, player, options, "Pots"),
+            lambda state: (
+                has_soul_absurd(state, player, options, "Pots") and
+                state.has("Small Key (Stone Tower)", player, 1)
+            ),
         "Stone Tower Temple Right Side Underwater Pots (3)":
-            lambda state: has_soul_absurd(state, player, options, "Pots"),
+            lambda state: (
+                has_soul_absurd(state, player, options, "Pots") and
+                state.has("Small Key (Stone Tower)", player, 1)
+            ),
         "Stone Tower Temple Right Side Underwater Pots (4)":
-            lambda state: has_soul_absurd(state, player, options, "Pots"),
+            lambda state: (
+                has_soul_absurd(state, player, options, "Pots") and
+                state.has("Small Key (Stone Tower)", player, 1)
+            ),
         "Stone Tower Temple Right Side Underwater Pots (5)":
-            lambda state: has_soul_absurd(state, player, options, "Pots"),
+            lambda state: (
+                has_soul_absurd(state, player, options, "Pots") and
+                state.has("Small Key (Stone Tower)", player, 1)
+            ),
         "Stone Tower Temple Deku Updraft Pots (1)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Pots")
@@ -6641,188 +6736,208 @@ def get_nearly_location_rules(player, options, prices, boss_placements):
             lambda state: has_soul_absurd(state, player, options, "Grottos"),
         "Ikana Canyon Across Ocean Deed Ravine Gossip Fairy":
             lambda state: (
-                    state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player)
+                (state.has("Song of Healing", player) or state.has("Epona's Song", player)) and
+                has_ocarina_item(state, player)
             ),
         "Deku Trial Front Left Gossip":
             lambda state: (
                 has_soul_npc(state, player, options, "Moon Kids") and
                 (
                     state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player) or 
+                    state.has("Epona's Song", player) or
                     state.has("Song of Storms", player)
-                )
+                ) and
+                has_ocarina_item(state, player)
             ),
         "Deku Trial Back Left Gossip":
             lambda state: (
                 has_soul_npc(state, player, options, "Moon Kids") and
                 (
                     state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player) or 
+                    state.has("Epona's Song", player) or
                     state.has("Song of Storms", player)
-                )
+                ) and
+                has_ocarina_item(state, player)
             ),
         "Deku Trial Front Right Gossip":
             lambda state: (
                 has_soul_npc(state, player, options, "Moon Kids") and
                 (
                     state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player) or 
+                    state.has("Epona's Song", player) or
                     state.has("Song of Storms", player)
-                )
+                ) and
+                has_ocarina_item(state, player)
             ),
         "Deku Trial Back Right Gossip":
             lambda state: (
                 has_soul_npc(state, player, options, "Moon Kids") and
                 (
                     state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player) or 
+                    state.has("Epona's Song", player) or
                     state.has("Song of Storms", player)
-                )
+                ) and
+                has_ocarina_item(state, player)
             ),
         "Deku Trial Furthest Back Gossip":
             lambda state: (
                 has_soul_npc(state, player, options, "Moon Kids") and
                 (
                     state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player) or 
+                    state.has("Epona's Song", player) or
                     state.has("Song of Storms", player)
-                )
+                ) and
+                has_ocarina_item(state, player)
             ),
         "Goron Trial 1st Gazebo Gossip (0)":
             lambda state: (
                 has_soul_npc(state, player, options, "Moon Kids") and
                 (
                     state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player) or 
+                    state.has("Epona's Song", player) or
                     state.has("Song of Storms", player)
-                )
+                ) and
+                has_ocarina_item(state, player)
             ),
         "Goron Trial 1st Gazebo Gossip (1)":
             lambda state: (
                 has_soul_npc(state, player, options, "Moon Kids") and
                 (
                     state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player) or 
+                    state.has("Epona's Song", player) or
                     state.has("Song of Storms", player)
-                )
+                ) and
+                has_ocarina_item(state, player)
             ),
         "Goron Trial 2nd Gazebo Gossip (0)":
             lambda state: (
                 has_soul_npc(state, player, options, "Moon Kids") and
                 (
                     state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player) or 
+                    state.has("Epona's Song", player) or
                     state.has("Song of Storms", player)
-                )
+                ) and
+                has_ocarina_item(state, player)
             ),
         "Goron Trial 2nd Gazebo Gossip (1)":
             lambda state: (
                 has_soul_npc(state, player, options, "Moon Kids") and
                 (
                     state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player) or 
+                    state.has("Epona's Song", player) or
                     state.has("Song of Storms", player)
-                )
+                ) and
+                has_ocarina_item(state, player)
             ),
         "Goron Trial Near Heart Piece Gossip (1)":
             lambda state: (
                 has_soul_npc(state, player, options, "Moon Kids") and
                 (
                     state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player) or 
+                    state.has("Epona's Song", player) or
                     state.has("Song of Storms", player)
-                )
+                ) and
+                has_ocarina_item(state, player)
             ),
         "Zora Trial RRR Path Gossip":
             lambda state: (
                 has_soul_npc(state, player, options, "Moon Kids") and
                 (
                     state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player) or 
+                    state.has("Epona's Song", player) or
                     state.has("Song of Storms", player)
-                )
+                ) and
+                has_ocarina_item(state, player)
             ),
         "Zora Trial RRL Path Gossip":
             lambda state: (
                 has_soul_npc(state, player, options, "Moon Kids") and
                 (
                     state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player) or 
+                    state.has("Epona's Song", player) or
                     state.has("Song of Storms", player)
-                )
+                ) and
+                has_ocarina_item(state, player)
             ),
         "Zora Trial LRR Path Gossip":
             lambda state: (
                 has_soul_npc(state, player, options, "Moon Kids") and
                 (
                     state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player) or 
+                    state.has("Epona's Song", player) or
                     state.has("Song of Storms", player)
-                )
+                ) and
+                has_ocarina_item(state, player)
             ),
         "Zora Trial LRLL Path Gossip":
             lambda state: (
                 has_soul_npc(state, player, options, "Moon Kids") and
                 (
                     state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player) or 
+                    state.has("Epona's Song", player) or
                     state.has("Song of Storms", player)
-                )
+                ) and
+                has_ocarina_item(state, player)
             ),
         "Zora Trial LLL Path Gossip":
             lambda state: (
                 has_soul_npc(state, player, options, "Moon Kids") and
                 (
                     state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player) or 
+                    state.has("Epona's Song", player) or
                     state.has("Song of Storms", player)
-                )
+                ) and
+                has_ocarina_item(state, player)
             ),
         "Link Trial Gossip (1)":
             lambda state: (
                 has_soul_npc(state, player, options, "Moon Kids") and
                 (
                     state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player) or 
+                    state.has("Epona's Song", player) or
                     state.has("Song of Storms", player)
-                )
+                ) and
+                has_ocarina_item(state, player)
             ),
         "Link Trial Gossip (2)":
             lambda state: (
                 has_soul_npc(state, player, options, "Moon Kids") and
                 (
                     state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player) or 
+                    state.has("Epona's Song", player) or
                     state.has("Song of Storms", player)
-                )
+                ) and
+                has_ocarina_item(state, player)
             ),
         "Link Trial Gossip (3)":
             lambda state: (
                 has_soul_npc(state, player, options, "Moon Kids") and
                 (
                     state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player) or 
+                    state.has("Epona's Song", player) or
                     state.has("Song of Storms", player)
-                )
+                ) and
+                has_ocarina_item(state, player)
             ),
         "Link Trial Gossip (4)":
             lambda state: (
                 has_soul_npc(state, player, options, "Moon Kids") and
                 (
                     state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player) or 
+                    state.has("Epona's Song", player) or
                     state.has("Song of Storms", player)
-                )
+                ) and
+                has_ocarina_item(state, player)
             ),
         "Link Trial Gossip (5)":
             lambda state: (
                 has_soul_npc(state, player, options, "Moon Kids") and
                 (
                     state.has("Song of Healing", player) or
-                    state.has("Epona's Song", player) or 
+                    state.has("Epona's Song", player) or
                     state.has("Song of Storms", player)
-                )
+                ) and
+                has_ocarina_item(state, player)
             ),
         "Fairy Fountain Left Side Well (0)":
             lambda state: (
@@ -8149,7 +8264,8 @@ def get_nearly_location_rules(player, options, prices, boss_placements):
         "Stone Tower Temple Deku Updraft Flower":
             lambda state: (
                 has_soul_absurd(state, player, options, "Deku Flowers") and
-                state.has("Deku Mask", player)
+                state.has("Deku Mask", player) and
+                state.has("Small Key (Stone Tower)", player, 1)
             ),
         "Stone Tower Temple Inverted Eastern Air Gust Room Flower (1)":
             lambda state: (
@@ -8161,6 +8277,26 @@ def get_nearly_location_rules(player, options, prices, boss_placements):
                 has_soul_absurd(state, player, options, "Deku Flowers") and
                 state.has("Deku Mask", player)
             ),
+        "Stone Tower Temple Eastern Water Room Sun Block Chest":
+            lambda state: state.has("Small Key (Stone Tower)", player, 1),
+        "Stone Tower Temple Eyegore Room Dexi Hand Ledge Chest":
+            lambda state: state.has("Small Key (Stone Tower)", player, 1),
+        "Stone Tower Temple Garo Master Chest":
+            lambda state: state.has("Small Key (Stone Tower)", player, 1),
+        "Stone Tower Temple Mirror Room Pots (1)":
+            lambda state: (
+                has_soul_absurd(state, player, options, "Pots") and
+                state.has("Small Key (Stone Tower)", player, 1)
+            ),
+        "Stone Tower Temple Mirror Room Pots (2)":
+            lambda state: (
+                has_soul_absurd(state, player, options, "Pots") and
+                state.has("Small Key (Stone Tower)", player, 1)
+            ),
+        "Stone Tower Temple Mirror Room Sun Block Chest":
+            lambda state: state.has("Small Key (Stone Tower)", player, 1),
+        "Stone Tower Temple Mirror Room Sun Face Chest":
+            lambda state: state.has("Small Key (Stone Tower)", player, 1),
         "Inverted Stone Tower Temple Small Poe Room Flower (1)":
             lambda state: (
                 has_soul_absurd(state, player, options, "Deku Flowers") and
@@ -8328,6 +8464,8 @@ def get_nearly_location_rules(player, options, prices, boss_placements):
             lambda state: has_soul_absurd(state, player, options, "Signs"),
         "Goron Village Outside Goron Shrine":
             lambda state: has_soul_absurd(state, player, options, "Signs"),
+        "Goron Village Baby Goron Lullaby":
+            lambda state: has_goron_ocarina(state, player),
         "Path to Snowhead Cut the Sign":
             lambda state: has_soul_absurd(state, player, options, "Signs"),
         "Path to Snowhead Upper Cut the Sign":
