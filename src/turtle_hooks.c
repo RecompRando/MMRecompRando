@@ -35,11 +35,15 @@ RECOMP_HOOK("func_80AB023C")
 void DmChar08_MessageUpdate(DmChar08* this, PlayState* play) {
     // @rando add a way to get out of GBT by talking to the turtle rather than hookshot
     // original textbox replaced in eztr_text.c
-    if (play->msgCtx.currentTextId == 0x102F && Message_GetState(&play->msgCtx) == TEXT_STATE_CHOICE
-            && Message_ShouldAdvance(play) && play->msgCtx.choiceIndex == 0) {
-        play->nextEntrance = ENTRANCE(ZORA_CAPE, 7);
-        play->transitionTrigger = TRANS_TRIGGER_START;
-        Scene_SetExitFade(play);
-        this->actionFunc = func_80AAFB94;
+    if (play->msgCtx.currentTextId == 0x102F && Message_GetState(&play->msgCtx) == TEXT_STATE_CHOICE && Message_ShouldAdvance(play)) {
+        if (play->msgCtx.choiceIndex == 0) {
+            play->nextEntrance = ENTRANCE(ZORA_CAPE, 7);
+            play->transitionTrigger = TRANS_TRIGGER_START;
+            Scene_SetExitFade(play);
+            this->actionFunc = func_80AAFB94;
+        } else {
+            Audio_PlaySfx_MessageCancel();
+            Message_CloseTextbox(play);
+        }
     }
 }
