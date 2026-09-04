@@ -454,8 +454,7 @@ void randoAddNotificationToQueue(RandoNotificationType notif_type, const char* n
 
     REPY_FN_EXEC_CACHE(
         py_rando_add_notification,
-        // "recomp_data.game_data['notifications'].append([text, type])\n"
-        "notification = {'type': type, 'text', text}\n"
+        "notification = {'type': type, 'text': text}\n"
         "recomp_data.game_data['notifications'].append(notification)\n"
     );
 
