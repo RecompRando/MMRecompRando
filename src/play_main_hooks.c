@@ -772,10 +772,9 @@ void update_rando(PlayState* play) {
                 char* player_name;
                 rando_get_item_name_from_id(item_id, &item_name);
                 rando_get_player_name(player, &player_name);
-                randoEmitRecieveNotification(item_name, player_name, randoConvertItemId(item_id), item_type);
+                randoCreateReceiveNotification(item_name, player_name, randoConvertItemId(item_id), item_type);
                 recomp_free(item_name);
                 recomp_free(player_name);
-                break; // TEMP: due to a crash when displaying too many ui elements, items are processed once per frame
             }
         }
 
@@ -794,7 +793,7 @@ void update_rando(PlayState* play) {
             // display what/who caused the last death
             char* cause;
             rando_get_death_link_cause(&cause);
-            randoEmitNormalNotification(cause);
+            randoCreateNormalNotification(cause);
         }
 
         // check for 100% condition to give majora soul (gigarando)

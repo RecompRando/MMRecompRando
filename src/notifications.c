@@ -2,6 +2,7 @@
 #include "recompui.h"
 #include "recompconfig.h"
 #include "incbin.h"
+#include "apcommon.h"
 
 // used ProxySaw's notification mod as a base https://github.com/garrettjoecox/ProxyMM_RecompMods/blob/main/packages/Notifications/src/notifications.c
 
@@ -92,7 +93,12 @@ void setNotificationWidth() {
     }
 }
 
+void randoEmitNotificationFromQueue();
+
 void notificationUpdateCycle() {
+    // handle notifications once per frame to prevent a crash/present nicer
+    randoEmitNotificationFromQueue();
+
     // fade out + remove notifications
     int start_index = notif_head;
     for (int i = 0; i < notif_count; i++) {
@@ -162,6 +168,16 @@ void randoCreateNotificationContainer() {
 
     recompui_close_context(notif_context);
     recompui_show_context(notif_context);
+
+    // set up notification queue to use later
+    REPY_FN_SETUP_RANDO;
+    
+    REPY_FN_EXEC_CACHE(
+        py_rando_setup_notification_queue,
+        "recomp_data.game_data['notifications'] = list()"
+    );
+    
+    REPY_FN_CLEANUP;
 }
 
 RecompuiResource create_basic_notification_element() {
@@ -337,7 +353,7 @@ RecompuiColor* notification_get_item_classification_color(RandoItemClassificatio
     return &msgTextColor;
 }
 
-void randoEmitRecieveNotification(const char* item_name, const char* from_name, const ItemId item, RandoItemClassification item_class) {
+void randoEmitReceiveNotification(const char* item_name, const char* from_name, const ItemId item, RandoItemClassification item_class) {
     const float max_text_width = NOTIFICATION_WIDTH - IMG_SIZE - (NOTIFICATION_PADDING * 3);
 
     recompui_open_context(notif_context);
@@ -428,4 +444,122 @@ void randoEmitErrorNotification(const char* error_text) {
     recompui_set_color(text_got, &msgTextColor);
 
     recompui_close_context(notif_context);
+}
+
+void randoAddNotificationToQueue(RandoNotificationType notif_type, const char* notif_text) {
+    REPY_FN_SETUP_RANDO;
+    
+    REPY_FN_SET_U32("type", (u32)notif_type);
+    REPY_FN_SET_STR("text", notif_text);
+
+    REPY_FN_EXEC_CACHE(
+        py_rando_add_notification,
+        // "recomp_data.game_data['notifications'].append([text, type])\n"
+        "notification = {'type': type, 'text', text}\n"
+        "recomp_data.game_data['notifications'].append(notification)\n"
+    );
+
+    REPY_FN_CLEANUP;
+}
+
+void randoCreateNormalNotification(const char* notif_text) {
+    randoAddNotificationToQueue(RANDO_NOTIFICATION_NORMAL, notif_text);
+}
+
+void randoCreateErrorNotification(const char* error_text) {
+    randoAddNotificationToQueue(RANDO_NOTIFICATION_ERROR, error_text);
+}
+
+void randoAddAPNotificationToQueue(RandoNotificationType notif_type, const char* item_name, const char* player_name, const ItemId item, RandoItemClassification item_class) {
+    REPY_FN_SETUP_RANDO;
+    
+    REPY_FN_SET_U32("type", (u32)notif_type);
+    REPY_FN_SET_STR("item_name", item_name);
+    REPY_FN_SET_STR("player_name", player_name);
+    REPY_FN_SET_U32("item", (u32)item);
+    REPY_FN_SET_U32("item_class", (u32)item_class);
+
+    REPY_FN_EXEC_CACHE(
+        py_rando_add_ap_notification,
+        "notification = {\n"
+        "   'type': type,\n"
+        "   'item_name': item_name,\n"
+        "   'player_name': player_name,\n"
+        "   'item': item,\n"
+        "   'item_class': item_class,\n"
+        "}\n"
+        "recomp_data.game_data['notifications'].append(notification)\n"
+    );
+
+    REPY_FN_CLEANUP;
+}
+
+void randoCreateReceiveNotification(const char* item_name, const char* from_name, const ItemId item, RandoItemClassification item_class) {
+    randoAddAPNotificationToQueue(RANDO_NOTIFICATION_RECEIVE, item_name, from_name, item, item_class);
+}
+
+void randoCreateSendNotification(const char* item_name, const char* to_name, const ItemId item, RandoItemClassification item_class) {
+    randoAddAPNotificationToQueue(RANDO_NOTIFICATION_SEND, item_name, to_name, item, item_class);
+}
+
+void randoEmitNotificationFromQueue() {
+    REPY_FN_SETUP_RANDO;
+    
+    REPY_FN_IF_CACHE(py_rando_notifications_queued, "len(recomp_data.game_data['notifications'])") {
+        REPY_FN_EXEC_CACHE(
+            py_rando_get_notification_from_queue,
+            "notification = recomp_data.game_data['notifications'].pop(0)\n"
+            "type = notification['type']\n"
+        );
+        
+        u32 type = REPY_FN_GET_U32("type");
+
+        if (type == RANDO_NOTIFICATION_NORMAL || type == RANDO_NOTIFICATION_ERROR) {
+            REPY_FN_EXEC_CACHE(
+                py_rando_get_basic_notification_info,
+                "text = notification['text']\n"
+            );
+            
+            char* text = REPY_FN_GET_STR("text");
+            
+            switch (type) {
+                case RANDO_NOTIFICATION_NORMAL:
+                    randoEmitNormalNotification(text);
+                    break;
+                case RANDO_NOTIFICATION_ERROR:
+                    randoEmitErrorNotification(text);
+                    break;
+            }
+            
+            recomp_free(text);
+            
+        } else if (type == RANDO_NOTIFICATION_RECEIVE || type == RANDO_NOTIFICATION_SEND) {
+            REPY_FN_EXEC_CACHE(
+                py_rando_get_ap_notification_info,
+                "item_name = notification['item_name']\n"
+                "player_name = notification['player_name']\n"
+                "item = notification['item']\n"
+                "item_class = notification['item_class']\n"
+            );
+            
+            char* item_name = REPY_FN_GET_STR("item_name");
+            char* player_name = REPY_FN_GET_STR("player_name");
+            u32 item = REPY_FN_GET_U32("item");
+            u32 item_class = REPY_FN_GET_U32("item_class");
+            
+            switch (type) {
+                case RANDO_NOTIFICATION_RECEIVE:
+                    randoEmitReceiveNotification(item_name, player_name, item, item_class);
+                    break;
+                case RANDO_NOTIFICATION_SEND:
+                    randoEmitSendNotification(item_name, player_name, item, item_class);
+                    break;
+            }
+
+            recomp_free(item_name);
+            recomp_free(player_name);
+        }
+    }
+
+    REPY_FN_CLEANUP;
 }

@@ -177,7 +177,7 @@ static void generatePressed(RecompuiResource resource, const RecompuiEventData* 
         }
         else {
             recompui_close_context(import_menu.context);
-            randoEmitErrorNotification("Failed to generate. Please report the settings you used to the developers.");
+            randoCreateErrorNotification("Failed to generate. Please report the settings you used to the developers.");
             recompui_open_context(import_menu.context);
         }
 

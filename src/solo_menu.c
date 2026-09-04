@@ -223,8 +223,8 @@ static void startPressed(RecompuiResource resource, const RecompuiEventData* dat
         else {
             recomp_printf("Failed to start solo\n");
             recompui_close_context(solo_menu.context);
-            randoEmitErrorNotification("Failed to load seed, file may be corrupted");
-            randoEmitErrorNotification(error_msg); // show error message in more detail
+            randoCreateErrorNotification("Failed to load seed, file may be corrupted");
+            randoCreateErrorNotification(error_msg); // show error message in more detail
             recompui_open_context(solo_menu.context);
         }
         recomp_free(error_msg);

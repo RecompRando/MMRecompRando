@@ -381,17 +381,30 @@ void randoShowAPConnectMenu();
 void randoCreateImportMenu();
 void randoShowImportMenu();
 void randoCreateModCheckMenu();
+bool randoGenerateMenuOpen();
 bool randoCheckRequiredMods();
 void randoStart(bool multiworld);
 
 void randoScout();
 
+typedef enum {
+    RANDO_NOTIFICATION_NORMAL,
+    RANDO_NOTIFICATION_ERROR,
+    RANDO_NOTIFICATION_RECEIVE,
+    RANDO_NOTIFICATION_SEND
+} RandoNotificationType;
+
 void notificationUpdateCycle();
 void randoCreateNotificationContainer();
-void randoEmitRecieveNotification(const char* item_name, const char* from_name, const ItemId item, RandoItemClassification item_class);
+void randoEmitReceiveNotification(const char* item_name, const char* from_name, const ItemId item, RandoItemClassification item_class);
+void randoCreateReceiveNotification(const char* item_name, const char* from_name, const ItemId item, RandoItemClassification item_class);
 void randoEmitSendNotification(const char* item_name, const char* to_name, const ItemId item, RandoItemClassification item_class);
+void randoCreateSendNotification(const char* item_name, const char* to_name, const ItemId item, RandoItemClassification item_class);
+void randoAddAPNotificationToQueue(RandoNotificationType notif_type, const char* item_name, const char* player_name, const ItemId item, RandoItemClassification item_class);
 void randoEmitNormalNotification(const char* notif_text);
+void randoCreateNormalNotification(const char* notif_text);
 void randoEmitErrorNotification(const char* error_text);
-bool randoGenerateMenuOpen();
+void randoCreateErrorNotification(const char* error_text);
+void randoAddNotificationToQueue(RandoNotificationType notif_type, const char* notif_text);
 
 #endif

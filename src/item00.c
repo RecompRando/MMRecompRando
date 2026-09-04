@@ -877,7 +877,7 @@ void EnItem00_RandoGive(EnItem00* this, PlayState* play, s32 getItemId, u32 loca
             ItemId item_id = (locationType == RANDO_ITEM_CLASS_JUNK) ? ITEM_AP_FILLER : ITEM_AP_USEFUL;
             rando_get_location_item_name(location, &item_name);
             rando_get_location_item_player(location, &player_name);
-            randoEmitSendNotification(item_name, player_name, item_id, locationType);
+            randoCreateSendNotification(item_name, player_name, item_id, locationType);
             recomp_free(item_name);
             recomp_free(player_name);
         }

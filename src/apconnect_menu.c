@@ -21,14 +21,14 @@ static void connectPressed(RecompuiResource resource, const RecompuiEventData* d
             }
             recompui_hide_context(connect_menu.context);
             recompui_close_context(connect_menu.context);
-            randoEmitNormalNotification("Successfully connected");
+            randoCreateNormalNotification("Successfully connected");
             recompui_open_context(connect_menu.context);
             rando_set_saved_apconnect(recomp_get_save_file_path(), server_text, slot_text, password_text);
         }
         else {
             recompui_close_context(connect_menu.context);
-            // randoEmitErrorNotification("Failed to connect");
-            randoEmitErrorNotification(connection_failed_msg);
+            // randoCreateErrorNotification("Failed to connect");
+            randoCreateErrorNotification(connection_failed_msg);
             recompui_open_context(connect_menu.context);
         }
 

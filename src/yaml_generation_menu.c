@@ -216,7 +216,7 @@ void randoYAMLExportCallback(RecompuiResource button, const RecompuiEventData* d
         
         // The notification opens its own UI context, so this one must be closed first.
         recompui_close_context(menu->context);
-        randoEmitNormalNotification(output_dir);
+        randoCreateNormalNotification(output_dir);
         recompui_open_context(menu->context);
         
         // Return to start menu
@@ -251,7 +251,7 @@ void randoYAMLGenerateCallback(RecompuiResource button, const RecompuiEventData*
         }
         else {
             recompui_close_context(yaml_config_menu.context);
-            randoEmitErrorNotification("Failed to generate. Please report the settings you used to the developers.");
+            randoCreateErrorNotification("Failed to generate. Please report the settings you used to the developers.");
             recompui_open_context(yaml_config_menu.context);
         }
 
