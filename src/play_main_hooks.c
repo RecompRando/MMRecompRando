@@ -51,8 +51,6 @@ void init_rando()
         hasBDSoTMod = true;
     }
     registerActorExtensions();
-
-    randoCreateNotificationContainer();
 }
 
 void randoScout() {
