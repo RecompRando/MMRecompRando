@@ -13,5 +13,10 @@ build/
 mm_recomp_rando/
 .vs/
 runtime/
+downloads/
+binaries/
+*.pyc
+test_env/
+*.thunderstore.zip
 RecompModTool*
 OfflineModRecomp*
