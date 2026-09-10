@@ -15248,7 +15248,11 @@ def get_location_rules(player, options, prices, boss_placements):
                  can_use_fire_arrows(state, player))
             ),
         "Path to Mountains Snowballs (12)":
-            lambda state: True,
+            lambda state: (
+                (state.has("Goron Mask", player) or
+                 has_explosives(state, player) or
+                 can_use_fire_arrows(state, player))
+            ),
         "Path to Mountains Snowballs (13)":
             lambda state: (
                 (state.has("Goron Mask", player) or
@@ -15256,7 +15260,11 @@ def get_location_rules(player, options, prices, boss_placements):
                  can_use_fire_arrows(state, player))
             ),
         "Path to Mountains Snowballs (14)":
-            lambda state: True,
+            lambda state: (
+                (state.has("Goron Mask", player) or
+                 has_explosives(state, player) or
+                 can_use_fire_arrows(state, player))
+            ),
         "Path to Mountains Snowballs (15)":
             lambda state: (
                 (state.has("Goron Mask", player) or
@@ -17405,35 +17413,44 @@ def get_location_rules(player, options, prices, boss_placements):
         "Snowhead Temple 4F Outside Wizzrobe Icicles (1)":
             lambda state: (
                 state.has("Small Key (Snowhead)", player, 3) and
+                state.has("Goron Mask", player) and
                 can_use_fire_arrows(state, player) and
                 state.has("Deku Mask", player)
             ),
         "Snowhead Temple 4F Outside Wizzrobe Icicles (2)":
             lambda state: (
                 state.has("Small Key (Snowhead)", player, 3) and
+                state.has("Goron Mask", player) and
                 can_use_fire_arrows(state, player) and
                 state.has("Deku Mask", player)
             ),
-
         "Snowhead Temple Outside Boss Door Icicles (1)":
             lambda state: (
                 state.has("Small Key (Snowhead)", player, 3) and
-                can_use_fire_arrows(state, player)
+                state.has("Goron Mask", player) and
+                can_use_fire_arrows(state, player) and
+                state.has("Deku Mask", player)
             ),
         "Snowhead Temple Outside Boss Door Icicles (2)":
             lambda state: (
                 state.has("Small Key (Snowhead)", player, 3) and
-                can_use_fire_arrows(state, player)
-            ),        
+                state.has("Goron Mask", player) and
+                can_use_fire_arrows(state, player) and
+                state.has("Deku Mask", player)
+            ),    
         "Snowhead Temple Outside Boss Door Icicles (3)":
             lambda state: (
                 state.has("Small Key (Snowhead)", player, 3) and
-                can_use_fire_arrows(state, player)
-            ),        
+                state.has("Goron Mask", player) and
+                can_use_fire_arrows(state, player) and
+                state.has("Deku Mask", player)
+            ),      
         "Snowhead Temple Outside Boss Door Icicles (4)":
             lambda state: (
                 state.has("Small Key (Snowhead)", player, 3) and
-                can_use_fire_arrows(state, player)
+                state.has("Goron Mask", player) and
+                can_use_fire_arrows(state, player) and
+                state.has("Deku Mask", player)
             ),
         # Great Bay Temple
 
