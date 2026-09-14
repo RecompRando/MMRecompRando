@@ -1,8 +1,11 @@
 #ifndef __Z64RECOMP_API_H__
 #define __Z64RECOMP_API_H__
 
-#include "z64actor.h"
 #include "modding.h"
+#include "PR/ultratypes.h"
+
+// Pull in the Actor typedef to avoid needing to include the entirety of z64actor.h.
+typedef struct Actor Actor;
 
 typedef u32 ActorExtensionId;
 
