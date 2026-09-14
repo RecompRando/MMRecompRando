@@ -6,7 +6,6 @@
 struct EnJgameTsn;
 
 typedef void (*EnJgameTsnActionFunc)(struct EnJgameTsn*, PlayState*);
-RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
 
 typedef struct {
     /* 0x00 */ Vec3s* points;

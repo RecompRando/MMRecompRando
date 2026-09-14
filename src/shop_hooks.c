@@ -2,264 +2,32 @@
 #include "global.h"
 
 #include "apcommon.h"
-#include "overlays/actors/ovl_En_GirlA/z_en_girla.h"
+#include "shops.h"
 
-#define LOCATION_SHOP_ITEM (0x090000 | this->items[this->cursorIndex]->itemParams)
-#define LOCATION_FSN_RUPEE (0x070000 | (this->actor.id) << 8 | this->getItemId)
+s16 shopItemId;
 
-#define FSN_LIMB_MAX 0x12
-#define ENFSN_LIMB_MAX FSN_LIMB_MAX + 1 // Note: adding 1 to FSN_LIMB_MAX due to bug in the skeleton, see bug in object_fsn.xml
-#define ENFSN_IS_SHOP(thisx) (!((thisx)->params & 1))
-
-struct EnFsn;
-
-typedef void (*EnFsnActionFunc)(struct EnFsn*, PlayState*);
-
-typedef struct EnFsn {
-    /* 0x000 */ Actor actor;
-    /* 0x144 */ UNK_TYPE1 pad144[0x4C];
-    /* 0x190 */ SkelAnime skelAnime;
-    /* 0x1D4 */ EnFsnActionFunc actionFunc;
-    /* 0x1D8 */ EnFsnActionFunc prevActionFunc; // Used to return to correct browsing function
-    /* 0x1DC */ ColliderCylinder collider;
-    /* 0x228 */ s16 fidgetTableY[ENFSN_LIMB_MAX];
-    /* 0x24E */ s16 fidgetTableZ[ENFSN_LIMB_MAX];
-    /* 0x274 */ Vec3s headRot;
-    /* 0x27A */ Vec3s torsoRot; // Set but never used
-    /* 0x280 */ Vec3s jointTable[ENFSN_LIMB_MAX];
-    /* 0x2F2 */ Vec3s morphTable[ENFSN_LIMB_MAX];
-    /* 0x364 */ s16 eyeTexIndex;
-    /* 0x366 */ s16 blinkTimer;
-    /* 0x368 */ s16 cutsceneState;
-    /* 0x36A */ s16 csId;
-    /* 0x36C */ s16 lookToShopkeeperCsId;
-    /* 0x36E */ s16 lookToShelfCsId;
-    /* 0x370 */ s16 lookToShopkeeperFromShelfCsId;
-    /* 0x372 */ s16 lookToShopkeeperBuyingCsId;
-    /* 0x374 */ s16 price;
-    /* 0x376 */ u16 textId;
-    /* 0x378 */ u8 isSelling;
-    /* 0x379 */ u8 cursorIndex;
-    /* 0x37C */ s32 getItemId;
-    /* 0x380 */ s16 stolenItem1;
-    /* 0x382 */ s16 stolenItem2;
-    /* 0x384 */ s16 itemIds[3];
-    /* 0x38A */ s16 totalSellingItems;
-    /* 0x38C */ s16 numSellingItems;
-    /* 0x390 */ EnGirlA* items[3];
-    /* 0x39C */ s16 delayTimer;
-    /* 0x3A0 */ s32 stickAccumX;
-    /* 0x3A4 */ s32 stickAccumY;
-    /* 0x3A8 */ Vec3f cursorPos;
-    /* 0x3B4 */ Color_RGBAu32 cursorColor;
-    /* 0x3C4 */ f32 cursorAnimTween;
-    /* 0x3C8 */ u8 cursorAnimState;
-    /* 0x3C9 */ u8 drawCursor;
-    /* 0x3CC */ StickDirectionPrompt stickLeftPrompt;
-    /* 0x404 */ StickDirectionPrompt stickRightPrompt;
-    /* 0x43C */ f32 arrowAnimTween;
-    /* 0x440 */ f32 stickAnimTween;
-    /* 0x444 */ u8 arrowAnimState;
-    /* 0x445 */ u8 stickAnimState;
-    /* 0x448 */ f32 shopItemSelectedTween;
-    /* 0x44C */ s16 animIndex;
-    /* 0x44E */ u16 flags;
-} EnFsn; // size = 0x450
-
-typedef enum {
-    /* 0 */ ENFSN_CUTSCENESTATE_STOPPED,
-    /* 1 */ ENFSN_CUTSCENESTATE_WAITING,
-    /* 2 */ ENFSN_CUTSCENESTATE_PLAYING
-} EnFsnCutsceneState;
-
-#define ANI_LIMB_MAX 0x10
-#define ENOSSAN_LIMB_MAX MAX((s32)FSN_LIMB_MAX + 1, (s32)ANI_LIMB_MAX) // Note: adding 1 to FSN_LIMB_MAX due to bug in the skeleton, see bug in object_fsn.xml
-
-struct EnOssan;
-
-typedef void (*EnOssanActionFunc)(struct EnOssan*, PlayState*);
-typedef void (*EnOssanBlinkFunc)(struct EnOssan*);
-
-typedef struct EnOssan {
-    /* 0x000 */ Actor actor;
-    /* 0x144 */ SkelAnime skelAnime;
-    /* 0x188 */ EnOssanActionFunc actionFunc;
-    /* 0x18C */ EnOssanActionFunc prevActionFunc; // Used to restore back to correct browsing function
-    /* 0x190 */ ColliderCylinder collider;
-    /* 0x1DC */ s16 delayTimer;
-    /* 0x1DE */ s8 objectSlot;
-    /* 0x1E0 */ s16 eyeTexIndex;
-    /* 0x1E2 */ s16 blinkTimer;
-    /* 0x1E4 */ EnOssanBlinkFunc blinkFunc;
-    /* 0x1E8 */ EnGirlA* items[8];
-    /* 0x208 */ s32 stickAccumX;
-    /* 0x20C */ s32 stickAccumY;
-    /* 0x210 */ u8 moveHorizontal;
-    /* 0x211 */ u8 moveVertical;
-    /* 0x214 */ Vec3f cursorPos;
-    /* 0x220 */ Color_RGBAu32 cursorColor;
-    /* 0x230 */ f32 cursorAnimTween;
-    /* 0x234 */ u8 cursorAnimState;
-    /* 0x235 */ u8 drawCursor;
-    /* 0x236 */ u8 cursorIndex;
-    /* 0x238 */ StickDirectionPrompt stickLeftPrompt;
-    /* 0x270 */ StickDirectionPrompt stickRightPrompt;
-    /* 0x2A8 */ f32 arrowAnimTween;
-    /* 0x2AC */ f32 stickAnimTween;
-    /* 0x2B0 */ u8 arrowAnimState;
-    /* 0x2B1 */ u8 stickAnimState;
-    /* 0x2B4 */ f32 shopItemSelectedTween;
-    /* 0x2B8 */ s16 lookToShopkeeperCsId;
-    /* 0x2BA */ s16 lookToLeftShelfCsId;
-    /* 0x2BC */ s16 lookToRightShelfCsId;
-    /* 0x2BE */ s16 lookToShopKeeperFromShelfCsId;
-    /* 0x2C0 */ s16 csId;
-    /* 0x2C2 */ s16 cutsceneState;
-    /* 0x2C4 */ u16 textId;
-    /* 0x2C6 */ Vec3s headRot;
-    /* 0x2CC */ Vec3s unk2CC; // Set but never used
-    /* 0x2D2 */ s16 fidgetTableY[ENOSSAN_LIMB_MAX];
-    /* 0x2F8 */ s16 fidgetTableZ[ENOSSAN_LIMB_MAX];
-    /* 0x31E */ Vec3s jointTable[ENOSSAN_LIMB_MAX];
-    /* 0x390 */ Vec3s morphTable[ENOSSAN_LIMB_MAX];
-    /* 0x402 */ s16 animIndex;
-    /* 0x404 */ Vec3s partTimerHeadRot;
-    /* 0x40A */ u16 flags;
-} EnOssan; // size = 0x40C
-
-#define ZORA_LIMB_MAX 0x14
-#define BOMB_SHOPKEEPER_LIMB_MAX 0x10
-#define GORON_LIMB_MAX 0x12
-#define ENSOB1_LIMB_MAX MAX(MAX((s32)ZORA_LIMB_MAX, (s32)BOMB_SHOPKEEPER_LIMB_MAX), (s32)GORON_LIMB_MAX)
-
-struct EnSob1;
-
-typedef void (*EnSob1ActionFunc)(struct EnSob1*, PlayState*);
-typedef void (*EnSob1BlinkFunc)(struct EnSob1*);
-
-#define ENSOB1_GET_SHOPTYPE(thisx) ((thisx)->params & 0x1F)
-#define ENSOB1_GET_PATH_INDEX(thisx) (((thisx)->params & 0x3E0) >> 5)
-
-#define ENSOB1_PATH_INDEX_NONE 0x1F
-
-typedef struct EnSob1XZRange {
-    /* 0x0 */ f32 xMin;
-    /* 0x4 */ f32 xMax;
-    /* 0x8 */ f32 zMin;
-    /* 0xC */ f32 zMax;
-} EnSob1XZRange; // size = 0x10
-
-typedef struct EnSob1 {
-    /* 0x000 */ Actor actor;
-    /* 0x144 */ SkelAnime skelAnime;
-    /* 0x188 */ EnSob1ActionFunc actionFunc;
-    /* 0x18C */ EnSob1ActionFunc prevActionFunc; // Used to restore back to correct browsing function
-    /* 0x190 */ EnSob1ActionFunc changeObjectFunc;
-    /* 0x194 */ ColliderCylinder collider;
-    /* 0x1E0 */ Path* path;
-    /* 0x1E4 */ s32 waypoint;
-    /* 0x1E8 */ s16 delayTimer;
-    /* 0x1EA */ s8 mainObjectSlot;
-    /* 0x1EB */ s8 unusedObjectSlot;
-    /* 0x1EC */ s8 shopkeeperAnimObjectSlot;
-    /* 0x1EE */ s16 headRot;
-    /* 0x1F0 */ s16 headRotTarget;
-    /* 0x1F2 */ Vec3s jointTable[ENSOB1_LIMB_MAX];
-    /* 0x26A */ Vec3s morphTable[ENSOB1_LIMB_MAX];
-    /* 0x2E2 */ s16 eyeTexIndex;
-    /* 0x2E4 */ s16 blinkTimer;
-    /* 0x2E8 */ EnSob1BlinkFunc blinkFunc;
-    /* 0x2EC */ EnGirlA* items[3]; // Items on shelf are indexed as: /* 2 1 0 */
-    /* 0x2F8 */ s32 stickAccumX;
-    /* 0x2FC */ s32 stickAccumY;
-    /* 0x300 */ Vec3f cursorPos;
-    /* 0x30C */ Color_RGBAu32 cursorColor;
-    /* 0x31C */ f32 cursorAnimTween;
-    /* 0x320 */ u8 cursorAnimState;
-    /* 0x321 */ u8 drawCursor;
-    /* 0x322 */ u8 cursorIndex;
-    /* 0x324 */ StickDirectionPrompt stickLeftPrompt;
-    /* 0x35C */ StickDirectionPrompt stickRightPrompt;
-    /* 0x394 */ f32 arrowAnimTween;
-    /* 0x398 */ f32 stickAnimTween;
-    /* 0x39C */ u8 arrowAnimState;
-    /* 0x39D */ u8 stickAnimState;
-    /* 0x39E */ s16 cutsceneState;
-    /* 0x3A0 */ s16 csId;
-    /* 0x3A2 */ s16 lookFowardCsId;
-    /* 0x3A4 */ s16 lookToShelfCsId;
-    /* 0x3A6 */ s16 lookToShopkeeperCsId;
-    /* 0x3A8 */ UNK_TYPE1 pad3A8[0x4];
-    /* 0x3AC */ f32 shopItemSelectedTween;
-    /* 0x3B0 */ UNK_TYPE1 pad3B0[0x4];
-    /* 0x3B4 */ u16 welcomeTextId;
-    /* 0x3B6 */ u16 talkOptionTextId;
-    /* 0x3B8 */ u16 goodbyeTextId;
-    /* 0x3BA */ u8 wasTalkedToWhileWalking;
-    /* 0x3BC */ EnSob1XZRange posXZRange;
-    /* 0x3CC */ s16 shopType;
-} EnSob1; // size = 0x3D0
-
-struct EnTrt;
-
-typedef void (*EnTrtActionFunc)(struct EnTrt*, PlayState*);
-typedef void (*EnTrtBlinkFunc)(struct EnTrt*);
-
-typedef struct EnTrt {
-    /* 0x000 */ Actor actor;
-    /* 0x144 */ EnTrtActionFunc actionFunc;
-    /* 0x148 */ EnTrtActionFunc prevActionFunc;
-    /* 0x14C */ SkelAnime skelAnime;
-    /* 0x190 */ ColliderCylinder collider;
-    /* 0x1DC */ UNK_TYPE1 pad1DC[0x154];
-    /* 0x330 */ s16 delayTimer;
-    /* 0x332 */ s16 sleepSoundTimer;
-    /* 0x334 */ s16 cutsceneState;
-    /* 0x338 */ s32 stickAccumX;
-    /* 0x33C */ s32 stickAccumY;
-    /* 0x340 */ EnGirlA* items[3];
-    /* 0x34C */ u8 cursorIndex;
-    /* 0x350 */ StickDirectionPrompt stickLeftPrompt;
-    /* 0x388 */ StickDirectionPrompt stickRightPrompt;
-    /* 0x3C0 */ f32 shopItemSelectedTween;
-    /* 0x3C4 */ f32 cursorAnimTween;
-    /* 0x3C8 */ u8 cursorAnimState;
-    /* 0x3CC */ f32 arrowAnimTween;
-    /* 0x3D0 */ f32 stickAnimTween;
-    /* 0x3D4 */ u8 arrowAnimState;
-    /* 0x3D5 */ u8 stickAnimState;
-    /* 0x3D6 */ s16 blinkTimer;
-    /* 0x3D8 */ s16 eyeTexIndex;
-    /* 0x3DC */ EnTrtBlinkFunc blinkFunc;
-    /* 0x3E0 */ s16 csId;
-    /* 0x3E2 */ s16 tmpGetMushroomCsId;
-    /* 0x3E4 */ Vec3f cursorPos;
-    /* 0x3F0 */ Color_RGBAu32 cursorColor;
-    /* 0x400 */ u8 drawCursor;
-    /* 0x402 */ s16 timer;
-    /* 0x404 */ s16 animIndex;
-    /* 0x406 */ u16 textId;
-    /* 0x408 */ u16 prevTextId;
-    /* 0x40A */ u16 talkOptionTextId;
-    /* 0x40C */ s16 lookForwardCutscene;
-    /* 0x40E */ s16 lookToShelfCsId;
-    /* 0x410 */ s16 lookToShopkeeperCsId;
-    /* 0x412 */ s16 getMushroomCsId;
-    /* 0x414 */ UNK_TYPE1 pad414[0x2];
-    /* 0x416 */ Vec3s headRot;
-    /* 0x41C */ Vec3f headPos;
-    /* 0x428 */ s16 headPitch;
-    /* 0x42A */ s16 headYaw;
-    /* 0x42C */ u16 flags;
-} EnTrt; // size = 0x430
+s32 rando_get_shop_price(u32 shop_item_id) {
+    REPY_FN_SETUP_RANDO;
+    REPY_FN_SET_U32("shop_item_id", shop_item_id);
+    REPY_FN_EVAL_CACHE_S32(
+        py_rando_get_shop_price,
+        "recomp_data.ctx.slot_data['shop_prices'][shop_item_id]\n",
+        price
+    );
+    REPY_FN_CLEANUP;
+    return price;
+}
 
 // Curiosity Shop
 void EnFsn_SetupResumeInteraction(EnFsn* this, PlayState* play);
 void EnFsn_PlayerCannotBuy(EnFsn* this, PlayState* play);
 
+EnFsn* sEnFsn;
+
 RECOMP_PATCH void EnFsn_GiveItem(EnFsn* this, PlayState* play) {
     if (Actor_HasParent(&this->actor, play)) {
-        if ((this->isSelling == true) && (this->items[this->cursorIndex]->getItemId == GI_MASK_ALL_NIGHT)) {
+        if ((this->isSelling == true) &&
+            (this->items[this->cursorIndex]->getItemId == GI_MASK_ALL_NIGHT || this->items[this->cursorIndex]->actor.params == SI_MASK_ALL_NIGHT)) {
             Message_BombersNotebookQueueEvent(play, BOMBERS_NOTEBOOK_EVENT_RECEIVED_ALL_NIGHT_MASK);
             Message_BombersNotebookQueueEvent(play, BOMBERS_NOTEBOOK_EVENT_MET_CURIOSITY_SHOP_MAN);
         }
@@ -270,7 +38,7 @@ RECOMP_PATCH void EnFsn_GiveItem(EnFsn* this, PlayState* play) {
         this->actionFunc = EnFsn_SetupResumeInteraction;
         this->getItemId = 0;
     } else if (this->isSelling == true) {
-        if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled()) {
+        if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_get_slotdata_u32("shopsanity")) {
             Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
         } else {
             Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
@@ -279,7 +47,7 @@ RECOMP_PATCH void EnFsn_GiveItem(EnFsn* this, PlayState* play) {
         if (this->getItemId == GI_MASK_KEATON || this->getItemId == GI_LETTER_TO_MAMA) {
             Actor_OfferGetItem(&this->actor, play, this->getItemId, 300.0f, 300.0f);
         } else {
-            if (!rando_get_curiostity_shop_trades() || rando_location_is_checked(LOCATION_FSN_RUPEE)) {
+            if (!rando_get_slotdata_u32("curiostity_shop_trades") || rando_location_is_checked(LOCATION_FSN_RUPEE)) {
                 Actor_OfferGetItem(&this->actor, play, this->getItemId, 300.0f, 300.0f);
             } else {
                 Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_FSN_RUPEE), LOCATION_FSN_RUPEE, 300.0f, 300.0f, true, true);
@@ -304,7 +72,7 @@ RECOMP_PATCH void EnFsn_HandleCanPlayerBuyItem(EnFsn* this, PlayState* play) {
             Audio_PlaySfx_MessageDecide();
             item = this->items[this->cursorIndex];
             item->buyFanfareFunc(play, item);
-            if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled()) {
+            if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_get_slotdata_u32("shopsanity")) {
                 Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
             } else {
                 Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
@@ -344,16 +112,52 @@ RECOMP_PATCH void EnFsn_HandleCanPlayerBuyItem(EnFsn* this, PlayState* play) {
     }
 }
 
+RECOMP_HOOK("EnFsn_CursorLeftRight")
+void PreRandoGrabSelectedItem_EnFsn_CursorLeftRight(EnFsn* this) {
+    sEnFsn = this;
+    shopItemId = this->items[this->cursorIndex]->actor.params;
+}
+
+RECOMP_HOOK_RETURN("EnFsn_CursorLeftRight")
+void RandoGrabSelectedItem_EnFsn_CursorLeftRight() {
+    EnFsn* this = sEnFsn;
+    shopItemId = this->items[this->cursorIndex]->actor.params;
+}
+
+RECOMP_HOOK("EnFsn_FaceShopkeeperSelling")
+void PreRandoGrabSelectedItem_EnFsn_FaceShopkeeperSelling(EnFsn* this, PlayState* play) {
+    sEnFsn = this;
+    shopItemId = this->items[this->cursorIndex]->actor.params;
+}
+
+RECOMP_HOOK_RETURN("EnFsn_FaceShopkeeperSelling")
+void RandoGrabSelectedItem_EnFsn_FaceShopkeeperSelling() {
+    EnFsn* this = sEnFsn;
+    shopItemId = this->items[this->cursorIndex]->actor.params;
+}
+
 // Trading Post
 void EnOssan_SetupAction(EnOssan* this, EnOssanActionFunc action);
 void EnOssan_SetupItemPurchased(EnOssan* this, PlayState* play);
+
+EnOssan* sEnOssan;
+
+extern ShopItem sShops_ovl_En_Ossan[2][8];
+
+RECOMP_HOOK("EnOssan_SpawnShopItems")
+void EnOssan_FixNightShops(EnOssan* this, PlayState* play, ShopItem* shop) {
+    // set trading post shop to use day items if advanced shopsanity is disabled
+    if (this->actor.params == 1 && rando_get_slotdata_u32("shopsanity") == 1) {
+        Lib_MemCpy(shop, sShops_ovl_En_Ossan[0], sizeof(sShops_ovl_En_Ossan[0]));
+    }
+}
 
 RECOMP_PATCH void EnOssan_BuyItemWithFanfare(EnOssan* this, PlayState* play) {
     if (Actor_HasParent(&this->actor, play)) {
         this->actor.parent = NULL;
         EnOssan_SetupAction(this, EnOssan_SetupItemPurchased);
     } else {
-        if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled()) {
+        if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_get_slotdata_u32("shopsanity")) {
             Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
         } else {
             Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
@@ -364,7 +168,7 @@ RECOMP_PATCH void EnOssan_BuyItemWithFanfare(EnOssan* this, PlayState* play) {
 RECOMP_PATCH void EnOssan_SetupBuyItemWithFanfare(PlayState* play, EnOssan* this) {
     Player* player = GET_PLAYER(play);
 
-    if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled()) {
+    if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_get_slotdata_u32("shopsanity")) {
         Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
     } else {
         Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
@@ -378,16 +182,72 @@ RECOMP_PATCH void EnOssan_SetupBuyItemWithFanfare(PlayState* play, EnOssan* this
     EnOssan_SetupAction(this, EnOssan_BuyItemWithFanfare);
 }
 
+RECOMP_HOOK("EnOssan_FaceShopkeeper") // grabbing selected item, annoyingly need to hook before and after
+void PreRandoGrabSelectedItem_EnOssan_FaceShopkeeper(EnOssan* this, PlayState* play) {
+    sEnOssan = this;
+}
+
+RECOMP_HOOK_RETURN("EnOssan_FaceShopkeeper")
+void RandoGrabSelectedItem_EnOssan_FaceShopkeeper() {
+    EnOssan* this = sEnOssan;
+    shopItemId = this->items[this->cursorIndex]->actor.params;
+}
+
+RECOMP_HOOK("EnOssan_CursorUpDown")
+void PreRandoGrabSelectedItem_EnOssan_CursorUpDown(EnOssan* this) {
+    sEnOssan = this;
+}
+
+RECOMP_HOOK_RETURN("EnOssan_CursorUpDown")
+void RandoGrabSelectedItem_EnOssan_CursorUpDown() {
+    EnOssan* this = sEnOssan;
+    shopItemId = this->items[this->cursorIndex]->actor.params;
+}
+
+RECOMP_HOOK("EnOssan_BrowseLeftShelf")
+void PreRandoGrabSelectedItem_EnOssan_BrowseLeftShelf(EnOssan* this, PlayState* play) {
+    sEnOssan = this;
+}
+
+RECOMP_HOOK_RETURN("EnOssan_BrowseLeftShelf")
+void RandoGrabSelectedItem_EnOssan_BrowseLeftShelf() {
+    EnOssan* this = sEnOssan;
+    shopItemId = this->items[this->cursorIndex]->actor.params;
+}
+
+RECOMP_HOOK("EnOssan_BrowseRightShelf")
+void PreRandoGrabSelectedItem_EnOssan_BrowseRightShelf(EnOssan* this, PlayState* play) {
+    sEnOssan = this;
+}
+
+RECOMP_HOOK_RETURN("EnOssan_BrowseRightShelf")
+void RandoGrabSelectedItem_EnOssan_BrowseRightShelf() {
+    EnOssan* this = sEnOssan;
+    shopItemId = this->items[this->cursorIndex]->actor.params;
+}
+
 // Zora, Goron, and Bomb
 void EnSob1_SetupAction(EnSob1* this, EnSob1ActionFunc action);
 void EnSob1_SetupItemPurchased(EnSob1* this, PlayState* play);
+
+EnSob1* sEnSob1;
+
+extern ShopItem sShops_ovl_En_Sob1[4][3];
+
+RECOMP_HOOK("EnSob1_SpawnShopItems")
+void EnSob1_FixGoronSpringShop(EnSob1* this, PlayState* play, ShopItem* shopItem) {
+    // set spring goron shop to use normal shop items if advanced shopsanity is disabled
+    if (this->shopType == GORON_SHOP_SPRING && rando_get_slotdata_u32("shopsanity") == 1) {
+        Lib_MemCpy(shopItem, sShops_ovl_En_Sob1[GORON_SHOP], sizeof(sShops_ovl_En_Sob1[GORON_SHOP]));
+    }
+}
 
 RECOMP_PATCH void EnSob1_BuyItemWithFanfare(EnSob1* this, PlayState* play) {
     if (Actor_HasParent(&this->actor, play)) {
         this->actor.parent = NULL;
         EnSob1_SetupAction(this, EnSob1_SetupItemPurchased);
     } else {
-        if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled()) {
+        if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_get_slotdata_u32("shopsanity")) {
             Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
         } else {
             Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
@@ -398,7 +258,7 @@ RECOMP_PATCH void EnSob1_BuyItemWithFanfare(EnSob1* this, PlayState* play) {
 RECOMP_PATCH void EnSob1_SetupBuyItemWithFanfare(PlayState* play, EnSob1* this) {
     Player* player = GET_PLAYER(play);
 
-    if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_shopsanity_enabled()) {
+    if (rando_location_is_checked(LOCATION_SHOP_ITEM) || !rando_get_slotdata_u32("shopsanity")) {
         Actor_OfferGetItem(&this->actor, play, this->items[this->cursorIndex]->getItemId, 300.0f, 300.0f);
     } else {
         Actor_OfferGetItemHook(&this->actor, play, this->items[this->cursorIndex]->getItemId, LOCATION_SHOP_ITEM, 300.0f, 300.0f, true, true);
@@ -410,6 +270,28 @@ RECOMP_PATCH void EnSob1_SetupBuyItemWithFanfare(PlayState* play, EnSob1* this) 
     Interface_SetHudVisibility(HUD_VISIBILITY_ALL);
     this->drawCursor = 0;
     EnSob1_SetupAction(this, EnSob1_BuyItemWithFanfare);
+}
+
+RECOMP_HOOK("EnSob1_FaceShopkeeper")
+void PreRandoGrabSelectedItem_EnSob1_FaceShopkeeper(EnSob1* this, PlayState* play) {
+    sEnSob1 = this;
+}
+
+RECOMP_HOOK_RETURN("EnSob1_FaceShopkeeper")
+void RandoGrabSelectedItem_EnSob1_FaceShopkeeper() {
+    EnSob1* this = sEnSob1;
+    shopItemId = this->items[this->cursorIndex]->actor.params;
+}
+
+RECOMP_HOOK("EnSob1_CursorLeftRight")
+void PreRandoGrabSelectedItem_EnSob1_CursorLeftRight(PlayState* play, EnSob1* this) {
+    sEnSob1 = this;
+}
+
+RECOMP_HOOK_RETURN("EnSob1_CursorLeftRight")
+void RandoGrabSelectedItem_EnSob1_CursorLeftRight() {
+    EnSob1* this = sEnSob1;
+    shopItemId = this->items[this->cursorIndex]->actor.params;
 }
 
 // Kotake
@@ -439,7 +321,7 @@ void EnTrt_VanillaBuyItemWithFanfare(EnTrt* this, PlayState* play) {
 }
 
 RECOMP_PATCH void EnTrt_BuyItemWithFanfare(EnTrt* this, PlayState* play) {
-    if (!rando_shopsanity_enabled() || rando_location_is_checked(location_to_buy)) {
+    if (!rando_get_slotdata_u32("shopsanity") || rando_location_is_checked(location_to_buy)) {
         EnTrt_VanillaBuyItemWithFanfare(this, play);
     } else {
         EnTrt_ShopsanityBuyItemWithFanfare(this, play);
@@ -565,7 +447,7 @@ RECOMP_PATCH void EnTrt_HandleCanBuyItem(PlayState* play, EnTrt* this) {
 }
 
 bool shopItemIsChecked(EnGirlA* item, PlayState* play) {
-    return rando_location_is_checked_async(0x090000 | item->actor.params);
+    return rando_location_is_checked(0x090000 | item->actor.params);
 }
 
 extern bool kotake_is_weird;
@@ -582,7 +464,7 @@ RECOMP_PATCH void EnTrt_SelectItem(EnTrt* this, PlayState* play) {
             if (!EnTrt_TestCancelOption(this, play, CONTROLLER1(&play->state)) && Message_ShouldAdvance(play)) {
                 switch (play->msgCtx.choiceIndex) {
                     case 0:
-                        kotake_is_weird = rando_shopsanity_enabled() && !shopItemIsChecked(item, play);
+                        kotake_is_weird = rando_get_slotdata_u32("shopsanity") && !shopItemIsChecked(item, play);
                         EnTrt_HandleCanBuyItem(play, this);
                         break;
 
@@ -598,7 +480,7 @@ RECOMP_PATCH void EnTrt_SelectItem(EnTrt* this, PlayState* play) {
             }
         } else if ((talkState == TEXT_STATE_5) && Message_ShouldAdvance(play)) {
             // if (!Inventory_HasEmptyBottle()) {
-            if (!Inventory_HasEmptyBottle() && (rando_location_is_checked(location_to_buy) || !rando_shopsanity_enabled())) {
+            if (!Inventory_HasEmptyBottle() && rando_location_is_checked(GI_POTION_BLUE)) {
                 Audio_PlaySfx(NA_SE_SY_ERROR);
                 EnTrt_SetupCannotBuy(play, this, 0x846);
             } else {
@@ -606,6 +488,7 @@ RECOMP_PATCH void EnTrt_SelectItem(EnTrt* this, PlayState* play) {
                     CutsceneManager_Stop(this->csId);
                     this->cutsceneState = ENTRT_CUTSCENESTATE_STOPPED;
                 }
+                location_to_buy = GI_POTION_BLUE;
                 EnTrt_SetupBuyItemWithFanfare(play, this);
                 this->drawCursor = 0;
                 this->shopItemSelectedTween = 0.0f;
@@ -613,5 +496,19 @@ RECOMP_PATCH void EnTrt_SelectItem(EnTrt* this, PlayState* play) {
                 SET_WEEKEVENTREG(WEEKEVENTREG_RECEIVED_FREE_BLUE_POTION);
             }
         }
+    }
+}
+
+RECOMP_HOOK("EnTrt_GetItemTextId")
+void RandoGrabSelectedItem_EnTrt_GetItemTextId(EnTrt* this) {
+    shopItemId = this->items[this->cursorIndex]->actor.params;
+}
+
+RECOMP_HOOK("EnTrt_GetItemChoiceTextId")
+void EnTrt_CheckFreeBluePotion(EnTrt* this) {
+    if (rando_location_is_checked(GI_POTION_BLUE)) {
+        SET_WEEKEVENTREG(WEEKEVENTREG_RECEIVED_FREE_BLUE_POTION);
+    } else {
+        CLEAR_WEEKEVENTREG(WEEKEVENTREG_RECEIVED_FREE_BLUE_POTION);
     }
 }

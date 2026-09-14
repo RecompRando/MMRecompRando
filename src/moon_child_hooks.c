@@ -32,7 +32,7 @@ bool rando_met_majora_condition() {
     return ((CHECK_QUEST_ITEM(QUEST_REMAINS_ODOLWA) > 0) +
             (CHECK_QUEST_ITEM(QUEST_REMAINS_GOHT) > 0) +
             (CHECK_QUEST_ITEM(QUEST_REMAINS_GYORG) > 0) +
-            (CHECK_QUEST_ITEM(QUEST_REMAINS_TWINMOLD) > 0)) >= rando_get_majora_remains_required();
+            (CHECK_QUEST_ITEM(QUEST_REMAINS_TWINMOLD) > 0)) >= rando_get_slotdata_u32("majora_remains_required");
 }
 
 extern AnimationHeader gMoonChildStandingAnim;

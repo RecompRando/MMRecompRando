@@ -3,8 +3,6 @@
 
 #include "apcommon.h"
 
-RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
-
 typedef enum {
     /*  0 */ BHEART_PARAM_NORMAL,    // Spawn Parameter for Normal Scale.
     /* 35 */ BHEART_PARAM_SMALL = 35 // Spawn Parameter for Small Scale.

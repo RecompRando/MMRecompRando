@@ -89,7 +89,7 @@ bool rando_met_moon_condition() {
     return ((CHECK_QUEST_ITEM(QUEST_REMAINS_ODOLWA) > 0) +
             (CHECK_QUEST_ITEM(QUEST_REMAINS_GOHT) > 0) +
             (CHECK_QUEST_ITEM(QUEST_REMAINS_GYORG) > 0) +
-            (CHECK_QUEST_ITEM(QUEST_REMAINS_TWINMOLD) > 0)) >= rando_get_moon_remains_required();
+            (CHECK_QUEST_ITEM(QUEST_REMAINS_TWINMOLD) > 0)) >= rando_get_slotdata_u32("moon_remains_required");
 }
 
 RECOMP_PATCH void EnTimeTag_RooftopOath_Wait(EnTimeTag* this, PlayState* play) {

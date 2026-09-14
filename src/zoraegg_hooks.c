@@ -3,8 +3,6 @@
 
 #include "apcommon.h"
 
-RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
-
 struct EnZoraegg;
 
 typedef void (*EnZoraeggActionFunc)(struct EnZoraegg*, PlayState*);

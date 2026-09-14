@@ -4,29 +4,119 @@
 #include "modding.h"
 #include "global.h"
 
+#include "rando_glue.h"
+
+#define GI_AP_PROG GI_77
+#define GI_AP_FILLER GI_90
+#define GI_AP_USEFUL GI_B3
+
+#define ITEM_AP_PROG 0xCD
+#define ITEM_AP_FILLER 0xCE
+#define ITEM_AP_USEFUL 0xCF
+
+#define GID_APLOGO_FILLER GID_37
+#define GID_APLOGO_PROG GID_46
+#define GID_APLOGO_USEFUL GID_4C
+
 #define GI_BAG_BOMBCHU GI_54
+
+#define GI_STRAY_FAIRY_CLOCKTOWN GI_B2
+#define GI_STRAY_FAIRY_WOODFALL GI_46
+#define GI_STRAY_FAIRY_SNOWHEAD GI_47
+#define GI_STRAY_FAIRY_GREATBAY GI_48
+#define GI_STRAY_FAIRY_STONETOWER GI_49
+
+#define GI_SONG_TIME GI_A6
+#define GI_SONG_HEALING GI_AF
+#define GI_SONG_EPONA GI_A5
+#define GI_SONG_SOARING GI_A3
+#define GI_SONG_STORMS GI_A2
+#define GI_SONG_SONATA GI_AE
+#define GI_SONG_LULLABY GI_AD
+#define GI_SONG_NOVA GI_AC
+#define GI_SONG_ELEGY GI_A8
+#define GI_SONG_OATH GI_A7
 
 #define GI_SPIN_ATTACK GI_71
 #define GI_OCEAN_SKULL_TOKEN GI_72
 #define GI_DEFENSE_DOUBLE GI_73
 #define GI_TRUE_SKULL_TOKEN GI_75
 
-#define GI_KEY_BOSS_WOODFALL (GI_MAX + 1)
-#define GI_KEY_SMALL_WOODFALL (GI_MAX + 2)
-#define GI_MAP_WOODFALL (GI_MAX + 3)
-#define GI_COMPASS_WOODFALL (GI_MAX + 4)
-#define GI_KEY_BOSS_SNOWHEAD (GI_MAX + 5)
-#define GI_KEY_SMALL_SNOWHEAD (GI_MAX + 6)
-#define GI_MAP_SNOWHEAD (GI_MAX + 7)
-#define GI_COMPASS_SNOWHEAD (GI_MAX + 8)
-#define GI_KEY_BOSS_GREATBAY (GI_MAX + 9)
-#define GI_KEY_SMALL_GREATBAY (GI_MAX + 10)
-#define GI_MAP_GREATBAY (GI_MAX + 11)
-#define GI_COMPASS_GREATBAY (GI_MAX + 12)
-#define GI_KEY_BOSS_STONETOWER (GI_MAX + 13)
-#define GI_KEY_SMALL_STONETOWER (GI_MAX + 14)
-#define GI_MAP_STONETOWER (GI_MAX + 15)
-#define GI_COMPASS_STONETOWER (GI_MAX + 16)
+// this enum MUST match sGetItemTable_ap in item_give.c
+typedef enum {
+    GI_OFFSET = GI_MAX,
+    // dungeon items
+    GI_KEY_BOSS_WOODFALL,
+    GI_KEY_SMALL_WOODFALL,
+    GI_MAP_WOODFALL,
+    GI_COMPASS_WOODFALL,
+    GI_KEY_BOSS_SNOWHEAD,
+    GI_KEY_SMALL_SNOWHEAD,
+    GI_MAP_SNOWHEAD,
+    GI_COMPASS_SNOWHEAD,
+    GI_KEY_BOSS_GREATBAY,
+    GI_KEY_SMALL_GREATBAY,
+    GI_MAP_GREATBAY,
+    GI_COMPASS_GREATBAY,
+    GI_KEY_BOSS_STONETOWER,
+    GI_KEY_SMALL_STONETOWER,
+    GI_MAP_STONETOWER,
+    GI_COMPASS_STONETOWER,
+    // upgrades
+    GI_MAGIC_UPGRADE,
+    // end
+    GI_EXTENDED_MAX,
+} ExtendedGITable;
+
+typedef enum {
+    GID_OFFSET = GID_MASK_FIERCE_DEITY,
+    // dungeon songs
+    GID_SONG_SONATA,
+    GID_SONG_LULLABY,
+    GID_SONG_NOVA,
+    GID_SONG_ELEGY,
+    GID_SONG_OATH,
+    // normal songs
+    GID_SONG_TIME,
+    GID_SONG_HEALING,
+    GID_SONG_EPONA,
+    GID_SONG_SOARING,
+    GID_SONG_STORMS,
+    // upgrades
+    GID_SPIN_ATTACK,
+    GID_MAGIC_UPGRADE,
+    // stray fairies
+    GID_SF_WOODFALL,
+    GID_SF_SNOWHEAD,
+    GID_SF_GREATBAY,
+    GID_SF_STONETOWER,
+    GID_SF_CLOCKTOWN,
+    // dungeon items
+    GID_KEY_BOSS_WOODFALL,
+    GID_KEY_SMALL_WOODFALL,
+    GID_MAP_WOODFALL,
+    GID_COMPASS_WOODFALL,
+    GID_KEY_BOSS_SNOWHEAD,
+    GID_KEY_SMALL_SNOWHEAD,
+    GID_MAP_SNOWHEAD,
+    GID_COMPASS_SNOWHEAD,
+    GID_KEY_BOSS_GREATBAY,
+    GID_KEY_SMALL_GREATBAY,
+    GID_MAP_GREATBAY,
+    GID_COMPASS_GREATBAY,
+    GID_KEY_BOSS_STONETOWER,
+    GID_KEY_SMALL_STONETOWER,
+    GID_MAP_STONETOWER,
+    GID_COMPASS_STONETOWER,
+    // custom items
+    GID_BAG_BOMBCHU,
+    GID_DEFENSE_DOUBLE,
+    GID_SWAMP_SKULL_TOKEN,
+    GID_OCEAN_SKULL_TOKEN,
+    GID_RUPOOR, // unimplemented
+    // end
+    GID_EXTENDED_MAX,
+} ExtendedGIDTable;
 
 #define AP_ITEM_ID_STRAY_FAIRY_WOODFALL 0x010000
 #define AP_ITEM_ID_STRAY_FAIRY_SNOWHEAD 0x010001
@@ -113,53 +203,7 @@
 #define LOCATION_SWAMP_GUIDE_GOOD 0x071C54
 #define LOCATION_SWAMP_GUIDE_OKAY 0x071C52
 
-#define MAX_BOMBCHUS ((s8) (10*rando_has_item_async(GI_BAG_BOMBCHU) + 10))
-
-RECOMP_IMPORT(".", bool rando_location_is_checked(u32 location_id));
-RECOMP_IMPORT(".", bool rando_location_is_checked_async(u32 location_id));
-RECOMP_IMPORT(".", bool rando_get_death_link_pending());
-RECOMP_IMPORT(".", void rando_reset_death_link_pending());
-RECOMP_IMPORT(".", bool rando_get_death_link_enabled());
-RECOMP_IMPORT(".", void rando_send_death_link());
-RECOMP_IMPORT(".", u32 rando_damage_multiplier());
-RECOMP_IMPORT(".", u32 rando_death_behavior());
-RECOMP_IMPORT(".", u32 rando_get_moon_remains_required());
-RECOMP_IMPORT(".", u32 rando_get_majora_remains_required());
-RECOMP_IMPORT(".", u32 rando_get_random_seed());
-RECOMP_IMPORT(".", bool rando_is_magic_trap());
-RECOMP_IMPORT(".", bool rando_skulltulas_enabled());
-RECOMP_IMPORT(".", bool rando_shopsanity_enabled());
-RECOMP_IMPORT(".", bool rando_advanced_shops_enabled());
-RECOMP_IMPORT(".", bool rando_get_curiostity_shop_trades());
-RECOMP_IMPORT(".", bool rando_scrubs_enabled());
-RECOMP_IMPORT(".", bool rando_cows_enabled());
-RECOMP_IMPORT(".", u32 rando_get_slotdata_u32(char* key));
-RECOMP_IMPORT(".", void rando_get_slotdata_raw_o32(const char* key, u32* out_handle_ptr));
-RECOMP_IMPORT(".", u32 rando_access_slotdata_raw_u32_o32(u32* in_handle_ptr));
-RECOMP_IMPORT(".", void rando_access_slotdata_raw_array_o32(u32* in_handle_ptr, u32 index, u32* out_handle_ptr));
-RECOMP_IMPORT(".", void rando_access_slotdata_raw_dict_o32(u32* in_handle_ptr, const char* key, u32* out_handle_ptr));
-RECOMP_IMPORT(".", u32 rando_get_location_type(u32 location_id));
-RECOMP_IMPORT(".", u32 rando_get_item_id(u32 location_id));
-RECOMP_IMPORT(".", void rando_broadcast_location_hint(u32 location_id));
-RECOMP_IMPORT(".", void rando_send_location(u32 location_id));
-RECOMP_IMPORT(".", void rando_complete_goal());
-RECOMP_IMPORT(".", u32 rando_has_item(u32 item_id));
-RECOMP_IMPORT(".", u32 rando_has_item_async(u32 item_id));
-RECOMP_IMPORT(".", u32 rando_get_own_slot_id());
-RECOMP_IMPORT(".", s16 rando_get_shop_price(u32 shop_item_id));
-RECOMP_IMPORT(".", u32 rando_get_items_size());
-RECOMP_IMPORT(".", u32 rando_get_item(u32 items_i));
-RECOMP_IMPORT(".", s32 rando_get_item_location(u32 items_i));
-RECOMP_IMPORT(".", u32 rando_get_sending_player(u32 items_i));
-RECOMP_IMPORT(".", void rando_get_item_name_from_id(u32 item_id, char* out_str));
-RECOMP_IMPORT(".", void rando_get_sending_player_name(u32 items_i, char* out_str));
-RECOMP_IMPORT(".", void rando_get_location_item_player(u32 location_id, char* out_str));
-RECOMP_IMPORT(".", void rando_get_location_item_name(u32 location_id, char* out_str));
-RECOMP_IMPORT(".", u32 rando_get_last_location_sent());
-RECOMP_IMPORT(".", u32 rando_get_seed_name(char* seed_name_out, u32 buffer_size));
-RECOMP_IMPORT(".", void rando_get_own_slot_name(char* out_str));
-RECOMP_IMPORT(".", void rando_get_saved_apconnect(u8* save_dir, char* address, char* player_name, char* password));
-RECOMP_IMPORT(".", void rando_set_saved_apconnect(u8* save_dir, char* address, char* player_name, char* password));
+#define MAX_BOMBCHUS ((s8) (10*rando_has_item(GI_BAG_BOMBCHU) + 10))
 
 // WEEKEVENTREG_17_80: we have given the Moon's Tear to the scrub
 // WEEKEVENTREG_74_80: the Moon's Tear has fallen
@@ -177,15 +221,31 @@ bool loadObject(PlayState* play, void** objectSegment, OSMesgQueue* objectLoadQu
 void GetItem_DrawDynamic(PlayState* play, void* objectSegment, s16 objectId);
 s32 Actor_OfferGetItemHook(Actor* actor, PlayState* play, GetItemId getItemId, u32 location, f32 xzRange, f32 yRange, bool use_workaround, bool item_is_shuffled);
 
-u8 randoItemGive(u32 gi);
+bool rando_get_camc_enabled();
 
-typedef struct GetItemEntry {
+typedef enum {
+    CAMC_DISABLED,
+    CAMC_SHOW_UNCHECKED,
+    CAMC_ENABLED,
+} CAMCType;
+
+typedef enum {
+    CAMC_DRAW_DISABLED,
+    CAMC_DRAW_UNCHECKED,
+    CAMC_DRAW_ENABLED,
+    CAMC_DRAW_CUSTOM,
+} CAMCDrawType;
+
+u8 randoItemGive(u32 gi);
+u32 rando_get_item_id(u32 location_id);
+
+typedef struct GetItemEntryAP {
     /* 0x0 */ u8 itemId;
     /* 0x1 */ u8 field; // various bit-packed data
     /* 0x2 */ s16 gid;   // defines the draw id and chest opening animation
-    /* 0x3 */ u8 textId;
+    /* 0x3 */ u16 textId;
     /* 0x4 */ u16 objectId;
-} GetItemEntry; // size = 0x6
+} GetItemEntryAP; // size = 0x6
 
 bool isAP(s16 gi);
 
@@ -193,15 +253,15 @@ u16 getObjectId(s16 gi);
 
 s16 getGid(s16 gi);
 
-u8 getTextId(s16 gi);
+u16 getTextId(s16 gi);
 
 extern s8 giToItemId[];
 
 typedef enum {
-    RANDO_ITEM_CLASS_PROGRESSION,
-    RANDO_ITEM_CLASS_USEFUL,
-    RANDO_ITEM_CLASS_JUNK,
-    RANDO_ITEM_CLASS_TRAP
+    RANDO_ITEM_CLASS_JUNK           = 0b000,
+    RANDO_ITEM_CLASS_PROGRESSION    = 0b001,
+    RANDO_ITEM_CLASS_USEFUL         = 0b010,
+    RANDO_ITEM_CLASS_TRAP           = 0b100
 } RandoItemClassification;
 
 void randoCreateStartMenu();
@@ -212,14 +272,33 @@ void randoCreateYamlConfigMenu();
 void randoShowYamlConfigMenu();
 void randoCreateAPConnectMenu();
 void randoShowAPConnectMenu();
+void randoCreateImportMenu();
+void randoShowImportMenu();
+void randoCreateModCheckMenu();
+bool randoGenerateMenuOpen();
+bool randoCheckRequiredMods();
 void randoStart(bool multiworld);
+
+void randoScout();
+
+typedef enum {
+    RANDO_NOTIFICATION_NORMAL,
+    RANDO_NOTIFICATION_ERROR,
+    RANDO_NOTIFICATION_RECEIVE,
+    RANDO_NOTIFICATION_SEND
+} RandoNotificationType;
 
 void notificationUpdateCycle();
 void randoCreateNotificationContainer();
-void randoEmitRecieveNotification(const char* item_name, const char* from_name, const ItemId item, RandoItemClassification item_class);
+void randoEmitReceiveNotification(const char* item_name, const char* from_name, const ItemId item, RandoItemClassification item_class);
+void randoCreateReceiveNotification(const char* item_name, const char* from_name, const ItemId item, RandoItemClassification item_class);
 void randoEmitSendNotification(const char* item_name, const char* to_name, const ItemId item, RandoItemClassification item_class);
+void randoCreateSendNotification(const char* item_name, const char* to_name, const ItemId item, RandoItemClassification item_class);
+void randoAddAPNotificationToQueue(RandoNotificationType notif_type, const char* item_name, const char* player_name, const ItemId item, RandoItemClassification item_class);
 void randoEmitNormalNotification(const char* notif_text);
+void randoCreateNormalNotification(const char* notif_text);
 void randoEmitErrorNotification(const char* error_text);
-bool randoGenerateMenuOpen();
+void randoCreateErrorNotification(const char* error_text);
+void randoAddNotificationToQueue(RandoNotificationType notif_type, const char* notif_text);
 
 #endif

@@ -6,7 +6,6 @@
 
 #include "apcommon.h"
 
-RECOMP_IMPORT(".", bool rando_get_receive_filled_wallets_enabled());
 
 extern s16 sExtraItemBases[];
 extern s16 sAmmoRefillCounts[];
@@ -59,7 +58,7 @@ void func_8082DB90(PlayState* play, Player* this, PlayerAnimationHeader* anim);
  */
 #define GIFIELD(flags, dropType) ((flags) | (dropType))
 
-GetItemEntry sGetItemTable_ap[] = {
+GetItemEntryAP sGetItemTable_ap[] = {
     // GI_RUPEE_GREEN
     GET_ITEM(ITEM_RUPEE_GREEN, OBJECT_GI_RUPY, GID_RUPEE_GREEN, 0xC4, GIFIELD(0, ITEM00_RUPEE_GREEN), CHEST_ANIM_SHORT),
     // GI_RUPEE_BLUE
@@ -352,7 +351,7 @@ GetItemEntry sGetItemTable_ap[] = {
     // GI_HYLIAN_LOACH
     GET_ITEM(ITEM_BOTTLE, OBJECT_GI_BOTTLE, GID_BOTTLE, 0x70, GIFIELD(GIFIELD_NO_COLLECTIBLE, 0), CHEST_ANIM_LONG),
     // GI_71
-    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_SWORD_1, GID_SWORD_KOKIRI, 0xCA, 0, 0),
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_SWORD_1, GID_SPIN_ATTACK, 0xCA, 0, 0),
     // GI_72
     GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_SUTARU, GID_OCEAN_SKULL_TOKEN, 0x72, GIFIELD(GIFIELD_NO_COLLECTIBLE, 0), CHEST_ANIM_SHORT),
     // GI_73
@@ -438,7 +437,7 @@ GetItemEntry sGetItemTable_ap[] = {
     GET_ITEM(ITEM_MASK_KAFEIS_MASK, OBJECT_GI_MASK05, GID_MASK_KAFEIS_MASK, 0x8F,
              GIFIELD(GIFIELD_20 | GIFIELD_NO_COLLECTIBLE, 0), CHEST_ANIM_LONG),
     // GI_90
-    GET_ITEM(ITEM_DEED_LAND, OBJECT_UNSET_0, GID_APLOGO_FILLER, 0x90, 0, 0),
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_UNSET_0, GID_APLOGO_FILLER, 0x77, 0, 0),
     // GI_CHATEAU
     GET_ITEM(ITEM_CHATEAU_2, OBJECT_GI_BOTTLE_21, GID_CHATEAU, 0x91, GIFIELD(GIFIELD_NO_COLLECTIBLE, 0),
              CHEST_ANIM_LONG),
@@ -530,7 +529,7 @@ GetItemEntry sGetItemTable_ap[] = {
     GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_BOTTLE_04, GID_SF_CLOCKTOWN, 0xB2, GIFIELD(GIFIELD_NO_COLLECTIBLE, 0), CHEST_ANIM_SHORT),
     // GI_B3
     //GET_ITEM(ITEM_NONE, OBJECT_GI_MSSA, GID_MASK_SUN, 0xB3, GIFIELD(GIFIELD_NO_COLLECTIBLE, 0), CHEST_ANIM_LONG),
-    GET_ITEM(ITEM_DEED_LAND, OBJECT_UNSET_0, GID_APLOGO_USEFUL, 0xB3, GIFIELD(GIFIELD_NO_COLLECTIBLE, 0), CHEST_ANIM_LONG),
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_UNSET_0, GID_APLOGO_USEFUL, 0x77, GIFIELD(GIFIELD_NO_COLLECTIBLE, 0), CHEST_ANIM_LONG),
     // GI_TINGLE_MAP_CLOCK_TOWN
     GET_ITEM(ITEM_TINGLE_MAP, OBJECT_GI_FIELDMAP, GID_TINGLE_MAP, 0xB4, GIFIELD(GIFIELD_20 | GIFIELD_NO_COLLECTIBLE, 0),
              CHEST_ANIM_LONG),
@@ -602,6 +601,9 @@ GetItemEntry sGetItemTable_ap[] = {
     // GI_COMPASS_STONETOWER
     GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_COMPASS, GID_COMPASS_STONETOWER, 0x3F, GIFIELD(GIFIELD_20 | GIFIELD_NO_COLLECTIBLE, 0),
              CHEST_ANIM_LONG),
+    // GI_MAGIC_UPGRADE
+    GET_ITEM(ITEM_DEED_LAND, OBJECT_GI_MAGICPOT, GID_MAGIC_UPGRADE, 0xC8,
+             GIFIELD(GIFIELD_20 | GIFIELD_40, ITEM00_MAGIC_JAR_BIG), CHEST_ANIM_LONG),
 };
 
 bool isAP(s16 gi) {
@@ -629,7 +631,7 @@ s16 getGid(s16 gi) {
     return (((gid < 0) ? -1 : 1)*gid) - 1;
 }
 
-u8 getTextId(s16 gi) {
+u16 getTextId(s16 gi) {
     return sGetItemTable_ap[gi - 1].textId;
 }
 
@@ -665,8 +667,6 @@ void func_8084748C(Player* this, f32* speed, f32 speedTarget, s16 yawTarget);
 bool playerObjectStatic;
 bool playerUseExtended = false;
 s16 playerExtendedGid;
-
-RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
 
 RECOMP_PATCH void Player_DrawGetItemImpl(PlayState* play, Player* player, Vec3f* refPos, s32 drawIdPlusOne) {
     f32 sp34;
@@ -751,7 +751,7 @@ RECOMP_PATCH void func_80848250(PlayState* play, Player* this) {
 
 // Player_UpdateCurrentGetItemDrawId?
 RECOMP_PATCH void func_8082ECE0(Player* this) {
-    GetItemEntry* giEntry;
+    GetItemEntryAP* giEntry;
     s16 gid;
     if (itemWorkaround) {
         giEntry = &sGetItemTable_ap[trueGI - 1];
@@ -804,7 +804,7 @@ RECOMP_PATCH s32 func_808482E0(PlayState* play, Player* this) {
     }
 
     if (this->av1.actionVar1 == 0) {
-        GetItemEntry* giEntry;
+        GetItemEntryAP* giEntry;
         if (itemWorkaround) {
             gi = ABS_ALT(trueGI);
             if (rando_has_item(GI_OCARINA_OF_TIME)) {
@@ -1273,7 +1273,7 @@ typedef struct EnBom {
 } EnBom; // size = 0x204
 
 void func_8082DAD4(Player* this);
-void func_8083D168(PlayState* play, Player* this, GetItemEntry* giEntry);
+void func_8083D168(PlayState* play, Player* this, GetItemEntryAP* giEntry);
 s32 func_80832558(PlayState* play, Player* this, PlayerFuncD58 arg2);
 void func_8082E920(PlayState* play, Player* this, s32 moveFlags);
 void Player_AnimationPlayOnce(PlayState* play, Player* this, PlayerAnimationHeader* anim);
@@ -1286,7 +1286,7 @@ RECOMP_PATCH s32 Player_ActionChange_2(Player* this, PlayState* play) {
         if (interactRangeActor != NULL) {
             if (this->getItemId > GI_NONE) {
                 if (this->getItemId < GI_MAX || this->getItemId > GI_MAX) {
-                    GetItemEntry* giEntry = &sGetItemTable_ap[this->getItemId - 1];
+                    GetItemEntryAP* giEntry = &sGetItemTable_ap[this->getItemId - 1];
                     interactRangeActor->parent = &this->actor;
                     if ((Item_CheckObtainability(giEntry->itemId) == ITEM_NONE) ||
                         ((s16)giEntry->objectId == OBJECT_GI_BOMB_2)) {
@@ -1324,7 +1324,7 @@ RECOMP_PATCH s32 Player_ActionChange_2(Player* this, PlayState* play) {
                             if (itemWorkaround) {
                                 this->getItemId = -trueGI;
                             }
-                            GetItemEntry* giEntry = &sGetItemTable_ap[-this->getItemId - 1];
+                            GetItemEntryAP* giEntry = &sGetItemTable_ap[-this->getItemId - 1];
                             EnBox* chest = (EnBox*)interactRangeActor;
 
                             /*if ((giEntry->itemId != ITEM_NONE) &&
@@ -1482,13 +1482,13 @@ RECOMP_PATCH s32 Actor_OfferGetItem(Actor* actor, PlayState* play, GetItemId get
                         itemShuffled = true;
                         trueGI = rando_get_item_id(LOCATION_QUEST_BOTTLE);
                         location_to_send = LOCATION_QUEST_BOTTLE;
-                    } else if (getItemId == GI_MILK && actor->id == ACTOR_ID_BARTEN && !rando_location_is_checked(LOCATION_MILK) && rando_shopsanity_enabled()) {
+                    } else if (getItemId == GI_MILK && actor->id == ACTOR_ID_BARTEN && !rando_location_is_checked(LOCATION_MILK) && rando_get_slotdata_u32("shopsanity")) {
                         // Milk Bar Milk Purchase
                         itemWorkaround = true;
                         itemShuffled = true;
                         location_to_send = LOCATION_MILK;
                         trueGI = rando_get_item_id(LOCATION_MILK);
-                    } else if (getItemId == GI_CHATEAU && actor->id == ACTOR_ID_BARTEN && !rando_location_is_checked(GI_CHATEAU) && rando_shopsanity_enabled()) {
+                    } else if (getItemId == GI_CHATEAU && actor->id == ACTOR_ID_BARTEN && !rando_location_is_checked(GI_CHATEAU) && rando_get_slotdata_u32("shopsanity")) {
                         // Milk Bar Chateau Purchase
                         itemWorkaround = true;
                         itemShuffled = true;
@@ -1546,7 +1546,7 @@ RECOMP_PATCH s32 Actor_OfferGetItem(Actor* actor, PlayState* play, GetItemId get
     return false;
 }
 
-s32 Actor_OfferGetItemHook(Actor* actor, PlayState* play, GetItemId getItemId, u32 location, f32 xzRange, f32 yRange, bool use_workaround, bool item_is_shuffled) {
+RECOMP_EXPORT s32 Actor_OfferGetItemHook(Actor* actor, PlayState* play, GetItemId getItemId, u32 location, f32 xzRange, f32 yRange, bool use_workaround, bool item_is_shuffled) {
     Player* player = GET_PLAYER(play);
 
     if (!(player->stateFlags1 &
@@ -2146,19 +2146,19 @@ u8 randoItemGive(u32 gi) {
     } else if (item == ITEM_WALLET_ADULT) {
         if (CUR_UPG_VALUE(UPG_WALLET) == 2) {
             // stop sending yourself wallets you freaks
-            if (rando_get_receive_filled_wallets_enabled()) {
+            if (rando_get_slotdata_u32("receive_filled_wallets")) {
                 Rupees_ChangeBy(gUpgradeCapacities[UPG_WALLET][3]); // you can get money though
             }
             return ITEM_NONE;
         } else if (CUR_UPG_VALUE(UPG_WALLET) == 1) {
             Inventory_ChangeUpgrade(UPG_WALLET, 2);
-            if (rando_get_receive_filled_wallets_enabled()) {
+            if (rando_get_slotdata_u32("receive_filled_wallets")) {
                 Rupees_ChangeBy(gUpgradeCapacities[UPG_WALLET][2]);
             }
             return ITEM_NONE;
         }
         Inventory_ChangeUpgrade(UPG_WALLET, 1);
-        if (rando_get_receive_filled_wallets_enabled()) {
+        if (rando_get_slotdata_u32("receive_filled_wallets")) {
             Rupees_ChangeBy(gUpgradeCapacities[UPG_WALLET][1]);
         }
         return ITEM_NONE;

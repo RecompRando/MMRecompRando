@@ -2,8 +2,7 @@
 #include "apconnect_menu.h"
 #include "recompconfig.h"
 #include "recomputils.h"
-
-RECOMP_IMPORT(".", bool rando_init(char* address, char* player_name, char* password));
+#include "rando_glue.h"
 
 ApconnectMenu connect_menu;
 
@@ -12,19 +11,21 @@ static void connectPressed(RecompuiResource resource, const RecompuiEventData* d
         char* server_text = recompui_get_input_text(connect_menu.server_textinput);
         char* slot_text = recompui_get_input_text(connect_menu.slot_textinput);
         char* password_text = recompui_get_input_text(connect_menu.password_textinput);
-        bool success = rando_init(server_text, slot_text, password_text);
+        char* connection_failed_msg;
+        bool success = rando_init(server_text, slot_text, password_text, &connection_failed_msg);
 
         if (success) {
             randoStart(true);
             recompui_hide_context(connect_menu.context);
             recompui_close_context(connect_menu.context);
-            randoEmitNormalNotification("Successfully connected");
+            randoCreateNormalNotification("Successfully connected");
             recompui_open_context(connect_menu.context);
             rando_set_saved_apconnect(recomp_get_save_file_path(), server_text, slot_text, password_text);
         }
         else {
             recompui_close_context(connect_menu.context);
-            randoEmitErrorNotification("Failed to connect");
+            // randoCreateErrorNotification("Failed to connect");
+            randoCreateErrorNotification(connection_failed_msg);
             recompui_open_context(connect_menu.context);
         }
 
@@ -57,10 +58,10 @@ void randoCreateAPConnectMenu() {
 
     createUiFrame(connect_menu.context, &connect_menu.frame);
 
-    char address[64];
-    char player_name[17];
-    char password[128];
-    rando_get_saved_apconnect(recomp_get_save_file_path(), address, player_name, password);
+    char* address;
+    char* player_name;
+    char* password;
+    rando_get_saved_apconnect(recomp_get_save_file_path(), &address, &player_name, &password);
 
     // Create a label for the server address.
     connect_menu.server_label = recompui_create_label(connect_menu.context, connect_menu.frame.container, "Server Address:Port", LABELSTYLE_NORMAL);
@@ -111,6 +112,10 @@ void randoCreateAPConnectMenu() {
     recompui_register_callback(connect_menu.back_button, backPressed, NULL);
     
     recompui_close_context(connect_menu.context);
+    
+    recomp_free(address);
+    recomp_free(player_name);
+    recomp_free(password);
 }
 
 void randoShowAPConnectMenu() {

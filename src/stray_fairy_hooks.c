@@ -4,8 +4,6 @@
 
 #include "apcommon.h"
 
-RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
-
 #define FLAGS (ACTOR_FLAG_10)
 
 #define THIS ((EnElforg*)thisx)
@@ -332,7 +330,7 @@ RECOMP_PATCH void EnElforg_FreeFloating(EnElforg* this, PlayState* play) {
                 player->stateFlags1 |= PLAYER_STATE1_20000000;
                 rando_send_location(LOCATION_CLOCK_TOWN_STRAY_FAIRY);
                 // Bring me back to North Clock Town!
-                Message_StartTextbox(play, rando_get_item_id(LOCATION_CLOCK_TOWN_STRAY_FAIRY), NULL);
+                Message_StartTextbox(play, getTextId(rando_get_item_id(LOCATION_CLOCK_TOWN_STRAY_FAIRY)), NULL);
                 this->actionFunc = EnElforg_ClockTownFairyCollected;
                 CutsceneManager_Queue(CS_ID_GLOBAL_TALK);
                 return;
@@ -345,7 +343,7 @@ RECOMP_PATCH void EnElforg_FreeFloating(EnElforg* this, PlayState* play) {
                 player->actor.freezeTimer = 10;
                 player->stateFlags1 |= PLAYER_STATE1_20000000;
                 // You found a Stray Fairy!
-                Message_StartTextbox(play, rando_get_item_id(LOCATION_STRAY_FAIRY), NULL);
+                Message_StartTextbox(play, getTextId(rando_get_item_id(LOCATION_STRAY_FAIRY)), NULL);
                 if (gSaveContext.save.saveInfo.inventory.strayFairies[(void)0, gSaveContext.dungeonIndex] >=
                     STRAY_FAIRY_SCATTERED_TOTAL) {
                     Audio_PlayFanfare(NA_BGM_GET_ITEM | 0x900);
@@ -408,26 +406,26 @@ void EnElforg_WaitForObject(EnElforg* this, PlayState* play) {
     }
 
     switch (getItemId) {
-        case GI_B2:
+        case GI_STRAY_FAIRY_CLOCKTOWN:
             this->area = STRAY_FAIRY_AREA_CLOCK_TOWN;
             townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
             townFairyRenderNormal[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
             break;
-        case GI_46:
+        case GI_STRAY_FAIRY_WOODFALL:
             this->area = STRAY_FAIRY_AREA_WOODFALL;
             townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
             townFairyRenderNormal[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
             break;
-        case GI_47:
+        case GI_STRAY_FAIRY_SNOWHEAD:
             this->area = STRAY_FAIRY_AREA_SNOWHEAD;
             townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
             townFairyRenderNormal[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
-        case GI_48:
+        case GI_STRAY_FAIRY_GREATBAY:
             this->area = STRAY_FAIRY_AREA_GREAT_BAY;
             townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
             townFairyRenderNormal[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
             break;
-        case GI_49:
+        case GI_STRAY_FAIRY_STONETOWER:
             this->area = STRAY_FAIRY_AREA_STONE_TOWER;
             townFairyObjectLoaded[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;
             townFairyRenderNormal[STRAY_FAIRY_GET_FLAG(&this->actor) % 15] = true;

@@ -7,13 +7,15 @@
 
 bool saveOpened = false;
 
-RECOMP_IMPORT(".", bool rando_get_permanent_chateau_romani_enabled());
-RECOMP_IMPORT(".", bool rando_get_start_with_consumables_enabled());
-RECOMP_IMPORT(".", bool rando_get_start_with_inverted_time_enabled());
-
 RECOMP_CALLBACK("*", recomp_on_load_save)
 void rando_on_load_save(FileSelectState* fileSelect, SramContext* sramCtx) {
     saveOpened = true;
+
+    s32 save_slot = gSaveContext.fileNum;
+    if (fileSelect->isOwlSave[gSaveContext.fileNum + 2]) {
+        save_slot = gSaveContext.fileNum + 2;
+    }
+    rando_load_current_state(save_slot);
 }
 
 extern SavePlayerData sSaveDefaultPlayerData;
@@ -104,15 +106,16 @@ void Sram_SetInitialWeekEvents(void) {
     // skip initial ikana canyon sharp cs
     SET_WEEKEVENTREG(WEEKEVENTREG_14_02);
 
-    // skip having to rewatch the great bay turtle cutscene
-    if(spawnedTurtle) {
+    // skip having to rewatch the full great bay turtle cutscene
+    SET_WEEKEVENTREG(WEEKEVENTREG_93_08);
+    // keep the turtle raised if cutscene was watched, unless treesanity is enabled to reach the trees
+    if(spawnedTurtle && !rando_get_slotdata_u32("treesanity")) {
         SET_WEEKEVENTREG(WEEKEVENTREG_53_20);
     }
 
     // restore chateau romani state after cycle reset
-    if (drankChateau && rando_get_permanent_chateau_romani_enabled()) {
+    if (drankChateau && rando_get_slotdata_u32("permanent_chateau_romani")) {
         SET_WEEKEVENTREG(WEEKEVENTREG_DRANK_CHATEAU_ROMANI);
-        drankChateau = false;
     }
 }
 
@@ -126,7 +129,7 @@ RECOMP_PATCH void Sram_InitNewSave(void) {
 
     gSaveContext.save.hasTatl = true;
 
-    if (rando_get_start_with_consumables_enabled()) {
+    if (rando_get_slotdata_u32("start_with_consumables")) {
         // start with basic consumables
         gSaveContext.save.saveInfo.playerData.rupees = gUpgradeCapacities[UPG_WALLET][0];
         gSaveContext.save.saveInfo.inventory.items[SLOT_DEKU_STICK] = ITEM_DEKU_STICK;
@@ -135,7 +138,7 @@ RECOMP_PATCH void Sram_InitNewSave(void) {
         gSaveContext.save.saveInfo.inventory.ammo[SLOT_DEKU_NUT] = 20;
     }
 
-    if (rando_get_start_with_inverted_time_enabled()) {
+    if (rando_get_slotdata_u32("start_with_inverted_time")) {
         gSaveContext.save.timeSpeedOffset = -2;
     }
 
@@ -162,7 +165,15 @@ RECOMP_PATCH void Sram_InitNewSave(void) {
     gSaveContext.save.saveInfo.playerData.healthCapacity = 0x10;
     gSaveContext.save.saveInfo.playerData.health = 0x10;
 
+    SET_EQUIP_VALUE(EQUIP_TYPE_SWORD, EQUIP_VALUE_SWORD_NONE);
     SET_EQUIP_VALUE(EQUIP_TYPE_SHIELD, EQUIP_VALUE_SHIELD_NONE);
+    CUR_FORM_EQUIP(EQUIP_SLOT_B) = ITEM_NONE;
+
+    if (!rando_get_slotdata_u32("magic_is_a_trap")) {
+        if (!rando_has_item(AP_ITEM_ID_MAGIC)) {
+            gSaveContext.save.saveInfo.playerData.magic = 0;
+        }
+    }
 
     Sram_GenerateRandomSaveFields();
 
@@ -221,7 +232,7 @@ void Sram_ResetSaveCycle(PlayState* play) {
                 BUTTON_ITEM_EQUIP(0, EQUIP_SLOT_B) = ITEM_SWORD_KOKIRI + sword_level - 1;
             }
         }
-        SET_EQUIP_VALUE(EQUIP_TYPE_SWORD, EQUIP_VALUE_SWORD_KOKIRI + sword_level - 1);
+        SET_EQUIP_VALUE(EQUIP_TYPE_SWORD, MIN(sword_level, EQUIP_VALUE_SWORD_GILDED));
     }
 
     if ((STOLEN_ITEM_1 == ITEM_SWORD_GREAT_FAIRY) || (STOLEN_ITEM_2 == ITEM_SWORD_GREAT_FAIRY)) {
@@ -338,7 +349,7 @@ RECOMP_PATCH void Sram_SaveEndOfCycle(PlayState* play) {
     }
 
     // persistent flags
-    drankChateau = CHECK_WEEKEVENTREG(WEEKEVENTREG_DRANK_CHATEAU_ROMANI);
+    drankChateau = CHECK_WEEKEVENTREG(WEEKEVENTREG_DRANK_CHATEAU_ROMANI) || drankChateau;
     spawnedTurtle = CHECK_WEEKEVENTREG(WEEKEVENTREG_53_20);
 
     for (i = 0; i < ARRAY_COUNT(sPersistentCycleWeekEventRegs); i++) {

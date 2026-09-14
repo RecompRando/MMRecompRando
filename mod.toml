@@ -37,9 +37,18 @@ minimum_recomp_version = "1.2.2"
 dependencies = [
     "RecompExternalPython_API:2.0.0",
     "REPY_PopularPythonPackages:1.0.0",
-    "owls_never_quit:1.0.0",
-    "mm_recomp_better_double_sot:0.0.1",
-    "mm_recomp_colors:0.5.0"
+    "owls_never_quit:1.0.0", # required to prevent quiting (unhandled)
+]
+
+# REPY_PopularPythonPackages found here: https://github.com/LT-Schmiddy/repy_popular_python_packages
+
+# Optional dependency mods. This has the same format as `dependencies`, but the game will still start if dependencies in this
+# list aren't present. You can query the presence of a given dependency by using `recomp_is_dependency_met` in recomputils.h.
+# Calling a function imported from an optional dependency that isn't present will trigger an error.
+optional_dependencies = [
+    "mm_recomp_better_double_sot:1.0.1",
+    "mm_recomp_colors:0.5.0",
+    "ProxyMM_ActorListIndex:0.0.3",
 ]
 
 # Native libraries (e.g. DLLs) and the functions they export.
@@ -64,9 +73,46 @@ data_reference_syms_files = [ "Zelda64RecompSyms/mm.us.rev1.datasyms.toml", "Zel
 additional_files = [ "thumb.dds" ]
 
 [[manifest.config_options]]
+id = "enable_notifications"
+name = "Display Notifications"
+description = "Sets if you want to be notified when you receive items."
+type = "Enum"
+options = [ "Disabled", "Enabled" ]
+default = "Enabled"
+
+[[manifest.config_options]]
 id = "notification_position"
 name = "Notification Position"
-description = "Sets where incoming item notifications appear on your screen"
+description = "Sets where incoming item notifications appear on your screen."
 type = "Enum"
 options = [ "Top Left", "Top Right", "Bottom Left", "Bottom Right" ]
 default = "Top Left"
+
+[[manifest.config_options]]
+id = "local_notifications"
+name = "Show Local Notifications"
+description = """Sets if you want to be notified when your player/slot recieves an item.
+
+This is mainly useful to those wanting to play co-op on the same "slot" within a multiworld."""
+type = "Enum"
+options = [ "Disabled", "Enabled" ]
+default = "Disabled"
+
+[[manifest.config_options]]
+id = "deathlink"
+name = "DeathLink"
+description = """- Multiworlds Only -
+Sets if you die when other players who also have "DeathLink" enabled die - the reverse is true as well."""
+type = "Enum"
+options = [ "Disabled", "Enabled" ]
+default = "Enabled"
+
+[[manifest.config_options]]
+id = "camc_enabled"
+name = "Container Appearance Matches Contents"
+description = """Sets if the appearance of different containers match the content within them.
+
+The "Show Unchecked" option will set all uncollected container appearances (excluding chests) to be a golden color."""
+type = "Enum"
+options = [ "Disabled", "Show Unchecked", "Enabled" ]
+default = "Enabled"

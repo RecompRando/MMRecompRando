@@ -201,9 +201,9 @@ class MMRWorld(World):
         if self.options.skullsanity.value == 0:
             for i in range(0, 31):
                 if i != 3:
-                    self.place(code_to_location_table[0x3469420062700 | i], "Swamp Skulltula Token")
+                    self.place(code_to_location_table[0x062700 | i], "Swamp Skulltula Token")
                 if i != 0:
-                    self.place(code_to_location_table[0x3469420062800 | i], "Ocean Skulltula Token")
+                    self.place(code_to_location_table[0x062800 | i], "Ocean Skulltula Token")
                 
 
         if not self.options.shuffle_great_fairy_rewards.value:
@@ -317,21 +317,21 @@ class MMRWorld(World):
         if self.options.starting_hearts_are_containers_or_pieces.value == 0:
             containers = int(shp/4) - 1
             for i in range(0, containers):
-                self.place(code_to_location_table[0x34694200D0000 | i], "Heart Container")
+                self.place(code_to_location_table[0x0D0000 | i], "Heart Container")
 
             hearts_left = shp % 4
             for i in range(0, hearts_left):
-                self.place(code_to_location_table[0x34694200D0000 | (containers + i)], "Heart Piece")
+                self.place(code_to_location_table[0x0D0000 | (containers + i)], "Heart Piece")
 
             if (shp % 4) != 0:
                 for i in range(containers + hearts_left, containers + 4):
-                    mw.get_location(code_to_location_table[0x34694200D0000 | i], player).item_rule = lambda item: item.name != "Heart Piece" and item.name != "Heart Container"
+                    mw.get_location(code_to_location_table[0x0D0000 | i], player).item_rule = lambda item: item.name != "Heart Piece" and item.name != "Heart Container"
         else:
             for i in range(0, shp - 4):
-                self.place(code_to_location_table[0x34694200D0000 | i], "Heart Piece")
+                self.place(code_to_location_table[0x0D0000 | i], "Heart Piece")
 
             for i in range(shp - 4, 8):
-                mw.get_location(code_to_location_table[0x34694200D0000 | i], player).item_rule = lambda item: item.name != "Heart Piece" and item.name != "Heart Container"
+                mw.get_location(code_to_location_table[0x0D0000 | i], player).item_rule = lambda item: item.name != "Heart Piece" and item.name != "Heart Container"
 
         # TODO: check options to see what player starts with
         # ~ mw.get_location("Top of Clock Tower (Ocarina of Time)", player).place_locked_item(self.create_item(self.get_filler_item_name()))

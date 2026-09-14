@@ -59,8 +59,6 @@ void ObjTokeiStep_Destroy(Actor* thisx, PlayState* play) {
     tokei_steps = NULL;
 }
 
-RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
-
 extern u16 D_80A43364[];
 extern s16 sCsIdList[2];
 

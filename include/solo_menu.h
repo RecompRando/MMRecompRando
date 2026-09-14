@@ -35,6 +35,8 @@ typedef struct {
     RecompuiResource footer;
     // Button to return to the start menu.
     RecompuiResource new_seed_button;
+    // Button to open the import yaml menu.
+    RecompuiResource import_button;
     // Button to return to the start menu.
     RecompuiResource back_button;
 

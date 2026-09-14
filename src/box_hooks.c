@@ -6,8 +6,6 @@
 #include "box_ap.h"
 #include "box_ootmm.h"
 
-RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
-
 struct EnBox;
 struct struct_80867BDC_a0;
 
@@ -187,8 +185,6 @@ void EnBox_FallOnSwitchFlag(EnBox* this, PlayState* play);
 void EnBox_AppearSwitchFlag(EnBox* this, PlayState* play);
 void EnBox_AppearOnRoomClear(EnBox* this, PlayState* play);
 void func_80867BDC(struct_80867BDC_a0* arg0, PlayState* play, Vec3f* pos);
-
-RECOMP_IMPORT(".", bool rando_get_camc_enabled());
 
 RECOMP_PATCH void EnBox_Init(Actor* thisx, PlayState* play) {
     s32 pad;

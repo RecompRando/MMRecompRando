@@ -45,6 +45,7 @@ void createUiFrame(RecompuiContext context, UiFrame* frame) {
     recompui_set_background_color(frame->root, &bg_color);
 
     // Set up the flexbox properties of the root element.
+    recompui_set_display(frame->root, DISPLAY_FLEX);
     recompui_set_flex_direction(frame->root, FLEX_DIRECTION_COLUMN);
     recompui_set_justify_content(frame->root, JUSTIFY_CONTENT_CENTER);
     recompui_set_align_items(frame->root, ALIGN_ITEMS_CENTER);
@@ -72,7 +73,6 @@ void createUiFrame(RecompuiContext context, UiFrame* frame) {
 
 #define C_TO_PARAMS(c) (c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF
 
-RECOMP_IMPORT(".", int rando_get_tunic_color());
 RECOMP_IMPORT("mm_recomp_colors", void colors_set_human_tunic(u8 r, u8 g, u8 b));
 
 RECOMP_DECLARE_EVENT(rando_on_connect());
@@ -83,6 +83,8 @@ bool is_multiworld = false;
 void randoStart(bool multiworld) {
     rando_started = true;
     is_multiworld = multiworld;
+    rando_on_connect();
+    randoScout();
 }
 
 // Startup Menu
@@ -90,17 +92,17 @@ void Setup_InitImpl(SetupState* this);
 
 void RandoMenu_Main(GameState* thisx) {
     SetupState* this = (SetupState*)thisx;
-    
+
     notificationUpdateCycle();
 
     // Perform the original setup init after connection.
     if (rando_started) {
         // Set the filename based on the seed and session type.
-        char seed_name[64];
+        char* seed_name;
+        char* slot_name;
         char file_name[72];
-        char slot_name[20];
-        rando_get_seed_name(seed_name, sizeof(seed_name));
-        rando_get_own_slot_name(slot_name);
+        rando_get_seed_name(&seed_name, sizeof(seed_name));
+        rando_get_own_slot_name(&slot_name);
         if (is_multiworld) {
             sprintf(file_name, "multi_%s_%s", slot_name, seed_name);
         }
@@ -109,8 +111,9 @@ void RandoMenu_Main(GameState* thisx) {
         }
         recomp_change_save_file(file_name);
 
-        colors_set_human_tunic(C_TO_PARAMS(rando_get_tunic_color()));
-        rando_on_connect();
+        if (recomp_is_dependency_met("mm_recomp_colors") == DEPENDENCY_STATUS_FOUND) {
+            colors_set_human_tunic(C_TO_PARAMS(rando_get_slotdata_u32("link_tunic_color")));
+        }
         Setup_InitImpl(this);
     }
 
