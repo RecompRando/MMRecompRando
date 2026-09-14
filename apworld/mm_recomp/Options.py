@@ -33,11 +33,6 @@ class MoonRemainsRequired(Range):
     default = 4
 
 
-class CAMC(DefaultOnToggle):
-    """Set whether chest appearance matches contents."""
-    display_name = "CAMC"
-
-
 class Swordless(Toggle):
     """Start the game without a sword, and shuffle an extra Progressive Sword into the pool."""
     display_name = "Swordless"
@@ -272,7 +267,6 @@ class MMROptions(PerGameCommonOptions):
     logic_difficulty: LogicDifficulty
     majora_remains_required: MajoraRemainsRequired
     moon_remains_required: MoonRemainsRequired
-    camc: CAMC
     swordless: Swordless
     shieldless: Shieldless
     start_with_soaring: StartWithSoaring
@@ -302,5 +296,4 @@ class MMROptions(PerGameCommonOptions):
     magic_is_a_trap: MagicIsATrap
     damage_multiplier: DamageMultiplier
     death_behavior: DeathBehavior
-    death_link: DeathLink
     link_tunic_color: LinkTunicColor

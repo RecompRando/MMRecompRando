@@ -38,12 +38,11 @@ class MMRWorld(World):
     location_name_to_id = location_table
     item_name_to_id = item_table
     
-    prices_ints: List[int]
-    prices: str
+    shop_prices = List[int]
 
     def generate_early(self):
         # Create shop prices.
-        self.prices_ints = []
+        self.shop_prices = []
         self.prices = ""
 
         if self.options.shopsanity.value != 0:
@@ -62,10 +61,12 @@ class MMRWorld(World):
                     price = default_shop_prices[i]
                 else:
                     price = self.random.randint(0, price_max)
-                self.prices_ints.append(price)
-                self.prices += str(price) + " "
-
-            self.prices = self.prices[:-1]
+                self.shop_prices.append(price)
+        else:
+            # populate stored prices with default prices if shopsanity is disabled
+            for i in range(0, 36):
+                price = default_shop_prices[i]
+                self.shop_prices.append(price)
     
     def create_item(self, name: str) -> MMRItem:
         return MMRItem(name, item_data_table[name].type, item_data_table[name].code, self.player)
@@ -351,7 +352,7 @@ class MMRWorld(World):
         player = self.player
         mw = self.multiworld
         options = self.options
-        prices = self.prices_ints
+        prices = self.shop_prices
 
         # Completion condition.
         mw.completion_condition[player] = lambda state: state.has("Victory", player)
@@ -385,7 +386,7 @@ class MMRWorld(World):
         if self.options.shopsanity.value:
             spoiler_handle.write("\nShop Prices:\n")
             for location, shop_id in shop_location_to_id.items():
-                spoiler_handle.write(f"\n{location}: {self.prices_ints[shop_id]} Rupees")
+                spoiler_handle.write(f"\n{location}: {self.shop_prices[shop_id]} Rupees")
 
     def fill_slot_data(self):
         shp = self.options.starting_hearts.value
@@ -398,8 +399,7 @@ class MMRWorld(World):
             "fairysanity": self.options.fairysanity.value,
             "shopsanity": self.options.shopsanity.value,                                                                
             "scrubsanity": self.options.scrubsanity.value,
-            "shop_prices": self.prices,
-            "shop_prices_ints": self.prices_ints,
+            "shop_prices": self.shop_prices,
             "cowsanity": self.options.cowsanity.value,
             "keysanity": self.options.keysanity.value,
             "bosskeysanity": self.options.bosskeysanity.value,
@@ -407,8 +407,6 @@ class MMRWorld(World):
             "curiostity_shop_trades": self.options.curiostity_shop_trades.value,
             "damage_multiplier": self.options.damage_multiplier.value,
             "death_behavior": self.options.death_behavior.value,
-            "death_link": self.options.death_link.value,
-            "camc": self.options.camc.value,
             "starting_heart_locations": 8 if self.options.starting_hearts_are_containers_or_pieces.value == 1 else starting_containers + starting_pieces + shuffled_containers + shuffled_pieces,
             "majora_remains_required": self.options.majora_remains_required.value,
             "moon_remains_required": self.options.moon_remains_required.value,
@@ -424,6 +422,5 @@ class MMRWorld(World):
             "shuffle_spiderhouse_reward": self.options.shuffle_spiderhouse_reward.value,
             "shuffle_great_fairy_rewards": self.options.shuffle_great_fairy_rewards.value,
             "link_tunic_color": ((self.options.link_tunic_color.value[0] & 0xFF) << 16) | ((self.options.link_tunic_color.value[1] & 0xFF) << 8) | (self.options.link_tunic_color.value[2] & 0xFF),
-            "random_seed": self.random.getrandbits(32),
             "logic_difficulty": self.options.logic_difficulty.value
         }
