@@ -1083,14 +1083,17 @@ EZTR_MSG_CALLBACK(StoneTowerSmallKeyCount) {
 #define SPIDER_OCEAN 1
 void skullTokenMsg(EZTR_MsgBuffer* buf, u8 type, u8 count, u8 required) {
     char* type_str;
+    char* type_article;
     u32 reward_location;
 
     switch (type) {
         case SPIDER_SWAMP:
+            type_article = "a" EZTR_CC_END;
             type_str = EZTR_CC_COLOR_GREEN "Swamp" EZTR_CC_END;
             reward_location = GI_MASK_TRUTH;
             break;
         case SPIDER_OCEAN:
+            type_article = "an" EZTR_CC_END;
             type_str = EZTR_CC_COLOR_BLUE "Ocean" EZTR_CC_END;
             reward_location = GI_WALLET_GIANT;
             break;
@@ -1126,9 +1129,10 @@ void skullTokenMsg(EZTR_MsgBuffer* buf, u8 type, u8 count, u8 required) {
 
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
-        "You got a %m Skulltula Spirit" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_NEWLINE
+        "You got %m %m Skulltula Spirit" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_NEWLINE
         "This is your " EZTR_CC_COLOR_RED "%m" EZTR_CC_COLOR_DEFAULT " one." EZTR_CC_NEWLINE
         "%m" EZTR_CC_END,
+        type_article,
         type_str,
         count_str,
         flavor_text
