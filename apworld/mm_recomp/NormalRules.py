@@ -17619,7 +17619,6 @@ def get_location_rules(player, options, prices, boss_placements):
                 can_use_lens(state, player) and
                 can_clear_snowhead(state, player, boss_placements) and
                 state.can_reach("Snowhead", 'Region', player)
-
             ),
         # Twin Islands Scarecrows
         "Twin Islands Scarecrow":

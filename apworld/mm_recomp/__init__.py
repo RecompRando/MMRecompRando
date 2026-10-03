@@ -15,6 +15,7 @@ from .NearlyRules import *
 from .Constants import *
 
 import copy
+import logging
 
 class MMRWebWorld(WebWorld):
     # ~ theme = "partyTime"
@@ -262,10 +263,6 @@ class MMRWorld(World):
         if self.options.absurd_souls.value:
             filler_amount -= 1
 
-        filler_amount += 100 #temp
-
-        self.create_and_add_filler_items(filler_amount)
-
         shp = self.options.starting_hearts.value
         if self.options.starting_hearts_are_containers_or_pieces.value == 0:
             for i in range(0, int((12 - shp)/4)):
@@ -275,6 +272,19 @@ class MMRWorld(World):
         else:
             for i in range(0, 12 - shp):
                 mw.itempool.append(self.create_item("Heart Piece"))
+
+        # Filler = open locations minus items already submitted to the pool. Should hopefully stop the
+        # extra junk items in the pool. I have not been able to fully test so leaving the hand count in for now
+        # to help debug if there is a fuckup.
+        open_locations = len(mw.get_unfilled_locations(self.player))
+        submitted = sum(1 for item in mw.itempool if item.player == self.player)
+        needed = open_locations - submitted
+        if needed != filler_amount:
+            logging.debug(f"MM Recomp ({mw.player_name[self.player]}): hand-tallied filler {filler_amount}, actual {needed}")
+        if needed < 0:
+            raise Exception(f"MM Recomp ({mw.player_name[self.player]}): {-needed} more items than locations "
+                            f"({submitted} items, {open_locations} locations). Check item num_exist/can_create vs location options.")
+        self.create_and_add_filler_items(needed)
 
     def create_regions(self) -> None:
         player = self.player
