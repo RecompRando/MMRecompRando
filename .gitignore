@@ -18,3 +18,4 @@ binaries/
 *.pyc
 test_env/
 *.thunderstore.zip
+apworld/mm_recomp.apworld
