@@ -38,6 +38,19 @@ def can_smack_hard(state, player):
 def can_smack(state, player):
     return can_smack_hard(state, player) or state.has("Deku Mask", player)
 
+def can_do_dmg(state, player):
+    return (can_smack(state, player) or
+	   state.has("Deku Stick", player) or
+	   has_explosives(state, player) or
+	   has_hard_projectiles(state, player))
+
+def can_activate_owl(state, player, options):
+    return (state.has("Progressive Sword", player) or 
+            state.has("Fierce Deity's Mask", player) or 
+            state.has("Great Fairy Sword", player) or 
+	    (has_soul_enemy(state, player, options, "Soul of Deku Baba") and
+	     can_do_dmg(state, player)))	   
+
 def can_clear_area(state, player, dungeon):
     if dungeon == DUNGEON_WOODFALL:
         return state.can_reach("Woodfall Temple Odolwa's Remains", "Location", player)
@@ -18461,34 +18474,36 @@ def get_location_rules(player, options, prices, boss_placements):
     # Owls
 
         "Clock Town Owl Statue":
-            lambda state: True,
+            lambda state: can_activate_owl(state, player, options),
         "Milk Road Owl Statue":
-            lambda state: True,
+            lambda state: can_activate_owl(state, player, options),
         "Southern Swamp Owl Statue":
-            lambda state: True,
+            lambda state: can_activate_owl(state, player, options),
         "Woodfall Owl Statue":
-            lambda state: state.can_reach("Woodfall", 'Region', player),
+            lambda state: state.can_reach("Woodfall", 'Region', player) and can_activate_owl(state, player, options),
         "Mountain Village Owl Statue":
-            lambda state: state.can_reach("Mountain Village", 'Region', player),
+            lambda state: state.can_reach("Mountain Village", 'Region', player) and can_activate_owl(state, player, options),
         "Snowhead Owl Statue":
-            lambda state: state.can_reach("Snowhead", 'Region', player),
+            lambda state: state.can_reach("Snowhead", 'Region', player) and can_activate_owl(state, player, options),
         "Great Bay Coast Owl Statue":
-            lambda state: state.can_reach("Great Bay", 'Region', player),
+            lambda state: state.can_reach("Great Bay", 'Region', player) and can_activate_owl(state, player, options),
         "Zora Cape Owl Statue":
-            lambda state: state.can_reach("Zora Hall", 'Region', player),
+            lambda state: state.can_reach("Zora Hall", 'Region', player) and can_activate_owl(state, player, options),
         "Ikana Canyon Owl Statue":
-            lambda state: state.can_reach("Upper Ikana Canyon", 'Region', player),
+            lambda state: state.can_reach("Upper Ikana Canyon", 'Region', player) and can_activate_owl(state, player, options),
         "Stone Tower Owl Statue":
             lambda state: (
                 (
                     state.has("Hookshot", player) and
                     can_play_song("Elegy of Emptiness", state, player) and
                     state.has("Goron Mask", player) and
-                    state.has("Zora Mask", player)
+                    state.has("Zora Mask", player) and
+	            can_activate_owl(state, player, options)
                 ) or
                 (
                     state.has("Stone Tower Owl Statue", player) and
-                    can_play_song("Song of Soaring", state, player)
+                    can_play_song("Song of Soaring", state, player) and
+		    can_activate_owl(state, player, options)
                 )
             ),
 
@@ -20081,8 +20096,10 @@ def get_location_rules(player, options, prices, boss_placements):
             lambda state: (
                 has_soul_absurd(state, player, options, "Deku Flowers") and
                 state.has("Deku Mask", player) and 
-                can_clear_woodfall(state, player, boss_placements)
+                can_clear_woodfall(state, player, boss_placements) and
+		state.has("Land Title Deed", player)
             ), 
+
             #Snowhead Flowers
         "Goron Village Business Scrub Flower":
             lambda state: (

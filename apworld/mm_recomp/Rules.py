@@ -70,6 +70,12 @@ def can_smack_hard(state, player):
 def can_smack(state, player):
     return can_smack_hard(state, player) or state.has("Deku Mask", player)
 
+def can_do_dmg(state, player):
+    return (can_smack(state, player) or state.has("Deku Stick", player) or has_explosives(state, player) or has_hard_projectiles(state, player))
+
+def can_activate_owl(state, player, options):
+    return (state.has("Progressive Sword", player) or state.has("Fierce Deity's Mask", player) or state.has("Great Fairy Sword", player) or (has_soul_enemy(state, player, options, "Soul of Deku Baba") and can_do_dmg(state, player)))
+
 def can_clear_woodfall(state, player):
     return state.can_reach("Woodfall Temple Odolwa's Remains", 'Location', player)
     
