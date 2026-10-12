@@ -1,7 +1,7 @@
 #include "modding.h"
 #include "global.h"
 
-bool skipDigging = false;
+#include "apcommon.h"
 
 #define BIG_POE_SET_SWITCH_FLAG(type) ((1 << 0x8) | type)
 
@@ -82,8 +82,8 @@ RECOMP_PATCH void EnBigpo_SelectRandomFireLocations(EnBigpo* this, PlayState* pl
         }
     }
 
-    // massive speedup, could become an option
-    if (skipDigging) {
+    // To skip the digging with Dampe part, spawning the big poe instantly.
+    if (rando_get_slotdata_u32("skip_digging")) {
         fireCount = 0;
         // need dampe to be under his bed somewhere here (currently completely removes him)
         Actor* npcPtr;

@@ -8,7 +8,7 @@ RECOMP_IMPORT("*", int recomp_printf(const char* fmt, ...));
 #define ENSI_GET_CHEST_FLAG(thisx) (((thisx)->params & 0xFC) >> 2)
 
 #define LOCATION_SKULL_TOKEN (0x060000 | (play->sceneId << 8) | ENSI_GET_CHEST_FLAG(&this->actor))
-#define GET_GI_TOKEN ((rando_skulltulas_enabled()) ? rando_get_item_id(LOCATION_SKULL_TOKEN) : GI_SKULL_TOKEN)
+#define GET_GI_TOKEN ((rando_get_slotdata_u32("skullsanity") != 2) ? rando_get_item_id(LOCATION_SKULL_TOKEN) : GI_SKULL_TOKEN)
 
 #define SPIDER_HOUSE_TOKENS_REQUIRED 30
 
@@ -117,7 +117,7 @@ void EnSi_TokenCollected(EnSi* this, PlayState* play) {
 RECOMP_PATCH void EnSi_GiveToken(EnSi* this, PlayState* play) {
     Player* player = GET_PLAYER(play);
     s32 chestFlag = ENSI_GET_CHEST_FLAG(&this->actor);
-    u8 swamp_token_count = (rando_skulltulas_enabled() ? rando_has_item(GI_TRUE_SKULL_TOKEN) : Inventory_GetSkullTokenCount(0x27));
+    u8 swamp_token_count = (rando_get_slotdata_u32("skullsanity") != 2 ? rando_has_item(GI_TRUE_SKULL_TOKEN) : Inventory_GetSkullTokenCount(0x27));
 
     if ((chestFlag < 0x20) && (chestFlag >= 0)) {
         Flags_SetTreasure(play, chestFlag);
@@ -126,7 +126,7 @@ RECOMP_PATCH void EnSi_GiveToken(EnSi* this, PlayState* play) {
     tokenPickedUp[chestFlag] = true;
 
     recomp_printf("token location: 0x%06X\n", LOCATION_SKULL_TOKEN);
-    if (rando_skulltulas_enabled()) {
+    if (rando_get_slotdata_u32("skullsanity") != 2) {
         rando_send_location(LOCATION_SKULL_TOKEN);
         Message_StartTextbox(play, getTextId(tokenPrevGI[chestFlag]), NULL);
         Audio_PlayFanfare(NA_BGM_GET_SMALL_ITEM);
@@ -193,7 +193,7 @@ RECOMP_PATCH void EnSi_Init(Actor* thisx, PlayState* play) {
     EnSi* this = THIS;
     s32 chestFlag = ENSI_GET_CHEST_FLAG(&this->actor);
 
-    if (rando_skulltulas_enabled() && rando_location_is_checked(LOCATION_SKULL_TOKEN)) {
+    if (rando_get_slotdata_u32("skullsanity") != 2 && rando_location_is_checked(LOCATION_SKULL_TOKEN)) {
         Actor_Kill(thisx);
         return;
     }

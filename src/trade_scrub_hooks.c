@@ -105,7 +105,7 @@ void EnAkindonuts_OfferRandoShopItem(EnAkindonuts* this, PlayState* play) {
 
 RECOMP_PATCH void func_80BEF360(EnAkindonuts* this, PlayState* play) {
     if (this->unk_32C & 0x40) {
-        if (!rando_scrubs_enabled() || rando_location_is_checked(LOCATION_SCRUB_SHOP)) {
+        if (!rando_get_slotdata_u32("scrubsanity") || rando_location_is_checked(LOCATION_SCRUB_SHOP)) {
             this->actionFunc = EnAkindonuts_OfferNormalShopItem;
         } else {
             this->actionFunc = EnAkindonuts_OfferRandoShopItem;
@@ -124,7 +124,7 @@ RECOMP_PATCH void func_80BEF360(EnAkindonuts* this, PlayState* play) {
 }
 
 RECOMP_PATCH s32 func_80BED208(EnAkindonuts* this) {
-    if (!rando_scrubs_enabled()) {
+    if (!rando_get_slotdata_u32("scrubsanity")) {
         if ((u32)INV_CONTENT(ITEM_MAGIC_BEANS) != ITEM_MAGIC_BEANS) {
             return 0;
         }
@@ -144,7 +144,7 @@ RECOMP_PATCH s32 func_80BED208(EnAkindonuts* this) {
 }
 
 RECOMP_PATCH s32 func_80BED27C(EnAkindonuts* this) {
-    if (!rando_scrubs_enabled()) {
+    if (!rando_get_slotdata_u32("scrubsanity")) {
         if (GET_CUR_UPG_VALUE(UPG_BOMB_BAG) == 3) {
             return 2;
         }
@@ -164,7 +164,7 @@ RECOMP_PATCH s32 func_80BED27C(EnAkindonuts* this) {
 }
 
 RECOMP_PATCH s32 func_80BED2FC(EnAkindonuts* this) {
-    if (!Inventory_HasEmptyBottle() && !rando_scrubs_enabled()) {
+    if (!Inventory_HasEmptyBottle() && !rando_get_slotdata_u32("scrubsanity")) {
         return 2;
     }
 
@@ -178,7 +178,7 @@ RECOMP_PATCH s32 func_80BED2FC(EnAkindonuts* this) {
 }
 
 RECOMP_PATCH s32 func_80BED35C(EnAkindonuts* this) {
-    if (!Inventory_HasEmptyBottle() && !rando_scrubs_enabled()) {
+    if (!Inventory_HasEmptyBottle() && !rando_get_slotdata_u32("scrubsanity")) {
         return 2;
     }
 

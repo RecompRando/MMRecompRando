@@ -77,10 +77,10 @@ RECOMP_PATCH void EnLiftNuts_GiveReward(EnLiftNuts* this, PlayState* play) {
         }
         EnLiftNuts_SetupResumeConversation(this);
     //} else if ((this->textId == 0x27F4) && !CHECK_WEEKEVENTREG(WEEKEVENTREG_RECEIVED_DEKU_PLAYGROUND_HEART_PIECE)) {
-    } else if ((this->textId == 0x27F4) && !rando_location_is_checked(LOCATION_PLAYGROUND_ALL_DAYS)) {
+    } if ((this->textId == 0x27F4) && !rando_location_is_checked(LOCATION_PLAYGROUND_ALL_DAYS) && (s16) rando_get_slotdata_u32("shuffle_minigames") == 0) {
         Actor_OfferGetItem(&this->actor, play, GI_HEART_PIECE, 500.0f, 100.0f);
     //} else {
-    } else if (!rando_location_is_checked(LOCATION_PLAYGROUND_ANY_DAY)) {
+    } else if (!rando_location_is_checked(LOCATION_PLAYGROUND_ANY_DAY) && (s16) rando_get_slotdata_u32("shuffle_minigames") != 0) {
         Actor_OfferGetItem(&this->actor, play, GI_RUPEE_PURPLE, 500.0f, 100.0f);
     } else {
         Actor_OfferGetItemHook(&this->actor, play, GI_RUPEE_PURPLE, 0, 500.0f, 100.0f, false, false);

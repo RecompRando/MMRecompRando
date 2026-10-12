@@ -61,7 +61,7 @@ void EnGirlA_WaitForObject(EnGirlA* this, PlayState* play) {
 RECOMP_PATCH void EnGirlA_Update(Actor* thisx, PlayState* play) {
     EnGirlA* this = THIS;
 
-    if (!shopObjectLoaded[this->actor.params] && rando_shopsanity_enabled() && !rando_location_is_checked(LOCATION_SHOP_ITEM)) {
+    if (!shopObjectLoaded[this->actor.params] && rando_get_slotdata_u32("shopsanity") && !rando_location_is_checked(LOCATION_SHOP_ITEM)) {
         EnGirlA_WaitForObject(this, play);
     }
 
@@ -76,7 +76,7 @@ RECOMP_PATCH void EnGirlA_Draw(Actor* thisx, PlayState* play) {
         this->drawFunc(&this->actor, play, 0);
     }
 
-    if (rando_shopsanity_enabled() && !rando_location_is_checked(LOCATION_SHOP_ITEM)) {
+    if (rando_get_slotdata_u32("shopsanity") && !rando_location_is_checked(LOCATION_SHOP_ITEM)) {
         s16 getItemId = rando_get_item_id(LOCATION_SHOP_ITEM);
         if (shopObjectLoaded[this->actor.params]) {
             // fix rotation of some items
@@ -168,7 +168,7 @@ void EnGirlA_RandoBuyFanfare(PlayState* play, EnGirlA* this) {
 }
 
 RECOMP_PATCH void EnGirlA_InitItem(PlayState* play, EnGirlA* this) {
-    if (!rando_shopsanity_enabled() || rando_location_is_checked(LOCATION_SHOP_ITEM)) {
+    if (!rando_get_slotdata_u32("shopsanity") || rando_location_is_checked(LOCATION_SHOP_ITEM)) {
         ShopItemEntry* shopItem = &sShopItemEntries[this->actor.params];
 
         this->actor.textId = shopItem->descriptionTextId;
@@ -190,7 +190,7 @@ RECOMP_PATCH void EnGirlA_InitItem(PlayState* play, EnGirlA* this) {
 
 RECOMP_PATCH void EnGirlA_InitalUpdate(EnGirlA* this, PlayState* play) {
     s16 params = this->actor.params;
-    if (rando_shopsanity_enabled() && !rando_location_is_checked(LOCATION_SHOP_ITEM)
+    if (rando_get_slotdata_u32("shopsanity") && !rando_location_is_checked(LOCATION_SHOP_ITEM)
         && !(this->actor.params == SI_BOTTLE ||
             this->actor.params == SI_SWORD_GREAT_FAIRY ||
             this->actor.params == SI_SWORD_KOKIRI ||
