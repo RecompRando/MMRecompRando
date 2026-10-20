@@ -91,7 +91,7 @@ def add_archive_download_and_extract(name: str, url: str, extract_dir: Path) -> 
 if platform.system() == "Windows":
     add_archive_download_and_extract(
         "llvmmips",
-        "https://github.com/LT-Schmiddy/n64recomp-clang/releases/download/release-21.1.8/Windows-AMD64-ClangEssentialsAndN64Recomp-ClangVersion21.1.8-MipsOnly.zip",
+        "https://github.com/LT-Schmiddy/n64recomp-clang/releases/download/release-22.1.8/Windows-AMD64-ClangEssentialsAndN64Recomp-ClangVersion22.1.8-MipsOnly.zip",
         binaries_dir.joinpath("llvmmips_win")
     )
     llvmmips_bin_path = binaries_dir.joinpath("llvmmips_win/nrs_bin")
@@ -100,7 +100,7 @@ if platform.system() == "Windows":
 elif platform.system() == "Darwin":
     add_archive_download_and_extract(
         "llvmmips",
-        "https://github.com/LT-Schmiddy/n64recomp-clang/releases/download/release-21.1.8/Darwin-arm64-ClangEssentialsAndN64Recomp-ClangVersion21.1.8-MipsOnly.tar.xz",
+        "https://github.com/LT-Schmiddy/n64recomp-clang/releases/download/release-22.1.8/Darwin-arm64-ClangEssentialsAndN64Recomp-ClangVersion22.1.8-MipsOnly.tar.xz",
         binaries_dir.joinpath("llvmmips_macos")
     )
     llvmmips_bin_path = binaries_dir.joinpath("llvmmips_macos/nrs_bin")
@@ -109,7 +109,7 @@ elif platform.system() == "Darwin":
 else:
     add_archive_download_and_extract(
         "llvmmips",
-        "https://github.com/LT-Schmiddy/n64recomp-clang/releases/download/release-21.1.8/Linux-x86_64-ClangEssentialsAndN64Recomp-ClangVersion21.1.8-MipsOnly.tar.xz",
+        "https://github.com/LT-Schmiddy/n64recomp-clang/releases/download/release-22.1.8/Linux-x86_64-ClangEssentialsAndN64Recomp-ClangVersion22.1.8-MipsOnly.tar.xz",
         binaries_dir.joinpath("llvmmips_linux")
     )
     
@@ -159,7 +159,7 @@ def populate_file_injection(injections: dict[Path, Path], inject_root: Path, sea
 # include_python_files[Path("README.md")] = root_dir.joinpath("README.md")
 
 # Including entire directories:
-# populate_file_injection(include_python_files, Path("offline_build"), root_dir.joinpath("offline_build"))
+# populate_file_injection(include_python_files, Path(""), root_dir.joinpath("src/python"))
 
 # Declaring the mod toml files to build. 
 # Note that the mod toml job doesn't automatically find the RecompModTool. We'll need to pass that in ourselves.
