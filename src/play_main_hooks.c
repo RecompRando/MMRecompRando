@@ -362,35 +362,6 @@ bool rando_get_camc_enabled() {
     return recomp_get_config_u32("camc_enabled");
 }
 
-RECOMP_HOOK("Sram_StartWriteToFlashDefault")
-void rando_save_state_normally() {
-    if (gSaveContext.fileNum == 0xFF) return; // ignore "slot" 0xFF (file deletion?)
-    recomp_printf("saving rando state from normal saves | slot %d\n", gSaveContext.fileNum);
-    rando_save_current_state(gSaveContext.fileNum);
-    rando_save_current_state(gSaveContext.fileNum + 2); // override owl saves
-}
-
-RECOMP_HOOK("Sram_StartWriteToFlashOwlSave")
-void rando_save_state_from_owl() {
-    recomp_printf("saving rando state from owls | slot %d\n", gSaveContext.fileNum + 2);
-    rando_save_current_state(gSaveContext.fileNum + 2);
-}
-
-RECOMP_CALLBACK("*", recomp_on_autosave)
-void rando_handle_autosaves(PlayState* play) {
-    recomp_printf("saving rando state from autosave | slot %d\n", gSaveContext.fileNum + 2);
-    rando_save_current_state(gSaveContext.fileNum + 2);
-}
-
-// u8 justLoadedOwlSave;
-
-// RECOMP_HOOK("Sram_OpenSave")
-RECOMP_CALLBACK("*", recomp_on_load_save) // functionally equivalent
-void rando_load_save() {
-    recomp_printf("loaded save\n");
-    // justLoadedOwlSave = gSaveContext.save.isOwlSave; // will be 1 for owl, and 2 for autosave
-}
-
 ItemId randoConvertItemId(u32 ap_item_id) {
     ap_item_id &= 0xFFFFFF;
 

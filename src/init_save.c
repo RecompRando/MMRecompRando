@@ -18,6 +18,33 @@ void rando_on_load_save(FileSelectState* fileSelect, SramContext* sramCtx) {
     rando_load_current_state(save_slot);
 }
 
+RECOMP_HOOK("Sram_StartWriteToFlashDefault")
+void rando_save_state_normally() {
+    if (gSaveContext.fileNum == 0xFF) return; // ignore "slot" 0xFF (file deletion?)
+    recomp_printf("saving rando state from normal saves | slot %d\n", gSaveContext.fileNum);
+    rando_save_current_state(gSaveContext.fileNum);
+    rando_save_current_state(gSaveContext.fileNum + 2); // override owl saves
+}
+
+RECOMP_HOOK("Sram_StartWriteToFlashOwlSave")
+void rando_save_state_from_owl() {
+    recomp_printf("saving rando state from owls | slot %d\n", gSaveContext.fileNum + 2);
+    rando_save_current_state(gSaveContext.fileNum + 2);
+}
+
+RECOMP_CALLBACK("*", recomp_on_autosave)
+void rando_handle_autosaves(PlayState* play) {
+    recomp_printf("saving rando state from autosave | slot %d\n", gSaveContext.fileNum + 2);
+    rando_save_current_state(gSaveContext.fileNum + 2);
+}
+
+RECOMP_HOOK("Sram_CopySave")
+void rando_copy_save(FileSelectState* fileSelect, SramContext* sramCtx) {
+    recomp_printf("copying rando state from slot %d to slot %d\n", fileSelect->selectedFileIndex, fileSelect->copyDestFileIndex);
+    rando_copy_save_state(fileSelect->selectedFileIndex, fileSelect->copyDestFileIndex);
+    rando_copy_save_state(fileSelect->selectedFileIndex + 2, fileSelect->copyDestFileIndex + 2); // copy owl saves
+}
+
 extern SavePlayerData sSaveDefaultPlayerData;
 extern ItemEquips sSaveDefaultItemEquips;
 extern Inventory sSaveDefaultInventory;
