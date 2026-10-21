@@ -52,7 +52,6 @@ dependencies = [
 optional_dependencies = [
     "mm_recomp_better_double_sot:1.0.1",
     "mm_recomp_colors:0.5.0",
-    "ProxyMM_ActorListIndex:0.0.3",
 ]
 
 # Native libraries (e.g. DLLs) and the functions they export.
@@ -109,7 +108,7 @@ description = """- Multiworlds Only -
 Sets if you die when other players who also have "DeathLink" enabled die - the reverse is true as well."""
 type = "Enum"
 options = [ "Disabled", "Enabled" ]
-default = "Enabled"
+default = "Disabled"
 
 [[manifest.config_options]]
 id = "camc_enabled"

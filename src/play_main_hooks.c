@@ -476,9 +476,6 @@ RECOMP_EXPORT u32 rando_get_item_id(u32 location)
             
             else if (gi == GI_WALLET_ADULT)
             {
-                if (rando_get_slotdata_u32("child_wallet")) {
-                    return MIN(GI_WALLET_ADULT + rando_has_item(GI_WALLET_ADULT) - 1, GI_WALLET_GIANT);
-                }
                 return MIN(GI_WALLET_ADULT + rando_has_item(GI_WALLET_ADULT), GI_WALLET_GIANT);
             }
             

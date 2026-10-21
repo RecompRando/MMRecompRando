@@ -108,8 +108,8 @@ void Sram_SetInitialWeekEvents(void) {
 
     // skip having to rewatch the full great bay turtle cutscene
     SET_WEEKEVENTREG(WEEKEVENTREG_93_08);
-    // keep the turtle raised if cutscene was watched, unless treesanity is enabled to reach the trees
-    if(spawnedTurtle && !rando_get_slotdata_u32("treesanity")) {
+    // keep the turtle raised if cutscene was watched
+    if(spawnedTurtle) {
         SET_WEEKEVENTREG(WEEKEVENTREG_53_20);
     }
 

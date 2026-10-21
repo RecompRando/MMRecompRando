@@ -1,5 +1,7 @@
 #include "modding.h"
 #include "apcommon.h"
+#include "recomputils.h"
+#include "recompconfig.h"
 
 #include "aplogo_filler.h"
 #include "aplogo_prog.h"
@@ -37,13 +39,16 @@ void GetItem_DrawRemains(PlayState* play, s16 drawId);
 
 void GetItem_DrawRecompImport(PlayState* play, s16 drawId);
 void GetItem_DrawBombchuBagDL(PlayState* play, void* dl0, void* dl1, void* dl2);
-void GetItem_DrawSkullTokenDL(PlayState* play, void* dl0, void* dl1);
+void GetItem_DrawSkullTokenGeneric(PlayState* play, TokenType type);
 void GetItem_DrawRupeeDL(PlayState* play, void* dl0, void* dl1, void* dl2, void* dl3);
 void GetItem_DrawDungeonOpa0(PlayState* play, void* dl0, s16 drawId);
 void GetItem_DrawBossKeyRecolor(PlayState* play, void* dl0, void* dl1, s16 drawId);
 void GetItem_DrawCompassRecolor(PlayState* play, void* dl0, void* dl1, s16 drawId);
+void GetItem_DrawOpa0DL(PlayState* play, void* dl0);
 void GetItem_DrawXlu01DL(PlayState* play, void* dl0, void* dl1);
 void GetItem_DrawAPFiller(PlayState* play, s16 drawId);
+void GetItem_DrawOpa0WithFlame(PlayState* play, void* dl0);
+void GetItem_DrawOpa01WithFlame(PlayState* play, void* dl0, void* dl1);
 void GetItem_DrawStrayFairy(PlayState* play, s16 drawId);
 
 extern Gfx gGiEmptyBottleCorkDL[];
@@ -755,11 +760,25 @@ bool loadObject(PlayState* play, void** objectSegment, OSMesgQueue* objectLoadQu
     return false;
 }
 
+// @rando add export for other mods to create their own draws for items
+typedef void (*randoDrawFunc)(PlayState*, s16);
+randoDrawFunc customRandoItemDraws[GID_EXTENDED_MAX];
+
+RECOMP_EXPORT void rando_add_custom_draw(s16 drawId, randoDrawFunc customItemDrawFunc) {
+    customRandoItemDraws[drawId] = customItemDrawFunc;
+}
+
 /**
  * Draw "Get Item" Model
  * Calls the corresponding draw function for the given draw ID
  */
 RECOMP_PATCH void GetItem_Draw(PlayState* play, s16 drawId) {
+    // @rando override for external custom draw
+    if (customRandoItemDraws[drawId] != NULL) {
+        customRandoItemDraws[drawId](play, drawId);
+        return;
+    }
+
     switch (drawId) {
         case GID_SONG_SOARING:
             GetItem_DrawXlu01DL(play, gGiSoaringColorDL, gGiSongNoteDL);
@@ -774,10 +793,10 @@ RECOMP_PATCH void GetItem_Draw(PlayState* play, s16 drawId) {
             GetItem_DrawXlu01DL(play, gGiDDHeartBorderDL, gGiDDHeartContainerDL);
             return;
         case GID_SWAMP_SKULL_TOKEN:
-            GetItem_DrawSkullTokenDL(play, gGiSkulltulaTokenDL, gGiSkulltulaTokenSwampFlameDL);
+            GetItem_DrawSkullTokenGeneric(play, TOKEN_SWAMP);
             return;
         case GID_OCEAN_SKULL_TOKEN:
-            GetItem_DrawSkullTokenDL(play, gGiSkulltulaTokenDL, gGiSkulltulaTokenOceanFlameDL);
+            GetItem_DrawSkullTokenGeneric(play, TOKEN_OCEAN);
             return;
         case GID_KEY_BOSS_WOODFALL:
         case GID_KEY_BOSS_SNOWHEAD:
@@ -808,6 +827,20 @@ RECOMP_PATCH void GetItem_Draw(PlayState* play, s16 drawId) {
         case GID_RUPOOR:
             GetItem_DrawRupeeDL(play, gGiRupeeInnerDL, gGiRupoorInnerColorDL, gGiRupeeOuterDL, gGiRupoorOuterColorDL);
             return;
+        case GID_SPIN_ATTACK:
+            GetItem_DrawOpa01WithFlame(play, gGiKokiriSwordBladeHiltDL, gGiKokiriSwordGuardDL);
+            return;
+        case GID_MAGIC_UPGRADE:
+            GetItem_DrawOpa0WithFlame(play, gGiMagicJarLargeDL);
+            return;
+        case GID_FROG_YELLOW:
+        case GID_FROG_CYAN:
+        case GID_FROG_PINK:
+        case GID_FROG_BLUE:
+        case GID_FROG_WHITE:
+            // GetItem_DrawFrog(play, drawId);
+            // GetItem_DrawOpa0DL(play, frog);
+            return;
         case GID_SF_CLOCKTOWN:
         case GID_SF_WOODFALL:
         case GID_SF_SNOWHEAD:
@@ -825,89 +858,9 @@ void GetItem_DrawDynamic(PlayState* play, void* objectSegment, s16 drawId) {
     u32 prevSegment = gSegments[6];
     gSegments[6] = OS_K0_TO_PHYSICAL(objectSegment);
 
-    if (drawId >= GID_SONG_SOARING) {
-        switch(drawId) {
-            case GID_SONG_SOARING:
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_SONG_STORMS:
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_DEFENSE_DOUBLE:
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_SWAMP_SKULL_TOKEN:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_OCEAN_SKULL_TOKEN:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_KEY_BOSS_WOODFALL:
-            case GID_KEY_BOSS_SNOWHEAD:
-            case GID_KEY_BOSS_GREATBAY:
-            case GID_KEY_BOSS_STONETOWER:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_KEY_SMALL_WOODFALL:
-            case GID_KEY_SMALL_SNOWHEAD:
-            case GID_KEY_SMALL_GREATBAY:
-            case GID_KEY_SMALL_STONETOWER:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                break;
-            case GID_MAP_WOODFALL:
-            case GID_MAP_SNOWHEAD:
-            case GID_MAP_GREATBAY:
-            case GID_MAP_STONETOWER:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                break;
-            case GID_COMPASS_WOODFALL:
-            case GID_COMPASS_SNOWHEAD:
-            case GID_COMPASS_GREATBAY:
-            case GID_COMPASS_STONETOWER:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_RUPOOR:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case GID_SF_CLOCKTOWN:
-            case GID_SF_WOODFALL:
-            case GID_SF_SNOWHEAD:
-            case GID_SF_GREATBAY:
-            case GID_SF_STONETOWER:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-        }
-    } else {
-        switch (sGetObjectType[drawId]) {
-            case OPA0:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                break;
-            case XLU0:
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case OPA01:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                break;
-            case XLU01:
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-            case OPA0XLU1:
-                gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
-                gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
-                break;
-        }
-    }
+    // there doesn't seem to be a problem letting everything opa and xlu
+    gSPSegment(POLY_OPA_DISP++, 0x06, objectSegment);
+    gSPSegment(POLY_XLU_DISP++, 0x06, objectSegment);
 
     GetItem_Draw(play, drawId);
 
@@ -1056,9 +1009,68 @@ void GetItem_DrawBombchuBagDL(PlayState* play, void* dl0, void* dl1, void* dl2) 
     CLOSE_DISPS();
 }
 
-void GetItem_DrawSkullTokenDL(PlayState* play, void* dl0, void* dl1) {
-    s32 pad;
+void GetItem_DrawFire(PlayState* play, Color_RGB8 color) {
+    OPEN_DISPS(play->state.gfxCtx);
 
+    Gfx_SetupDL25_Xlu(play->state.gfxCtx);
+
+    gSPSegment(POLY_XLU_DISP++, 0x08,
+               Gfx_TwoTexScroll(play->state.gfxCtx, G_TX_RENDERTILE, play->state.frames * 0, -(play->state.frames * 5),
+                                32, 32, 1, play->state.frames * 0, play->state.frames * 0, 32, 64));
+
+    gDPSetPrimColor(POLY_XLU_DISP++, 0x80, 0x80, color.r, color.g, color.b, 255);
+    gDPSetEnvColor(POLY_XLU_DISP++, color.r, color.g, color.b, 0);
+
+    Matrix_Push();
+    Matrix_ReplaceRotation(&play->billboardMtxF);
+    gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+    
+    gSPDisplayList(POLY_XLU_DISP++, gGiFlameDL);
+
+    Matrix_Pop();
+
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
+void GetItem_DrawSkullTokenGeneric(PlayState* play, TokenType type) {
+    Color_RGB8 flameColor;
+    
+    OPEN_DISPS(play->state.gfxCtx);
+
+    Gfx_SetupDL25_Opa(play->state.gfxCtx);
+
+    if (type == TOKEN_SWAMP || type == TOKEN_OCEAN) {
+        gDPSetPrimColor(POLY_OPA_DISP++, 0x80, 0x80, 255, 255, 170, 255);
+        gDPSetEnvColor(POLY_OPA_DISP++, 150, 120, 0, 0);
+    } else {
+        gDPSetPrimColor(POLY_OPA_DISP++, 0x80, 0x80, 255, 255, 255, 255);
+        gDPSetEnvColor(POLY_OPA_DISP++, 0xAA, 0xAA, 0xAA, 0xFF);
+        // gDPSetPrimColor(POLY_OPA_DISP++, 0x80, 0x80, rainbowColor.r, rainbowColor.g, rainbowColor.b, 255);
+        // gDPSetEnvColor(POLY_OPA_DISP++, rainbowColor.r, rainbowColor.g, rainbowColor.b, 0);
+    }
+
+    switch (type) {
+        case TOKEN_SWAMP:
+            flameColor = gGiSwampFlameColor;
+            break;
+        case TOKEN_OCEAN:
+            flameColor = gGiOceanFlameColor;
+            break;
+        default:
+            flameColor = gGiDefaultFlameColor;
+            // flameColor = rainbowColor;
+            break;
+    }
+
+    gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+    gSPDisplayList(POLY_OPA_DISP++, gGiSkulltulaTokenFullDL);
+
+    CLOSE_DISPS(play->state.gfxCtx);
+
+    GetItem_DrawFire(play, flameColor);
+}
+
+void GetItem_DrawOpa0WithFlame(PlayState* play, void* dl0) {    
     OPEN_DISPS(play->state.gfxCtx);
 
     Gfx_SetupDL25_Opa(play->state.gfxCtx);
@@ -1066,15 +1078,23 @@ void GetItem_DrawSkullTokenDL(PlayState* play, void* dl0, void* dl1) {
     gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
     gSPDisplayList(POLY_OPA_DISP++, dl0);
 
-    Gfx_SetupDL25_Xlu(play->state.gfxCtx);
+    CLOSE_DISPS(play->state.gfxCtx);
 
-    gSPSegment(POLY_XLU_DISP++, 0x08,
-               Gfx_TwoTexScroll(play->state.gfxCtx, G_TX_RENDERTILE, play->state.frames * 0, -(play->state.frames * 5),
-                                32, 32, 1, play->state.frames * 0, play->state.frames * 0, 32, 64));
-    gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
-    gSPDisplayList(POLY_XLU_DISP++, dl1);
+    GetItem_DrawFire(play, gGiDefaultFlameColor);
+}
+
+void GetItem_DrawOpa01WithFlame(PlayState* play, void* dl0, void* dl1) {    
+    OPEN_DISPS(play->state.gfxCtx);
+
+    Gfx_SetupDL25_Opa(play->state.gfxCtx);
+
+    gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+    gSPDisplayList(POLY_OPA_DISP++, dl0);
+    gSPDisplayList(POLY_OPA_DISP++, dl1);
 
     CLOSE_DISPS(play->state.gfxCtx);
+
+    GetItem_DrawFire(play, gGiDefaultFlameColor);
 }
 
 void GetItem_DrawRupeeDL(PlayState* play, void* dl0, void* dl1, void* dl2, void* dl3) {
@@ -1162,6 +1182,17 @@ void GetItem_DrawCompassRecolor(PlayState* play, void* dl0, void* dl1, s16 drawI
 
     gSPMatrix(POLY_XLU_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
     gSPDisplayList(POLY_XLU_DISP++, dl1);
+
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
+void GetItem_DrawOpa0DL(PlayState* play, void* dl0) {
+    OPEN_DISPS(play->state.gfxCtx);
+
+    Gfx_SetupDL25_Opa(play->state.gfxCtx);
+
+    gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx), G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW);
+    gSPDisplayList(POLY_OPA_DISP++, dl0);
 
     CLOSE_DISPS(play->state.gfxCtx);
 }
