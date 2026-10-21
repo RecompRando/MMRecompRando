@@ -134,6 +134,23 @@ def can_reach_seahorse(state, player):
             state.has("Pictograph Box", player) and 
             (state.has("Hookshot", player) or state.has("Goron Mask", player)))
 
+def can_get_frog_choir_hp(state, player, options):
+    if not state.has("Don Gero's Mask", player):
+        return False
+    if not can_clear_snowhead(state, player):
+        return False
+    
+    if options.frogsanity.value:
+        frogs = ["Yellow Frog", "White Frog", "Cyan Frog", "Blue Frog", "Pink Frog"]
+        return all(state.has(frog, player) for frog in frogs)
+    else:
+        return (
+            state.can_reach("Woodfall Temple Gekko Chest", "Location", player) and
+            state.can_reach("Great Bay Temple", "Region", player) and
+            can_use_ice_arrows(state, player) and
+            can_use_fire_arrows(state, player)
+        )
+
 def can_afford_price(state, player, price):
     if price > 200:
         return state.has("Progressive Wallet", player, 2)
@@ -1081,14 +1098,7 @@ def get_location_rules(player, options, prices):
         "Mountain Village Spring Ramp Grotto":
             lambda state: can_clear_snowhead(state, player),
         "Mountain Village Spring Frog Choir HP":
-            lambda state: (
-                state.has("Don Gero Mask", player) and 
-                can_clear_snowhead(state, player) and 
-                state.can_reach("Woodfall Temple Gekko Chest", 'Location', player) and 
-                state.can_reach("Great Bay Temple", 'Region', player) and 
-                can_use_ice_arrows(state, player) and 
-                can_use_fire_arrows(state, player)
-            ),
+            lambda state: can_get_frog_choir_hp(state, player, options),
         "Mountain Village Smithy Upgrade":
             lambda state: (
                 can_afford_price(state, player, 100) and 
@@ -2427,7 +2437,7 @@ def get_location_rules(player, options, prices):
                 state.has("Couple's Mask", player) and 
                 state.has("Great Fairy Mask", player) and 
                 state.has("Gibdo Mask", player) and 
-                state.has("Don Gero Mask", player) and 
+                state.has("Don Gero's Mask", player) and 
                 state.has("Kamaro Mask", player) and 
                 state.has("Mask of Truth", player) and 
                 state.has("Stone Mask", player) and 
@@ -2436,6 +2446,28 @@ def get_location_rules(player, options, prices):
                 state.has("Mask of Scents", player) and 
                 state.has("Kafei's Mask", player)
             ),
+
+        # Frogs
+
+        "Laundry Pool Frog":
+            lambda state: state.has("Don Gero's Mask", player),
+        "Southern Swamp Frog":
+            lambda state: state.has("Don Gero's Mask", player),
+        "Woodfall Temple Miniboss Frog":
+            lambda state: (
+                state.has("Deku Mask", player) and
+                state.has("Progressive Bow", player) and 
+                can_smack(state, player) and
+                state.has("Don Gero's Mask", player)
+            ),
+        "Great Bay Temple Miniboss Frog":
+            lambda state: (
+                state.has("Zora Mask", player) and 
+                can_use_ice_arrows(state, player) and 
+                can_use_fire_arrows(state, player) and
+                state.has("Don Gero's Mask", player)
+            ),
+
         "Defeat Majora":
             lambda state: (
                 can_smack_hard(state, player) and 

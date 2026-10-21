@@ -12,6 +12,7 @@
 #include "skull_token.h"
 #include "dungeon_items.h"
 #include "rupoor.h"
+#include "frog.h"
 
 void GetItem_DrawBombchu(PlayState* play, s16 drawId);
 void GetItem_DrawPoes(PlayState* play, s16 drawId);
@@ -833,13 +834,9 @@ RECOMP_PATCH void GetItem_Draw(PlayState* play, s16 drawId) {
         case GID_MAGIC_UPGRADE:
             GetItem_DrawOpa0WithFlame(play, gGiMagicJarLargeDL);
             return;
-        case GID_FROG_YELLOW:
-        case GID_FROG_CYAN:
-        case GID_FROG_PINK:
-        case GID_FROG_BLUE:
-        case GID_FROG_WHITE:
+        case GID_FROG:
             // GetItem_DrawFrog(play, drawId);
-            // GetItem_DrawOpa0DL(play, frog);
+            GetItem_DrawOpa0DL(play, frog);
             return;
         case GID_SF_CLOCKTOWN:
         case GID_SF_WOODFALL:

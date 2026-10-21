@@ -134,9 +134,6 @@ class Shopsanity(Choice):
     option_advanced = 2
     default = 0
 
-class Scrubsanity(Toggle):
-    """Choose whether to shuffle Business Scrub purchases."""
-    display_name = "Shuffle Business Scrub Purchases"
 
 class ShopPrices(Choice):
     """Choose how expensive shop items are.
@@ -157,9 +154,19 @@ class ShopPrices(Choice):
     default = 0
 
 
+class Scrubsanity(Toggle):
+    """Choose whether to shuffle Business Scrub purchases."""
+    display_name = "Shuffle Business Scrub Purchases"
+
+
 class Cowsanity(Toggle):
     """Choose whether to shuffle Cows."""
     display_name = "Shuffle Cows"
+
+
+class Frogsanity(Toggle):
+    """Choose whether the four frogs are shuffled items."""
+    display_name = "Frogsanity"       
 
 
 class ShuffleGreatFairyRewards(Toggle):
@@ -282,6 +289,7 @@ class MMROptions(PerGameCommonOptions):
     scrubsanity: Scrubsanity
     shop_prices: ShopPrices
     cowsanity: Cowsanity
+    frogsanity: Frogsanity
     shuffle_great_fairy_rewards: ShuffleGreatFairyRewards
     required_stray_fairies: RequiredStrayFairies
     fairysanity: Fairysanity

@@ -64,6 +64,8 @@ typedef enum {
     GI_COMPASS_STONETOWER,
     // upgrades
     GI_MAGIC_UPGRADE,
+    // frogs
+    GI_FROG,
     // end
     GI_EXTENDED_MAX,
 } ExtendedGITable;
@@ -115,11 +117,7 @@ typedef enum {
     GID_OCEAN_SKULL_TOKEN,
     GID_RUPOOR, // unimplemented
     // frogs
-    GID_FROG_YELLOW,
-    GID_FROG_CYAN,
-    GID_FROG_PINK,
-    GID_FROG_BLUE,
-    GID_FROG_WHITE,
+    GID_FROG,
     // end
     GID_EXTENDED_MAX,
 } ExtendedGIDTable;

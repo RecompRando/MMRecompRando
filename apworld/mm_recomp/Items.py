@@ -201,7 +201,7 @@ item_data_table: Dict[str, MMRItemData] = {
         code=0x000087,
         type=ItemClassification.progression
     ),
-    "Don Gero Mask": MMRItemData(
+    "Don Gero's Mask": MMRItemData(
         code=0x000088,
         type=ItemClassification.progression
     ),
@@ -532,6 +532,34 @@ item_data_table: Dict[str, MMRItemData] = {
         type=ItemClassification.useful,
         num_exist=2
     ),
+
+    # Frogs
+    "Yellow Frog": MMRItemData(
+        code=0xFF0000,
+        type=ItemClassification.progression,
+        can_create=lambda options: options.frogsanity.value
+    ),
+    "White Frog": MMRItemData(
+        code=0xFF0004,
+        type=ItemClassification.progression,
+        can_create=lambda options: options.frogsanity.value
+    ),
+    "Cyan Frog": MMRItemData(
+        code=0xFF0003,
+        type=ItemClassification.progression,
+        can_create=lambda options: options.frogsanity.value
+    ),
+    "Blue Frog": MMRItemData(
+        code=0xFF0001,
+        type=ItemClassification.progression,
+        can_create=lambda options: options.frogsanity.value
+    ),
+    "Pink Frog": MMRItemData(
+        code=0xFF0002,
+        type=ItemClassification.progression,
+        can_create=lambda options: options.frogsanity.value
+    ),
+
     "Victory": MMRItemData(
         type=ItemClassification.progression,
         can_create=lambda options: False

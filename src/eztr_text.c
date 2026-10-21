@@ -139,6 +139,7 @@ EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Bombchu_Bag);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Magic);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_SpinAttack);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_DoubleDefense);
+EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Frogs); // Frogs
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Time); // Songs
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Healing);
 EZTR_DEFINE_CUSTOM_MSG_HANDLE(Rando_GI_Epona);
@@ -235,7 +236,7 @@ EZTR_MSG_CALLBACK(randoGIMagic) {
     }
 }
 
-EZTR_MSG_CALLBACK(randoGISouls) {
+EZTR_MSG_CALLBACK(randoGIFrogs) {
     u32 location = rando_get_last_location_sent();
     char* item_name;
 
@@ -244,7 +245,7 @@ EZTR_MSG_CALLBACK(randoGISouls) {
     
     EZTR_MsgSContent_Sprintf(
         buf->data.content,
-        "You found the" EZTR_CC_NEWLINE "%c%s" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
+        " You found the %c%s" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         getAPLocationItemColor(location),
         item_name
     );
@@ -3549,6 +3550,19 @@ EZTR_ON_INIT void init_text() {
         "You are a" EZTR_CC_COLOR_RED "FOOL" EZTR_CC_COLOR_DEFAULT "!" EZTR_CC_END,
         NULL
     );
+
+    EZTR_Basic_AddCustomText(
+        EZTR_HNAME(Rando_GI_Frogs),
+        EZTR_TRANSLUSCENT_BLUE_TEXT_BOX,
+        0,
+        EZTR_ICON_DON_GEROS_MASK,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        EZTR_NO_VALUE,
+        false,
+        "\xBF",
+        randoGIFrogs
+    );
     
     EZTR_Basic_AddCustomText(
         EZTR_HNAME(Rando_Moon_Child_Return),
@@ -3756,6 +3770,7 @@ EZTR_ON_INIT void init_text() {
     sGetItemTable_ap[GI_COMPASS_STONETOWER - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_STCompass));
     sGetItemTable_ap[GI_TRUE_SKULL_TOKEN - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Swamp_Token)); // Skulltula Tokens
     sGetItemTable_ap[GI_OCEAN_SKULL_TOKEN - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Ocean_Token));
+    sGetItemTable_ap[GI_FROG - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Frogs)); // Frogs
     sGetItemTable_ap[GI_SONG_TIME - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Time)); // Songs
     sGetItemTable_ap[GI_SONG_HEALING - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Healing));
     sGetItemTable_ap[GI_SONG_EPONA - 1].textId = EZTR_GET_CUSTOM_MSG_ID(EZTR_HNAME(Rando_GI_Epona));

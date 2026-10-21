@@ -1833,6 +1833,29 @@ location_data_table: Dict[str, MMRLocationData] = {
         region="The Moon",
         address=0x00007B
     ),
+
+    # Frogs
+    "Laundry Pool Frog": MMRLocationData(
+        region="Clock Town",
+        address=0xFF0004,
+        can_create=lambda options: options.frogsanity.value
+    ), 
+    "Southern Swamp Frog": MMRLocationData(
+        region="Southern Swamp",
+        address=0xFF0003,
+        can_create=lambda options: options.frogsanity.value
+    ),
+    "Woodfall Temple Miniboss Frog": MMRLocationData(
+        region="Woodfall Temple",
+        address=0xFF0001,
+        can_create=lambda options: options.frogsanity.value
+    ),    
+    "Great Bay Temple Miniboss Frog": MMRLocationData(
+        region="Great Bay Temple",
+        address=0xFF0002,
+        can_create=lambda options: options.frogsanity.value
+    ),  
+
     "Defeat Majora": MMRLocationData(
         region="The Moon",
         locked_item="Victory"

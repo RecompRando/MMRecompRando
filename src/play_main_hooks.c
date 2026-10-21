@@ -518,6 +518,8 @@ RECOMP_EXPORT u32 rando_get_item_id(u32 location)
                         return (GI_COMPASS_WOODFALL + (((item >> 8) & 0xF) * 4));
                 }
                 return GI_NONE;
+            case 0xFF0000:
+                return GI_FROG;
         }
     }
 
