@@ -2324,7 +2324,7 @@ EZTR_MSG_CALLBACK(randoGossips) {
                 break;
             case 16: // Lottery Shop Sign
                 text = "The sign outside the " EZTR_CC_COLOR_RED "Lottery Shop" EZTR_CC_NEWLINE
-                        EZTR_CC_COLOR_DEFAULT "tells you what the" EZTR_CC_COLOR_RED "prize" EZTR_CC_COLOR_DEFAULT " is!" EZTR_CC_END;
+                        EZTR_CC_COLOR_DEFAULT "tells you what the " EZTR_CC_COLOR_RED "prize" EZTR_CC_COLOR_DEFAULT " is!" EZTR_CC_END;
                 break;
             case 17: // Player reportedly forgot unchecked location
                 REPY_FN_EXEC_CACHE(
@@ -2380,7 +2380,8 @@ EZTR_MSG_CALLBACK(randoGossips) {
                         "Try it now!" EZTR_CC_END;
                 break;
             case 20: // Mega reference without context
-                text = "     " EZTR_CC_BTN_CUP EZTR_CC_NEWLINE
+                text = EZTR_CC_QUICKTEXT_ENABLE
+                        "     " EZTR_CC_BTN_CUP EZTR_CC_NEWLINE
                         "        " EZTR_CC_BTN_CRIGHT EZTR_CC_NEWLINE
                         EZTR_CC_BTN_A " " EZTR_CC_BTN_A EZTR_CC_END;
                 break;
