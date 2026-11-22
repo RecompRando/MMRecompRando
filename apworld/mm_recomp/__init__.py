@@ -1,8 +1,8 @@
 from typing import List
 from typing import Dict
-from typing import TextIO
+from typing import TextIO, ClassVar
 
-from BaseClasses import Region, Tutorial
+from BaseClasses import Region, Tutorial, ItemClassification
 from worlds.AutoWorld import WebWorld, World
 from .Items import MMRItem, item_data_table, item_table, code_to_item_table
 from .Locations import MMRLocation, location_data_table, location_table, code_to_location_table, locked_locations
@@ -14,7 +14,7 @@ from .Constants import default_shop_prices
 
 class MMRWebWorld(WebWorld):
     # ~ theme = "partyTime"
-    
+
     setup_en = Tutorial(
         tutorial_name="Start Guide",
         description="A guide to playing Majora's Mask Recompiled in Archipelago.",
@@ -37,39 +37,70 @@ class MMRWorld(World):
     options = MMROptions
     location_name_to_id = location_table
     item_name_to_id = item_table
-    
+
     shop_prices = List[int]
 
     def generate_early(self):
+
+        if self.options.shuffle_stray_fairies.value == 3:
+            self.options.local_items.value.add("Stray Fairy (Clock Town)")
+            self.options.local_items.value.add("Stray Fairy (Woodfall)")
+            self.options.local_items.value.add("Stray Fairy (Snowhead)")
+            self.options.local_items.value.add("Stray Fairy (Great Bay)")
+            self.options.local_items.value.add("Stray Fairy (Stone Tower)")
+
+        if self.options.shuffle_maps_and_compasses.value == 4:
+            self.options.local_items.value.add("Dungeon Map (Woodfall)")
+            self.options.local_items.value.add("Dungeon Map (Snowhead)")
+            self.options.local_items.value.add("Dungeon Map (Great Bay)")
+            self.options.local_items.value.add("Dungeon Map (Stone Tower)")
+            self.options.local_items.value.add("Compass (Woodfall)")
+            self.options.local_items.value.add("Compass (Snowhead)")
+            self.options.local_items.value.add("Compass (Great Bay)")
+            self.options.local_items.value.add("Compass (Stone Tower)")
+
+        if self.options.shuffle_small_keys.value == 4:
+            self.options.local_items.value.add("Small Key (Woodfall)")
+            self.options.local_items.value.add("Small Key (Snowhead)")
+            self.options.local_items.value.add("Small Key (Great Bay)")
+            self.options.local_items.value.add("Small Key (Stone Tower)")
+
+        if self.options.shuffle_boss_keys.value == 4:
+            self.options.local_items.value.add("Boss Key (Woodfall)")
+            self.options.local_items.value.add("Boss Key (Snowhead)")
+            self.options.local_items.value.add("Boss Key (Great Bay)")
+            self.options.local_items.value.add("Boss Key (Stone Tower)")
+
         # Create shop prices.
         self.shop_prices = []
         self.prices = ""
 
         if self.options.shopsanity.value != 0:
-            price_max = 0
-
-            if self.options.shop_prices.value == 2:
-                price_max = 99
-            elif self.options.shop_prices.value == 3:
-                price_max = 200
-            elif self.options.shop_prices.value == 4:
-                price_max = 500
-
             # There are 34 (+2 fake) shop locations that need prices
             for i in range(0, 36):
                 if self.options.shop_prices.value == 0:
                     price = default_shop_prices[i]
                 else:
-                    price = self.random.randint(0, price_max)
+                    price = self.random.randrange(0, self.options.max_shop_prices.value, 5)
                 self.shop_prices.append(price)
         else:
             # populate stored prices with default prices if shopsanity is disabled
             for i in range(0, 36):
                 price = default_shop_prices[i]
                 self.shop_prices.append(price)
-    
+
     def create_item(self, name: str) -> MMRItem:
-        return MMRItem(name, item_data_table[name].type, item_data_table[name].code, self.player)
+        if (name == "Stray Fairy (Clock Town)" or
+            name == "Stray Fairy (Woodfall)" or
+            name == "Stray Fairy (Snowhead)" or
+            name == "Stray Fairy (Great Bay)" or
+            name == "Stray Fairy (Stone Tower)") and self.options.shuffle_great_fairy_rewards == 0:
+            return MMRItem(name, ItemClassification.filler, item_data_table[name].code, self.player)
+        elif (name == "Swamp Skulltula Token" or
+              name == "Ocean Skulltula Token") and self.options.shuffle_spiderhouse_reward == 0:
+            return MMRItem(name, ItemClassification.filler, item_data_table[name].code, self.player)
+        else:
+            return MMRItem(name, item_data_table[name].type, item_data_table[name].code, self.player)
 
     def place(self, location, item):
         player = self.player
@@ -99,12 +130,12 @@ class MMRWorld(World):
 
         if self.options.shieldless.value:
             mw.itempool.append(self.create_item("Progressive Shield"))
-            
+
         if self.options.start_with_soaring.value:
             mw.push_precollected(self.create_item("Song of Soaring"))
             self.create_and_add_filler_items()
-        
-        if self.options.shuffle_spiderhouse_reward.value:
+
+        if self.options.shuffle_spiderhouse_reward.value != 1:
             mw.itempool.append(self.create_item("Progressive Wallet"))
 
         if self.options.shuffle_regional_maps.value == 1:
@@ -116,26 +147,99 @@ class MMRWorld(World):
             mw.push_precollected(self.create_item("Stone Tower Map"))
             self.create_and_add_filler_items(6)
 
+        if self.options.shuffle_maps_and_compasses.value == 0:
+            mw.push_precollected(self.create_item("Dungeon Map (Woodfall)"))
+            mw.push_precollected(self.create_item("Compass (Woodfall)"))
+            mw.push_precollected(self.create_item("Dungeon Map (Snowhead)"))
+            mw.push_precollected(self.create_item("Compass (Snowhead)"))
+            mw.push_precollected(self.create_item("Dungeon Map (Great Bay)"))
+            mw.push_precollected(self.create_item("Compass (Great Bay)"))
+            mw.push_precollected(self.create_item("Dungeon Map (Stone Tower)"))
+            mw.push_precollected(self.create_item("Compass (Stone Tower)"))
+
+        if self.options.shuffle_small_keys.value == 0:
+            mw.push_precollected(self.create_item("Small Key (Woodfall)"))
+            mw.push_precollected(self.create_item("Small Key (Snowhead)"))
+            mw.push_precollected(self.create_item("Small Key (Snowhead)"))
+            mw.push_precollected(self.create_item("Small Key (Snowhead)"))
+            mw.push_precollected(self.create_item("Small Key (Great Bay)"))
+            mw.push_precollected(self.create_item("Small Key (Stone Tower)"))
+            mw.push_precollected(self.create_item("Small Key (Stone Tower)"))
+            mw.push_precollected(self.create_item("Small Key (Stone Tower)"))
+            mw.push_precollected(self.create_item("Small Key (Stone Tower)"))
+
+        if self.options.shuffle_boss_keys == 0:
+            mw.push_precollected(self.create_item("Boss Key (Woodfall)"))
+            mw.push_precollected(self.create_item("Boss Key (Snowhead)"))
+            mw.push_precollected(self.create_item("Boss Key (Great Bay)"))
+            mw.push_precollected(self.create_item("Boss Key (Stone Tower)"))
+
         if self.options.curiostity_shop_trades.value:
             mw.itempool.append(self.create_item("Blue Rupee"))
             mw.itempool.append(self.create_item("Red Rupee"))
             mw.itempool.append(self.create_item("Purple Rupee"))
             mw.itempool.append(self.create_item("Gold Rupee"))
-            
+
         if self.options.scrubsanity.value != 0:
             self.create_and_add_filler_items(4)
-        
+
         if self.options.shopsanity.value != 0:
             self.create_and_add_filler_items(27)
 
         if self.options.shopsanity.value == 2:
             self.create_and_add_filler_items(11)
-        
+
         if self.options.cowsanity.value != 0:
             self.create_and_add_filler_items(8)
-        
+
         if self.options.intro_checks.value:
             self.create_and_add_filler_items(1)
+
+        if self.options.shuffle_great_fairy_rewards.value != 0:
+            self.create_and_add_filler_items(6)
+
+        if self.options.shuffle_spiderhouse_reward.value != 0:
+            self.create_and_add_filler_items(2)
+
+        if self.options.shuffle_minigames.value == 1:
+            self.create_and_add_filler_items(5)
+        elif self.options.shuffle_minigames.value == 2:
+            self.create_and_add_filler_items(9)
+
+        if self.options.shuffle_treasure_chest_game.value == 1:
+            self.create_and_add_filler_items(1)
+        elif self.options.shuffle_treasure_chest_game.value == 2:
+            self.create_and_add_filler_items(4)
+
+        if self.options.shuffle_zora_pot_game.value == 0:
+            self.create_and_add_filler_items(1)
+
+        if self.options.shuffle_beaver_races.value:
+            self.create_and_add_filler_items(1)
+            if self.options.shuffle_beaver_races.value == 2:
+                self.create_and_add_filler_items(1)
+
+        if self.options.shuffle_lottery.value:
+            self.create_and_add_filler_items(1)
+
+        if self.options.shuffle_picture_rewards.value:
+            self.create_and_add_filler_items(1)
+            if self.options.shuffle_picture_rewards.value == 2:
+                self.create_and_add_filler_items(4)
+
+        if self.options.infinite_magic_behavior. value == 2:
+            mw.itempool.append(self.create_item("Progressive Magic"))
+        else:
+            self.create_and_add_filler_items(1)
+
+        if self.options.shuffle_maps_and_compasses.value == 0:
+            self.create_and_add_filler_items(8)
+
+        if self.options.shuffle_small_keys.value == 0:
+            self.create_and_add_filler_items(9)
+
+        if self.options.shuffle_boss_keys == 0:
+            self.create_and_add_filler_items(4)
 
         shp = self.options.starting_hearts.value
         if self.options.starting_hearts_are_containers_or_pieces.value == 0:
@@ -186,7 +290,7 @@ class MMRWorld(World):
             self.place("Snowhead Temple Goht's Remains", "Goht's Remains")
             self.place("Great Bay Temple Gyorg's Remains", "Gyorg's Remains")
             self.place("Stone Tower Temple Inverted Twinmold's Remains", "Twinmold's Remains")
-        
+
         if self.options.shuffle_boss_remains.value == 2:
             remains_list = ["Odolwa's Remains", "Goht's Remains", "Gyorg's Remains", "Twinmold's Remains"]
             
@@ -195,7 +299,7 @@ class MMRWorld(World):
             self.place("Great Bay Temple Gyorg's Remains", remains_list.pop(self.random.randint(0, 1)))
             self.place("Stone Tower Temple Inverted Twinmold's Remains", remains_list[0])
 
-        if not self.options.shuffle_spiderhouse_reward.value:
+        if self.options.shuffle_spiderhouse_reward.value == 1:
             self.place("Swamp Spider House Reward", "Mask of Truth")
             self.place("Ocean Spider House Reward", "Progressive Wallet")
 
@@ -205,9 +309,8 @@ class MMRWorld(World):
                     self.place(code_to_location_table[0x062700 | i], "Swamp Skulltula Token")
                 if i != 0:
                     self.place(code_to_location_table[0x062800 | i], "Ocean Skulltula Token")
-                
 
-        if not self.options.shuffle_great_fairy_rewards.value:
+        if self.options.shuffle_great_fairy_rewards.value == 1: #vanilla
             self.place("North Clock Town Great Fairy Reward", "Progressive Magic")
             self.place("North Clock Town Great Fairy Reward (Has Transformation Mask)", "Great Fairy Mask")
             self.place("Woodfall Great Fairy Reward", "Great Spin Attack")
@@ -215,7 +318,18 @@ class MMRWorld(World):
             self.place("Great Bay Great Fairy Reward", "Double Defense")
             self.place("Stone Tower Great Fairy Reward", "Great Fairy Sword")
 
-        if not self.options.keysanity.value:
+        # Check if any of the dungeon related options are set to vanilla.
+        # This is to make sure that the generator doesn't try to place items in locations that are already occupied.
+        if self.options.shuffle_maps_and_compasses.value == 1:
+            self.place("Woodfall Temple Turtle Chest", "Dungeon Map (Woodfall)")
+            self.place("Woodfall Temple Dragonfly Chest", "Compass (Woodfall)")
+            self.place("Snowhead Temple Elevator Room Lower Chest", "Dungeon Map (Snowhead)")
+            self.place("Snowhead Temple Frozen Block Chest", "Compass (Snowhead)")
+            self.place("Great Bay Temple Before Red Valve Room Chest", "Dungeon Map (Great Bay)")
+            self.place("Great Bay Temple Caged Chest Room Upper Chest", "Compass (Great Bay)")
+            self.place("Stone Tower Temple Armos Room Back Chest", "Dungeon Map (Stone Tower)")
+            self.place("Stone Tower Temple Eastern Water Room Sun Block Chest", "Compass (Stone Tower)")
+        if self.options.shuffle_small_keys.value == 1:
             self.place("Woodfall Temple Ledge Chest", "Small Key (Woodfall)")
 
             self.place("Snowhead Temple Behind Stacked Block Chest", "Small Key (Snowhead)")
@@ -229,13 +343,13 @@ class MMRWorld(World):
             self.place("Stone Tower Temple Inverted Eastern Air Gust Room Switch Chest", "Small Key (Stone Tower)")
             self.place("Stone Tower Temple Inverted Death Armos Maze Chest", "Small Key (Stone Tower)")
         
-        if not self.options.bosskeysanity.value:
+        if self.options.shuffle_boss_keys.value == 1:
             self.place("Woodfall Temple Gekko Chest", "Boss Key (Woodfall)")
             self.place("Snowhead Temple Upper Wizzrobe Chest", "Boss Key (Snowhead)")
             self.place("Great Bay Temple Mad Jellied Gekko Chest", "Boss Key (Great Bay)")
             self.place("Stone Tower Temple Inverted Gomess Chest", "Boss Key (Stone Tower)")
 
-        if not self.options.fairysanity.value:
+        if self.options.shuffle_stray_fairies.value == 0:
             self.place("Laundry Pool Stray Fairy (Clock Town)", "Stray Fairy (Clock Town)")
 
             self.place("Woodfall Temple Entrance Chest SF", "Stray Fairy (Woodfall)")
@@ -253,7 +367,7 @@ class MMRWorld(World):
             self.place("Woodfall Temple Pre-Boss Upper Right Bubble SF", "Stray Fairy (Woodfall)")
             self.place("Woodfall Temple Pre-Boss Upper Left Bubble SF", "Stray Fairy (Woodfall)")
             self.place("Woodfall Temple Pre-Boss Pillar Bubble SF", "Stray Fairy (Woodfall)")
-            
+
             self.place("Snowhead Temple Basement Switch Chest SF", "Stray Fairy (Snowhead)")
             self.place("Snowhead Temple Elevator Room Invisible Platform Chest SF", "Stray Fairy (Snowhead)")
             self.place("Snowhead Temple Stacked Block Upper Chest SF", "Stray Fairy (Snowhead)")
@@ -301,6 +415,136 @@ class MMRWorld(World):
             self.place("Stone Tower Temple Inverted Eastern Air Gust Room Fire Chest", "Stray Fairy (Stone Tower)")
             self.place("Stone Tower Temple Entrance Room Lower Chest", "Stray Fairy (Stone Tower)")
             self.place("Stone Tower Temple After Garo Upside Down Chest", "Stray Fairy (Stone Tower)")
+
+        if (self.options.shuffle_maps_and_compasses.value == 2 or self.options.shuffle_small_keys.value == 2 or
+        self.options.shuffle_boss_keys.value == 2 or self.options.shuffle_stray_fairies.value == 1):
+            unfilled_wft_locations = []
+            unfilled_sht_locations = []
+            unfilled_gbt_locations = []
+            unfilled_stt_locations = []
+            for unfilled_location_name in self.multiworld.get_unfilled_locations(self.player):
+                for location_name, location_data in location_data_table.items():
+                    if location_data.region == "Woodfall Temple":
+                        if self.multiworld.players > 1:
+                            updated_unfilled_location_name = str(unfilled_location_name).replace(
+                                                                 (f" ({self.player_name})"), "")
+                            if updated_unfilled_location_name == location_name:
+                                unfilled_wft_locations.append(updated_unfilled_location_name)
+                        else:
+                            if str(unfilled_location_name) == location_name:
+                                unfilled_wft_locations.append(str(unfilled_location_name))
+                    elif location_data.region == "Snowhead Temple":
+                        if self.multiworld.players > 1:
+                            updated_unfilled_location_name = str(unfilled_location_name).replace(
+                                                                 (f" ({self.player_name})"), "")
+                            if updated_unfilled_location_name == location_name:
+                                unfilled_sht_locations.append(updated_unfilled_location_name)
+                        else:
+                            if str(unfilled_location_name) == location_name:
+                                unfilled_sht_locations.append(str(unfilled_location_name))
+                    elif location_data.region == "Great Bay Temple":
+                        if self.multiworld.players > 1:
+                            updated_unfilled_location_name = str(unfilled_location_name).replace(
+                                                                 (f" ({self.player_name})"), "")
+                            if updated_unfilled_location_name == location_name:
+                                unfilled_gbt_locations.append(updated_unfilled_location_name)
+                        else:
+                            if str(unfilled_location_name) == location_name:
+                                unfilled_gbt_locations.append(str(unfilled_location_name))
+                    elif location_data.region in ["Stone Tower Temple", "Stone Tower Temple (Inverted)"]:
+                        if self.multiworld.players > 1:
+                            updated_unfilled_location_name = str(unfilled_location_name).replace(
+                                                                 (f" ({self.player_name})"), "")
+                            if updated_unfilled_location_name == location_name:
+                                unfilled_stt_locations.append(updated_unfilled_location_name)
+                        else:
+                            if str(unfilled_location_name) == location_name:
+                                unfilled_stt_locations.append(str(unfilled_location_name))
+            self.random.shuffle(unfilled_wft_locations)
+            self.random.shuffle(unfilled_sht_locations)
+            self.random.shuffle(unfilled_gbt_locations)
+            self.random.shuffle(unfilled_stt_locations)
+            if self.options.shuffle_maps_and_compasses.value == 2:
+                self.place(unfilled_wft_locations.pop(0), "Dungeon Map (Woodfall)")
+                self.place(unfilled_wft_locations.pop(0), "Compass (Woodfall)")
+                self.place(unfilled_sht_locations.pop(0), "Dungeon Map (Snowhead)")
+                self.place(unfilled_sht_locations.pop(0), "Compass (Snowhead)")
+                self.place(unfilled_gbt_locations.pop(0), "Dungeon Map (Great Bay)")
+                self.place(unfilled_gbt_locations.pop(0), "Compass (Great Bay)")
+                self.place(unfilled_stt_locations.pop(0), "Dungeon Map (Stone Tower)")
+                self.place(unfilled_stt_locations.pop(0), "Compass (Stone Tower)")
+            if self.options.shuffle_small_keys.value == 2:
+                self.place(unfilled_wft_locations.pop(0), "Small Key (Woodfall)")
+                self.place(unfilled_sht_locations.pop(0), "Small Key (Snowhead)")
+                self.place(unfilled_sht_locations.pop(0), "Small Key (Snowhead)")
+                self.place(unfilled_sht_locations.pop(0), "Small Key (Snowhead)")
+                self.place(unfilled_gbt_locations.pop(0), "Small Key (Great Bay)")
+                self.place(unfilled_stt_locations.pop(0), "Small Key (Stone Tower)")
+                self.place(unfilled_stt_locations.pop(0), "Small Key (Stone Tower)")
+                self.place(unfilled_stt_locations.pop(0), "Small Key (Stone Tower)")
+                self.place(unfilled_stt_locations.pop(0), "Small Key (Stone Tower)")
+            if self.options.shuffle_boss_keys.value == 2:
+                self.place(unfilled_wft_locations.pop(0), "Boss Key (Woodfall)")
+                self.place(unfilled_sht_locations.pop(0), "Boss Key (Snowhead)")
+                self.place(unfilled_gbt_locations.pop(0), "Boss Key (Great Bay)")
+                self.place(unfilled_stt_locations.pop(0), "Boss Key (Stone Tower)")
+            if self.options.shuffle_stray_fairies.value == 1:
+                count = 0
+                while count < 15:
+                    count = count + 1
+                    self.place(unfilled_wft_locations.pop(0), "Stray Fairy (Woodfall)")
+                    self.place(unfilled_sht_locations.pop(0), "Stray Fairy (Snowhead)")
+                    self.place(unfilled_gbt_locations.pop(0), "Stray Fairy (Great Bay)")
+                    self.place(unfilled_stt_locations.pop(0), "Stray Fairy (Stone Tower)")
+
+        if (self.options.shuffle_maps_and_compasses.value == 3 or self.options.shuffle_small_keys.value == 3 or
+        self.options.shuffle_boss_keys.value == 3 or self.options.shuffle_stray_fairies.value == 2):
+            unfilled_dungeon_locations = []
+            for unfilled_location_name in self.multiworld.get_unfilled_locations(self.player):
+                for location_name, location_data in location_data_table.items():
+                    if location_data.region in [
+                        "Woodfall Temple", "Snowhead Temple", "Great Bay Temple",
+                        "Stone Tower Temple", "Stone Tower Temple (Inverted)"
+                    ]:
+                        if self.multiworld.players > 1:
+                            updated_unfilled_location_name = str(unfilled_location_name).replace(
+                                                             (f" ({self.player_name})"), "")
+                            if updated_unfilled_location_name == location_name:
+                                unfilled_dungeon_locations.append(updated_unfilled_location_name)
+                        else:
+                            if str(unfilled_location_name) == location_name:
+                                unfilled_dungeon_locations.append(str(unfilled_location_name))
+            self.random.shuffle(unfilled_dungeon_locations)
+            if self.options.shuffle_maps_and_compasses.value == 3:
+                for item_to_place in [
+                    "Dungeon Map (Woodfall)",    "Compass (Woodfall)",
+                    "Dungeon Map (Snowhead)",    "Compass (Snowhead)",
+                    "Dungeon Map (Great Bay)",   "Compass (Great Bay)",
+                    "Dungeon Map (Stone Tower)", "Compass (Stone Tower)"
+                ]:
+                    self.place(unfilled_dungeon_locations.pop(0), item_to_place)
+            if self.options.shuffle_small_keys.value == 3:
+                for item_to_place in [
+                    "Small Key (Woodfall)",
+                    "Small Key (Snowhead)", "Small Key (Snowhead)", "Small Key (Snowhead)",
+                    "Small Key (Great Bay)",
+                    "Small Key (Stone Tower)", "Small Key (Stone Tower)",
+                    "Small Key (Stone Tower)", "Small Key (Stone Tower)"
+                ]:
+                    self.place(unfilled_dungeon_locations.pop(0), item_to_place)
+            if self.options.shuffle_boss_keys.value == 3:
+                self.place(unfilled_dungeon_locations.pop(0), "Boss Key (Woodfall)")
+                self.place(unfilled_dungeon_locations.pop(0), "Boss Key (Snowhead)")
+                self.place(unfilled_dungeon_locations.pop(0), "Boss Key (Great Bay)")
+                self.place(unfilled_dungeon_locations.pop(0), "Boss Key (Stone Tower)")
+            if self.options.shuffle_stray_fairies.value == 2:
+                count = 0
+                while count < 15:
+                    count = count + 1
+                    self.place(unfilled_dungeon_locations.pop(0), "Stray Fairy (Woodfall)")
+                    self.place(unfilled_dungeon_locations.pop(0), "Stray Fairy (Snowhead)")
+                    self.place(unfilled_dungeon_locations.pop(0), "Stray Fairy (Great Bay)")
+                    self.place(unfilled_dungeon_locations.pop(0), "Stray Fairy (Stone Tower)")
             
         sword_location = mw.get_location("Link's Inventory (Kokiri Sword)", player)
         if self.options.swordless.value:
@@ -376,9 +620,7 @@ class MMRWorld(World):
 
             if name not in location_rules:
                 print(f"Location '{name}' does not have any logic")
-            
-            if self.options.skullsanity.value == 2 and (name == "Swamp Spider House Reward" or name == "Ocean Spider House Reward"):
-                continue
+
             if name in location_rules and location_data_table[name].can_create(self.options):
                 location.access_rule = location_rules[name]
 
@@ -396,14 +638,15 @@ class MMRWorld(World):
         shuffled_pieces = (12 - shp) % 4
         return {
             "skullsanity": self.options.skullsanity.value,
-            "fairysanity": self.options.fairysanity.value,
+            "shuffle_stray_fairies": self.options.shuffle_stray_fairies.value,
             "shopsanity": self.options.shopsanity.value,                                                                
             "scrubsanity": self.options.scrubsanity.value,
             "shop_prices": self.shop_prices,
             "cowsanity": self.options.cowsanity.value,
             "frogsanity": self.options.frogsanity.value,
-            "keysanity": self.options.keysanity.value,
-            "bosskeysanity": self.options.bosskeysanity.value,
+            "shuffle_maps_and_compasses": self.options.shuffle_maps_and_compasses.value,
+            "shuffle_small_keys": self.options.shuffle_small_keys.value,
+            "shuffle_boss_keys": self.options.shuffle_boss_keys.value,
             "intro_checks": self.options.intro_checks.value,
             "curiostity_shop_trades": self.options.curiostity_shop_trades.value,
             "damage_multiplier": self.options.damage_multiplier.value,
@@ -414,7 +657,8 @@ class MMRWorld(World):
             "required_skull_tokens": self.options.required_skull_tokens.value,
             "required_stray_fairies": self.options.required_stray_fairies.value,
             "start_with_consumables": self.options.start_with_consumables.value,
-            "permanent_chateau_romani": self.options.permanent_chateau_romani.value,
+            "infinite_magic_behavior": self.options.infinite_magic_behavior.value,
+            "skip_digging": self.options.skip_digging.value,
             "start_with_inverted_time": self.options.start_with_inverted_time.value,
             "receive_filled_wallets": self.options.receive_filled_wallets.value,
             "remains_allow_boss_warps": self.options.remains_allow_boss_warps.value,
@@ -422,6 +666,12 @@ class MMRWorld(World):
             "shuffle_regional_maps": self.options.shuffle_regional_maps.value,
             "shuffle_spiderhouse_reward": self.options.shuffle_spiderhouse_reward.value,
             "shuffle_great_fairy_rewards": self.options.shuffle_great_fairy_rewards.value,
+            "shuffle_minigames": self.options.shuffle_minigames.value,
+            "shuffle_treasure_chest_game": self.options.shuffle_treasure_chest_game.value,
+            "shuffle_zora_pot_game": self.options.shuffle_zora_pot_game.value,
+            "shuffle_beaver_races": self.options.shuffle_beaver_races.value,
+            "shuffle_picture_rewards": self.options.shuffle_picture_rewards.value,
+            "shuffle_lottery": self.options.shuffle_lottery.value,
             "link_tunic_color": ((self.options.link_tunic_color.value[0] & 0xFF) << 16) | ((self.options.link_tunic_color.value[1] & 0xFF) << 8) | (self.options.link_tunic_color.value[2] & 0xFF),
             "logic_difficulty": self.options.logic_difficulty.value
         }

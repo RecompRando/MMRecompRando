@@ -5,6 +5,8 @@
 
 #include "apcommon.h"
 
+#define LOCATION_BEAVER_BOTTLE 0x09018D
+
 bool saveOpened = false;
 
 RECOMP_CALLBACK("*", recomp_on_load_save)
@@ -124,8 +126,10 @@ void Sram_SetInitialWeekEvents(void) {
     SET_WEEKEVENTREG(WEEKEVENTREG_81_40);
     SET_WEEKEVENTREG(WEEKEVENTREG_82_02);
     
-    // skip little brother beaver
-    SET_WEEKEVENTREG(WEEKEVENTREG_24_04);
+    // skip little brother beaver if his item was given
+    if (rando_location_is_checked(LOCATION_BEAVER_BOTTLE)) {
+        SET_WEEKEVENTREG(WEEKEVENTREG_24_04);
+    }
 
     // skip secret shrine entrance guy text
     SET_WEEKEVENTREG(WEEKEVENTREG_76_80);
@@ -141,7 +145,7 @@ void Sram_SetInitialWeekEvents(void) {
     }
 
     // restore chateau romani state after cycle reset
-    if (drankChateau && rando_get_slotdata_u32("permanent_chateau_romani")) {
+    if ((drankChateau && rando_get_slotdata_u32("infinite_magic_behavior") == 1) || (rando_get_slotdata_u32("infinite_magic_behavior") == 2 && rando_has_item(AP_ITEM_ID_MAGIC) >= 3)) {
         SET_WEEKEVENTREG(WEEKEVENTREG_DRANK_CHATEAU_ROMANI);
     }
 }

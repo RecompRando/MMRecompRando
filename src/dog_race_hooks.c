@@ -70,14 +70,9 @@ RECOMP_PATCH void EnRacedog_Race(EnRacedog* this, PlayState* play) {
 
         EnRacedog_UpdateSpeed(this);
 
-        // Turns blue dog into his true form
-        if (this->index == 0x02) {
+        // Turns selected dog into giga dog
+        if ((this->index == this->selectedDogIndex) && (INV_CONTENT(ITEM_MASK_TRUTH) == ITEM_MASK_TRUTH)) {
             this->actor.speed = 10.0f;
-        }
-
-        // Turns gold dog into garbage
-        if (this->index == 0x09) {
-            this->actor.speed = 3.0f;
         }
 
         // Putting this after EnRacedog_UpdateSpeed will ensure that when EnRacedog_CalculateFinalStretchTargetSpeed

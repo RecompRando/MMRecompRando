@@ -11,7 +11,10 @@ RECOMP_PATCH void EnKujiya_GivePrize(EnKujiya* this, PlayState* play) {
     if (Actor_HasParent(&this->actor, play)) {
         EnKujiya_SetupFinishGivePrize(this);
     } else {
-        // Actor_OfferGetItem(&this->actor, play, GI_RUPEE_PURPLE, 500.0f, 100.0f);
-        Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_LOTTERY_SHOP), LOCATION_LOTTERY_SHOP, 500.0f, 100.0f, true, true);
+        if (rando_get_slotdata_u32("shuffle_lottery") == 0){
+            Actor_OfferGetItem(&this->actor, play, GI_RUPEE_PURPLE, 500.0f, 100.0f);
+        } else {
+            Actor_OfferGetItemHook(&this->actor, play, rando_get_item_id(LOCATION_LOTTERY_SHOP), LOCATION_LOTTERY_SHOP, 500.0f, 100.0f, true, true);
+        }
     }
 }
