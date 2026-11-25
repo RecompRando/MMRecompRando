@@ -6,7 +6,7 @@ from BaseClasses import Region, Tutorial, ItemClassification
 from worlds.AutoWorld import WebWorld, World
 from .Items import MMRItem, item_data_table, item_table, code_to_item_table
 from .Locations import MMRLocation, location_data_table, location_table, code_to_location_table, locked_locations
-from .Options import MMROptions
+from .Options import MMROptions, mm_option_groups
 from .Regions import region_data_table, get_exit
 from .Rules import *
 from .NormalRules import *
@@ -25,6 +25,8 @@ class MMRWebWorld(WebWorld):
     )
     
     tutorials = [setup_en]
+
+    option_groups = mm_option_groups
 
 
 class MMRWorld(World):

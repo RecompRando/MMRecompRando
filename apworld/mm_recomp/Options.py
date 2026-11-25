@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from typing import Dict
 
-from Options import Choice, DefaultOnToggle, Toggle, Range, NamedRange, OptionList, StartInventoryPool, DeathLink, PerGameCommonOptions
+from Options import Choice, DefaultOnToggle, Toggle, Range, NamedRange, OptionList, StartInventoryPool, DeathLink, OptionGroup, PerGameCommonOptions
 
 
 class LogicDifficulty(Choice):
@@ -432,6 +432,66 @@ class LinkTunicColor(OptionList):
     """Choose a color for Link's tunic."""
     display_name = "Link Tunic Color"
     default = [30, 105, 27]
+
+
+mm_option_groups = [
+    OptionGroup("Requirements", [
+        MoonRemainsRequired,
+        MajoraRemainsRequired,
+    ]),
+    OptionGroup("Starting Item Shuffle", [
+        Swordless,
+        Shieldless,
+        StartingHeartQuarters, # change to just hearts
+        StartingHeartsAreContainersOrPieces,
+    ]),
+    OptionGroup("Quality of Life", [
+        StartWithSoaring,
+        StartWithInvertedTime, # remove option later
+        StartWithConsumables, # adjust option once we get capacity shuffles
+        ReceiveFilledWallets,
+        InfiniteMagicBehavior,
+        MagicIsATrap,
+        SkipDigging,
+    ]),
+    OptionGroup("Dungeon Options", [
+        ShuffleBossRemains,
+        BossWarpsWithRemains,
+    ]),
+    OptionGroup("Sanities", [
+        ShuffleSpiderHouseReward,
+        RequiredSkullTokens,
+        Skullsanity,
+        ShuffleGreatFairyRewards,
+        RequiredStrayFairies,
+        ShuffleStrayFairies,
+        Shopsanity,
+        ShopPrices,
+        MaxShopPrices,
+        Scrubsanity,
+        CuriostityShopTrades,
+        Cowsanity,
+        Frogsanity,
+        ShuffleRegionalMaps, # Tinglesanity
+        ShuffleSmallKeys,
+        ShuffleBossKeys,
+        ShuffleMapsAndCompasses,
+        IntroChecks,
+    ]),
+    OptionGroup("Minigames", [
+        ShuffleMinigames,
+        ShuffleTreasureChestGame,
+        ShuffleZoraPotGame,
+        ShuffleBeaverRace,
+        ShuffleLottery,
+        ShufflePictureRewards,
+    ]),
+    OptionGroup("Additional Options", [
+        DamageMultiplier,
+        DeathBehavior,
+        LinkTunicColor,
+    ]),
+]
 
 
 @dataclass
