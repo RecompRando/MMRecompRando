@@ -290,7 +290,7 @@ class ShuffleBossKeys(Choice):
     default = 1
 
 
-class CuriostityShopTrades(Toggle):
+class CuriosityShopTrades(Toggle):
     """Choose whether to shuffle the rupees given for trading bottled items at the Curiosity Shop."""
     display_name = "Curiosity Shop Trades"
 
@@ -446,7 +446,7 @@ mm_option_groups = [
     OptionGroup("Shuffles", [
         ShuffleRegionalMaps, # Tinglesanity
         ShuffleSpiderHouseReward,
-        CuriostityShopTrades,
+        CuriosityShopTrades,
         ShuffleGreatFairyRewards,
         IntroChecks,
     ]),
@@ -523,7 +523,7 @@ class MMROptions(PerGameCommonOptions):
     shuffle_maps_and_compasses: ShuffleMapsAndCompasses
     shuffle_small_keys: ShuffleSmallKeys
     shuffle_boss_keys: ShuffleBossKeys
-    curiostity_shop_trades: CuriostityShopTrades
+    curiosity_shop_trades: CuriosityShopTrades
     intro_checks: IntroChecks
     shuffle_minigames: ShuffleMinigames
     shuffle_treasure_chest_game: ShuffleTreasureChestGame

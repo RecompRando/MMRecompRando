@@ -176,7 +176,7 @@ class MMRWorld(World):
             mw.push_precollected(self.create_item("Boss Key (Great Bay)"))
             mw.push_precollected(self.create_item("Boss Key (Stone Tower)"))
 
-        if self.options.curiostity_shop_trades.value:
+        if self.options.curiosity_shop_trades.value:
             mw.itempool.append(self.create_item("Blue Rupee"))
             mw.itempool.append(self.create_item("Red Rupee"))
             mw.itempool.append(self.create_item("Purple Rupee"))
@@ -650,7 +650,7 @@ class MMRWorld(World):
             "shuffle_small_keys": self.options.shuffle_small_keys.value,
             "shuffle_boss_keys": self.options.shuffle_boss_keys.value,
             "intro_checks": self.options.intro_checks.value,
-            "curiostity_shop_trades": self.options.curiostity_shop_trades.value,
+            "curiosity_shop_trades": self.options.curiosity_shop_trades.value,
             "damage_multiplier": self.options.damage_multiplier.value,
             "death_behavior": self.options.death_behavior.value,
             "starting_heart_locations": 8 if self.options.starting_hearts_are_containers_or_pieces.value == 1 else starting_containers + starting_pieces + shuffled_containers + shuffled_pieces,
