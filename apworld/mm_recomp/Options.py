@@ -224,7 +224,7 @@ class ShuffleStrayFairies(Choice):
     option_any_dungeon = 2
     option_local = 3
     option_fairysanity = 4
-    default = 3
+    default = 1
 
 class ShuffleMapsAndCompasses(Choice):
     """
@@ -245,7 +245,7 @@ class ShuffleMapsAndCompasses(Choice):
     option_any_dungeon = 3
     option_local = 4
     option_keysanity = 5
-    default = 4
+    default = 3
 
 class ShuffleSmallKeys(Choice):
     """
@@ -266,7 +266,7 @@ class ShuffleSmallKeys(Choice):
     option_any_dungeon = 3
     option_local = 4
     option_keysanity = 5
-    default = 4
+    default = 2
 
 class ShuffleBossKeys(Choice):
     """
@@ -287,7 +287,7 @@ class ShuffleBossKeys(Choice):
     option_any_dungeon = 3
     option_local = 4
     option_keysanity = 5
-    default = 4  
+    default = 1
 
 
 class CuriostityShopTrades(Toggle):
