@@ -854,7 +854,7 @@ void randoCreateYamlConfigMenu() {
             option_name = REPY_FN_GET_STR("option_name_colon");
             option_description = REPY_FN_GET_STR("option_description");
 
-            REPY_FN_IF_CACHE(py_rando_get_option_type, "option_type == 'Choice'") {
+            REPY_FN_IF_CACHE(py_rando_get_option_type, "option_type == 'Choice' or option_type == 'NamedRange'") {
                 REPY_FN_EXEC_CACHE(
                     py_rando_get_choice_option_info,
                     "num_choices = len(option_info['choices'])\n"
