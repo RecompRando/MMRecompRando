@@ -445,38 +445,31 @@ mm_option_groups = [
         StartingHeartQuarters, # change to just hearts
         StartingHeartsAreContainersOrPieces,
     ]),
-    OptionGroup("Quality of Life", [
-        StartWithSoaring,
-        StartWithInvertedTime, # remove option later
-        StartWithConsumables, # adjust option once we get capacity shuffles
-        ReceiveFilledWallets,
-        InfiniteMagicBehavior,
-        MagicIsATrap,
-        SkipDigging,
-    ]),
-    OptionGroup("Dungeon Options", [
-        ShuffleBossRemains,
-        BossWarpsWithRemains,
+    OptionGroup("Shuffles", [
+        ShuffleRegionalMaps, # Tinglesanity
+        ShuffleSpiderHouseReward,
+        CuriostityShopTrades,
+        ShuffleGreatFairyRewards,
+        IntroChecks,
     ]),
     OptionGroup("Sanities", [
-        ShuffleSpiderHouseReward,
-        RequiredSkullTokens,
         Skullsanity,
-        ShuffleGreatFairyRewards,
-        RequiredStrayFairies,
-        ShuffleStrayFairies,
+        RequiredSkullTokens,
         Shopsanity,
         ShopPrices,
         MaxShopPrices,
         Scrubsanity,
-        CuriostityShopTrades,
         Cowsanity,
         Frogsanity,
-        ShuffleRegionalMaps, # Tinglesanity
+    ]),
+    OptionGroup("Dungeon Options", [
+        ShuffleBossRemains,
+        BossWarpsWithRemains,
         ShuffleSmallKeys,
         ShuffleBossKeys,
         ShuffleMapsAndCompasses,
-        IntroChecks,
+        ShuffleStrayFairies,
+        RequiredStrayFairies,
     ]),
     OptionGroup("Minigames", [
         ShuffleMinigames,
@@ -485,6 +478,15 @@ mm_option_groups = [
         ShuffleBeaverRace,
         ShuffleLottery,
         ShufflePictureRewards,
+    ]),
+    OptionGroup("Quality of Life", [
+        StartWithSoaring,
+        StartWithInvertedTime, # remove option later
+        StartWithConsumables, # adjust option once we get capacity shuffles
+        ReceiveFilledWallets,
+        InfiniteMagicBehavior,
+        MagicIsATrap,
+        SkipDigging,
     ]),
     OptionGroup("Additional Options", [
         DamageMultiplier,
