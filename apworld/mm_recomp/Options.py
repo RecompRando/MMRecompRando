@@ -148,7 +148,7 @@ class ShopPrices(Choice):
     This only apply to the main shops of the game. This has no effect if shopsanity is disabled.
     
     Vanilla: Shop items have their normal prices.
-    Randomized: Shop items have their prices randomized. The maximum price can be configured in max_shop_prices.
+    Randomized: Shop items have their prices randomized. The maximum price can be configured in Maximum Shop Prices.
     """
     display_name = "Shop Prices"
     option_vanilla = 0
@@ -156,9 +156,7 @@ class ShopPrices(Choice):
     default = 0
 
 class MaxShopPrices(NamedRange):
-    """
-    Choose the maximum price shop items can be. This only has an effect if shop_prices is set to random.
-    """
+    """Choose the maximum price shop items can be. This only has an effect if Shop Prices is set to Randomized."""
     display_name = "Maximum Shop Prices"
     range_start = 0
     range_end = 500
@@ -230,14 +228,14 @@ class ShuffleStrayFairies(Choice):
 
 class ShuffleMapsAndCompasses(Choice):
     """
-    Choose how dungeon maps and compasses will be shuffled in the pool.
+    Choose how dungeon maps & compasses will be shuffled in the pool.
 
-    Start With: Start the seed with dungeon maps and compasses.
-    Vanilla: Dungeon maps and compasses will be placed where they can be found in vanilla.
-    Own Dungeon: Dungeon maps and compasses will be placed in their respective dungeons.
-    Any Dungeon: Dungeon maps and compasses will be placed in any of the four main dungeons.
-    Local: Dungeon maps and compasses will be placed anywhere in your own world.
-    Keysanity: Dungeon maps and compasses will be placed in any world.
+    Start With: Start the seed with maps & compasses.
+    Vanilla: Maps & compasses will be placed in their vanilla chests.
+    Own Dungeon: Maps & compasses will be placed in their respective dungeons.
+    Any Dungeon: Maps & compasses will be placed in any of the four main dungeons.
+    Local: Maps & compasses will be placed anywhere in your own world.
+    Keysanity: Maps & compasses will be placed in any world.
     """
     item_name_group = "Maps and Compasses"
     display_name = "Shuffle Maps and Compasses"
@@ -254,7 +252,7 @@ class ShuffleSmallKeys(Choice):
     Choose how small keys will be shuffled in the pool.
 
     Start With: Start the seed with small keys.
-    Vanilla: Small keys will be placed where they can be found in vanilla.
+    Vanilla: Small keys will be placed in their vanilla chests.
     Own Dungeon: Small keys will be placed in their respective dungeons.
     Any Dungeon: Small keys will be placed in any of the four main dungeons.
     Local: Small keys will be placed anywhere in your own world.
@@ -275,7 +273,7 @@ class ShuffleBossKeys(Choice):
     Choose how boss keys will be shuffled in the pool.
 
     Start With: Start the seed with boss keys.
-    Vanilla: Boss keys will be placed where they can be found in vanilla.
+    Vanilla: Boss keys will be placed in their vanilla chests.
     Own Dungeon: Boss keys will be placed in their respective dungeons.
     Any Dungeon: Boss keys will be placed in any of the four main dungeons.
     Local: Boss keys will be placed anywhere in your own world.
@@ -310,9 +308,9 @@ class ShuffleMinigames(Choice):
     - Deku Playground;
     - Great Bay Fisherman Game.
     
-    Disabled: Listed minigames are not shuffled.
-    Single: Listed minigames only have one location. Where applicable, the easier locations (any day/lowest points requirements) are shuffled.
-    Everything: Listed minigames are fully shuffled."""
+    Disabled: Minigames are not shuffled.
+    Single: Minigames only have one location. Where applicable, the easier locations (any day/lowest points) are shuffled.
+    Everything: Minigames are fully shuffled."""
     display_name = "Shuffle Minigames"
     option_disabled = 0
     option_single = 1
@@ -351,8 +349,8 @@ class ShufflePictureRewards(Choice):
     Choose whether the rewards for the Tourist Center picture contest and the Lulu fan are shuffled or not.
 
     Disabled: Picture rewards will be disabled.
-    Winning_only: Only the winning picture for the Tourist Center reward will be shuffled.
-    All_pictures: All picture rewards will be shuffled.
+    Winning Only: Only the winning picture for the Tourist Center reward will be shuffled.
+    All Pictures: All picture rewards will be shuffled.
     """
     display_name = "Shuffle Picture Rewards"
     option_disabled = 0
